@@ -200,6 +200,10 @@ bool boxInRoom(room_struct* r, physicsObject_struct* o)
 	return false;
 }
 
+const int32 transX=inttof32(1);
+const int32 transY=inttof32(5);
+const int32 transZ=inttof32(1);
+
 bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 {
 	listCell_struct *lc=r->rectangles.first;
@@ -216,10 +220,12 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 			collidePortal(r,&lc->data,&portal2,&o2);
 			o2=vectDifference(o2,convertVect(vect(r->position.x,0,r->position.y)));
 		vect3D v=vectDifference(o2,o1);
-		int sqd=sqMagnitude(v);
+		// int sqd=sqMagnitude(v);
+		int32 sqd=divf32(mulf32(v.x,v.x),transX)+divf32(mulf32(v.y,v.y),transY)+divf32(mulf32(v.z,v.z),transZ);
 		if(sqd<o->sqRadius)
 		{
-			sqd=v.x*v.x+v.y*v.y+v.z*v.z;
+			// sqd=v.x*v.x+v.y*v.y+v.z*v.z;
+			int32 sqd=divf32((v.x*v.x),transX)+divf32((v.y*v.y),transY)+divf32((v.z*v.z),transZ);
 			u32 d=sqrtf32((sqd));
 			v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
 			o->position=addVect(o->position,v);

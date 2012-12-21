@@ -1,0 +1,465 @@
+#include "game/game_main.h"
+
+#define mcoord(i,j) ((i)+(j)*4)
+
+camera_struct playerCamera;
+
+//repurposed from libnds
+void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->projectionMatrix;
+	
+	int32 right, left, top, bottom;
+
+	top = mulf32(near, tanLerp(fovy>>1));
+
+	bottom = -top;
+	left = mulf32(bottom, aspect);
+	right = mulf32(top, aspect);
+	
+	*(m++) = divf32(2*near, right - left);
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = 0;
+	*(m++) = divf32(2*near, top - bottom);
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = divf32(right + left, right - left);
+	*(m++) = divf32(top + bottom, top - bottom);
+	*(m++) = -divf32(far + near, far - near);
+	*(m++) = inttof32(-1);
+
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = -divf32(2 * mulf32(far, near), far - near);
+	*(m++) = 0;
+	
+	// m[0] = divf32(2*near, right - left);
+	// m[4] = 0;
+	// m[8] = 0;
+	// m[12] = 0;
+
+	// m[1] = 0;
+	// m[5] = divf32(2*near, top - bottom);
+	// m[9] = 0;
+	// m[13] = 0;
+
+	// m[2] = divf32(right + left, right - left);
+	// m[6] = divf32(top + bottom, top - bottom);
+	// m[10] = -divf32(far + near, far - near);
+	// m[14] = inttof32(-1);
+
+	// m[3] = 0;
+	// m[7] = 0;
+	// m[11] = -divf32(2 * mulf32(far, near), far - near);
+	// m[15] = 0;
+}
+
+void initTransformationMatrix(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->transformationMatrix;
+	
+	*(m++)=inttof32(1);
+	*(m++)=0;
+	*(m++)=0;
+	
+	*(m++)=0;
+	*(m++)=inttof32(1);
+	*(m++)=0;
+	
+	*(m++)=0;
+	*(m++)=0;
+	*(m)=inttof32(1);
+}
+
+void updateViewMatrix(camera_struct* c)
+{
+	int i, j;
+	if(!c)c=&playerCamera;
+	int32* m1=c->projectionMatrix;
+	int32 m2[4*4];
+	const int fact=f32toint(SCALEFACT);
+	
+	for(i=0;i<3;i++)for(j=0;j<3;j++)m2[i+j*4]=c->transformationMatrix[i+j*3]*fact;
+	
+	m2[3+0*4]=0;
+	m2[3+1*4]=0;
+	m2[3+2*4]=0;
+	
+	// m2[0+3*4]=-c->position.x*fact;
+	// m2[1+3*4]=-c->position.y*fact;
+	// m2[2+3*4]=-c->position.z*fact;
+	m2[0+3*4]=0;
+	m2[1+3*4]=0;
+	m2[2+3*4]=0;
+	m2[3+3*4]=inttof32(1);
+	translateMatrix(m2,-c->position.x,-c->position.y,-c->position.z);
+	
+	multMatrix44(m2,m1,c->viewMatrix);
+}
+
+void multTransformationMatrix(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->transformationMatrix;
+	
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*(m++);
+	
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*(m++);
+	
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*(m++);
+	MATRIX_MULT3x3=*m;
+}
+
+void multProjectionMatrix(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->projectionMatrix;
+	
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*(m++);
+	MATRIX_MULT4x4=*m;
+}
+
+static inline void projectVectorPlane(vect3D* v, vect3D n)
+{
+	if(!v)return;
+	int32 r=dotProduct(*v,n);
+	*v=vectDifference(*v,vectMult(n,r));
+}
+
+void fixMatrix(int32* m) //3x3
+{
+	if(!m)return;
+	vect3D x=vect(m[0],m[3],m[6]);
+	vect3D y=vect(m[1],m[4],m[7]);
+	vect3D z=vect(m[2],m[5],m[8]);
+	
+	projectVectorPlane(&x,y);
+	projectVectorPlane(&z,y);
+	projectVectorPlane(&z,x);
+	
+	x=normalize(x);
+	y=normalize(y);
+	z=normalize(z);
+	
+	m[0]=x.x;m[3]=x.y;m[6]=x.z;
+	m[1]=y.x;m[4]=y.y;m[7]=y.z;
+	m[2]=z.x;m[5]=z.y;m[8]=z.z;
+}
+
+void multMatrix33(int32* m1, int32* m2, int32* m) //3x3
+{
+	int i, j;
+	// for(i=0;i<4;i++)for(j=0;j<4;j++)m[i+j*4]=m1[i+0*4]*m2[0+j*4]+m1[i+1*4]*m2[1+j*4]+m1[i+2*4]*m2[2+j*4]+m1[i+3*4]*m2[3+j*4];
+	for(i=0;i<3;i++)for(j=0;j<3;j++)m[j+i*3]=mulf32(m1[0+i*3],m2[j+0*3])+mulf32(m1[1+i*3],m2[j+1*3])+mulf32(m1[2+i*3],m2[j+2*3]);
+}
+
+void multMatrix44(int32* m1, int32* m2, int32* m) //4x4
+{
+	int i, j;
+	// for(i=0;i<4;i++)for(j=0;j<4;j++)m[i+j*4]=mulf32(m1[0+j*4],m2[i+0*4])+mulf32(m1[1+j*4],m2[i+1*4])+mulf32(m1[2+j*4],m2[i+2*4])+mulf32(m1[3+j*4],m2[i+3*4]);
+	for(i=0;i<4;i++)for(j=0;j<4;j++)m[i+j*4]=mulf32(m1[0+j*4],m2[i+0*4])+mulf32(m1[1+j*4],m2[i+1*4])+mulf32(m1[2+j*4],m2[i+2*4])+mulf32(m1[3+j*4],m2[i+3*4]);
+}
+
+void changeBase(int32* tm, vect3D x, vect3D y, vect3D z, bool r)
+{
+	int32 m[9], bcm[9];
+	
+	bcm[0]=x.x;bcm[1]=y.x;bcm[2]=z.x;
+	bcm[3]=x.y;bcm[4]=y.y;bcm[5]=z.y;
+	bcm[6]=x.z;bcm[7]=y.z;bcm[8]=z.z;
+	
+	// NOGBA("MATRIX");
+	// NOGBA("%d %d %d",bcm[0],bcm[1],bcm[2]);
+	// NOGBA("%d %d %d",bcm[0+3],bcm[1+3],bcm[2+3]);
+	// NOGBA("%d %d %d",bcm[0+3+3],bcm[1+3+3],bcm[2+3+3]);
+	
+	if(r)multMatrix33(tm,bcm,m);
+	else multMatrix33(bcm,tm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
+void rotateMatrixX(int32* tm, int32 x, bool r)
+{
+	int i;
+	int32 rm[9], m[9];
+	for(i=0;i<9;i++)rm[i]=0;
+	rm[0]=inttof32(1);
+	rm[4]=cosLerp(x);
+	rm[5]=sinLerp(x);
+	rm[7]=-sinLerp(x);
+	rm[8]=cosLerp(x);
+	if(r)multMatrix33(rm,tm,m);
+	else multMatrix33(tm,rm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
+void rotateMatrixY(int32* tm, int32 x, bool r)
+{
+	int i;
+	int32 rm[9], m[16];
+	for(i=0;i<9;i++)rm[i]=0;
+	rm[0]=cosLerp(x);
+	rm[2]=sinLerp(x);
+	rm[4]=inttof32(1);
+	rm[6]=-sinLerp(x);
+	rm[8]=cosLerp(x);
+	if(r)multMatrix33(rm,tm,m);
+	else multMatrix33(tm,rm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
+void rotateMatrixZ(int32* tm, int32 x, bool r)
+{
+	int i;
+	int32 rm[9], m[16];
+	for(i=0;i<9;i++)rm[i]=0;
+	rm[0]=cosLerp(x);
+	rm[1]=sinLerp(x);
+	rm[3]=-sinLerp(x);
+	rm[4]=cosLerp(x);
+	rm[8]=inttof32(1);
+	if(r)multMatrix33(rm,tm,m);
+	else multMatrix33(tm,rm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
+void translateMatrix(int32* tm, int32 x, int32 y, int32 z)
+{
+	int i;
+	int32 rm[16], m[16];
+	for(i=0;i<16;i++)rm[i]=0;
+	rm[0]=inttof32(1);
+	rm[1+4*1]=inttof32(1);
+	rm[2+4*2]=inttof32(1);
+	rm[3+4*3]=inttof32(1);
+	
+	rm[0+3*4]=x;
+	rm[1+3*4]=y;
+	rm[2+3*4]=z;
+	
+	multMatrix44(rm,tm,m);
+	memcpy(tm,m,16*sizeof(int32));
+}
+
+void initCamera(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	
+	c->position=vect(0,HEIGHTUNIT*STARTHEIGHT,0);
+	c->angle=vect(0,0,0);
+	c->angle2=vect(0,0,0);
+	c->object.position=c->position;
+	c->object.speed=vect(0,0,0);
+	c->lookAt=false;
+	
+	initTransformationMatrix(c);
+	initProjectionMatrix(c, 70*90, inttof32(4)/3, inttof32(1), inttof32(500));
+}
+
+vect3D getUnitVector(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	vect3D v;
+	// v.x=-mulf32(sinLerp(c->angle.y),cosLerp(c->angle.x));
+	// v.y=sinLerp(c->angle.x);
+	// v.z=-mulf32(cosLerp(c->angle.y),cosLerp(c->angle.x));
+	v.x=-c->transformationMatrix[2];
+	v.y=-c->transformationMatrix[5];
+	v.z=-c->transformationMatrix[8];
+	return v;
+}
+
+void projectCamera(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	// gluPerspective(70, 256.0 / 192.0, 5.0, 1000);
+	// gluPerspective(70, 256.0 / 192.0, 1.0, 500);
+	// gluPerspectivef32(70*90, inttof32(4)/3, inttof32(1), inttof32(500));
+	// gluPerspective(70, 256.0 / 192.0, 0.1, 600);
+	multProjectionMatrix(c);
+	
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void transformCamera(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	
+	multTransformationMatrix(c);
+
+	glTranslatef32(-c->position.x,-c->position.y,-c->position.z);
+}
+
+vect3D getCameraPosition(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	return c->position;
+}
+
+void setCamera(camera_struct* c, vect3D v)
+{
+	if(!c)c=&playerCamera;
+	c->position=v;
+}
+
+void moveCamera(camera_struct* c, vect3D v)
+{
+	if(!c)c=&playerCamera;
+	
+	vect3D v1=normalize(vect(c->transformationMatrix[2],0/*c->transformationMatrix[5]*/,c->transformationMatrix[8]));
+	
+	c->object.speed.x+=mulf32(v.z,v1.x)+mulf32(v.x,c->transformationMatrix[0]);
+	c->object.speed.y+=/*mulf32(v.z,v1.y)+*/mulf32(v.x,c->transformationMatrix[3]);
+	c->object.speed.z+=mulf32(v.z,v1.z)+mulf32(v.x,c->transformationMatrix[6]);
+}
+
+void rotateCamera(camera_struct* c, vect3D a)
+{
+	if(!c)c=&playerCamera;
+	
+	rotateMatrixX(c->transformationMatrix,-a.x,false);
+	rotateMatrixY(c->transformationMatrix,a.y,true);
+	rotateMatrixZ(c->transformationMatrix,a.z,false);
+	
+	c->angle.x+=a.x;
+	c->angle.y+=a.y;
+	c->angle.z+=a.z;
+	
+	// if(c->angle.x>4096*2)c->angle.x=4096*2;
+	// if(c->angle.x<-4096-2048)c->angle.x=-4096-2048;
+}
+
+void updateCameraPreview(room_struct* r, camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	updatePhysicsObjectRoom(r,&c->object,true);
+	c->position=c->object.position;
+}
+
+bool pointInFrustum(frustum_struct* f, vect3D v)
+{
+	if(!f)f=&playerCamera.frustum;
+	return ((evaluatePlanePoint(&f->plane[0],v)>0)&&(evaluatePlanePoint(&f->plane[1],v)>0)&&(evaluatePlanePoint(&f->plane[2],v)>0)
+		  &&(evaluatePlanePoint(&f->plane[3],v)>0)&&(evaluatePlanePoint(&f->plane[4],v)>0)&&(evaluatePlanePoint(&f->plane[5],v)>0));
+}
+
+void updateFrustum(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	frustum_struct* f=&c->frustum;
+
+	//near
+	f->plane[0].A=c->viewMatrix[mcoord(2,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[0].B=c->viewMatrix[mcoord(2,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[0].C=c->viewMatrix[mcoord(2,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[0].D=c->viewMatrix[mcoord(2,3)]+c->viewMatrix[mcoord(3,3)];
+	// f->plane[0].D=0;
+
+	//far
+	f->plane[1].A=-c->viewMatrix[mcoord(2,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[1].B=-c->viewMatrix[mcoord(2,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[1].C=-c->viewMatrix[mcoord(2,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[1].D=-c->viewMatrix[mcoord(2,3)]+c->viewMatrix[mcoord(3,3)];
+
+	//left
+	f->plane[2].A=c->viewMatrix[mcoord(0,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[2].B=c->viewMatrix[mcoord(0,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[2].C=c->viewMatrix[mcoord(0,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[2].D=c->viewMatrix[mcoord(0,3)]+c->viewMatrix[mcoord(3,3)];
+
+	//right
+	f->plane[3].A=-c->viewMatrix[mcoord(0,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[3].B=-c->viewMatrix[mcoord(0,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[3].C=-c->viewMatrix[mcoord(0,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[3].D=-c->viewMatrix[mcoord(0,3)]+c->viewMatrix[mcoord(3,3)];
+
+	//bottom
+	f->plane[4].A=c->viewMatrix[mcoord(1,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[4].B=c->viewMatrix[mcoord(1,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[4].C=c->viewMatrix[mcoord(1,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[4].D=c->viewMatrix[mcoord(1,3)]+c->viewMatrix[mcoord(3,3)];
+
+	//top
+	f->plane[5].A=-c->viewMatrix[mcoord(1,0)]+c->viewMatrix[mcoord(3,0)];
+	f->plane[5].B=-c->viewMatrix[mcoord(1,1)]+c->viewMatrix[mcoord(3,1)];
+	f->plane[5].C=-c->viewMatrix[mcoord(1,2)]+c->viewMatrix[mcoord(3,2)];
+	f->plane[5].D=-c->viewMatrix[mcoord(1,3)]+c->viewMatrix[mcoord(3,3)];
+
+	int i=0;
+	for(i=0;i<6;i++)
+	{
+		int32 r=sqrtf32(mulf32(f->plane[i].A,f->plane[i].A)+mulf32(f->plane[i].B,f->plane[i].B)+mulf32(f->plane[i].C,f->plane[i].C));
+		f->plane[i].A=divf32(f->plane[i].A,r);
+		f->plane[i].B=divf32(f->plane[i].B,r);
+		f->plane[i].C=divf32(f->plane[i].C,r);
+		f->plane[i].D=divf32(f->plane[i].D,r);
+		f->plane[i].point.x=-mulf32(f->plane[i].D,f->plane[i].A);
+		f->plane[i].point.y=-mulf32(f->plane[i].D,f->plane[i].B);
+		f->plane[i].point.z=-mulf32(f->plane[i].D,f->plane[i].C);
+	}
+}
+
+void updateCamera(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	c->position=c->object.position;
+	updateViewMatrix(c);
+	updateFrustum(c);
+	
+	iprintf("alignment : %d  \n",c->transformationMatrix[3]);
+	// if(c->transformationMatrix[4]<-32)
+	// {
+		// rotateMatrixX(c->transformationMatrix, -(1<<10), false);
+	// }else
+	{
+		if(c->transformationMatrix[3]>32)
+		{
+			if(c->transformationMatrix[3]>512)rotateMatrixZ(c->transformationMatrix, (1<<10), false);
+			else if(c->transformationMatrix[3]>256)rotateMatrixZ(c->transformationMatrix, (1<<9), false);
+			else if(c->transformationMatrix[3]>128)rotateMatrixZ(c->transformationMatrix, (1<<8), false);
+			// else if(c->transformationMatrix[3]>64)rotateMatrixZ(c->transformationMatrix, (1<<7), false);
+			// else if(c->transformationMatrix[3]>12)rotateMatrixZ(c->transformationMatrix, (1<<6), false);
+		}else if(c->transformationMatrix[3]<-32)
+		{
+			if(c->transformationMatrix[3]<-512)rotateMatrixZ(c->transformationMatrix, -(1<<10), false);
+			else if(c->transformationMatrix[3]<-256)rotateMatrixZ(c->transformationMatrix, -(1<<9), false);
+			else if(c->transformationMatrix[3]<-128)rotateMatrixZ(c->transformationMatrix, -(1<<8), false);
+			// else if(c->transformationMatrix[3]<-64)rotateMatrixZ(c->transformationMatrix, -(1<<7), false);
+			// else if(c->transformationMatrix[3]<-12)rotateMatrixZ(c->transformationMatrix, -(1<<6), false);
+		}
+	}
+	
+	fixMatrix(c->transformationMatrix); //compensate fixed point errors
+}
+
+camera_struct* getPlayerCamera(void){return &playerCamera;}

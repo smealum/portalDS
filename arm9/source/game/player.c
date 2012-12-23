@@ -169,9 +169,13 @@ void shootPlayerGun(player_struct* p, bool R)
 			particleExplosion(pos,16,RGB15(31,31,0));
 			
 			// r->hide^=1;
+			int32 angle=0;
+			vect3D v=vectDifference(pos,p->object->position);
 			
-			if(R){movePortal(&portal1, pos, vectMultInt(r->normal,-1), 0);}
-			else movePortal(&portal2, pos, vectMultInt(r->normal,-1), 0);
+			if(r->normal.y)angle=getAngle(0,0,-v.z,-v.x)<<6;
+			
+			if(R){movePortal(&portal1, pos, vectMultInt(r->normal,-1), angle);}
+			else movePortal(&portal2, pos, vectMultInt(r->normal,-1), angle);
 		}
 	}
 }

@@ -72,7 +72,7 @@ void drawPortal(portal_struct* p)
 	player_struct* pl=getPlayer();
 	int32 dist=distance(pl->object->position,p->position);
 	
-	// if(dist<inttof32(1)/6)
+	if(dist<inttof32(1)/6)
 	{
 		glPushMatrix();
 			glMatrixMode(GL_PROJECTION);
@@ -96,8 +96,7 @@ void drawPortal(portal_struct* p)
 			glMatrixMode(GL_MODELVIEW);
 		glPopMatrix(1);
 	}
-	return;
-	// else
+	else
 	{
 		glPushMatrix();
 			const vect3D v=addVect(p->position,vectDivInt(p->normal,64));

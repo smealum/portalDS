@@ -1,11 +1,11 @@
 #ifndef OBB_H
 #define OBB_H
 
-#define NUMOBJECTS (4)
+#define NUMOBJECTS (16)
 
 #define NUMOBBSEGMENTS (12)
 #define NUMOBBFACES (6)
-#define MAXCONTACTPOINTS (15) // pool system ?
+#define MAXCONTACTPOINTS (32) // pool system ?
 #define PENETRATIONTHRESHOLD (1<<6)
 #define MAXPENETRATIONBOX (1<<6)
 
@@ -36,6 +36,8 @@ typedef struct
 	contactPoint_type type;
 }contactPoint_struct;
 
+contactPoint_struct contactPoints[MAXCONTACTPOINTS];
+
 typedef struct
 {
 	int32 mass;
@@ -43,7 +45,7 @@ typedef struct
 	int32 invInertiaMatrix[9]; //3x3
 	int32 invWInertiaMatrix[9]; //3x3
 	u16 maxPenetration;
-	contactPoint_struct contactPoints[MAXCONTACTPOINTS];
+	contactPoint_struct* contactPoints; //all point to the same array, temporary
 	u8 numContactPoints;
 	vect3D size;
 	vect3D position;

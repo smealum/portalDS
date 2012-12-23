@@ -57,6 +57,9 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos)
     o->invInertiaMatrix[4]=divv16(inttof32(3),(mulf32(o->mass,(x2+z2))));
     o->invInertiaMatrix[8]=divv16(inttof32(3),(mulf32(o->mass,(x2+y2))));
 	
+	//temporary
+	o->contactPoints=contactPoints;
+	
 	//rotateMatrixX(o->transformationMatrix,4096,false);
 	//rotateMatrixZ(o->transformationMatrix,4096,false);
 	
@@ -88,6 +91,9 @@ void copyOBB(OBB_struct* o1, OBB_struct* o2)
 	o2->angularVelocity=o1->angularVelocity;
 	o2->forces=o1->forces;
 	o2->moment=o1->moment;
+	
+	//temporary
+	o2->contactPoints=contactPoints;
 	
 	memcpy(o2->transformationMatrix,o1->transformationMatrix,sizeof(int32)*9);
 	memcpy(o2->invInertiaMatrix,o1->invInertiaMatrix,sizeof(int32)*9);

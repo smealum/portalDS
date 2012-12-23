@@ -172,7 +172,8 @@ void shootPlayerGun(player_struct* p, bool R)
 			int32 angle=0;
 			vect3D v=vectDifference(pos,p->object->position);
 			
-			if(r->normal.y)angle=getAngle(0,0,-v.z,-v.x)<<6;
+			if(r->normal.y>0)angle=getAngle(0,0,-v.z,-v.x)<<6;
+			else if(r->normal.y<0)angle=getAngle(0,0,v.z,v.x)<<6;
 			
 			if(R){movePortal(&portal1, pos, vectMultInt(r->normal,-1), angle);}
 			else movePortal(&portal2, pos, vectMultInt(r->normal,-1), angle);

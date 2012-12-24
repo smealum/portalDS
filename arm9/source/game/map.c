@@ -40,7 +40,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	rec->normal=vect(0,0,0);
 	if(!size.x)
 	{
-		x=abs(size.y)*LIGHTMAPRESOLUTION;
+		x=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);
 		y=abs(size.z)*LIGHTMAPRESOLUTION;
 		rec->normal.x=inttof32(1);
 	}else if(!size.y)
@@ -50,7 +50,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 		rec->normal.y=inttof32(-1);
 	}else{
 		x=abs(size.x)*LIGHTMAPRESOLUTION;
-		y=abs(size.y)*LIGHTMAPRESOLUTION;
+		y=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);
 		rec->normal.z=inttof32(1);
 	}
 	sign*=(size.x>=0)?1:-1;
@@ -69,8 +69,8 @@ vect3D getUnitVect(rectangle_struct* rec)
 	vect3D size=rec->size;	
 	if(size.x>0)u.x=(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	else if(size.x)u.x=-(TILESIZE*2)/LIGHTMAPRESOLUTION;
-	if(size.y>0)u.y=HEIGHTUNIT/LIGHTMAPRESOLUTION;
-	else if(size.y)u.y=-HEIGHTUNIT/LIGHTMAPRESOLUTION;
+	if(size.y>0)u.y=(TILESIZE*2)/LIGHTMAPRESOLUTION;
+	else if(size.y)u.y=-(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	if(size.z>0)u.z=(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	else if(size.z)u.z=-(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	return u;
@@ -138,7 +138,7 @@ u8 computeLightings(entityCollection_struct* ec, vect3D p, rectangle_struct* rec
 {
 	if(ec)
 	{
-		int v=0;
+		int v=AMBIENTLIGHT;
 		int i;
 		for(i=0;i<ENTITYCOLLECTIONNUM;i++)
 		{
@@ -253,7 +253,7 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 	initRectangle2DList(&rl);
 	while(lc)
 	{
-		insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),vect2(abs(lc->data.size.x?lc->data.size.x:lc->data.size.y)*LIGHTMAPRESOLUTION,abs((lc->data.size.y&&lc->data.size.x)?(lc->data.size.y):lc->data.size.z)*LIGHTMAPRESOLUTION),&lc->data,false});
+		insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),vect2(abs(lc->data.size.x?(lc->data.size.x*LIGHTMAPRESOLUTION):(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((lc->data.size.y&&lc->data.size.x)?(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(lc->data.size.z*LIGHTMAPRESOLUTION))),&lc->data,false});
 		lc=lc->next;
 	}
 	int i;
@@ -266,14 +266,14 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 			if(r==d->primaryRoom)
 			{
 				rectangle_struct* rec=&d->primaryRec;
-				vect2D s=vect2(abs(rec->size.x?rec->size.x:rec->size.y)*LIGHTMAPRESOLUTION,abs((rec->size.y&&rec->size.x)?(rec->size.y):rec->size.z)*LIGHTMAPRESOLUTION);
+				vect2D s=vect2(abs(rec->size.x?(rec->size.x*LIGHTMAPRESOLUTION):(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((rec->size.y&&rec->size.x)?(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(rec->size.z*LIGHTMAPRESOLUTION)));
 				rec->lmSize=vect(s.x,s.y,0);
 				insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),s,rec,false});
 			}
 			if(r==d->secondaryRoom)
 			{
 				rectangle_struct* rec=&d->secondaryRec;
-				vect2D s=vect2(abs(rec->size.x?rec->size.x:rec->size.y)*LIGHTMAPRESOLUTION,abs((rec->size.y&&rec->size.x)?(rec->size.y):rec->size.z)*LIGHTMAPRESOLUTION);
+				vect2D s=vect2(abs(rec->size.x?(rec->size.x*LIGHTMAPRESOLUTION):(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((rec->size.y&&rec->size.x)?(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(rec->size.z*LIGHTMAPRESOLUTION))*LIGHTMAPRESOLUTION);
 				rec->lmSize=vect(s.x,s.y,0);
 				insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),s,rec,false});
 			}

@@ -6,15 +6,16 @@
 #define SCALEFACT (inttof32(150))
 
 // #define MAXHEIGHT 31
-#define MAXHEIGHT 127
+#define MAXHEIGHT 47
 #define STARTHEIGHT 16 //TEMP
 
 #define DEFAULTFLOOR 8
 #define DEFAULTCEILING 24
 
-#define LIGHTMAPRESOLUTION 5
+#define LIGHTMAPRESOLUTION 6
 
 #define LIGHTCONST (0)
+#define AMBIENTLIGHT (8) //portal is pretty bright, right ?
 
 typedef struct
 {

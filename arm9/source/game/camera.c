@@ -281,7 +281,7 @@ void initCamera(camera_struct* c)
 	c->lookAt=false;
 	
 	initTransformationMatrix(c);
-	initProjectionMatrix(c, 70*90, inttof32(4)/3, inttof32(1), inttof32(500));
+	initProjectionMatrix(c, 70*90, inttof32(4)/3, inttof32(2), inttof32(1000));
 }
 
 vect3D getUnitVector(camera_struct* c)

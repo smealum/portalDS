@@ -159,12 +159,14 @@ void listenPI7(void)
 						else if(x&8)normal.y=inttof32(1);
 						if(x&16)normal.z=-inttof32(1);
 						else if(x&32)normal.z=inttof32(1);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						x=fifoGetValue32(FIFO_USER_08);
 					if(id<2)
 					{
 						portal[id].position=pos;
 						portal[id].normal=normal;
-						portal[id].cos=inttof32(1);
-						portal[id].sin=0;
+						portal[id].cos=(x&((1<<16)-1))-inttof32(1);
+						portal[id].sin=((x>>16)&((1<<16)-1))-inttof32(1);
 						computePortalPlane(&portal[id]);
 					}
 				}

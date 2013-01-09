@@ -827,19 +827,6 @@ void simulate(OBB_struct* o, float dt2)
 	o->moment=vect(0,0,0);
 }
 
-void warpMatrix(portal_struct* p, int32* m) //3x3
-{
-	if(!m)return;
-	
-	vect3D x=warpVector(p,vect(m[0],m[3],m[6]));
-	vect3D y=warpVector(p,vect(m[1],m[4],m[7]));
-	vect3D z=warpVector(p,vect(m[2],m[5],m[8]));
-	
-	m[0]=x.x;m[3]=x.y;m[6]=x.z;
-	m[1]=y.x;m[4]=y.y;m[7]=y.z;
-	m[2]=z.x;m[5]=z.y;m[8]=z.z;
-}
-
 void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 {
 	if(!o&&id<2)return;

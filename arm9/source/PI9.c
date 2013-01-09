@@ -146,7 +146,7 @@ void updatePlayerPI(player_struct* p) //([vx][vy][vz])
 	fifoSendValue32(FIFO_USER_08,(p->object->position.z));
 }
 
-void updatePortalPI(u8 id, vect3D pos, vect3D normal) //(id;[px][py][pz][n])
+void updatePortalPI(u8 id, vect3D pos, vect3D normal, int32 angle) //(id;[px][py][pz][n][cos|sin])
 {	
 	u16 n=((normal.x<0))|((normal.x>0)<<1)
 		 |((normal.y<0)<<2)|((normal.y>0)<<3)
@@ -157,6 +157,7 @@ void updatePortalPI(u8 id, vect3D pos, vect3D normal) //(id;[px][py][pz][n])
 	fifoSendValue32(FIFO_USER_08,(pos.y*4));
 	fifoSendValue32(FIFO_USER_08,(pos.z*4));
 	fifoSendValue32(FIFO_USER_08,(n));
+	fifoSendValue32(FIFO_USER_08,((cosLerp(angle)+inttof32(1))|((sinLerp(angle)+inttof32(1))<<16)));
 }
 
 void listenPI9(void)
@@ -192,10 +193,10 @@ void listenPI9(void)
 			const vect3D v2=vect(o->transformationMatrix[1],o->transformationMatrix[4],o->transformationMatrix[7]);
 			const vect3D v=normalize(vectProduct(v1,v2));
 			
-			NOGBA("0 : %d %d %d",v1.x,v1.y,v1.z);
-			NOGBA("1 : %d %d %d",v2.x,v2.y,v2.z);
-			NOGBA("2 : %d %d %d",v.x,v.y,v.z);
-			NOGBA("4 : %d %d %d",warpVector(&portal1,v1));
+			// NOGBA("0 : %d %d %d",v1.x,v1.y,v1.z);
+			// NOGBA("1 : %d %d %d",v2.x,v2.y,v2.z);
+			// NOGBA("2 : %d %d %d",v.x,v.y,v.z);
+			// NOGBA("4 : %d %d %d",warpVector(&portal1,v1));
 			
 			o->transformationMatrix[2]=v.x;
 			o->transformationMatrix[5]=v.y;
@@ -298,16 +299,28 @@ void drawOBB(OBB_struct* o)
 			GFX_TEX_COORD=TEXTURE_PACK(0, inttot16(64));
 			glVertex3v16((v[OBBFaces[i][3]].x),(v[OBBFaces[i][3]].y),(v[OBBFaces[i][3]].z));
 		}
-	// glBegin(GL_TRIANGLES);
-		// for(i=0;i<NUMOBBSEGMENTS;i++)
-		// {
-			// glVertex3v16((v[OBBSegments[i][0]].x),(v[OBBSegments[i][0]].y),(v[OBBSegments[i][0]].z));
-			// glVertex3v16((v[OBBSegments[i][1]].x),(v[OBBSegments[i][1]].y),(v[OBBSegments[i][1]].z));
-			// glVertex3v16((v[OBBSegments[i][1]].x),(v[OBBSegments[i][1]].y),(v[OBBSegments[i][1]].z));
-		// }
-	// glEnd();
 
 	glPopMatrix(1);
+}
+
+void copyOBB(OBB_struct* o, OBB_struct* o2)
+{
+	if(!o || !o2)return;
+	o2->position=o->position;
+	o2->size=o->size;
+	o2->mass=o->mass;
+	o2->used=o->used;
+	o2->id=o->id;
+	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
+}
+
+void drawWarpedOBB(portal_struct* p, OBB_struct* o)
+{
+	OBB_struct o2;
+	copyOBB(o,&o2);
+	warpMatrix(p, o2.transformationMatrix);
+	o2.position=addVect(vectMultInt(p->targetPortal->position,4),warpVector(p,vectDifference(o2.position,vectMultInt(p->position,4))));
+	drawOBB(&o2);
 }
 
 void drawOBBs(void)
@@ -318,6 +331,8 @@ void drawOBBs(void)
 		if(objects[i].used)
 		{
 			drawOBB(&objects[i]);
+			drawWarpedOBB(&portal1,&objects[i]);
+			drawWarpedOBB(&portal2,&objects[i]);
 		}
 	}
 }

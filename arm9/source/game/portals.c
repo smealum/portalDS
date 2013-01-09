@@ -33,7 +33,7 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle)
 	
 	computePortalPlane(p);
 	
-	updatePortalPI(p==&portal2,pos,normal);
+	updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
 	
 	freePolygon(&p->unprojectedPolygon);
 	p->unprojectedPolygon=createEllipse(vect(0,0,0), vectDivInt(p->plane[0],12), vectDivInt(p->plane[1],6), 32);	
@@ -205,7 +205,7 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 	portal_struct* p2=p->targetPortal;
 	
 	// p->camera.position=vectDifference(addVect(p->targetPortal->position,c->position),p->position);
-	vect3D diff=warpVector(p, vectDifference(c->position,p->position));
+	vect3D diff=warpVector(p, vectDifference(c->position, p->position));
 	
 	p->camera.position=addVect(p2->position,diff);
 	// p->camera.position=p2->position;

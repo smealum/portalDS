@@ -16,7 +16,7 @@ typedef enum
 	PI_MAKEGRID=8,      //ARG : 0
 	PI_SETVELOCITY=9,   //ARG : 3 (id;[vx][vy][vz])
 	PI_UPDATEPLAYER=10, //ARG : 3 ([vx][vy][vz])
-	PI_UPDATEPORTAL=11, //ARG : 4 (id;[px][py][pz][n])
+	PI_UPDATEPORTAL=11, //ARG : 5 (id;[px][py][pz][n][cos|sin])
 }message_type;
 
 #ifdef ARM7
@@ -98,6 +98,19 @@ static inline vect3D warpVector(portal_struct* p, vect3D v)
 	int32 z=dotProduct(v,p->normal);
 	
 	return addVect(vectMult(p2->normal,-z),addVect(vectMult(p2->plane[0],-x),vectMult(p2->plane[1],y)));
+}
+
+static inline void warpMatrix(portal_struct* p, int32* m) //3x3
+{
+	if(!m)return;
+	
+	vect3D x=warpVector(p,vect(m[0],m[3],m[6]));
+	vect3D y=warpVector(p,vect(m[1],m[4],m[7]));
+	vect3D z=warpVector(p,vect(m[2],m[5],m[8]));
+	
+	m[0]=x.x;m[3]=x.y;m[6]=x.z;
+	m[1]=y.x;m[4]=y.y;m[7]=y.z;
+	m[2]=z.x;m[5]=z.y;m[8]=z.z;
 }
 
 #endif

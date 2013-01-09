@@ -175,8 +175,20 @@ void shootPlayerGun(player_struct* p, bool R)
 			if(r->normal.y>0)angle=getAngle(0,0,-v.z,-v.x)<<6;
 			else if(r->normal.y<0)angle=getAngle(0,0,v.z,v.x)<<6;
 			
-			if(R){movePortal(&portal1, pos, vectMultInt(r->normal,-1), angle);}
-			else movePortal(&portal2, pos, vectMultInt(r->normal,-1), angle);
+			portal_struct* por=R?(&portal1):(&portal2);
+			
+			vect3D oldp=por->position;
+			vect3D oldn=por->normal;
+			int32 olda=angle;
+			movePortal(por, pos, vectMultInt(r->normal,-1), angle, false);
+			
+			if(isPortalOnWall(p->currentRoom,por))
+			{
+				movePortal(por, pos, vectMultInt(r->normal,-1), angle, true);
+				NOGBA("lala");
+			}else{
+				movePortal(por, oldp, oldn, olda, false);
+			}
 		}
 	}
 }

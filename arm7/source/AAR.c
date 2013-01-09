@@ -1,8 +1,5 @@
 #include "stdafx.h"
 
-#define PORTALSIZEX (inttof32(1)/12) //TEMP (PIC.h)
-#define PORTALSIZEY (inttof32(1)/6)  //TEMP (PIC.h)
-
 #define ALLOCATORSIZE (8*1024)
 
 u8 allocatorPool[ALLOCATORSIZE];

@@ -22,7 +22,7 @@ void initPortals(void)
 	currentPortal=&portal1;
 }
 
-void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle)
+void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool send)
 {
 	if(!p)return;
 	p->position=pos;
@@ -33,10 +33,10 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle)
 	
 	computePortalPlane(p);
 	
-	updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
+	if(send)updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
 	
 	freePolygon(&p->unprojectedPolygon);
-	p->unprojectedPolygon=createEllipse(vect(0,0,0), vectDivInt(p->plane[0],12), vectDivInt(p->plane[1],6), 32);	
+	p->unprojectedPolygon=createEllipse(vect(0,0,0), vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);	
 	
 	NOGBA("PORTAL ! %d %d %d",p->position.x,p->position.y,p->position.z);
 }
@@ -115,7 +115,7 @@ void drawPortal(portal_struct* p)
 		
 		applyMTL(p->texture);
 		GFX_COLOR=RGB15(31,31,31);
-		const vect3D v1=(vectDivInt(p->plane[0],12)), v2=(vectDivInt(p->plane[1],6)), v3=vectDivInt(p->normal,128);
+		const vect3D v1=(vectDivInt(p->plane[0],PORTALFRACTIONX)), v2=(vectDivInt(p->plane[1],PORTALFRACTIONY)), v3=vectDivInt(p->normal,128);
 
 		glTranslate3f32(v3.x,v3.y,v3.z);
 
@@ -175,10 +175,10 @@ void updatePortal(portal_struct* p)
 	{
 		vect3D v[4];
 		
-		v[0]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-12), vectDivInt(p->plane[1],-6))));
-		v[1]=(addVect(p->position,addVect(vectDivInt(p->plane[0],12), vectDivInt(p->plane[1],-6))));
-		v[2]=(addVect(p->position,addVect(vectDivInt(p->plane[0],12), vectDivInt(p->plane[1],6))));
-		v[3]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-12), vectDivInt(p->plane[1],6))));
+		v[0]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
+		v[1]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
+		v[2]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
+		v[3]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
 		
 		const vect3D u1=normalize(vectDifference(v[1],v[0]));
 		const vect3D u2=normalize(vectDifference(v[3],v[0]));
@@ -186,7 +186,7 @@ void updatePortal(portal_struct* p)
 		const int32 d2=distance(v[0],v[3]);
 		
 		freePolygon(&p->polygon);
-		p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],12), vectDivInt(p->plane[1],6), 32);
+		p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);
 		projectPolygon(NULL, &p->polygon,v[0],u1,u2,d1,d2);
 	}
 }
@@ -253,4 +253,64 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 	p->camera.transformationMatrix[0]=x2.x;p->camera.transformationMatrix[3]=x2.y;p->camera.transformationMatrix[6]=x2.z;
 	p->camera.transformationMatrix[1]=y2.x;p->camera.transformationMatrix[4]=y2.y;p->camera.transformationMatrix[7]=y2.z;
 	p->camera.transformationMatrix[2]=z2.x;p->camera.transformationMatrix[5]=z2.y;p->camera.transformationMatrix[8]=z2.z;
+}
+
+const u8 segmentList[4][2]={{0,1},{1,2},{2,3},{3,0}};
+const u8 segmentNormal[4]={0,1,0,1};
+
+bool doSegmentsIntersect(vect3D s1, vect3D s2, vect3D sn, vect3D p1, vect3D p2, vect3D pn)
+{
+	bool v1=dotProduct(vectDifference(p1,s1),pn)>0;
+	bool v2=dotProduct(vectDifference(p1,s2),pn)>0;
+	bool v3=dotProduct(vectDifference(s1,p1),sn)>0;
+	bool v4=dotProduct(vectDifference(s1,p2),sn)>0;
+	return (v1!=v2)&&(v3!=v4);
+}
+
+bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_struct* rec)
+{
+	if(!p || !rec)return false;
+	if((rec->normal.x&&p->normal.x)||(rec->normal.z&&p->normal.z)||(rec->normal.y&&p->normal.y))return false;
+	vect3D pr=addVect(convertVect(vect(r->position.x,0,r->position.y)),vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2));
+	vect3D s=convertSize(rec->size);
+
+	//only need to do this once for all rectangles (so optimize it out)
+	const vect3D v[]={(vectDivInt(p->plane[0],PORTALFRACTIONX)), (vectDivInt(p->plane[1],PORTALFRACTIONY))};
+	const vect3D points[]={addVect(addVect(p->position,v[0]),v[1]),vectDifference(addVect(p->position,v[0]),v[1]),vectDifference(vectDifference(p->position,v[0]),v[1]),addVect(vectDifference(p->position,v[0]),v[1])};
+	
+	//projection = more elegant, less efficient ? (rectangles are axis aligned biatch)
+	if(p->normal.x)
+	{
+		if(!((pr.x<=p->position.x&&pr.x+s.x>=p->position.x)||(pr.x>=p->position.x&&pr.x+s.x<=p->position.x)))return false;
+	}else if(p->normal.y)
+	{
+		if(!((pr.y<=p->position.y&&pr.y+s.y>=p->position.y)||(pr.y>=p->position.y&&pr.y+s.y<=p->position.y)))return false;
+	}else{
+		if(!((pr.z<=p->position.z&&pr.z+s.z>=p->position.z)||(pr.z>=p->position.z&&pr.z+s.z<=p->position.z)))return false;
+	}
+	
+	vect3D p1=pr, p2=addVect(pr,s);
+	vect3D pn=rec->normal;
+	
+	int i;
+	for(i=0;i<4;i++)
+	{
+		const vect3D s1=points[segmentList[i][0]], s2=points[segmentList[i][1]]; //segment
+		if(doSegmentsIntersect(s1,s2,v[segmentNormal[i]],p1,p2,pn))return true;
+	}
+	NOGBA("here");
+	//add case where both p1 and p2 are in portal
+	
+	return false;
+}
+
+bool isPortalOnWall(room_struct* r, portal_struct* p)
+{
+	listCell_struct *lc=r->rectangles.first;
+	while(lc)
+	{
+		if(portalRectangleIntersection(r,p,&lc->data))return false;
+		lc=lc->next;
+	}
+	return true;
 }

@@ -258,16 +258,17 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 const u8 segmentList[4][2]={{0,1},{1,2},{2,3},{3,0}};
 const u8 segmentNormal[4]={0,1,0,1};
 
-bool doSegmentsIntersect(vect3D s1, vect3D s2, vect3D sn, vect3D p1, vect3D p2, vect3D pn)
+bool doSegmentsIntersect(vect3D s1, vect3D s2, vect3D sn, vect3D p1, vect3D p2, vect3D pn, bool *vv1, bool *vv2)
 {
 	bool v1=dotProduct(vectDifference(p1,s1),pn)>0;
 	bool v2=dotProduct(vectDifference(p1,s2),pn)>0;
 	bool v3=dotProduct(vectDifference(s1,p1),sn)>0;
 	bool v4=dotProduct(vectDifference(s1,p2),sn)>0;
+	*vv1=v1;*vv2=v2;
 	return (v1!=v2)&&(v3!=v4);
 }
 
-bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_struct* rec)
+bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_struct* rec, bool fix)
 {
 	if(!p || !rec)return false;
 	if((rec->normal.x&&p->normal.x)||(rec->normal.z&&p->normal.z)||(rec->normal.y&&p->normal.y))return false;
@@ -281,12 +282,12 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 	//projection = more elegant, less efficient ? (rectangles are axis aligned biatch)
 	if(p->normal.x)
 	{
-		if(!((pr.x<=p->position.x&&pr.x+s.x>=p->position.x)||(pr.x>=p->position.x&&pr.x+s.x<=p->position.x)))return false;
+		if(!((pr.x-PORTALMARGIN<=p->position.x&&pr.x+s.x+PORTALMARGIN>=p->position.x)||(pr.x+PORTALMARGIN>=p->position.x&&pr.x+s.x-PORTALMARGIN<=p->position.x)))return false;
 	}else if(p->normal.y)
 	{
-		if(!((pr.y<=p->position.y&&pr.y+s.y>=p->position.y)||(pr.y>=p->position.y&&pr.y+s.y<=p->position.y)))return false;
+		if(!((pr.y-PORTALMARGIN<=p->position.y&&pr.y+s.y+PORTALMARGIN>=p->position.y)||(pr.y+PORTALMARGIN>=p->position.y&&pr.y+s.y-PORTALMARGIN<=p->position.y)))return false;
 	}else{
-		if(!((pr.z<=p->position.z&&pr.z+s.z>=p->position.z)||(pr.z>=p->position.z&&pr.z+s.z<=p->position.z)))return false;
+		if(!((pr.z-PORTALMARGIN<=p->position.z&&pr.z+s.z+PORTALMARGIN>=p->position.z)||(pr.z+PORTALMARGIN>=p->position.z&&pr.z+s.z-PORTALMARGIN<=p->position.z)))return false;
 	}
 	
 	vect3D p1=pr, p2=addVect(pr,s);
@@ -296,20 +297,45 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 	for(i=0;i<4;i++)
 	{
 		const vect3D s1=points[segmentList[i][0]], s2=points[segmentList[i][1]]; //segment
-		if(doSegmentsIntersect(s1,s2,v[segmentNormal[i]],p1,p2,pn))return true;
+		bool v1, v2;
+		if(doSegmentsIntersect(s1,s2,v[segmentNormal[i]],p1,p2,pn,&v1,&v2))
+		{
+			if(fix)
+			{
+				bool v3=dotProduct(vectDifference(p1,p->position),pn)>0;
+				if(v3==v1)
+				{
+					int32 ln=dotProduct(pn,vectDifference(p1,s2));
+					ln+=(ln>0)?(PORTALMARGIN):(-PORTALMARGIN);
+					p->position=addVect(p->position,vectMult(pn,ln));
+				}else{
+					int32 ln=dotProduct(pn,vectDifference(p1,s1));
+					ln+=(ln>0)?(PORTALMARGIN):(-PORTALMARGIN);
+					p->position=addVect(p->position,vectMult(pn,ln));
+				}
+			//if put back, add updating of points
+			// }else{
+				// return true;
+			}
+			return true;
+		}
 	}
-	NOGBA("here");
-	//add case where both p1 and p2 are in portal
+	p1=vectDifference(p1,p->position);
+	p1=vect(dotProduct(p1,p->plane[0]),dotProduct(p1,p->plane[1]),0);
+	if(p1.x<PORTALSIZEX||p1.x>PORTALSIZEX||p1.y<PORTALSIZEY||p1.y>PORTALSIZEY)return false;
+	p2=vectDifference(p2,p->position);
+	p2=vect(dotProduct(p2,p->plane[0]),dotProduct(p2,p->plane[1]),0);
+	if(p2.x<PORTALSIZEX||p2.x>PORTALSIZEX||p2.y<PORTALSIZEY||p2.y>PORTALSIZEY)return false;
 	
-	return false;
+	return true;
 }
 
-bool isPortalOnWall(room_struct* r, portal_struct* p)
+bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix)
 {
 	listCell_struct *lc=r->rectangles.first;
 	while(lc)
 	{
-		if(portalRectangleIntersection(r,p,&lc->data))return false;
+		if(portalRectangleIntersection(r,p,&lc->data,fix)&&!fix)return false;
 		lc=lc->next;
 	}
 	return true;

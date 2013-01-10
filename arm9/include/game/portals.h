@@ -1,6 +1,8 @@
 #ifndef __PORTALS9__
 #define __PORTALS9__
 
+#define PORTALMARGIN (32)
+
 typedef struct portal_struct
 {
 	camera_struct camera;
@@ -26,6 +28,6 @@ void updatePortalCamera(portal_struct* p, camera_struct* c);
 
 void collidePortal(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* point);
 
-bool isPortalOnWall(room_struct* r, portal_struct* p);
+bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix);
 
 #endif

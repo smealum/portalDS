@@ -1,6 +1,9 @@
 #ifndef __PLAYER9__
 #define __PLAYER9__
 
+#define PLAYERGROUNDSPEED (inttof32(3)>>8)
+#define PLAYERAIRSPEED (inttof32(1)>>9)
+
 typedef struct
 {
 	vect3D relativePosition;

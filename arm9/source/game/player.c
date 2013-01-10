@@ -172,8 +172,8 @@ void shootPlayerGun(player_struct* p, bool R)
 			int32 angle=0;
 			vect3D v=vectDifference(pos,p->object->position);
 			
-			if(r->normal.y>0)angle=getAngle(0,0,-v.z,-v.x)<<6;
-			else if(r->normal.y<0)angle=getAngle(0,0,v.z,v.x)<<6;
+			if(r->normal.y<0)angle=getAngle(0,0,-v.z,-v.x)<<6;
+			else if(r->normal.y>0)angle=getAngle(0,0,v.z,v.x)<<6;
 			
 			portal_struct* por=R?(&portal1):(&portal2);
 			
@@ -223,10 +223,18 @@ void playerControls(player_struct* p)
 	
 	// if(keysHeld()&(KEY_A))rotateCamera(NULL, vect(0,0,-(1<<8)));
 	// if(keysHeld()&(KEY_Y))rotateCamera(NULL, vect(0,0,1<<8));
-	if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(inttof32(1)>>6,0,0));
-	if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(inttof32(1)>>6),0,0));
-	if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,inttof32(1)>>6));
-	if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(inttof32(1)>>6)));
+	if(p->object->contact)
+	{
+		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));
+		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));
+		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));
+		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));
+	}else{
+		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
+		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERAIRSPEED),0,0));
+		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
+		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
+	}
 	// if(keysHeld()&(KEY_SELECT))moveCamera(NULL, vect(0,-(inttof32(1)>>6),0));
 	// if(keysHeld()&(KEY_START))moveCamera(NULL, vect(0,inttof32(1)>>6,0));
 	if(keysDown()&(KEY_START))p->object->speed.y=(inttof32(1)>>4);

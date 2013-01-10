@@ -827,17 +827,25 @@ void simulate(OBB_struct* o, float dt2)
 	o->moment=vect(0,0,0);
 }
 
+bool pointInFrontOfPortal(portal_struct* p, vect3D pos) //assuming correct normal
+{
+	if(!p)return false;
+	const vect3D v2=vectDifference(pos, p->position); //then, project onto portal base
+	vect3D v=vect(dotProduct(p->plane[0],v2),dotProduct(p->plane[1],v2),0);
+	return (v.y>-PORTALSIZEY*4 && v.y<PORTALSIZEY*4 && v.x>-PORTALSIZEX*4 && v.x<PORTALSIZEX*4);
+}
+
 void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 {
 	if(!o&&id<2)return;
 
 	o->oldPortal[id]=o->portal[id];
-	o->portal[id]=dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0; //add boundaries
+	o->portal[id]=((dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0)&1)|(((pointInFrontOfPortal(&portal[id],o->position))&1)<<1);
 	
 	switch(init)
 	{
 		case false:
-			if(o->oldPortal[id] && !o->portal[id])
+			if((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2))
 			{
 				o->position=addVect(portal[id].targetPortal->position,warpVector(&portal[id],vectDifference(o->position,portal[id].position)));
 				o->velocity=warpVector(&portal[id],o->velocity);

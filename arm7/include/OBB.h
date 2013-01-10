@@ -52,8 +52,8 @@ typedef struct
 	vect3D velocity, angularVelocity, forces, moment;
 	vect3D angularMomentum;
 	vect3D AABBo, AABBs;
-	bool portal[2];
-	bool oldPortal[2];
+	u8 portal[2];
+	u8 oldPortal[2];
 	bool used;
 }OBB_struct;
 // 4 + 9*4*3 + 4 + 

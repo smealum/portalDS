@@ -275,13 +275,14 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 		checkObjectCollision(o,r);
 	}
 	
-	o->speed=vect(0,o->position.y-pos.y,0);
-	// if(!(o->position.y-pos.y))o->speed=vect(0,0,0);
-	// else o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
-	// o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
-	// if(ret){o->speed.x-=o->speed.x/2;o->speed.z-=o->speed.z/2;}
-	// else {o->speed.x-=o->speed.x/4;o->speed.z-=o->speed.z/4;}
-	// o->speed=vect(((o->position.x-pos.x)*9)/10,o->position.y-pos.y,((o->position.z-pos.z)*9)/10);
+	o->contact=ret;
+	
+	// o->speed=vect(0,o->position.y-pos.y,0);
+	o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
+	if(o->contact){o->speed.x-=o->speed.x/2;o->speed.z-=o->speed.z/2;} //floor friction
+	else {o->speed.x-=o->speed.x/32;o->speed.z-=o->speed.z/32;} //air friction
+	if(abs(o->speed.x)<3)o->speed.x=0;
+	if(abs(o->speed.z)<3)o->speed.z=0;
 }
 
 void updatePhysicsObject(physicsObject_struct* o)

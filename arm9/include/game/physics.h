@@ -9,6 +9,7 @@ typedef struct
 {
 	vect3D position, speed;
 	int32 radius, sqRadius;
+	bool contact;
 }physicsObject_struct;
 
 room_struct* getRoomPoint(vect3D p);

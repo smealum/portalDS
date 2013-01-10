@@ -1,7 +1,7 @@
 #ifndef __PARTICLES9__
 #define __PARTICLES9__
 
-#define NUMPARTICLES 128
+#define NUMPARTICLES 512
 
 typedef struct
 {

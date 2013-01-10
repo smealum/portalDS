@@ -166,7 +166,7 @@ void shootPlayerGun(player_struct* p, bool R)
 			vect3D pos=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 			NOGBA("SHOT WALL ! GOOD GOING %d %d",k,pos.z);
 			
-			particleExplosion(pos,16,RGB15(31,31,0));
+			particleExplosion(pos,64,R?(RGB15(31,31,0)):(RGB15(0,31,31)));
 			
 			// r->hide^=1;
 			int32 angle=0;

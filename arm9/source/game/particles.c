@@ -69,7 +69,7 @@ void updateParticle(particle_struct* p)
 	if(!p)return;
 	p->position.y-=GRAVITY/4;
 	p->timer++;
-	p->alpha=31-(p->timer*31)/p->life;
+	p->alpha=31-(p->timer*30)/p->life;
 	if(p->timer>p->life)p->used=false;
 	p->position=addVect(p->position,p->speed);
 }
@@ -87,10 +87,10 @@ void updateParticles(void)
 void particleExplosion(vect3D p, int number, u16 color)
 {
 	int i;
-	const u16 speed=32;
+	const u16 speed=64;
 	for(i=0;i<number;i++)
 	{
-		createParticles(p, vect((rand()%speed)-speed/2,(rand()%speed)-speed/2,(rand()%speed)-speed/2), 30, color);
+		createParticles(p, vect((rand()%speed)-speed/2,(rand()%speed)-speed/2,(rand()%speed)-speed/2), 20, color);
 	}
 }
 

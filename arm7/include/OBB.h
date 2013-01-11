@@ -1,7 +1,7 @@
 #ifndef OBB_H
 #define OBB_H
 
-#define NUMOBJECTS (16)
+#define NUMOBJECTS (8)
 
 #define NUMOBBSEGMENTS (12)
 #define NUMOBBFACES (6)

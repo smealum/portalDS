@@ -268,7 +268,7 @@ bool doSegmentsIntersect(vect3D s1, vect3D s2, vect3D sn, vect3D p1, vect3D p2, 
 	return (v1!=v2)&&(v3!=v4);
 }
 
-bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_struct* rec, bool fix)
+bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_struct* rec, vect3D origpos, bool fix)
 {
 	if(!p || !rec)return false;
 	if((rec->normal.x&&p->normal.x)||(rec->normal.z&&p->normal.z)||(rec->normal.y&&p->normal.y))return false;
@@ -302,7 +302,7 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 		{
 			if(fix)
 			{
-				bool v3=dotProduct(vectDifference(p1,p->position),pn)>0;
+				bool v3=dotProduct(vectDifference(p1,origpos),pn)>0;
 				if(v3==v1)
 				{
 					int32 ln=dotProduct(pn,vectDifference(p1,s2));
@@ -333,9 +333,10 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix)
 {
 	listCell_struct *lc=r->rectangles.first;
+	vect3D origpos=p->position;
 	while(lc)
 	{
-		if(portalRectangleIntersection(r,p,&lc->data,fix)&&!fix)return false;
+		if(portalRectangleIntersection(r,p,&lc->data,origpos,fix)&&!fix)return false;
 		lc=lc->next;
 	}
 	return true;

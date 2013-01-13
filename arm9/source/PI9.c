@@ -115,6 +115,8 @@ void createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez
 	fifoSendValue32(FIFO_USER_08,(a->position.x));
 	fifoSendValue32(FIFO_USER_08,(a->position.y));
 	fifoSendValue32(FIFO_USER_08,(a->position.z));
+	
+	NOGBA("aar : %d",a->id);
 }
 
 void applyForce(u8 id, vect3D pos, vect3D v) //(id;[posx|posy][posz][vx][vy][vz])

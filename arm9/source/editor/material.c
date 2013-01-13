@@ -25,6 +25,7 @@ void initMaterials(void)
 	defaultMaterial=createMaterial();
 	defaultMaterialSlice=createMaterialSlice();
 	loadMaterialSlice(defaultMaterialSlice,"default.pcx");
+	// defaultMaterialSlice->factor=2;
 }
 
 materialSlice_struct* createMaterialSlice()

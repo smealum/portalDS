@@ -134,6 +134,7 @@ AAR_struct* createAAR(u16 id, vect3D position, vect3D size, vect3D normal)
 			aaRectangles[i].position=position;
 			aaRectangles[i].size=size;
 			aaRectangles[i].normal=normal;
+			// fifoSendValue32(FIFO_USER_08,i);
 			return &aaRectangles[i];
 		}
 	// }

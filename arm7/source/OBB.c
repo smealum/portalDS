@@ -827,11 +827,12 @@ void simulate(OBB_struct* o, float dt2)
 	o->moment=vect(0,0,0);
 }
 
-bool pointInFrontOfPortal(portal_struct* p, vect3D pos) //assuming correct normal
+bool pointInFrontOfPortal(portal_struct* p, vect3D pos, int32* z) //assuming correct normal
 {
 	if(!p)return false;
 	const vect3D v2=vectDifference(pos, p->position); //then, project onto portal base
 	vect3D v=vect(dotProduct(p->plane[0],v2),dotProduct(p->plane[1],v2),0);
+	*z=dotProduct(p->normal,v2);
 	return (v.y>-PORTALSIZEY*4 && v.y<PORTALSIZEY*4 && v.x>-PORTALSIZEX*4 && v.x<PORTALSIZEX*4);
 }
 
@@ -839,13 +840,14 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 {
 	if(!o&&id<2)return;
 
+	int32 z;
 	o->oldPortal[id]=o->portal[id];
-	o->portal[id]=((dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0)&1)|(((pointInFrontOfPortal(&portal[id],o->position))&1)<<1);
+	o->portal[id]=((dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0)&1)|(((pointInFrontOfPortal(&portal[id],o->position,&z))&1)<<1);
 	
 	switch(init)
 	{
 		case false:
-			if((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2))
+			if(((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2)) || (o->portal[id]&2 && z<=0 && z>-16))
 			{
 				o->position=addVect(portal[id].targetPortal->position,warpVector(&portal[id],vectDifference(o->position,portal[id].position)));
 				o->velocity=warpVector(&portal[id],o->velocity);
@@ -853,8 +855,8 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 				o->angularVelocity=warpVector(&portal[id],o->angularVelocity);
 				o->moment=warpVector(&portal[id],o->moment);
 				
-				warpMatrix(&portal[id], o->transformationMatrix);		
-				warpMatrix(&portal[id], o->invWInertiaMatrix);				
+				warpMatrix(&portal[id], o->transformationMatrix);
+				warpMatrix(&portal[id], o->invWInertiaMatrix);
 			}
 			break;
 		default:

@@ -8,7 +8,8 @@ typedef struct
 {
 	mtlImg_struct* img;
 	u16 id;
-	s16 factor;
+	s16 factorX;
+	s16 factorY;
 	bool align;
 	bool used;
 }materialSlice_struct;

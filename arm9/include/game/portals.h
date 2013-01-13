@@ -6,7 +6,6 @@
 typedef struct portal_struct
 {
 	camera_struct camera;
-	mtlImg_struct* texture;
 	vect3D position;
 	u16 viewPoint[256*192];
 	u16 color;

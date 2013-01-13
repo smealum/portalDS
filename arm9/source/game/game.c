@@ -8,6 +8,8 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
+md2Model_struct testTurret, testButton1, testButton2;
+
 void initGame(void)
 {
 	int oldv=getMemFree();
@@ -84,6 +86,11 @@ void initGame(void)
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
+	loadMd2Model("turret.md2","turret.pcx",&testTurret); //TEMP
+	loadMd2Model("button1.md2","button1.pcx",&testButton1); //TEMP
+	loadMd2Model("button2.md2","button2.pcx",&testButton2); //TEMP
+	getVramStatus();
+	
 	startPI();
 }
 
@@ -137,7 +144,21 @@ static inline void render1(void)
 		
 		glScalef32(SCALEFACT,SCALEFACT,SCALEFACT);
 		
+		renderGun(NULL);
+		
 		transformCamera(NULL);
+		
+		glPushMatrix();
+			renderModelFrameInterp(0, 0, 0, &testTurret, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+			
+			glPushMatrix();
+				glTranslate3f32(-TILESIZE*5,0,0);
+				renderModelFrameInterp(0, 0, 0, &testButton1, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+			glPopMatrix(1);
+			
+			glTranslate3f32(0,0,TILESIZE*2);
+			renderModelFrameInterp(0, 0, 0, &testButton2, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+		glPopMatrix(1);
 		
 		drawRoomsGame(128);
 		

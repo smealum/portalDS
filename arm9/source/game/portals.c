@@ -1,6 +1,5 @@
 #include "game/game_main.h"
 
-mtlImg_struct *portalTexture1, *portalTexture2; //retarded but temp
 portal_struct portal1, portal2;
 portal_struct* currentPortal;
 
@@ -9,9 +8,6 @@ void preparePortal(void);
 void initPortals(void)
 {
 	initPolygonPool();
-	
-	portalTexture1=createTexture("portal1.pcx", "textures");
-	portalTexture2=createTexture("portal2.pcx", "textures");
 	
 	initPortal(&portal1, vect(256*4,1024*2,0), vect(inttof32(1),0,0), true);
 	initPortal(&portal2, vect(2048,1024+512,0), vect(0,inttof32(1),0), false);
@@ -46,8 +42,8 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	if(!p)return;
 	p->position=pos;
 	p->targetPortal=NULL;
-	if(color){p->color=RGB15(31,31,0);p->texture=portalTexture1;}
-	else {p->color=RGB15(0,31,31);p->texture=portalTexture2;}
+	if(color){p->color=RGB15(31,31,0);}
+	else {p->color=RGB15(0,31,31);}
 	initCamera(&p->camera);
 	
 	p->angle=0;
@@ -107,28 +103,6 @@ void drawPortal(portal_struct* p)
 			drawPolygon(p->unprojectedPolygon);
 		glPopMatrix(1);
 	}
-	
-	return;
-	
-	glPushMatrix();
-		glTranslate3f32(p->position.x,p->position.y,p->position.z);
-		
-		applyMTL(p->texture);
-		GFX_COLOR=RGB15(31,31,31);
-		const vect3D v1=(vectDivInt(p->plane[0],PORTALFRACTIONX)), v2=(vectDivInt(p->plane[1],PORTALFRACTIONY)), v3=vectDivInt(p->normal,128);
-
-		glTranslate3f32(v3.x,v3.y,v3.z);
-
-		glBegin(GL_QUAD);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(127),inttot16(0));
-			glVertex3v16(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0),inttot16(0));
-			glVertex3v16(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0),inttot16(127));
-			glVertex3v16(-v1.x+v2.x, -v1.y+v2.y, -v1.z+v2.z);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(127),inttot16(127));
-			glVertex3v16(-v1.x-v2.x, -v1.y-v2.y, -v1.z-v2.z);
-	glPopMatrix(1);
 }
 
 void getInvertedNormal(vect3D* n){if(!n->z)*n=vectMultInt(*n,-1);}

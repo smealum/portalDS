@@ -66,7 +66,8 @@ void loadMaterialSlice(materialSlice_struct* ms, char* filename)
 	{
 		ms->img=createTexture(filename,"textures");
 		ms->align=false;
-		ms->factor=1;
+		ms->factorX=1;
+		ms->factorY=1;
 	}
 }
 
@@ -89,7 +90,19 @@ void loadMaterialSlices(char* filename)
 			ms->align=(k!=0);
 			sprintf(key,"slice%d:factor",i);
 			sscanf(dictionary_get(dic, key, "1"),"%d",&k);
-			ms->factor=k;
+			ms->factorX=k;
+			ms->factorY=k;
+			
+			{
+				char def[16];
+				sprintf(def,"%d",ms->factorX);
+				sprintf(key,"slice%d:factorx",i);
+				sscanf(dictionary_get(dic, key, def),"%d",&k);
+				ms->factorX=k;
+				sprintf(key,"slice%d:factory",i);
+				sscanf(dictionary_get(dic, key, def),"%d",&k);
+				ms->factorY=k;
+			}
 		
 		// if(!ms->img){break;}
 		i++;
@@ -155,8 +168,8 @@ void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32
 		if(ms->align)p1=vect(inttot16(ms->img->height*rec->position.z-1),inttot16(((ms->img->height*rec->position.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
 		p2=vect(inttot16(ms->img->height*rec->size.z-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
 		p2=addVect(p1,p2);
-		p1=vectDivInt(p1,ms->factor);
-		p2=vectDivInt(p2,ms->factor);
+		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
 		t[3]=TEXTURE_PACK(p1.x, p1.y);
 		t[0]=TEXTURE_PACK(p1.x, p2.y);
 		t[1]=TEXTURE_PACK(p2.x, p2.y);
@@ -166,8 +179,8 @@ void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32
 		if(ms->align)p1=vect(inttot16(ms->img->width*rec->position.x-1),inttot16(ms->img->height*rec->position.z-1),0);
 		p2=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(ms->img->height*rec->size.z-1),0);
 		p2=addVect(p1,p2);
-		p1=vectDivInt(p1,ms->factor);
-		p2=vectDivInt(p2,ms->factor);
+		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
 		t[0]=TEXTURE_PACK(p1.x, p1.y);
 		t[1]=TEXTURE_PACK(p1.x, p2.y);
 		t[2]=TEXTURE_PACK(p2.x, p2.y);
@@ -177,8 +190,8 @@ void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32
 		if(ms->align)p1=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
 		p2=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
 		p2=addVect(p1,p2);
-		p1=vectDivInt(p1,ms->factor);
-		p2=vectDivInt(p2,ms->factor);
+		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
 		t[1]=TEXTURE_PACK(p1.x, p1.y);
 		t[0]=TEXTURE_PACK(p1.x, p2.y);
 		t[3]=TEXTURE_PACK(p2.x, p2.y);

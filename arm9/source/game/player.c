@@ -65,7 +65,7 @@ void initPlayer(player_struct* p)
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->life=4;
-	loadMd2Model("pistol.md2","pistol.pcx",&gun);
+	loadMd2Model("portalgun.md2","portalgun.pcx",&gun);
 	initModelInstance(&p->modelInstance,&gun);
 	crossHair=createTexture("crshair.pcx","textures");
 	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");

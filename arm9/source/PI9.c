@@ -9,8 +9,6 @@ OBB_struct objects[NUMOBJECTS];
 AAR_struct aaRectangles[NUMAARS];
 u8 selectID; //debug
 
-mtlImg_struct* cube;
-
 void initPI9(void)
 {
 	int i;
@@ -25,8 +23,6 @@ void initPI9(void)
 		aaRectangles[i].id=i;
 	}
 	selectID=0;
-	
-	cube=createTexture("companion.pcx","textures");
 }
 
 OBB_struct* newBox(void)
@@ -79,11 +75,16 @@ void resetPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESET);
 }
 
-void createBox(vect3D size, vect3D pos, int32 mass) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
+void createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
 {
 	OBB_struct* o=newBox();
 	if(!o)return;
-	o->size=size;
+	
+	initModelInstance(&o->modelInstance,model);
+	
+	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
+	// o->size=vect(192,192,192);
+	NOGBA("%d %d %d",o->size.x,o->size.y,o->size.z);
 	o->position=pos;
 	o->mass=mass>>3; //reduce precision to improve range
 	o->transformationMatrix[0]=inttof32(1);o->transformationMatrix[1]=0;o->transformationMatrix[2]=0;
@@ -275,12 +276,10 @@ void drawOBB(OBB_struct* o)
 	getOBBVertices(o,v);
 	
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-	
-	applyMTL(cube);
 
 	glPushMatrix();
 	
-	glTranslatef32(o->position.x,o->position.y,o->position.z);
+	glTranslatef32(o->position.x/4,o->position.y/4,o->position.z/4);
 	multTMatrix(o->transformationMatrix);
 
 	if(selectID==o->id)GFX_COLOR=RGB15(31,0,0);
@@ -288,19 +287,22 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
-	int i;
-	glBegin(GL_QUADS);
-		for(i=0;i<NUMOBBFACES;i++)
-		{
-			GFX_TEX_COORD=TEXTURE_PACK(0, 0);
-			glVertex3v16((v[OBBFaces[i][0]].x),(v[OBBFaces[i][0]].y),(v[OBBFaces[i][0]].z));
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), 0);
-			glVertex3v16((v[OBBFaces[i][1]].x),(v[OBBFaces[i][1]].y),(v[OBBFaces[i][1]].z));
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
-			glVertex3v16((v[OBBFaces[i][2]].x),(v[OBBFaces[i][2]].y),(v[OBBFaces[i][2]].z));
-			GFX_TEX_COORD=TEXTURE_PACK(0, inttot16(64));
-			glVertex3v16((v[OBBFaces[i][3]].x),(v[OBBFaces[i][3]].y),(v[OBBFaces[i][3]].z));
-		}
+	renderModelFrameInterp(0, 0, 0, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true);
+	
+	// int i;
+	// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
+	// glBegin(GL_QUADS);
+		// for(i=0;i<NUMOBBFACES;i++)
+		// {
+			// GFX_TEX_COORD=TEXTURE_PACK(0, 0);
+			// glVertex3v16((v[OBBFaces[i][0]].x),(v[OBBFaces[i][0]].y),(v[OBBFaces[i][0]].z));
+			// GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), 0);
+			// glVertex3v16((v[OBBFaces[i][1]].x),(v[OBBFaces[i][1]].y),(v[OBBFaces[i][1]].z));
+			// GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
+			// glVertex3v16((v[OBBFaces[i][2]].x),(v[OBBFaces[i][2]].y),(v[OBBFaces[i][2]].z));
+			// GFX_TEX_COORD=TEXTURE_PACK(0, inttot16(64));
+			// glVertex3v16((v[OBBFaces[i][3]].x),(v[OBBFaces[i][3]].y),(v[OBBFaces[i][3]].z));
+		// }
 
 	glPopMatrix(1);
 }
@@ -312,6 +314,7 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	o2->size=o->size;
 	o2->mass=o->mass;
 	o2->used=o->used;
+	o2->modelInstance=o->modelInstance;
 	o2->id=o->id;
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
 }

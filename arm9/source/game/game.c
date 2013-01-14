@@ -8,7 +8,7 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testTurret, testButton1, testButton2;
+md2Model_struct testTurret, testCube, testButton1, testButton2;
 
 void initGame(void)
 {
@@ -87,8 +87,9 @@ void initGame(void)
 	makeGrid();
 	
 	loadMd2Model("turret.md2","turret.pcx",&testTurret); //TEMP
+	loadMd2Model("cube.md2","storagecube.pcx",&testCube); //TEMP
 	loadMd2Model("button1.md2","button1.pcx",&testButton1); //TEMP
-	loadMd2Model("button2.md2","button2.pcx",&testButton2); //TEMP
+	// loadMd2Model("button2.md2","button2.pcx",&testButton2); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -116,7 +117,8 @@ static inline void render1(void)
 	
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
-		if(keysDown()&KEY_X)createBox(vectMultInt(vect(192,192,192),4),vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1));
+		if(keysDown()&KEY_X)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&testTurret);
+		if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&testCube);
 		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
 		if(keysDown()&KEY_Y){selectID++;selectID%=NUMOBJECTS;if(!objects[selectID].used)selectID=0;}
 		
@@ -149,15 +151,15 @@ static inline void render1(void)
 		transformCamera(NULL);
 		
 		glPushMatrix();
-			renderModelFrameInterp(0, 0, 0, &testTurret, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+			// renderModelFrameInterp(0, 0, 0, &testTurret, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
 			
 			glPushMatrix();
 				glTranslate3f32(-TILESIZE*5,0,0);
-				renderModelFrameInterp(0, 0, 0, &testButton1, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+				renderModelFrameInterp(0, 0, 0, &testButton1, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
 			glPopMatrix(1);
 			
-			glTranslate3f32(0,0,TILESIZE*2);
-			renderModelFrameInterp(0, 0, 0, &testButton2, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+			// glTranslate3f32(0,0,TILESIZE*2);
+			// renderModelFrameInterp(0, 0, 0, &testButton2, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
 		glPopMatrix(1);
 		
 		drawRoomsGame(128);
@@ -165,11 +167,11 @@ static inline void render1(void)
 		updateParticles();
 		drawParticles();
 		
-		glPushMatrix();
-			glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
+		// glPushMatrix();
+			// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
 			drawOBBs();
 			// drawAARs();
-		glPopMatrix(1);
+		// glPopMatrix(1);
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -198,6 +200,8 @@ static inline void render2(void)
 		
 		glScalef32(SCALEFACT,SCALEFACT,SCALEFACT);
 		
+		renderGun(NULL); //TEMP ?
+		
 		transformCamera(&currentPortal->camera);
 		
 		drawRoomsGame(0);
@@ -206,14 +210,14 @@ static inline void render2(void)
 			camera_struct* c=getPlayerCamera();
 			glTranslatef32(c->position.x,c->position.y-TILESIZE*3,c->position.z);
 			glRotateYi(c->angle.y+16384);
-			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT);
+			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT,false);
 		glPopMatrix(1);
 		
-		glPushMatrix();
-			glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
+		// glPushMatrix();
+			// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
 			drawOBBs();
 			// drawAARs();
-		glPopMatrix(1);
+		// glPopMatrix(1);
 			
 	glPopMatrix(1);
 	

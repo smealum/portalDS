@@ -44,25 +44,26 @@ vect3D anorms_table2[162] =
 void packFrameData(md2Model_struct *mdl, md2_frame_t* f)
 {
 	int i;
+	f->min=vect(f->verts[0].v[0],f->verts[0].v[1],f->verts[0].v[2]);
+	f->max=vect(f->verts[0].v[0],f->verts[0].v[1],f->verts[0].v[2]);
 	for(i=0;i<mdl->header.num_vertices;i++)
 	{
 	    md2_vertex_t* pvert = &f->verts[i];
 		// vect3D scale=f->scale;
 		// f->packedVerts[i]=vect(((scale.x*pvert->v[0])/8),((scale.y*pvert->v[1])/8),((scale.z*pvert->v[2])/8));
 		f->packedv10[i]=NORMAL_PACK(pvert->v[0],pvert->v[1],pvert->v[2]);
+		
+		if(pvert->v[0]<f->min.x)f->min.x=pvert->v[0];
+		else if(pvert->v[0]>f->max.x)f->max.x=pvert->v[0];
+		if(pvert->v[1]<f->min.y)f->min.y=pvert->v[1];
+		else if(pvert->v[1]>f->max.y)f->max.y=pvert->v[1];
+		if(pvert->v[2]<f->min.z)f->min.z=pvert->v[2];
+		else if(pvert->v[2]>f->max.z)f->max.z=pvert->v[2];
 	}
-	/*for(i=0;i<mdl->header.num_tris;i++)
-	{
-		int j;
-		vect3D n=vect(0,0,0);
-		for (j = 0; j < 3; ++j)
-		{
-			// md2_vertex_t* pvert = &f->verts[mdl->triangles[i].vertex[j]];
-			n=addVect(n,anorms_table2[f->verts[mdl->triangles[i].vertex[j]].normalIndex]);
-		}
-		n=vectDivInt(n,3);
-		f->faceNormals[i]=n;
-	}*/
+	f->min=vect(mulf32(f->min.x,f->scale.x)*128*32,mulf32(f->min.y,f->scale.y)*128*32,mulf32(f->min.z,f->scale.z)*128*32);
+	f->max=vect(mulf32(f->max.x,f->scale.x)*128*32,mulf32(f->max.y,f->scale.y)*128*32,mulf32(f->max.z,f->scale.z)*128*32);
+	// f->min=addVect(f->min,f->translate);
+	// f->max=addVect(f->max,f->translate);
 }
 
 void packTexcoordData(md2Model_struct *mdl)
@@ -275,7 +276,7 @@ void renderModelFrame(int n, const md2Model_struct *mdl)
 	glPopMatrix(1);
 }
 
-void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params)
+void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center)
 {
 	int i, j;
 	
@@ -296,10 +297,11 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 	
 		glRotateXi(-(1<<13));
 
-		glScalef32(1<<5,1<<5,1<<5);
+		glScalef32(1<<5,1<<5,1<<5); //?
 		
-		glTranslate3f32(pframe->translate.x+((pframe2->translate.x-pframe->translate.x)*m)/4,pframe->translate.y+((pframe2->translate.y-pframe->translate.y)*m)/4,pframe->translate.z+((pframe2->translate.z-pframe->translate.z)*m)/4);
-
+		if(!center)glTranslate3f32(pframe->translate.x+((pframe2->translate.x-pframe->translate.x)*m)/4,pframe->translate.y+((pframe2->translate.y-pframe->translate.y)*m)/4,pframe->translate.z+((pframe2->translate.z-pframe->translate.z)*m)/4);
+		else glTranslate3f32(-(pframe->min.x+pframe->max.x)/2,-(pframe->min.y+pframe->max.y)/2,-(pframe->min.z+pframe->max.z)/2);
+		
 		glScalef32((pframe->scale.x+((pframe2->scale.x-pframe->scale.x)*m)/4),(pframe->scale.y+((pframe2->scale.y-pframe->scale.y)*m)/4),(pframe->scale.z+((pframe2->scale.z-pframe->scale.z)*m)/4));
 
 		glScalef32(inttof32(32),inttof32(32),inttof32(32)); // necessary for v10

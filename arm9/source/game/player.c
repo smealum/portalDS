@@ -133,7 +133,7 @@ void renderGun(player_struct* p)
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
-		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0);
+		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
 	glPopMatrix(1);
 }
 
@@ -238,7 +238,7 @@ void playerControls(player_struct* p)
 	// if(keysHeld()&(KEY_SELECT))moveCamera(NULL, vect(0,-(inttof32(1)>>6),0));
 	// if(keysHeld()&(KEY_START))moveCamera(NULL, vect(0,inttof32(1)>>6,0));
 	if(keysDown()&(KEY_START))p->object->speed.y=(inttof32(1)>>4);
-	if(keysDown()&(KEY_SELECT)){camera_struct* c=getPlayerCamera();p->object->position=c->position=portal1.camera.position;memcpy(c->transformationMatrix,portal1.camera.transformationMatrix,9*sizeof(int32));}
+	// if(keysDown()&(KEY_SELECT)){camera_struct* c=getPlayerCamera();p->object->position=c->position=portal1.camera.position;memcpy(c->transformationMatrix,portal1.camera.transformationMatrix,9*sizeof(int32));}
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,2,true);}
 	
 	//DEBUG

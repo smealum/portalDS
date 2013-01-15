@@ -8,7 +8,7 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testTurret, testCube, testButton1, testButton2;
+md2Model_struct testCube, testButton1, testButton2;
 
 void initGame(void)
 {
@@ -55,6 +55,7 @@ void initGame(void)
 	loadMaterials("materials.ini");
 	
 	initEnemies();
+	initTurrets();
 		
 	readMap("lalala.map", true);
 	
@@ -86,7 +87,6 @@ void initGame(void)
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
-	loadMd2Model("turret.md2","turret.pcx",&testTurret); //TEMP
 	loadMd2Model("cube.md2","storagecube.pcx",&testCube); //TEMP
 	loadMd2Model("button1.md2","button1.pcx",&testButton1); //TEMP
 	// loadMd2Model("button2.md2","button2.pcx",&testButton2); //TEMP
@@ -117,7 +117,7 @@ static inline void render1(void)
 	
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
-		if(keysDown()&KEY_X)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&testTurret);
+		if(keysDown()&KEY_X)createTurret(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4));
 		if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&testCube);
 		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
 		if(keysDown()&KEY_Y){selectID++;selectID%=NUMOBJECTS;if(!objects[selectID].used)selectID=0;}
@@ -130,9 +130,10 @@ static inline void render1(void)
 			setVelocity(selectID, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),4));
 			// updatePlayerPI(NULL);
 		}
-	updatePlayer(NULL);
 	
+	updatePlayer(NULL);
 	updatePortals();
+	updateTurrets();
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
@@ -150,9 +151,7 @@ static inline void render1(void)
 		
 		transformCamera(NULL);
 		
-		glPushMatrix();
-			// renderModelFrameInterp(0, 0, 0, &testTurret, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
-			
+		glPushMatrix();			
 			glPushMatrix();
 				glTranslate3f32(-TILESIZE*5,0,0);
 				renderModelFrameInterp(0, 0, 0, &testButton1, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);

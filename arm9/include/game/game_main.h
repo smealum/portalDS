@@ -18,5 +18,6 @@
 #include "editor/room.h"
 #include "editor/rectangle.h"
 #include "PI9.h"
+#include "game/turrets.h"
 
 #endif

@@ -75,10 +75,10 @@ void resetPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESET);
 }
 
-void createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
+OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
 {
 	OBB_struct* o=newBox();
-	if(!o)return;
+	if(!o)return NULL;
 	
 	initModelInstance(&o->modelInstance,model);
 	
@@ -97,6 +97,8 @@ void createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|size
 	fifoSendValue32(FIFO_USER_08,(o->position.x));
 	fifoSendValue32(FIFO_USER_08,(o->position.y));
 	fifoSendValue32(FIFO_USER_08,(o->position.z));
+	
+	return o;
 }
 
 void createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|normal][posx][posy][posz])
@@ -287,7 +289,7 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
-	renderModelFrameInterp(0, 0, 0, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true);
+	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true);
 	
 	// int i;
 	// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);

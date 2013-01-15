@@ -29,8 +29,9 @@ void startPI(void);
 void pausePI(void);
 void listenPI9(void);
 void applyForce(u8 id, vect3D pos, vect3D v);
-void createBox(vect3D pos, int32 mass, md2Model_struct* model);
 void createAAR(vect3D size, vect3D pos, vect3D normal);
+
+OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model);
 
 void drawOBBs(void);
 void drawAARs(void);

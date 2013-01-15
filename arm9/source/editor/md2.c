@@ -342,7 +342,7 @@ void initModelInstance(modelInstance_struct* mi, md2Model_struct* mdl)
 
 void changeAnimation(modelInstance_struct* mi, u16 newAnim, bool oneshot)
 {
-	if(!mi || mi->currentAnim==newAnim)return;
+	if(!mi || mi->currentAnim==newAnim || newAnim>=mi->model->numAnim)return;
 	if(!oneshot && mi->oneshot){mi->oldAnim=newAnim;return;}
 	mi->oneshot=oneshot;
 	mi->oldAnim=mi->currentAnim;

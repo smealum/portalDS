@@ -321,7 +321,7 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
 }
 
-void drawWarpedOBB(portal_struct* p, OBB_struct* o)
+void drawWarpedOBB(portal_struct* p, OBB_struct* o) //warped md2 : no interpolation ? MORE : display list keyframes ?
 {
 	OBB_struct o2;
 	copyOBB(o,&o2);

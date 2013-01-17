@@ -75,6 +75,8 @@ rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, v
 
 void getPathfindingData(room_struct* r);
 
+u8 getHeightValue(room_struct* r, vect3D pos, bool floor);
+
 //lightmaps.h
 void loadLightMap(room_struct* r);
 void unloadLightMap(room_struct* r);

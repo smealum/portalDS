@@ -57,11 +57,10 @@ void initPlayer(player_struct* p)
 {
 	if(!p)p=&player;
 	p->object=&getPlayerCamera()->object;
-	p->object->position.x=-3*(TILESIZE*2);
-	// p->object->position.z=6*(TILESIZE*2);
+	//p->object->position=vect(0,0,0);
 	p->object->radius=PLAYERRADIUS;
 	p->object->sqRadius=SQPLAYERRADIUS;
-	p->currentRoom=NULL;
+	p->currentRoom=getRoomPoint(p->object->position);
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->life=4;

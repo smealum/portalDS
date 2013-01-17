@@ -8,7 +8,7 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testCube, testButton1, testButton2;
+md2Model_struct testCube;
 
 void initGame(void)
 {
@@ -56,6 +56,7 @@ void initGame(void)
 	
 	initEnemies();
 	initTurrets();
+	initBigButtons(getPlayer()->currentRoom);
 		
 	readMap("lalala.map", true);
 	
@@ -87,9 +88,8 @@ void initGame(void)
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
+	createBigButton(vect(0,0,0)); //TEMP
 	loadMd2Model("cube.md2","storagecube.pcx",&testCube); //TEMP
-	loadMd2Model("button1.md2","button1.pcx",&testButton1); //TEMP
-	// loadMd2Model("button2.md2","button2.pcx",&testButton2); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -151,26 +151,13 @@ static inline void render1(void)
 		
 		transformCamera(NULL);
 		
-		glPushMatrix();			
-			glPushMatrix();
-				glTranslate3f32(-TILESIZE*5,0,0);
-				renderModelFrameInterp(0, 0, 0, &testButton1, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
-			glPopMatrix(1);
-			
-			// glTranslate3f32(0,0,TILESIZE*2);
-			// renderModelFrameInterp(0, 0, 0, &testButton2, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
-		glPopMatrix(1);
-		
 		drawRoomsGame(128);
 		
 		updateParticles();
 		drawParticles();
 		
-		// glPushMatrix();
-			// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
-			drawOBBs();
-			// drawAARs();
-		// glPopMatrix(1);
+		drawOBBs();
+		drawBigButtons();
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -212,11 +199,8 @@ static inline void render2(void)
 			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT,false);
 		glPopMatrix(1);
 		
-		// glPushMatrix();
-			// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
-			drawOBBs();
-			// drawAARs();
-		// glPopMatrix(1);
+		drawOBBs();
+		drawBigButtons();
 			
 	glPopMatrix(1);
 	

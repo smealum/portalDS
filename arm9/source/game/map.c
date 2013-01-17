@@ -580,6 +580,13 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	}
 }
 
+u8 getHeightValue(room_struct* r, vect3D pos, bool floor)
+{
+	if(!r)return 0;
+	if(pos.x<0 || pos.z<0 || pos.x>=r->width || pos.z>=r->height)return 0;
+	return floor?(r->floor[pos.x+pos.z*r->width]):(r->ceiling[pos.x+pos.z*r->width]);
+}
+
 void getDoorWayData(doorCollection_struct* dc, room_struct* r)
 {
 	if(!r || r->doorWay)return;

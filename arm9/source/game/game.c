@@ -56,7 +56,7 @@ void initGame(void)
 	
 	initEnemies();
 	initTurrets();
-	initBigButtons(getPlayer()->currentRoom);
+	initBigButtons();
 		
 	readMap("lalala.map", true);
 	
@@ -85,10 +85,11 @@ void initGame(void)
 	// createAAR(vectMultInt(vect(TILESIZE*24,0,TILESIZE*24),4), vectMultInt(vect(-TILESIZE*12,HEIGHTUNIT*11,-TILESIZE*12),4), vect(0,inttof32(1),0));
 	// createAAR(vectMultInt(vect(0,HEIGHTUNIT*16,TILESIZE*16),4), vectMultInt(vect(TILESIZE*5,HEIGHTUNIT*11,-TILESIZE*4),4), vect(-inttof32(1),0,0));
 	
+	updatePlayer(NULL);createBigButton(NULL, vect(10,0,10)); //TEMP
+	
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
-	createBigButton(vect(0,0,0)); //TEMP
 	loadMd2Model("cube.md2","storagecube.pcx",&testCube); //TEMP
 	getVramStatus();
 	
@@ -134,6 +135,7 @@ static inline void render1(void)
 	updatePlayer(NULL);
 	updatePortals();
 	updateTurrets();
+	updateBigButtons();
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
@@ -196,7 +198,7 @@ static inline void render2(void)
 			camera_struct* c=getPlayerCamera();
 			glTranslatef32(c->position.x,c->position.y-TILESIZE*3,c->position.z);
 			glRotateYi(c->angle.y+16384);
-			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT,false);
+			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT,false,NULL);
 		glPopMatrix(1);
 		
 		drawOBBs();

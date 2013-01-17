@@ -480,7 +480,7 @@ void optimizeRoom(roomEdit_struct* re)
 					{
 						vect2D p, s;
 						getMaxRectangle(f, re->data.width, re->data.height, &p, &s);
-						addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(p.x,i,p.y),vect(s.x,0,s.y)},NULL);
+						addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(p.x,i,p.y),vect(s.x,0,s.y)},NULL,true);
 						scanEdge(re, re->data.floor, re->data.width, re->data.height, &p, &s, 0, 0, false);
 						scanEdge(re, re->data.floor, re->data.width, re->data.height, &p, &s, 1, 0, false);
 						scanEdge(re, re->data.floor, re->data.width, re->data.height, &p, &s, 2, 0, false);
@@ -515,7 +515,7 @@ void optimizeRoom(roomEdit_struct* re)
 					{
 						vect2D p, s;
 						getMaxRectangle(f, re->data.width, re->data.height, &p, &s);
-						addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(p.x+s.x,i,p.y),vect(-s.x,0,s.y)},NULL);
+						addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(p.x+s.x,i,p.y),vect(-s.x,0,s.y)},NULL,true);
 						scanEdge(re, re->data.ceiling, re->data.width, re->data.height, &p, &s, 0, 1, true);
 						scanEdge(re, re->data.ceiling, re->data.width, re->data.height, &p, &s, 1, 1, true);
 						scanEdge(re, re->data.ceiling, re->data.width, re->data.height, &p, &s, 2, 1, true);
@@ -1046,7 +1046,7 @@ void readRectangles(room_struct* r, FILE* f)
 	{
 		rectangle_struct rec;
 		readRectangle(&rec, f);
-		addRoomRectangle(r, NULL, rec, rec.material);
+		addRoomRectangle(r, NULL, rec, rec.material, true);
 	}
 }
 

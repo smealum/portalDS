@@ -60,7 +60,7 @@ void initPlayer(player_struct* p)
 	//p->object->position=vect(0,0,0);
 	p->object->radius=PLAYERRADIUS;
 	p->object->sqRadius=SQPLAYERRADIUS;
-	p->currentRoom=getRoomPoint(p->object->position);
+	p->currentRoom=NULL;
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->life=4;
@@ -117,9 +117,9 @@ void drawCrosshair(void)
 	glPopMatrix(1);
 }
 
-s16 depth=-96;
-s16 height=-54;
-s16 X=-37;
+s16 depth=-92;
+s16 height=-60;
+s16 X=-46;
 
 void renderGun(player_struct* p)
 {
@@ -132,8 +132,16 @@ void renderGun(player_struct* p)
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
-		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false);
+		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false, p->modelInstance.palette);
 	glPopMatrix(1);
+	
+	// if(keysDown() & KEY_A)height--;
+	// if(keysDown() & KEY_B)height++;
+	// if(keysDown() & KEY_X)X--;
+	// if(keysDown() & KEY_Y)X++;
+	// if(keysDown() & KEY_START)depth--;
+	// if(keysDown() & KEY_SELECT)depth++;
+	// NOGBA("%d %d %d",depth,height,X);
 }
 
 void shootPlayerGun(player_struct* p, bool R)
@@ -155,7 +163,7 @@ void shootPlayerGun(player_struct* p, bool R)
 		l.x-=TILESIZE;
 		l.z-=TILESIZE;
 		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip);
-		if(r)
+		if(r&&r->portalable)
 		{
 			// ip.x+=TILESIZE*2;
 			// ip.z+=TILESIZE*2;
@@ -184,7 +192,6 @@ void shootPlayerGun(player_struct* p, bool R)
 			if(isPortalOnWall(p->currentRoom,por,false))
 			{
 				movePortal(por, por->position, vectMultInt(r->normal,-1), angle, true);
-				NOGBA("lala");
 			}else{
 				movePortal(por, oldp, oldn, olda, false);
 			}

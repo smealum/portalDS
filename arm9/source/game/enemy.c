@@ -119,7 +119,7 @@ void drawEnemy(enemy_struct* e)
 			setUpEnemyLighting(e, &params);
 			glRotateYi(e->angle);
 			glScalef32(3<<10,3<<10,3<<10);
-			renderModelFrameInterp(e->modelInstance.currentFrame,e->modelInstance.nextFrame,e->modelInstance.interpCounter,e->modelInstance.model,params,false);
+			renderModelFrameInterp(e->modelInstance.currentFrame,e->modelInstance.nextFrame,e->modelInstance.interpCounter,e->modelInstance.model,params,false,e->modelInstance.palette);
 		}
 	glPopMatrix(1);
 }

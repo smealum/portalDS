@@ -276,7 +276,7 @@ void renderModelFrame(int n, const md2Model_struct *mdl)
 	glPopMatrix(1);
 }
 
-void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center)
+void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal)
 {
 	int i, j;
 	
@@ -292,6 +292,7 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 	md2_frame_t *pframe2=&mdl->frames[n2];
 		
 	applyMTL(mdl->texture);
+	if(pal)bindPaletteAddr(pal);
 
 	glPushMatrix();
 	
@@ -337,6 +338,7 @@ void initModelInstance(modelInstance_struct* mi, md2Model_struct* mdl)
 	mi->interpCounter=0;
 	mi->currentFrame=0;
 	mi->nextFrame=0;
+	mi->palette=NULL;
 	mi->model=mdl;
 }
 

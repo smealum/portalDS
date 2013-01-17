@@ -351,7 +351,7 @@ void drawRoomDoors(doorCollection_struct* dc, roomEdit_struct* re)
 
 void getDoorRectangle(door_struct* d, bool primary, rectangle_struct* rrrec)
 {
-	rectangle_struct rec=(rectangle_struct){vect(0,0,0),vect(0,0,0),vect(0,0,0)};
+	rectangle_struct rec;
 	if(!d || !d->primaryRoom)return;
 	if(primary)
 	{

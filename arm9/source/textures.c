@@ -274,14 +274,27 @@ void addPaletteToBank(mtlImg_struct *mtl, u16* data, size_t size)
 	loadPaletteToBank(mtl, data, size);
 }
 
+void editPalette(u16* addr, u8 index, u16 color)
+{
+	if(!addr)return;
+	vramSetBankE(VRAM_E_LCD);
+		addr[index]=color;
+	vramSetBankE(VRAM_E_TEX_PALETTE);
+}
+
 void bindPalette(mtlImg_struct *mtl)
 {
-		GFX_PAL_FORMAT = ((uint32)mtl->pal)>>(4);
+	GFX_PAL_FORMAT = ((uint32)mtl->pal)>>(4);
+}
+
+void bindPaletteAddr(u32* addr)
+{
+	GFX_PAL_FORMAT = ((uint32)addr)>>(4);
 }
 
 void bindPalette4(mtlImg_struct *mtl)
 {
-		GFX_PAL_FORMAT = ((uint32)mtl->pal)>>(4-1);
+	GFX_PAL_FORMAT = ((uint32)mtl->pal)>>(4-1);
 }
 
 void bindTexture(mtlImg_struct *mtl)
@@ -497,6 +510,27 @@ void loadTexturePCX(char* filename, char* directory, mtlImg_struct* mtl)
 	freePCX(pcxt);
 	
 	NOGBA("%s loaded.\n",filename);
+}
+
+u32* loadPalettePCX(char* filename, char* directory)
+{	
+	struct gl_texture_t *pcxt=(struct gl_texture_t *)ReadPCXFile(filename,directory);
+	mtlImg_struct mtl;
+	
+	NOGBA("format : %d",pcxt->format);
+	switch(pcxt->format)
+	{
+		case 4:
+			addPaletteToBank(&mtl, pcxt->palette, 16*2);
+			break;
+		case 8:
+			addPaletteToBank(&mtl, pcxt->palette, 256*2);
+			break;
+	}
+	
+	freePCX(pcxt);
+	
+	return mtl.pal;
 }
 
 void applyMTL(mtlImg_struct* mtl)

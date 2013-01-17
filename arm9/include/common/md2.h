@@ -98,12 +98,13 @@ typedef struct
 	u8 currentAnim;
 	u8 oldAnim;
 	bool oneshot;
+	u32* palette;
 	md2Model_struct* model;
 }modelInstance_struct;
 
 void freeMd2Model(md2Model_struct *mdl);
 void renderModelFrame (int n, const md2Model_struct *mdl);
-void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center);
+void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal);
 int loadMd2Model (const char *filename, char *texname, md2Model_struct *mdl);
 
 void initModelInstance(modelInstance_struct* mi, md2Model_struct* mdl);

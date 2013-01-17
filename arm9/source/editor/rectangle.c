@@ -114,32 +114,32 @@ void addEdgeRectangle(roomEdit_struct* re, vect2D* pos, vect2D* size, u8 edge, u
 	switch(edge)
 	{
 		case 0:
-			if(reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y),vect(l,old-k,0)},mat);
-			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y),vect(-l,old-k,0)},mat);
+			if(reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y),vect(l,old-k,0)},mat,true);
+			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y),vect(-l,old-k,0)},mat,true);
 			break;
 		case 1:
-			if(reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y+size->y),vect(-l,old-k,0)},mat);
-			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y+size->y),vect(l,old-k,0)},mat);
+			if(reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y+size->y),vect(-l,old-k,0)},mat,true);
+			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y+size->y),vect(l,old-k,0)},mat,true);
 			break;
 		case 2:
-			if(!reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i),vect(0,old-k,-l)},mat);
-			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i-l),vect(0,old-k,l)},mat);
+			if(!reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i),vect(0,old-k,-l)},mat,true);
+			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i-l),vect(0,old-k,l)},mat,true);
 			break;
 		case 3:
-			if(!reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i-l),vect(0,old-k,l)},mat);
-			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i),vect(0,old-k,-l)},mat);
+			if(!reverse)addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i-l),vect(0,old-k,l)},mat,true);
+			else addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i),vect(0,old-k,-l)},mat,true);
 			break;
 		case 4:
-			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y),vect(-l,old-k,0)},mat);
+			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i,k,pos->y),vect(-l,old-k,0)},mat,true);
 			break;
 		case 5:
-			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y+size->y),vect(l,old-k,0)},mat);
+			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(i-l,k,pos->y+size->y),vect(l,old-k,0)},mat,true);
 			break;
 		case 6:
-			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i),vect(0,old-k,-l)},mat);
+			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x,k,i),vect(0,old-k,-l)},mat,true);
 			break;
 		case 7:
-			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i-l),vect(0,old-k,l)},mat);
+			addRoomRectangle(&re->data,&re->entityCollection,(rectangle_struct){vect(pos->x+size->x,k,i-l),vect(0,old-k,l)},mat,true);
 			break;
 	}
 }

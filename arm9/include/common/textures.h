@@ -47,6 +47,8 @@ void loadTextureBufferA5I3(u8* buffer, u16* buffer2, u16 x, u16 y, mtlImg_struct
 void loadReservedTextureBufferA5I3(u8* buffer, u16* buffer2, u16 x, u16 y, mtlImg_struct *mtl, void* addr);
 void loadPartToBank(mtlImg_struct *mtl, u8* data, u16 w, u16 h, u16 x, u16 y, bool rot);
 void loadTexturePCX(char* filename, char* directory, mtlImg_struct* mtl);
+u32* loadPalettePCX(char* filename, char* directory);
+void editPalette(u16* addr, u8 index, u16 color);
 void applyMTL(mtlImg_struct *mtl);
 void initVramBanks(u8 banks);
 void getVramStatus();
@@ -58,6 +60,7 @@ void addPaletteToBank(mtlImg_struct *mtl, u16* data, size_t size);
 void bindPalette(mtlImg_struct *mtl);
 void bindPalette4(mtlImg_struct *mtl);
 void bindTexture(mtlImg_struct *mtl);
+void bindPaletteAddr(u32* addr);
 void getGlWL(u16 width, u16 height, u8* w, u8* l);
 
 void changeTextureSizeA5I3(mtlImg_struct *mtl, u16 x, u16 y);

@@ -61,7 +61,7 @@ void moveData(s8 v, roomEdit_struct* re, vect3D* so, vect3D* ss);
 void applyMaterial(material_struct* mat, roomEdit_struct* re, vect3D* so, vect3D* ss);
 void makeWall(roomEdit_struct* re, vect3D* so, vect3D* ss);
 void swapData(roomEdit_struct* re);
-void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat);
+rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat, bool portalable);
 void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_struct* ec);
 void optimizeRoom(roomEdit_struct* re);
 void changeRoom(roomEdit_struct* re, bool both);

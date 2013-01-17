@@ -5,12 +5,16 @@
 
 typedef struct
 {
+	room_struct* room;
+	rectangle_struct* surface;
 	vect3D position;
+	bool active;
 	bool used;
 }bigButton_struct;
 
-void initBigButtons(room_struct* r);
-bigButton_struct* createBigButton(vect3D position);
+void initBigButtons(void);
+bigButton_struct* createBigButton(room_struct* r, vect3D position);
 void drawBigButtons(void);
+void updateBigButtons(void);
 
 #endif

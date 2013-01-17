@@ -21,7 +21,7 @@ typedef struct
 {
 	vect3D position, size, lmSize, lmPos, normal;
 	material_struct* material;
-	bool rot, hide;
+	bool rot, portalable, hide, touched;
 }rectangle_struct;
 
 typedef struct listCell_struct
@@ -64,7 +64,7 @@ static inline vect3D convertSize(vect3D v)
 
 void initRoom(room_struct* r, u16 w, u16 h, vect3D p);
 void resizeRoom(room_struct* r, u16 l, u16 w, vect3D p);
-// void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec);
+// void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, bool portalable);
 void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size);
 void removeRectangles(room_struct* r);
 void drawRoom(room_struct* r, u8 mode);

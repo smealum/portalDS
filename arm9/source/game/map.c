@@ -183,9 +183,9 @@ void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
 	}
 }
 
-void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat)
+rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat, bool portalable)
 {
-	if((!rec.size.x && (!rec.size.z || !rec.size.y)) || (!rec.size.y && !rec.size.z))return;
+	if((!rec.size.x && (!rec.size.z || !rec.size.y)) || (!rec.size.y && !rec.size.z))return NULL;
 	initRectangle(&rec, rec.position, rec.size);
 	if(mat)rec.material=mat;
 	else{
@@ -198,8 +198,8 @@ void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_str
 		rec.material=r->materials[x+y*r->width];
 	}
 	// NOGBA("mat : %d",getMaterialID(rec.material));
-	/*rectangle_struct* rec2=*/addRectangle(rec, &r->rectangles);
-	// if(ec)generateLightmap(ec, rec2, r);
+	rec.portalable=portalable;
+	return addRectangle(rec, &r->rectangles);
 }
 
 void generateLightmap(entityCollection_struct* ec, rectangle_struct* rec, room_struct* r, u8* b)
@@ -315,7 +315,7 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 			if(r==d->primaryRoom)generateLightmap(ec, &d->primaryRec, r, r->lightMapBuffer);
 			if(r==d->secondaryRoom)generateLightmap(ec, &d->secondaryRec, r, r->lightMapBuffer);
 		}
-	}	
+	}
 	
 	NOGBA("done generating, loading...");
 	loadToBank(r->lightMap,r->lightMapBuffer);

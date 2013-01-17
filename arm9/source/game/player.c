@@ -65,7 +65,7 @@ void initPlayer(player_struct* p)
 	touchOld=touchCurrent;
 	p->life=4;
 	p->tempAngle=vect(0,0,0);
-	loadMd2Model("portalgun.md2","portalgun.pcx",&gun);
+	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
 	initModelInstance(&p->modelInstance,&gun);
 	crossHair=createTexture("crshair.pcx","textures");
 	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
@@ -129,7 +129,7 @@ void renderGun(player_struct* p)
 		glTranslate3f32(0,height,depth);
 		glRotateYi(-(1<<13));
 		glRotateYi(-p->tempAngle.y);
-		glRotateZi(-p->tempAngle.x/2);
+		glRotateZi(p->tempAngle.x/2);
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);

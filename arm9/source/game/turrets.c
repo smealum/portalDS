@@ -13,7 +13,7 @@ void initTurrets(void)
 		turrets[i].OBB=NULL;
 	}
 	
-	loadMd2Model("turret.md2","turret.pcx",&turretModel);
+	loadMd2Model("models/turret.md2","turret.pcx",&turretModel);
 }
 
 turret_struct* createTurret(vect3D position)

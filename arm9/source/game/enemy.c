@@ -18,7 +18,7 @@ void initEnemies(void)
 {
 	int i;
 	for(i=0;i<NUMENEMIES;i++)initEn(&enemy[i]);
-	loadMd2Model("enemy.md2", "enemy1.pcx", &enemyModel);
+	loadMd2Model("models/enemy.md2", "enemy1.pcx", &enemyModel);
 }
 
 void createEn(room_struct* r, vect3D p)

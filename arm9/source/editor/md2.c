@@ -62,8 +62,8 @@ void packFrameData(md2Model_struct *mdl, md2_frame_t* f)
 	}
 	f->min=vect(mulf32(f->min.x,f->scale.x)*128*32,mulf32(f->min.y,f->scale.y)*128*32,mulf32(f->min.z,f->scale.z)*128*32);
 	f->max=vect(mulf32(f->max.x,f->scale.x)*128*32,mulf32(f->max.y,f->scale.y)*128*32,mulf32(f->max.z,f->scale.z)*128*32);
-	// f->min=addVect(f->min,f->translate);
-	// f->max=addVect(f->max,f->translate);
+	f->min=addVect(f->min,f->translate);
+	f->max=addVect(f->max,f->translate);
 }
 
 void packTexcoordData(md2Model_struct *mdl)
@@ -300,8 +300,8 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 
 		glScalef32(1<<5,1<<5,1<<5); //?
 		
-		if(!center)glTranslate3f32(pframe->translate.x+((pframe2->translate.x-pframe->translate.x)*m)/4,pframe->translate.y+((pframe2->translate.y-pframe->translate.y)*m)/4,pframe->translate.z+((pframe2->translate.z-pframe->translate.z)*m)/4);
-		else glTranslate3f32(-(pframe->min.x+pframe->max.x)/2,-(pframe->min.y+pframe->max.y)/2,-(pframe->min.z+pframe->max.z)/2);
+		glTranslate3f32(pframe->translate.x+((pframe2->translate.x-pframe->translate.x)*m)/4,pframe->translate.y+((pframe2->translate.y-pframe->translate.y)*m)/4,pframe->translate.z+((pframe2->translate.z-pframe->translate.z)*m)/4);
+		if(center){md2_frame_t *frm=&mdl->frames[0];glTranslate3f32(-(frm->min.x+frm->max.x)/2,-(frm->min.y+frm->max.y)/2,-(frm->min.z+frm->max.z)/2);} //TEMP? ("fake" center)
 		
 		glScalef32((pframe->scale.x+((pframe2->scale.x-pframe->scale.x)*m)/4),(pframe->scale.y+((pframe2->scale.y-pframe->scale.y)*m)/4),(pframe->scale.z+((pframe2->scale.z-pframe->scale.z)*m)/4));
 

@@ -90,7 +90,7 @@ void initGame(void)
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
-	loadMd2Model("cube.md2","storagecube.pcx",&testCube); //TEMP
+	loadMd2Model("models/cube.md2","storagecube.pcx",&testCube); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -130,7 +130,8 @@ static inline void render1(void)
 			// applyForce(selectID, vect(0,0,0), vectMultInt(normalize(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),100));
 			setVelocity(selectID, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),4));
 			// updatePlayerPI(NULL);
-		}
+			changeAnimation(&getPlayer()->modelInstance,2,false);
+		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
 	
 	updatePlayer(NULL);
 	updatePortals();

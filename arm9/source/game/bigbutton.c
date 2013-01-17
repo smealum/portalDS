@@ -13,7 +13,7 @@ void initBigButtons(void)
 		bigButton[i].room=NULL;
 	}
 	
-	loadMd2Model("button1.md2","button1.pcx",&bigButtonModel);
+	loadMd2Model("models/button1.md2","button1.pcx",&bigButtonModel);
 	bigButtonBrightPalette=loadPalettePCX("button1b.pcx","textures");
 }
 

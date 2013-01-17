@@ -64,6 +64,7 @@ void initPlayer(player_struct* p)
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->life=4;
+	p->tempAngle=vect(0,0,0);
 	loadMd2Model("portalgun.md2","portalgun.pcx",&gun);
 	initModelInstance(&p->modelInstance,&gun);
 	crossHair=createTexture("crshair.pcx","textures");
@@ -118,7 +119,7 @@ void drawCrosshair(void)
 }
 
 s16 depth=-92;
-s16 height=-60;
+s16 height=-63;
 s16 X=-46;
 
 void renderGun(player_struct* p)
@@ -127,8 +128,8 @@ void renderGun(player_struct* p)
 	glPushMatrix();
 		glTranslate3f32(0,height,depth);
 		glRotateYi(-(1<<13));
-		// glTranslate3f32(0,0,depth);
-		// glRotateYi((1<<10));
+		glRotateYi(-p->tempAngle.y);
+		glRotateZi(-p->tempAngle.x/2);
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
@@ -224,6 +225,7 @@ void playerControls(player_struct* p)
 			angle.x -= degreesToAngle(dy);
 			angle.y -= degreesToAngle(dx);
 		}
+		p->tempAngle=addVect(p->tempAngle,angle);
 		rotateCamera(NULL, angle);
 	}
 	
@@ -318,6 +320,9 @@ void updatePlayer(player_struct* p)
 	
 	// updatePhysicsObject(p->object);
 	updateCamera(NULL);
+	
+	p->tempAngle.x/=2;
+	p->tempAngle.y/=2;
 	
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?

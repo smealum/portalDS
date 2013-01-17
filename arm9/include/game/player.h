@@ -8,6 +8,7 @@ typedef struct
 {
 	vect3D relativePosition;
 	vect3D relativePositionReal;
+	vect3D tempAngle;
 	room_struct* currentRoom;
 	physicsObject_struct* object;
 	modelInstance_struct modelInstance;

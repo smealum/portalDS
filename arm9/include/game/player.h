@@ -9,9 +9,11 @@ typedef struct
 	vect3D relativePosition;
 	vect3D relativePositionReal;
 	vect3D tempAngle;
+	s32 walkCnt;
 	room_struct* currentRoom;
 	physicsObject_struct* object;
 	modelInstance_struct modelInstance;
+	bool currentPortal;
 	s8 life;
 }player_struct;
 

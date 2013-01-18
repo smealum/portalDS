@@ -63,6 +63,7 @@ void initPlayer(player_struct* p)
 	p->currentRoom=NULL;
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
+	p->walkCnt=0;
 	p->life=4;
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
@@ -126,6 +127,7 @@ void renderGun(player_struct* p)
 {
 	if(!p)p=&player;
 	glPushMatrix();
+		glTranslate3f32((sinLerp(p->walkCnt>>1)>>11),(sinLerp(p->walkCnt)>>11),0);
 		glTranslate3f32(0,height,depth);
 		glRotateYi(-(1<<13));
 		glRotateYi(-p->tempAngle.y);
@@ -135,14 +137,6 @@ void renderGun(player_struct* p)
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
 		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false, p->modelInstance.palette);
 	glPopMatrix(1);
-	
-	// if(keysDown() & KEY_A)height--;
-	// if(keysDown() & KEY_B)height++;
-	// if(keysDown() & KEY_X)X--;
-	// if(keysDown() & KEY_Y)X++;
-	// if(keysDown() & KEY_START)depth--;
-	// if(keysDown() & KEY_SELECT)depth++;
-	// NOGBA("%d %d %d",depth,height,X);
 }
 
 void shootPlayerGun(player_struct* p, bool R)
@@ -152,6 +146,8 @@ void shootPlayerGun(player_struct* p, bool R)
 	
 	// mmEffect(&gunShot);
 	// mmEffect(SFX_GUNSHOT);
+	
+	p->currentPortal=R;
 	
 	int32 k=inttof32(300);
 	vect3D u=getUnitVector(NULL);
@@ -233,16 +229,17 @@ void playerControls(player_struct* p)
 	// if(keysHeld()&(KEY_Y))rotateCamera(NULL, vect(0,0,1<<8));
 	if(p->object->contact)
 	{
-		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));
-		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));
-		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));
-		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));
+		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/){moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));p->walkCnt+=2500;}
+		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/){moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));p->walkCnt+=2500;}
+		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/){moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));p->walkCnt+=2500;}
+		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/){moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));p->walkCnt+=2500;}
 	}else{
 		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
 		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERAIRSPEED),0,0));
 		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
 		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
 	}
+		
 	// if(keysHeld()&(KEY_SELECT))moveCamera(NULL, vect(0,-(inttof32(1)>>6),0));
 	// if(keysHeld()&(KEY_START))moveCamera(NULL, vect(0,inttof32(1)>>6,0));
 	if(keysDown()&(KEY_START))p->object->speed.y=(inttof32(1)>>4);
@@ -315,6 +312,8 @@ void updatePlayer(player_struct* p)
 	
 	// createParticles(p->object->position,vect(0,0,0),120);
 	// particleExplosion(p->object->position,32);
+	
+	editPalette((u16*)p->modelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	
 	collidePlayer(p,p->currentRoom);
 	

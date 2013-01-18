@@ -31,7 +31,7 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 		rec.material=NULL;
 		
 		rec.position=addVect(pos,vect(-1,1,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
-		if(recp){recp->hide=true;}
+		if(recp){recp->hide=true;bb->surface=recp;}
 		rec.position=addVect(pos,vect(-1,0,-1));rec.size=vect(2,1,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
 		if(recp)recp->hide=true;
 		rec.position=addVect(pos,vect(-1,1,1));rec.size=vect(2,-1,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
@@ -53,6 +53,7 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 bigButton_struct* createBigButton(room_struct* r, vect3D position)
 {
 	if(!r)r=getPlayer()->currentRoom;
+	if(!r)return NULL;
 	int i;
 	for(i=0;i<NUMBIGBUTTONS;i++)
 	{
@@ -94,6 +95,8 @@ void updateBigButton(bigButton_struct* bb)
 	if(!bb || !bb->used)return;
 	
 	bb->active=bb->surface->touched;
+	
+	NOGBA("touched ? %d",bb->surface->touched);
 }
 
 void updateBigButtons(void)

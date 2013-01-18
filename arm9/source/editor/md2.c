@@ -346,7 +346,7 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 		glScalef32(inttof32(32),inttof32(32),inttof32(32)); // necessary for v10
 		GFX_COLOR=RGB15(31,31,31);
 		
-		if(!m && pframe->displayList)
+		if(pframe->displayList && (!m || n==n2))
 		{
 			glCallList(pframe->displayList);
 		}else{		

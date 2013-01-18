@@ -20,5 +20,6 @@
 #include "PI9.h"
 #include "game/turrets.h"
 #include "game/bigbutton.h"
+#include "game/energyball.h"
 
 #endif

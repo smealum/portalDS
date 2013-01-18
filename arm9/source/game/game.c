@@ -8,7 +8,7 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testCube, testCatcher;
+md2Model_struct testCube;
 
 void initGame(void)
 {
@@ -57,6 +57,7 @@ void initGame(void)
 	initEnemies();
 	initTurrets();
 	initBigButtons();
+	initEnergyBalls();
 		
 	readMap("lalala.map", true);
 	
@@ -86,12 +87,12 @@ void initGame(void)
 	// createAAR(vectMultInt(vect(0,HEIGHTUNIT*16,TILESIZE*16),4), vectMultInt(vect(TILESIZE*5,HEIGHTUNIT*11,-TILESIZE*4),4), vect(-inttof32(1),0,0));
 	
 	updatePlayer(NULL);createBigButton(NULL, vect(10,0,10)); //TEMP
+	createEnergyDevice(NULL, vect(5,0,5), pX, false); //TEMP
 	
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
 	loadMd2Model("models/cube.md2","storagecube.pcx",&testCube); //TEMP
-	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&testCatcher); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -129,7 +130,7 @@ static inline void render1(void)
 			camera_struct* c=getPlayerCamera();
 			// applyForce(selectID, vect(0,0,0), vect(0,inttof32(2)*5,0));
 			// applyForce(selectID, vect(0,0,0), vectMultInt(normalize(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),100));
-			setVelocity(selectID, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),4));
+			setVelocity(selectID, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),4)),4),objects[selectID].position)),4));
 			// updatePlayerPI(NULL);
 			changeAnimation(&getPlayer()->modelInstance,2,false);
 		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
@@ -155,12 +156,12 @@ static inline void render1(void)
 		
 		transformCamera(NULL);
 		
-		glPushMatrix();			
-			glPushMatrix();
-				glTranslate3f32(-TILESIZE*5,0,0);
-				renderModelFrameInterp(0, 0, 0, &testCatcher, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL);
-			glPopMatrix(1);
-		glPopMatrix(1);
+		// glPushMatrix();
+			// glPushMatrix();
+				// glTranslate3f32(-TILESIZE*5,0,0);
+				// renderModelFrameInterp(0, 0, 0, &testCatcher, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL);
+			// glPopMatrix(1);
+		// glPopMatrix(1);
 		
 		drawRoomsGame(128);
 		
@@ -169,6 +170,7 @@ static inline void render1(void)
 		
 		drawOBBs();
 		drawBigButtons();
+		drawEnergyDevices();
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -213,6 +215,7 @@ static inline void render2(void)
 		
 		drawOBBs();
 		drawBigButtons();
+		drawEnergyDevices();
 			
 	glPopMatrix(1);
 	

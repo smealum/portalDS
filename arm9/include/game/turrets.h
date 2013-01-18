@@ -7,6 +7,7 @@
 typedef struct
 {
 	OBB_struct* OBB;
+	u8 counter;
 	bool used;
 }turret_struct;
 

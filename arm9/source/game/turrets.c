@@ -41,7 +41,8 @@ void updateTurret(turret_struct* t)
 {
 	if(!t || !t->used)return;
 	
-	editPalette((u16*)t->OBB->modelInstance.palette,0,RGB15(31,0,0)); //TEMP
+	t->counter+=2;t->counter%=63; //TEMP
+	editPalette((u16*)t->OBB->modelInstance.palette,0,RGB15(abs(31-t->counter),0,0)); //TEMP
 	
 	updateAnimation(&t->OBB->modelInstance); //TEMP
 }

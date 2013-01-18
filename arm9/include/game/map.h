@@ -77,6 +77,8 @@ void getPathfindingData(room_struct* r);
 
 u8 getHeightValue(room_struct* r, vect3D pos, bool floor);
 
+u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull);
+
 //lightmaps.h
 void loadLightMap(room_struct* r);
 void unloadLightMap(room_struct* r);

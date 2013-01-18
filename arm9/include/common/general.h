@@ -32,6 +32,7 @@
 #include "common/font.h"
 #include "common/GUI.h"
 #include "common/keyboard.h"
+#include "game/displaylist.h"
 
 #include "game/game_ex.h"
 #include "editor/editor_ex.h"

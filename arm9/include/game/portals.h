@@ -11,6 +11,7 @@ typedef struct portal_struct
 	u16 color;
 	vect3D normal, plane[2];
 	int32 angle, oldZ;
+	u32* displayList;
 	polygon_struct *polygon, *unprojectedPolygon;
 	struct portal_struct* targetPortal;
 }portal_struct;
@@ -22,8 +23,10 @@ void initPortals(void);
 void updatePortals(void);
 void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color);
 void drawPortal(portal_struct* p);
-void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool send);
+void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool actualMove);
 void updatePortalCamera(portal_struct* p, camera_struct* c);
+
+void drawPortalRoom(portal_struct* p);
 
 void collidePortal(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* point);
 

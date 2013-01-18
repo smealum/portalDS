@@ -152,10 +152,11 @@ void loadMaterials(char* filename)
 	iniparser_freedict(dic);
 }
 
-void bindMaterialSlice(materialSlice_struct* ms)
+void bindMaterialSlice(materialSlice_struct* ms, bool DL)
 {
 	if(!ms)ms=defaultMaterialSlice;
-	applyMTL(ms->img);
+	if(DL)applyMTLDL(ms->img);
+	else applyMTL(ms->img);
 }
 
 void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32* t)
@@ -224,7 +225,7 @@ void freeMaterialList(char** l)
 	free(l);
 }
 
-void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t)
+void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, bool DL)
 {
 	if(!m)m=defaultMaterial;
 	if(!m->used)return;
@@ -235,6 +236,6 @@ void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t)
 		else ms=m->bottom;
 	}
 	unbindMtl();
-	bindMaterialSlice(ms);
+	bindMaterialSlice(ms, DL);
 	getTextureCoordSlice(ms,rec,t);
 }

@@ -18,7 +18,7 @@ void initPortals(void)
 	currentPortal=&portal1;
 }
 
-void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool send)
+void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool actualMove)
 {
 	if(!p)return;
 	p->position=pos;
@@ -29,7 +29,13 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool s
 	
 	computePortalPlane(p);
 	
-	if(send)updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
+	if(actualMove)
+	{
+		updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
+		if(p->displayList)free(p->displayList);
+		p->displayList=NULL;
+		p->displayList=generateRoomDisplayList(NULL, p->position, p->normal, true);
+	}
 	
 	freePolygon(&p->unprojectedPolygon);
 	p->unprojectedPolygon=createEllipse(vect(0,0,0), vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);	
@@ -51,6 +57,8 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	p->normal=normal;
 	computePortalPlane(p);
 	
+	p->displayList=NULL;
+
 	p->polygon=NULL;
 	p->unprojectedPolygon=NULL;
 }
@@ -227,6 +235,17 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 	p->camera.transformationMatrix[0]=x2.x;p->camera.transformationMatrix[3]=x2.y;p->camera.transformationMatrix[6]=x2.z;
 	p->camera.transformationMatrix[1]=y2.x;p->camera.transformationMatrix[4]=y2.y;p->camera.transformationMatrix[7]=y2.z;
 	p->camera.transformationMatrix[2]=z2.x;p->camera.transformationMatrix[5]=z2.y;p->camera.transformationMatrix[8]=z2.z;
+}
+
+void drawPortalRoom(portal_struct* p)
+{
+	room_struct* r=getPlayer()->currentRoom;
+	if(!r || !p)return;
+	
+	glPushMatrix();
+		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
+		if(currentPortal->targetPortal && currentPortal->targetPortal->displayList)glCallList(currentPortal->targetPortal->displayList);
+	glPopMatrix(1);
 }
 
 const u8 segmentList[4][2]={{0,1},{1,2},{2,3},{3,0}};

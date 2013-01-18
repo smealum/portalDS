@@ -8,7 +8,7 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testCube;
+md2Model_struct testCube, testCatcher;
 
 void initGame(void)
 {
@@ -91,6 +91,7 @@ void initGame(void)
 	makeGrid();
 	
 	loadMd2Model("models/cube.md2","storagecube.pcx",&testCube); //TEMP
+	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&testCatcher); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -154,6 +155,13 @@ static inline void render1(void)
 		
 		transformCamera(NULL);
 		
+		glPushMatrix();			
+			glPushMatrix();
+				glTranslate3f32(-TILESIZE*5,0,0);
+				renderModelFrameInterp(0, 0, 0, &testCatcher, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL);
+			glPopMatrix(1);
+		glPopMatrix(1);
+		
 		drawRoomsGame(128);
 		
 		updateParticles();
@@ -189,11 +197,12 @@ static inline void render2(void)
 		
 		glScalef32(SCALEFACT,SCALEFACT,SCALEFACT);
 		
-		renderGun(NULL); //TEMP ?
+		renderGun(NULL);
 		
 		transformCamera(&currentPortal->camera);
 		
-		drawRoomsGame(0);
+		// drawRoomsGame(0);
+		drawPortalRoom(currentPortal);
 		
 		glPushMatrix();
 			camera_struct* c=getPlayerCamera();

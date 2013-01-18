@@ -4,6 +4,8 @@
 
 extern doorCollection_struct doorCollection;
 
+u32* testDL=NULL;
+
 void initRectangleList(rectangleList_struct* p)
 {
 	p->first=NULL;
@@ -369,15 +371,8 @@ vect3D getOverlayRectangleSize(rectangle_struct rec)
 	return u;
 }
 
-void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c)
+void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (clean up, switch to v10 ?)
 {
-	// if(c)glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	// else glPolyFmt(POLY_DECAL | POLY_ALPHA(31) | POLY_CULL_BACK);
-	// vect3D size=vect(rec.size.x*TILESIZE*2,rec.size.y*HEIGHTUNIT,rec.size.z*TILESIZE*2);
-	// if(!c)applyMTL(rec.lightMap);
-	// if(c)unbindMtl();
-	// glColor3b(255,255,255);
-	// NOGBA("%d %d",pos.x,pos.x);
 	if(rec.hide)return;
 	vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
 	vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
@@ -396,18 +391,10 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c)
 	int32 t[4];
 	if(c)
 	{
-		// p1=vect(0,0,0);
-		// if(!rec.size.x)p2=vect(inttot16(16*rec.size.y-1),inttot16(64*rec.size.z-1),0);
-		// else if(!rec.size.y)p2=vect(inttot16(64*rec.size.x-1),inttot16(64*rec.size.z-1),0);
-		// else p2=vect(inttot16(64*rec.size.x-1),inttot16(16*rec.size.y-1),0);
-		// t1=TEXTURE_PACK(p1.x, p1.y);
-		// t2=TEXTURE_PACK(p1.x, p2.y);
-		// t3=TEXTURE_PACK(p2.x, p2.y);
-		// t4=TEXTURE_PACK(p2.x, p1.y);
 		c=false;
 		glColor3b(255,255,255);
 		
-		bindMaterial(rec.material,&rec,t);
+		bindMaterial(rec.material,&rec,t,false);
 		t1=t[0];
 		t2=t[1];
 		t3=t[2];
@@ -456,6 +443,80 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c)
 	}
 }
 
+void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cpos, vect3D cnormal, bool cull) //TEMP ?
+{
+	if(rec.hide)return;
+	
+	vect3D v[4];
+	if(!rec.size.x)
+	{
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x, pos.y+size.y, pos.z+size.z);
+		v[3]=vect(pos.x, pos.y+size.y, pos.z);
+	}else if(rec.size.y){
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y+size.y, pos.z);
+		v[2]=vect(pos.x+size.x, pos.y+size.y, pos.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
+	}else{
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x+size.x, pos.y, pos.z+size.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
+	}
+	
+	if(cull)
+	{
+		int i;bool pass=false;
+		for(i=0;i<4;i++)
+		{
+			vect3D v1=vectDifference(v[i],cpos);
+			if(dotProduct(v1,cnormal)>0)pass=true;
+		}
+		if(!pass)return;
+	}
+	
+	vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
+	vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
+	int32 t1=TEXTURE_PACK(p1.x, p1.y);
+	int32 t2=TEXTURE_PACK(p1.x, p2.y);
+	int32 t3=TEXTURE_PACK(p2.x, p2.y);
+	int32 t4=TEXTURE_PACK(p2.x, p1.y);
+	if(rec.rot)
+	{
+		p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
+		t1=TEXTURE_PACK(p1.x, p1.y);
+		t4=TEXTURE_PACK(p1.x, p2.y);
+		t3=TEXTURE_PACK(p2.x, p2.y);
+		t2=TEXTURE_PACK(p2.x, p1.y);
+	}
+	int32 t[4];
+	if(c)
+	{
+		c=false;
+		glColor3b(255,255,255);
+		
+		bindMaterial(rec.material,&rec,t,true);
+		t1=t[0];
+		t2=t[1];
+		t3=t[2];
+		t4=t[3];
+	}
+	glBeginDL(GL_QUAD);
+		glTexCoordPACKED(t1);
+		glVertex3v16DL(v[0].x, v[0].y, v[0].z);
+
+		glTexCoordPACKED(t2);
+		glVertex3v16DL(v[1].x, v[1].y, v[1].z);
+
+		glTexCoordPACKED(t3);
+		glVertex3v16DL(v[2].x, v[2].y, v[2].z);
+
+		glTexCoordPACKED(t4);
+		glVertex3v16DL(v[3].x, v[3].y, v[3].z);
+}
+
 void transferRectangle(vect3D pos, vect3D size, vect3D normal)
 {
 	if(size.x<0){pos.x+=size.x;size.x=-size.x;}
@@ -480,7 +541,7 @@ void transferRectangles(room_struct* r)
 void drawRectangles(room_struct* r, u8 mode)
 {
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	// glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+	
 	listCell_struct *lc=r->rectangles.first;
 	unbindMtl();
 	GFX_COLOR=RGB15(31,31,31);
@@ -688,12 +749,6 @@ void drawRoom(room_struct* r, u8 mode) //obviously temp
 	}
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
-		// glPushMatrix();
-			// glTranslate3f32(-TILESIZE,0,-TILESIZE);
-			// glScalef32(TILESIZE*2*r->width,HEIGHTUNIT*31,TILESIZE*2*r->height);
-			// bool res=BoxTest(0,0,0,inttof32(1),inttof32(1),inttof32(1));
-			// if(!res)return;
-		// glPopMatrix(1);
 		if(mode&1)drawRectangles(r, mode);
 		else{
 			unbindMtl();
@@ -742,6 +797,35 @@ void drawRoom(room_struct* r, u8 mode) //obviously temp
 			glEnd();
 		}
 	glPopMatrix(1);
+}
+
+u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull)
+{	
+	if(!r)r=getPlayer()->currentRoom;
+	if(!r)return NULL;
+	u32* ptr=glBeginListDL();
+	
+	glPolyFmtDL(POLY_ALPHA(31) | POLY_CULL_BACK);
+	listCell_struct *lc=r->rectangles.first;
+	while(lc)
+	{
+		drawRectDL(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),true,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
+		lc=lc->next;
+	}
+	
+	lc=r->rectangles.first;
+	glPolyFmtDL(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
+	applyMTLDL(r->lightMap);
+	while(lc)
+	{
+		drawRectDL(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
+		lc=lc->next;
+	}
+	
+	u32 size=glEndListDL();
+	u32* displayList=malloc((size+1)*4);
+	if(displayList)memcpy(displayList,ptr,(size+1)*4);
+	return displayList;
 }
 
 void freeRoom(room_struct* r)

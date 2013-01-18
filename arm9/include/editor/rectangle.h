@@ -56,6 +56,6 @@ void scanEdgeInnerWall(roomEdit_struct* re, u8* floor, u8* ceiling, int w, int h
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip);
 vect3D getClosestPointRectangle(rectangle_struct* rec, vect3D o);
 
-void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t);
+void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, bool DL);
 
 #endif

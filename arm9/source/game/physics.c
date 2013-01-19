@@ -7,6 +7,7 @@
 #define BOXNUM 10
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
+extern platform_struct platform[NUMPLATFORMS];
 
 vect3D boxDefinition[]={vect(0,-PLAYERSIZEY,0),
 						vect(-PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,-PLAYERSIZEX),
@@ -214,7 +215,7 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	
 	while(lc) //add culling
 	{
-		vect3D o2=getClosestPointRectangle(&lc->data,o1);
+		vect3D o2=getClosestPointRectangleStruct(&lc->data,o1);
 			o2=addVect(o2,convertVect(vect(r->position.x,0,r->position.y)));
 			collidePortal(r,&lc->data,&portal1,&o2);
 			collidePortal(r,&lc->data,&portal2,&o2);
@@ -235,6 +236,29 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 			ret=true;
 		}
 		lc=lc->next;
+	}
+	
+	//platforms
+	int i;
+	for(i=0;i<NUMPLATFORMS;i++)
+	{
+		if(platform[i].used) //add culling
+		{
+			platform_struct* pf=&platform[i];
+			vect3D o2=getClosestPointRectangle(addVect(pf->position,vect(-PLATFORMSIZE,0,-PLATFORMSIZE)),vect(PLATFORMSIZE*2,0,PLATFORMSIZE*2),o->position);
+			vect3D v=vectDifference(o2,o->position);
+			int32 sqd=divf32(mulf32(v.x,v.x),transX)+divf32(mulf32(v.y,v.y),transY)+divf32(mulf32(v.z,v.z),transZ);
+			if(sqd<o->sqRadius)
+			{
+				int32 sqd=divf32((v.x*v.x),transX)+divf32((v.y*v.y),transY)+divf32((v.z*v.z),transZ);
+				u32 d=sqrtf32((sqd));
+				v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
+				o->position=addVect(o->position,v);
+				o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+				pf->touched=true;
+				ret=true;
+			}
+		}
 	}
 	
 	return ret;

@@ -8,7 +8,10 @@ PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
 
-md2Model_struct testCube;
+// extern md2Model_struct storageCubeModel, companionCubeModel, cubeDispenserModel; //TEMP
+cubeDispenser_struct* testDispenser;
+bigButton_struct* testButton;
+platform_struct* testPlatform;
 
 void initGame(void)
 {
@@ -59,6 +62,7 @@ void initGame(void)
 	initBigButtons();
 	initEnergyBalls();
 	initPlatforms();
+	initCubes();
 		
 	readMap("lalala.map", true);
 	
@@ -87,13 +91,16 @@ void initGame(void)
 	// createAAR(vectMultInt(vect(TILESIZE*24,0,TILESIZE*24),4), vectMultInt(vect(-TILESIZE*12,HEIGHTUNIT*11,-TILESIZE*12),4), vect(0,inttof32(1),0));
 	// createAAR(vectMultInt(vect(0,HEIGHTUNIT*16,TILESIZE*16),4), vectMultInt(vect(TILESIZE*5,HEIGHTUNIT*11,-TILESIZE*4),4), vect(-inttof32(1),0,0));
 	
-	updatePlayer(NULL);createBigButton(NULL, vect(10,0,10)); //TEMP
-	createEnergyDevice(NULL, vect(5,0,5), pX, false); //TEMP
+	updatePlayer(NULL);testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
+	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
+	createEnergyDevice(NULL, vect(0,4,4), pX, false); //TEMP
+	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE,-TILESIZE*4), true); //TEMP
+	// addActivatorTarget(&testButton->activator,(void*)testDispenser,DISPENSER_TARGET);//
+	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//
 	
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
 	
-	loadMd2Model("models/cube.md2","storagecube.pcx",&testCube); //TEMP
 	getVramStatus();
 	
 	startPI();
@@ -122,7 +129,8 @@ static inline void render1(void)
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
 		if(keysDown()&KEY_X)createTurret(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4));
-		if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&testCube);
+		// if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&companionCubeModel);
+		if(keysDown()&KEY_SELECT)testDispenser->active=true;
 		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
 		if(keysDown()&KEY_Y){selectID++;selectID%=NUMOBJECTS;if(!objects[selectID].used)selectID=0;}
 		
@@ -143,6 +151,7 @@ static inline void render1(void)
 	updateEnergyDevices();
 	updateEnergyBalls();
 	updatePlatforms();
+	updateCubeDispensers();
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
@@ -177,6 +186,7 @@ static inline void render1(void)
 		drawEnergyDevices();
 		drawEnergyBalls();
 		drawPlatforms();
+		drawCubeDispensers();
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -224,6 +234,7 @@ static inline void render2(void)
 		drawEnergyDevices();
 		drawEnergyBalls();
 		drawPlatforms();
+		drawCubeDispensers();
 
 	glPopMatrix(1);
 	

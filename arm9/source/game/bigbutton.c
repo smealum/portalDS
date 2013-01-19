@@ -45,6 +45,7 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 	pos=vect(pos.x+r->position.x, pos.y, pos.z+r->position.y);
 	bb->position=convertVect(pos);
 	
+	initActivator(&bb->activator);
 	bb->active=false;
 	
 	bb->used=true;
@@ -95,8 +96,8 @@ void updateBigButton(bigButton_struct* bb)
 	if(!bb || !bb->used)return;
 	
 	bb->active=bb->surface->touched;
-	
-	NOGBA("touched ? %d",bb->surface->touched);
+	if(bb->active)useActivator(&bb->activator);
+	else unuseActivator(&bb->activator);
 }
 
 void updateBigButtons(void)

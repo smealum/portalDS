@@ -19,8 +19,10 @@
 #include "editor/rectangle.h"
 #include "PI9.h"
 #include "game/turrets.h"
-#include "game/bigbutton.h"
 #include "game/energyball.h"
 #include "game/platform.h"
+#include "game/cubes.h"
+#include "game/activator.h"
+#include "game/bigbutton.h"
 
 #endif

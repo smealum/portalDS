@@ -523,10 +523,8 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 	return false;
 }
 
-vect3D getClosestPointRectangle(rectangle_struct* rec, vect3D o)
+vect3D getClosestPointRectangle(vect3D p, vect3D s, vect3D o)
 {
-	vect3D p=vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2);
-	vect3D s=vect(rec->size.x*TILESIZE*2,rec->size.y*HEIGHTUNIT,rec->size.z*TILESIZE*2);
 	vect3D u1, u2;
 	int32 x,y,sx,sy;
 	
@@ -575,6 +573,13 @@ vect3D getClosestPointRectangle(rectangle_struct* rec, vect3D o)
 	}
 	
 	return addVect(p,vect(mulf32(x,u1.x)+mulf32(y,u2.x), mulf32(x,u1.y)+mulf32(y,u2.y), mulf32(x,u1.z)+mulf32(y,u2.z)));
+}
+
+vect3D getClosestPointRectangleStruct(rectangle_struct* rec, vect3D o)
+{
+	vect3D p=vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2);
+	vect3D s=vect(rec->size.x*TILESIZE*2,rec->size.y*HEIGHTUNIT,rec->size.z*TILESIZE*2);
+	return getClosestPointRectangle(p, s, o);
 }
 
 int area2D(rectangle2D_struct rec)

@@ -13,6 +13,7 @@ typedef struct
 	room_struct* currentRoom;
 	physicsObject_struct* object;
 	modelInstance_struct modelInstance;
+	modelInstance_struct playerModelInstance;
 	bool currentPortal;
 	s8 life;
 }player_struct;
@@ -26,5 +27,6 @@ player_struct* getPlayer(void);
 void freePlayer(void);
 void drawCrosshair(void);
 void damagePlayer(player_struct* p);
+void drawPlayer(player_struct* p);
 
 #endif

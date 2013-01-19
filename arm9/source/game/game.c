@@ -11,6 +11,7 @@ extern roomEdit_struct roomEdits[NUMROOMEDITS];
 // extern md2Model_struct storageCubeModel, companionCubeModel, cubeDispenserModel; //TEMP
 cubeDispenser_struct* testDispenser;
 bigButton_struct* testButton;
+bigButton_struct* testButton2;
 platform_struct* testPlatform;
 
 void initGame(void)
@@ -57,7 +58,7 @@ void initGame(void)
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
 	
-	initEnemies();
+	// initEnemies();
 	initTurrets();
 	initBigButtons();
 	initEnergyBalls();
@@ -86,10 +87,11 @@ void initGame(void)
 	initPI9();
 	
 	updatePlayer(NULL);testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
+	testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
-	createEnergyDevice(NULL, vect(0,4,4), pX, false); //TEMP
+	createEnergyDevice(NULL, vect(0,7,7), pX, false); //TEMP
 	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
-	// addActivatorTarget(&testButton->activator,(void*)testDispenser,DISPENSER_TARGET);//
+	// addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET);//
 	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//
 	
 	transferRectangles(&roomEdits[0].data);
@@ -100,13 +102,9 @@ void initGame(void)
 	startPI();
 }
 
-extern md2Model_struct enemyModel;
-
 bool testbool=false;
 bool switchPortal=false;
 portal_struct *currentPortal, *previousPortal;
-
-extern md2Model_struct enemyModel; //TEMP
 
 void postProcess(u16* scrP, u32* stackP);
 bool orangeSeen, blueSeen;
@@ -224,12 +222,7 @@ static inline void render2(void)
 		// drawRoomsGame(0);
 		drawPortalRoom(currentPortal);
 		
-		glPushMatrix();
-			camera_struct* c=getPlayerCamera();
-			glTranslatef32(c->position.x,c->position.y-TILESIZE*3,c->position.z);
-			glRotateYi(c->angle.y+16384);
-			renderModelFrameInterp(0,0,0,&enemyModel,POLY_ALPHA(31)|POLY_CULL_FRONT,false,NULL);
-		glPopMatrix(1);
+		drawPlayer(NULL);
 		
 		drawOBBs();
 		drawBigButtons();
@@ -305,7 +298,7 @@ void killGame(void)
 	fadeOut();
 	NOGBA("KILLING IT");
 	wipeMapEdit();
-	freeEnemies();
+	// freeEnemies();
 	freePlayer();
 	freeState(NULL);
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());

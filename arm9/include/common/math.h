@@ -29,6 +29,12 @@ static inline void fadeOut(void)
 	int i;for(i=0;i<=16;i++){setBrightness(3,-i);swiWaitForVBlank();}
 }
 
+static inline void transposeMatrix33(int32* m1, int32* m2) //3x3
+{
+	int i, j;
+	for(i=0;i<3;i++)for(j=0;j<3;j++)m2[j+i*3]=m1[i+j*3];
+}
+
 static inline vect3D addVect(vect3D p1, vect3D p2)
 {
 	return vect(p1.x+p2.x,p1.y+p2.y,p1.z+p2.z);

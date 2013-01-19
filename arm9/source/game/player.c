@@ -5,7 +5,7 @@
 #define SQPLAYERRADIUS ((PLAYERRADIUS*PLAYERRADIUS)>>12)
 
 player_struct player;
-md2Model_struct gun;
+md2Model_struct gun, playerModel;
 mtlImg_struct* crossHair;
 struct gl_texture_t *bottomScreen;
 
@@ -67,12 +67,31 @@ void initPlayer(player_struct* p)
 	p->life=4;
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
+	loadMd2Model("models/ratman.md2","ratman.pcx",&playerModel);
 	initModelInstance(&p->modelInstance,&gun);
-	crossHair=createTexture("crshair.pcx","textures");
+	initModelInstance(&p->playerModelInstance,&playerModel);
+	// crossHair=createTexture("crshair.pcx","textures");
 	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
 	// bgSub=bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
 	// dmaCopy(bottomScreen->palette, BG_PALETTE_SUB, 256*2);
 	// copyBottomScreen(0);
+}
+
+void drawPlayer(player_struct* p)
+{
+	if(!p)p=&player;
+	
+	glPushMatrix();
+		camera_struct* c=getPlayerCamera();
+		glTranslatef32(c->position.x,c->position.y-600,c->position.z);
+		int32 m[9];transposeMatrix33(c->transformationMatrix,m);
+		m[0]=-m[0];m[3]=-m[3];m[6]=-m[6];
+		m[1]=0;m[4]=inttof32(1);m[7]=0;
+		m[2]=-m[2];m[5]=-m[5];m[8]=-m[8];
+		fixMatrix(m);
+		multMatrixGfx33(m);
+		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,POLY_ALPHA(31)|POLY_CULL_FRONT,false,p->playerModelInstance.palette);
+	glPopMatrix(1);
 }
 
 void damagePlayer(player_struct* p)
@@ -92,7 +111,7 @@ void drawCrosshair(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	
-	applyMTL(crossHair);
+	// applyMTL(crossHair);
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
@@ -229,10 +248,12 @@ void playerControls(player_struct* p)
 	// if(keysHeld()&(KEY_Y))rotateCamera(NULL, vect(0,0,1<<8));
 	if(p->object->contact)
 	{
-		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/){moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));p->walkCnt+=2500;}
-		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/){moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));p->walkCnt+=2500;}
-		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/){moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));p->walkCnt+=2500;}
-		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/){moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));p->walkCnt+=2500;}
+		bool idle=true;
+		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/){moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
+		else if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/){moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
+		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/){moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
+		else if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/){moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
+		if(idle)changeAnimation(&p->playerModelInstance,0,false);
 	}else{
 		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
 		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERAIRSPEED),0,0));
@@ -314,6 +335,7 @@ void updatePlayer(player_struct* p)
 	// particleExplosion(p->object->position,32);
 	
 	editPalette((u16*)p->modelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
+	editPalette((u16*)p->playerModelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	
 	collidePlayer(p,p->currentRoom);
 	
@@ -322,6 +344,8 @@ void updatePlayer(player_struct* p)
 	
 	p->tempAngle.x/=2;
 	p->tempAngle.y/=2;
+	
+	updateAnimation(&p->playerModelInstance);
 	
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?

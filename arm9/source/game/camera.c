@@ -103,11 +103,10 @@ void updateViewMatrix(camera_struct* c)
 	multMatrix44(m2,m1,c->viewMatrix);
 }
 
-void multTransformationMatrix(camera_struct* c)
+void multMatrixGfx33(int32* n)
 {
-	if(!c)c=&playerCamera;
-	int32* m=c->transformationMatrix;
-	
+	if(!n)return;
+	int32* m=n;
 	MATRIX_MULT3x3=*(m++);
 	MATRIX_MULT3x3=*(m++);
 	MATRIX_MULT3x3=*(m++);
@@ -119,6 +118,12 @@ void multTransformationMatrix(camera_struct* c)
 	MATRIX_MULT3x3=*(m++);
 	MATRIX_MULT3x3=*(m++);
 	MATRIX_MULT3x3=*m;
+}
+
+void multTransformationMatrix(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+	multMatrixGfx33(c->transformationMatrix);
 }
 
 void multProjectionMatrix(camera_struct* c)
@@ -433,6 +438,7 @@ void updateCamera(camera_struct* c)
 {
 	if(!c)c=&playerCamera;
 	c->position=c->object.position;
+	// c->position.y+=128;
 	updateViewMatrix(c);
 	updateFrustum(c);
 	

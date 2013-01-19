@@ -21,5 +21,6 @@
 #include "game/turrets.h"
 #include "game/bigbutton.h"
 #include "game/energyball.h"
+#include "game/platform.h"
 
 #endif

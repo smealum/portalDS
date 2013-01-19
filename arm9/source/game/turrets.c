@@ -1,4 +1,3 @@
-#include <nds.h>
 #include "game/game_main.h"
 
 turret_struct turrets[NUMTURRETS];

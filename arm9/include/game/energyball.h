@@ -2,6 +2,7 @@
 #define ENERGYBALL_H
 
 #define NUMENERGYDEVICES (8)
+#define NUMENERGYBALLS (8)
 
 typedef enum
 {
@@ -22,9 +23,20 @@ typedef struct
 	bool used;
 }energyDevice_struct;
 
+typedef struct
+{
+	vect3D position, direction;
+	u16 life;
+	bool used;
+}energyBall_struct;
+
 void initEnergyBalls(void);
 energyDevice_struct* createEnergyDevice(room_struct* r, vect3D pos, deviceOrientation_type or, bool type);
 void drawEnergyDevices(void);
 void updateEnergyDevices(void);
+
+energyBall_struct* createEnergyBall(vect3D pos, vect3D dir);
+void drawEnergyBalls(void);
+void updateEnergyBalls(void);
 
 #endif

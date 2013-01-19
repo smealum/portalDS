@@ -1,7 +1,7 @@
-#include <nds.h>
 #include "game/game_main.h"
 
 energyDevice_struct energyDevice[NUMENERGYDEVICES];
+energyBall_struct energyBall[NUMENERGYBALLS];
 
 md2Model_struct energyCatcherModel, energyLauncherModel;
 
@@ -11,6 +11,10 @@ void initEnergyBalls(void)
 	for(i=0;i<NUMENERGYDEVICES;i++)
 	{
 		energyDevice[i].used=false;
+	}
+	for(i=0;i<NUMENERGYBALLS;i++)
+	{
+		energyBall[i].used=false;
 	}
 	
 	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&energyCatcherModel);
@@ -139,5 +143,54 @@ void updateEnergyDevices(void)
 	for(i=0;i<NUMENERGYDEVICES;i++)
 	{
 		if(energyDevice[i].used)updateEnergyDevice(&energyDevice[i]);
+	}
+}
+
+void initEnergyBall(energyBall_struct* eb, vect3D pos, vect3D dir)
+{
+	if(!eb)return;
+	
+	eb->used=true;
+}
+
+energyBall_struct* createEnergyBall(vect3D pos, vect3D dir)
+{
+	int i;
+	for(i=0;i<NUMENERGYBALLS;i++)
+	{
+		if(energyBall[i].used)
+		{
+			initEnergyBall(&energyBall[i],pos,dir);
+			return &energyBall[i];
+		}
+	}
+	return NULL;
+}
+
+void drawEnergyBall(energyBall_struct* eb)
+{
+	if(!eb)return;
+}
+
+void drawEnergyBalls(void)
+{
+	int i;
+	for(i=0;i<NUMENERGYBALLS;i++)
+	{
+		if(energyBall[i].used)drawEnergyBall(&energyBall[i]);
+	}
+}
+
+void updateEnergyBall(energyBall_struct* eb)
+{
+	if(!eb)return;
+}
+
+void updateEnergyBalls(void)
+{
+	int i;
+	for(i=0;i<NUMENERGYBALLS;i++)
+	{
+		if(energyBall[i].used)updateEnergyBall(&energyBall[i]);
 	}
 }

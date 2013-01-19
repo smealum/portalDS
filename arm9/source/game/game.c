@@ -58,6 +58,7 @@ void initGame(void)
 	initTurrets();
 	initBigButtons();
 	initEnergyBalls();
+	initPlatforms();
 		
 	readMap("lalala.map", true);
 	
@@ -139,6 +140,9 @@ static inline void render1(void)
 	updatePortals();
 	updateTurrets();
 	updateBigButtons();
+	updateEnergyDevices();
+	updateEnergyBalls();
+	updatePlatforms();
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
@@ -171,6 +175,8 @@ static inline void render1(void)
 		drawOBBs();
 		drawBigButtons();
 		drawEnergyDevices();
+		drawEnergyBalls();
+		drawPlatforms();
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -216,7 +222,9 @@ static inline void render2(void)
 		drawOBBs();
 		drawBigButtons();
 		drawEnergyDevices();
-			
+		drawEnergyBalls();
+		drawPlatforms();
+
 	glPopMatrix(1);
 	
 	glFlush(0);

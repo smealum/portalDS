@@ -85,16 +85,10 @@ void initGame(void)
 	//PHYSICS
 	initPI9();
 	
-	// createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*16,-inttof32(0)),inttof32(1));
-	// createBox(vectMultInt(vect(TILESIZE,TILESIZE,TILESIZE),4),vectMultInt(vect(-inttof32(0),HEIGHTUNIT*16,-inttof32(0)),4),inttof32(1));
-		
-	// createAAR(vectMultInt(vect(TILESIZE*24,0,TILESIZE*24),4), vectMultInt(vect(-TILESIZE*12,HEIGHTUNIT*11,-TILESIZE*12),4), vect(0,inttof32(1),0));
-	// createAAR(vectMultInt(vect(0,HEIGHTUNIT*16,TILESIZE*16),4), vectMultInt(vect(TILESIZE*5,HEIGHTUNIT*11,-TILESIZE*4),4), vect(-inttof32(1),0,0));
-	
 	updatePlayer(NULL);testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
 	createEnergyDevice(NULL, vect(0,4,4), pX, false); //TEMP
-	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE,-TILESIZE*4), true); //TEMP
+	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
 	// addActivatorTarget(&testButton->activator,(void*)testDispenser,DISPENSER_TARGET);//
 	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//
 	
@@ -144,20 +138,24 @@ static inline void render1(void)
 			changeAnimation(&getPlayer()->modelInstance,2,false);
 		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
 	
-	updatePlayer(NULL);
-	updatePortals();
-	updateTurrets();
-	updateBigButtons();
-	updateEnergyDevices();
-	updateEnergyBalls();
-	updatePlatforms();
-	updateCubeDispensers();
+	// cpuStartTiming(0);
+		updatePlayer(NULL);
+	// iprintf("player : %d  \n",cpuEndTiming());
+	// cpuStartTiming(0);
+		updatePortals();
+		updateTurrets();
+		updateBigButtons();
+		updateEnergyDevices();
+		updateEnergyBalls();
+		updatePlatforms();
+		updateCubeDispensers();
+	// iprintf("updates : %d  \n",cpuEndTiming());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
 	GFX_CLEAR_COLOR=0;
 	
-		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);NOGBA("ALERT %d      \n",cnt-4096);}
+		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}
 	
 	projectCamera(NULL);
 
@@ -181,12 +179,16 @@ static inline void render1(void)
 		updateParticles();
 		drawParticles();
 		
-		drawOBBs();
-		drawBigButtons();
-		drawEnergyDevices();
-		drawEnergyBalls();
-		drawPlatforms();
-		drawCubeDispensers();
+		// cpuStartTiming(0);
+			drawOBBs();
+		// iprintf("OBBs : %d  \n",cpuEndTiming());
+		// cpuStartTiming(0);
+			drawBigButtons();
+			drawEnergyDevices();
+			drawEnergyBalls();
+			drawPlatforms();
+			drawCubeDispensers();
+		// iprintf("stuff : %d  \n",cpuEndTiming());
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -273,7 +275,7 @@ void gameFrame(void)
 	{
 		case false:
 			iprintf("\x1b[0;0H");
-			cpuStartTiming(0);
+			// cpuStartTiming(0);
 			postProcess1();
 			// iprintf("frm 1 : %d  \n",cpuGetTiming());
 			render1();
@@ -283,7 +285,7 @@ void gameFrame(void)
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
 			break;
 		case true:
-			cpuStartTiming(0);
+			// cpuStartTiming(0);
 			postProcess2();
 			// iprintf("frm 2 : %d  \n",cpuGetTiming());
 			render2();

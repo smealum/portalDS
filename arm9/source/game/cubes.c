@@ -45,6 +45,7 @@ void initCubeDispenser(room_struct* r, cubeDispenser_struct* cd, vect3D pos, boo
 	cd->position=convertVect(pos);
 	
 	cd->companion=companion;
+	cd->currentCube=NULL;
 	
 	changeAnimation(&cd->modelInstance,0,false);
 	
@@ -90,14 +91,14 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 {
 	if(!cd)return;
 	
-	if(cd->active)
+	if(cd->active && !cd->oldActive)
 	{
-		createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
+		cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
 		changeAnimation(&cd->modelInstance,1,true);
-		cd->active=false;
 	}
 	
 	updateAnimation(&cd->modelInstance);
+	cd->oldActive=cd->active;
 }
 
 void updateCubeDispensers(void)

@@ -153,7 +153,9 @@ void updatePortal(portal_struct* p)
 		if(z<0 && p->oldZ>=0){currentPortal=p;warpPlayer(p,pl);}
 	}
 	p->oldZ=z;
-	
+		
+	int32 dist=distance(pl->object->position,p->position);
+	if(dist<inttof32(1)/6)
 	{
 		vect3D v[4];
 		

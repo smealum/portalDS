@@ -789,15 +789,15 @@ void simulate(OBB_struct* o, float dt2)
 		OBB_struct bkp;
 		copyOBB(o,&bkp);
 
-		cpuStartTiming(0);
+		// cpuStartTiming(0);
         integrate(o,targetTime-currentTime);
-		integ+=cpuEndTiming();
+		// integ+=cpuEndTiming();
 
-		cpuStartTiming(0);
+		// cpuStartTiming(0);
 		checkOBBCollisions(o);
-		coll+=cpuEndTiming();
+		// coll+=cpuEndTiming();
 		
-		cpuStartTiming(0);
+		// cpuStartTiming(0);
 		if(o->numContactPoints && o->maxPenetration>PENETRATIONTHRESHOLD)
         {
             targetTime=(currentTime+targetTime)/2;
@@ -820,8 +820,9 @@ void simulate(OBB_struct* o, float dt2)
             currentTime=targetTime;
 			targetTime=dt;
 		}
-		impul+=cpuEndTiming();
+		// impul+=cpuEndTiming();
     }
+	collideSpherePlatforms(&o->position,o->size.x-8);
 		
 	o->forces=vect(0,0,0);
 	o->moment=vect(0,0,0);

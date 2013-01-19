@@ -30,6 +30,7 @@ typedef struct
 void initAARs(void);
 void drawAARs(void);
 void AARsOBBContacts(OBB_struct* o);
+void updateAAR(u16 id, vect3D position);
 AAR_struct* createAAR(u16 id, vect3D position, vect3D size, vect3D normal);
 
 #endif

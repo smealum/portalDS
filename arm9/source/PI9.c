@@ -122,6 +122,27 @@ void createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez
 	NOGBA("aar : %d",a->id);
 }
 
+void addPlatform(vect3D pos)
+{
+	AAR_struct* a=newAAR();
+	if(!a)return;
+	a->size=vect(PLATFORMSIZE*2*4,0,PLATFORMSIZE*2*4);
+	a->position=pos;
+	
+	fifoSendValue32(FIFO_USER_08,PI_ADDPLATFORM|((a->id)<<PISIGNALDATA));
+	fifoSendValue32(FIFO_USER_08,(a->position.x));
+	fifoSendValue32(FIFO_USER_08,(a->position.y));
+	fifoSendValue32(FIFO_USER_08,(a->position.z));
+}
+
+void changePlatform(u8 id, vect3D pos)
+{
+	fifoSendValue32(FIFO_USER_08,PI_UPDATEPLATFORM|((id)<<PISIGNALDATA));
+	fifoSendValue32(FIFO_USER_08,(pos.x));
+	fifoSendValue32(FIFO_USER_08,(pos.y));
+	fifoSendValue32(FIFO_USER_08,(pos.z));
+}
+
 void applyForce(u8 id, vect3D pos, vect3D v) //(id;[posx|posy][posz][vx][vy][vz])
 {	
 	if(id>NUMOBJECTS || !objects[id].used)return;
@@ -289,6 +310,7 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
+	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true, o->modelInstance.palette);
 	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true, o->modelInstance.palette);
 	
 	// int i;

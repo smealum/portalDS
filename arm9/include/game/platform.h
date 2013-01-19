@@ -1,9 +1,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#define NUMPLATFORMS (8)
-#define PLATFORMSIZE (TILESIZE*3) //half
-
 typedef struct
 {
 	vect3D position, velocity;
@@ -12,6 +9,7 @@ typedef struct
 	bool touched, oldTouched;
 	bool active, backandforth;
 	bool used;
+	u8 id;
 }platform_struct;
 
 void initPlatforms(void);

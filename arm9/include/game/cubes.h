@@ -8,7 +8,8 @@ typedef struct
 	vect3D position;
 	modelInstance_struct modelInstance;
 	bool companion;
-	bool active;
+	bool active, oldActive;
+	OBB_struct* currentCube;
 	bool used;
 }cubeDispenser_struct;
 

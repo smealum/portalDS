@@ -10,6 +10,9 @@
 #define PISIGNALDATA (6)
 #define PISIGNALMASK ((1<<PISIGNALDATA)-1)
 
+#define NUMPLATFORMS (8)
+#define PLATFORMSIZE (256*3) //half
+
 typedef enum
 {
 	PI_START=1,  	    //ARG : 0
@@ -23,6 +26,8 @@ typedef enum
 	PI_SETVELOCITY=9,   //ARG : 3 (id;[vx][vy][vz])
 	PI_UPDATEPLAYER=10, //ARG : 3 ([vx][vy][vz])
 	PI_UPDATEPORTAL=11, //ARG : 5 (id;[px][py][pz][n][cos|sin])
+	PI_ADDPLATFORM=12,  //ARG : 3 (id;[posx][posy][posz])
+	PI_UPDATEPLATFORM=13,//ARG : 3 (id;[posx][posy][posz])
 }message_type;
 
 #ifdef ARM7

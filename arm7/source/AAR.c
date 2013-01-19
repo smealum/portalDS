@@ -141,6 +141,18 @@ AAR_struct* createAAR(u16 id, vect3D position, vect3D size, vect3D normal)
 	return NULL;
 }
 
+void updateAAR(u16 id, vect3D position)
+{
+	int i=id;
+	// for(i=0;i<NUMAARS;i++)
+	// {
+		if(aaRectangles[i].used)
+		{
+			aaRectangles[i].position=position;
+		}
+	// }
+}
+
 bool pointInPortal(portal_struct* p, vect3D pos) //assuming correct normal
 {
 	if(!p)return false;

@@ -11,10 +11,11 @@ void initPlatforms(void)
 	}
 }
 
-void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, bool BAF)
+void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF)
 {
 	if(!pf)return;
 	
+	pf->id=id;
 	pf->origin=orig;
 	pf->destination=dest;
 	
@@ -24,6 +25,8 @@ void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, bool BAF)
 	pf->direction=true;
 	pf->touched=false;
 	pf->backandforth=true;
+	
+	addPlatform(vectMultInt(orig,4)); //TEMP
 	
 	pf->used=true;
 }
@@ -35,7 +38,7 @@ platform_struct* createPlatform(vect3D orig, vect3D dest, bool BAF)
 	{
 		if(!platform[i].used)
 		{
-			initPlatform(&platform[i],orig,dest,BAF);
+			initPlatform(&platform[i],orig,dest,i,BAF);
 			return &platform[i];
 		}
 	}
@@ -112,6 +115,7 @@ void updatePlatform(platform_struct* pf)
 				break;
 		}
 		pf->position=addVect(pf->position,pf->velocity);
+		changePlatform(pf->id,vectMultInt(pf->position,4));
 	}
 	
 	pf->oldTouched=pf->touched;

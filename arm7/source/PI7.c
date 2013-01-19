@@ -8,6 +8,7 @@ void initPI7(void)
 {
 	initOBBs();
 	initAARs();
+	initPlatforms();
 	
 	player.position=vect(0,0,0);
 	
@@ -169,6 +170,34 @@ void listenPI7(void)
 						portal[id].sin=((x>>16)&((1<<16)-1))-inttof32(1);
 						computePortalPlane(&portal[id]);
 					}
+				}
+				break;
+			case PI_ADDPLATFORM:
+				{
+					vect3D pos;
+					vect3D normal=vect(0,0,0);
+					u8 id=signal>>PISIGNALDATA;
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.x=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.y=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.z=fifoGetValue32(FIFO_USER_08);
+					createPlatform(id,pos);
+				}
+				break;
+			case PI_UPDATEPLATFORM:
+				{
+					vect3D pos;
+					vect3D normal=vect(0,0,0);
+					u8 id=signal>>PISIGNALDATA;
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.x=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.y=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						pos.z=fifoGetValue32(FIFO_USER_08);
+					updatePlatform(id,pos);
 				}
 				break;
 			default:

@@ -73,7 +73,9 @@ void drawBigButton(bigButton_struct* bb)
 	
 	glPushMatrix();
 		glTranslate3f32(bb->position.x,bb->position.y,bb->position.z);
-		renderModelFrameInterp(0, 0, 0, &bigButtonModel, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false, bb->active?(bigButtonBrightPalette):(NULL));
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
+		// setupObjectLighting(NULL, bb->position, &params);
+		renderModelFrameInterp(0, 0, 0, &bigButtonModel, params, false, bb->active?(bigButtonBrightPalette):(NULL));
 	glPopMatrix(1);
 }
 

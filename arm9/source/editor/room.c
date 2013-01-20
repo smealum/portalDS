@@ -34,6 +34,7 @@ void initRoomEdit(roomEdit_struct* re)
 		re->used=false;
 		re->quadsUpToDate=false;
 		re->lightUpToDate=false;
+		re->data.entityCollection=&re->entityCollection;
 	}
 }
 
@@ -1067,7 +1068,7 @@ void readEntity(room_struct* r, entity_struct* e, FILE* f, bool game)
 			initEnemy(e,0);
 			e->data=malloc(sizeof(enemyData_struct));
 			fread(e->data,sizeof(enemyData_struct),1,f);
-			createEn(r,vect(e->position.x,e->position.z,e->position.y));
+			// createEn(r,vect(e->position.x,e->position.z,e->position.y));
 			break;
 	}
 }

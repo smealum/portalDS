@@ -90,7 +90,9 @@ void drawPlayer(player_struct* p)
 		m[2]=-m[2];m[5]=-m[5];m[8]=-m[8];
 		fixMatrix(m);
 		multMatrixGfx33(m);
-		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,POLY_ALPHA(31)|POLY_CULL_FRONT,false,p->playerModelInstance.palette);
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
+		// setupObjectLighting(NULL, p->object->position, &params);
+		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
 	glPopMatrix(1);
 }
 
@@ -154,7 +156,12 @@ void renderGun(player_struct* p)
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
-		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, false, p->modelInstance.palette);
+		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT;
+		room_struct* r=getPlayer()->currentRoom;
+		// vect3D v=reverseConvertVect(vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y))));
+		// NOGBA("%d %d %d",v.x,v.y,v.z);
+		// setupObjectLighting(NULL, p->object->position, &params);
+		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, params, false, p->modelInstance.palette);
 	glPopMatrix(1);
 }
 

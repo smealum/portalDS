@@ -272,7 +272,7 @@ void renderModelFrame(int n, const md2Model_struct *mdl)
 {
 	int i, j;
 	
-	glPolyFmt(POLY_ALPHA(31) | POLY_FORMAT_LIGHT0 | POLY_CULL_FRONT);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_FRONT);
 
 	n%=mdl->header.num_frames;
 	if ((n < 0) || (n > mdl->header.num_frames - 1))return;
@@ -300,7 +300,7 @@ void renderModelFrame(int n, const md2Model_struct *mdl)
 			{
 				GFX_TEX_COORD=mdl->packedTexcoords[mdl->triangles[i].st[j]];
 
-				GFX_NORMAL=anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex];
+				// GFX_NORMAL=anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex];
 
 				//v16
 				// vect3D v=pframe->packedVerts[mdl->triangles[i].vertex[j]];

@@ -48,5 +48,6 @@ void drawEntity(entity_struct* e);
 void drawEntityCollection(entityCollection_struct* ec);
 void renderEntityCollection(entityCollection_struct* ec);
 entity_struct* collideEntityCollection(entityCollection_struct* ec, int px, int py);
+void getClosestLights(entityCollection_struct* ec, vect3D tilepos, entity_struct** ll1, entity_struct** ll2, entity_struct** ll3, int32* dd1, int32* dd2, int32* dd3);
 
 #endif

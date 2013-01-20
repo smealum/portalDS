@@ -117,7 +117,9 @@ void drawEnergyDevice(energyDevice_struct* ed)
 				break;
 		}
 		
-		renderModelFrameInterp(ed->modelInstance.currentFrame,ed->modelInstance.nextFrame,ed->modelInstance.interpCounter,ed->modelInstance.model,POLY_ALPHA(31)|POLY_CULL_NONE,false,ed->modelInstance.palette);
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE;
+		// setupObjectLighting(NULL, ed->position, &params);
+		renderModelFrameInterp(ed->modelInstance.currentFrame,ed->modelInstance.nextFrame,ed->modelInstance.interpCounter,ed->modelInstance.model,params,false,ed->modelInstance.palette);
 	glPopMatrix(1);
 }
 

@@ -61,7 +61,9 @@ void drawPlatform(platform_struct* pf)
 	glPushMatrix();
 		glTranslate3f32(pf->position.x,pf->position.y,pf->position.z);
 		GFX_COLOR=RGB15(28,30,31);
-		renderModelFrameInterp(0, 0, 0, &platformModel, POLY_ALPHA(31) | POLY_CULL_FRONT, false, NULL);
+		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT;
+		// setupObjectLighting(NULL, pf->position, &params);
+		renderModelFrameInterp(0, 0, 0, &platformModel, params, false, NULL);
 		//TEMP
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 		applyMTL(platformTexture);
@@ -74,6 +76,7 @@ void drawPlatform(platform_struct* pf)
 			glVertex3v16(LOGOSIZE, LOGOHEIGHT, -LOGOSIZE);
 			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 31<<4);
 			glVertex3v16(-LOGOSIZE, LOGOHEIGHT, -LOGOSIZE);
+			
 		glPolyFmt(POLY_ALPHA(16) | POLY_ID(31) | POLY_CULL_BACK);
 		unbindMtl();
 		glBegin(GL_QUAD);

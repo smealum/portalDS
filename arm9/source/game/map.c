@@ -828,6 +828,56 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	return displayList;
 }
 
+vect3D getVector(vect3D pos, entity_struct* ent)
+{
+	vect3D p=ent->position;
+	vect3D v=vectDifference(pos,vect(p.x*(TILESIZE*2),p.z*HEIGHTUNIT,p.y*(TILESIZE*2)));
+	v=vectMultInt(v,100);
+	int32 dist=magnitude(v);
+	v=divideVect(v,dist);
+	// dist/=100;
+	return vect(f32tov10(v.x),f32tov10(v.y),f32tov10(v.z));
+}
+
+void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
+{
+	if(!r)r=getPlayer()->currentRoom;
+	if(!r)return;
+	entity_struct *l1, *l2, *l3;
+	int32 d1, d2, d3;
+	vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
+	getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
+	// *params=POLY_ALPHA(31) | POLY_CULL_FRONT;
+	
+	glMaterialf(GL_AMBIENT, RGB15(2,2,2));
+	glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
+	glMaterialf(GL_SPECULAR, RGB15(0,0,0));
+	glMaterialf(GL_EMISSION, RGB15(0,0,0));
+	
+	if(l1)
+	{
+		*params|=POLY_FORMAT_LIGHT0;
+		vect3D v=getVector(pos, l1);
+		d1*=64;
+		int32 v2=31-((31*d1)*(((lightData_struct*)l1->data)->intensity));
+		glLight(0, RGB15(v2,v2,v2), v.x, v.y, v.z);
+		if(l2)
+		{
+			*params|=POLY_FORMAT_LIGHT1;
+			vect3D v=getVector(pos, l2);
+			int32 v2=31-((31*d2)*(((lightData_struct*)l2->data)->intensity));
+			glLight(1, RGB15(v2,v2,v2), v.x, v.y, v.z);
+			if(l3)
+			{
+				*params|=POLY_FORMAT_LIGHT2;
+				vect3D v=getVector(pos, l3);
+				int32 v2=31-((31*d3)*(((lightData_struct*)l3->data)->intensity));
+				glLight(2, RGB15(v2,v2,v2), v.x, v.y, v.z);
+			}
+		}
+	}
+}
+
 void freeRoom(room_struct* r)
 {
 	if(r)

@@ -58,7 +58,6 @@ void initGame(void)
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
 	
-	// initEnemies();
 	initTurrets();
 	initBigButtons();
 	initEnergyBalls();
@@ -70,8 +69,6 @@ void initGame(void)
 	currentBuffer=false;
 	
 	getVramStatus();
-	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
-	NOGBA("vs mem free : %dko (%do)",oldv/1024,oldv);
 	fadeIn();
 	
 	mainBG=bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 0, 0);
@@ -80,6 +77,9 @@ void initGame(void)
 	
 	consoleInit(&bottomScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 16, 0, false, true);
 	consoleSelect(&bottomScreen);
+	
+	// glSetToonTableRange(0, 14, RGB15(16,16,16));
+	// glSetToonTableRange(15, 31, RGB15(26,26,26));
 	
 	initPortals();
 	
@@ -100,6 +100,9 @@ void initGame(void)
 	getVramStatus();
 	
 	startPI();
+	
+	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	NOGBA("vs mem free : %dko (%do)",oldv/1024,oldv);
 }
 
 bool testbool=false;
@@ -298,7 +301,6 @@ void killGame(void)
 	fadeOut();
 	NOGBA("KILLING IT");
 	wipeMapEdit();
-	// freeEnemies();
 	freePlayer();
 	freeState(NULL);
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());

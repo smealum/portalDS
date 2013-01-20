@@ -275,7 +275,7 @@ void wipeEntityCollection(entityCollection_struct* ec)
 	}
 }
 
-void getClosestLights(entityCollection_struct* ec, enemy_struct* e, entity_struct** ll1, entity_struct** ll2, entity_struct** ll3, int32* dd1, int32* dd2, int32* dd3)
+void getClosestLights(entityCollection_struct* ec, vect3D tilepos, entity_struct** ll1, entity_struct** ll2, entity_struct** ll3, int32* dd1, int32* dd2, int32* dd3)
 {
 	if(!ec)return;
 	entity_struct *l1, *l2, *l3;
@@ -288,7 +288,7 @@ void getClosestLights(entityCollection_struct* ec, enemy_struct* e, entity_struc
 		if(ec->entity[i].used && ec->entity[i].type==lightEntity)
 		{
 			entity_struct* ent=&ec->entity[i];
-			int32 d=(e->tilePosition.x-ent->position.x)*(e->tilePosition.x-ent->position.x)+((e->tilePosition.y-ent->position.y)*(e->tilePosition.y-ent->position.y))/16+(e->tilePosition.z-ent->position.z)*(e->tilePosition.z-ent->position.z);
+			int32 d=(tilepos.x-ent->position.x)*(tilepos.x-ent->position.x)+((tilepos.y-ent->position.y)*(tilepos.y-ent->position.y))/16+(tilepos.z-ent->position.z)*(tilepos.z-ent->position.z);
 			if(d<d1){d3=d2;d2=d1;d1=d;
 					l3=l2;l2=l1;l1=ent;}
 			else if(d<d2){d3=d2;d2=d;

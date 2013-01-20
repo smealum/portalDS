@@ -74,7 +74,9 @@ void drawCubeDispenser(cubeDispenser_struct* cd)
 	
 	glPushMatrix();
 		glTranslate3f32(cd->position.x,cd->position.y,cd->position.z);
-		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,POLY_ALPHA(31)|POLY_CULL_NONE,false,cd->modelInstance.palette);
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE;
+		// setupObjectLighting(NULL, cd->position, &params);
+		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,params,false,cd->modelInstance.palette);
 	glPopMatrix(1);
 }
 

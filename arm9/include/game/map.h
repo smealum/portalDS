@@ -49,8 +49,14 @@ typedef struct
 	void** doorWay;
 	mtlImg_struct* lightMap;
 	lightMapSlots_struct* lmSlot;
+	entityCollection_struct* entityCollection;
 	rectangleList_struct rectangles;
 }room_struct;
+
+static inline vect3D reverseConvertVect(vect3D v)
+{
+	return vect((v.x+TILESIZE)/(TILESIZE*2),v.y/HEIGHTUNIT,(v.z+TILESIZE)/(TILESIZE*2));
+}
 
 static inline vect3D convertVect(vect3D v)
 {
@@ -78,6 +84,8 @@ void getPathfindingData(room_struct* r);
 u8 getHeightValue(room_struct* r, vect3D pos, bool floor);
 
 u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull);
+
+void setupObjectLighting(room_struct* r, vect3D pos, u32* params);
 
 //lightmaps.h
 void loadLightMap(room_struct* r);

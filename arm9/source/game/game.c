@@ -91,7 +91,7 @@ void initGame(void)
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
 	createEnergyDevice(NULL, vect(0,7,7), pX, false); //TEMP
 	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
-	// addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET);//
+	addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET);//
 	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//
 	
 	transferRectangles(&roomEdits[0].data);

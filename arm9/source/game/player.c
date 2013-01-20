@@ -68,6 +68,8 @@ void initPlayer(player_struct* p)
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
 	loadMd2Model("models/ratman.md2","ratman.pcx",&playerModel);
+	generateModelDisplayLists(&gun);
+	generateModelDisplayLists(&playerModel);
 	initModelInstance(&p->modelInstance,&gun);
 	initModelInstance(&p->playerModelInstance,&playerModel);
 	// crossHair=createTexture("crshair.pcx","textures");
@@ -92,7 +94,8 @@ void drawPlayer(player_struct* p)
 		multMatrixGfx33(m);
 		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
 		// setupObjectLighting(NULL, p->object->position, &params);
-		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
+		// renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
+		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,0,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
 	glPopMatrix(1);
 }
 

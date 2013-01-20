@@ -75,6 +75,30 @@ void resetPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESET);
 }
 
+void sendBoxData(OBB_struct* o)
+{
+	if(!o)return NULL;
+	
+	fifoSendValue32(FIFO_USER_08,PI_ADDBOX|((o->id)<<PISIGNALDATA));
+	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));	
+	fifoSendValue32(FIFO_USER_08,(o->size.z&((1<<16)-1))|((o->mass&((1<<16)-1))<<16));
+	fifoSendValue32(FIFO_USER_08,(o->position.x));
+	fifoSendValue32(FIFO_USER_08,(o->position.y));
+	fifoSendValue32(FIFO_USER_08,(o->position.z));
+}
+
+void resetBox(OBB_struct* o, vect3D pos)
+{
+	if(!o)return NULL;
+	
+	o->position=pos;
+	o->transformationMatrix[0]=inttof32(1);o->transformationMatrix[1]=0;o->transformationMatrix[2]=0;
+	o->transformationMatrix[3]=0;o->transformationMatrix[4]=inttof32(1);o->transformationMatrix[5]=0;
+	o->transformationMatrix[6]=0;o->transformationMatrix[7]=0;o->transformationMatrix[8]=inttof32(1);
+	
+	sendBoxData(o);
+}
+
 OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
 {
 	OBB_struct* o=newBox();
@@ -83,20 +107,8 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	initModelInstance(&o->modelInstance,model);
 	
 	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
-	// o->size=vect(192,192,192);
-	NOGBA("%d %d %d",o->size.x,o->size.y,o->size.z);
-	o->position=pos;
 	o->mass=mass>>3; //reduce precision to improve range
-	o->transformationMatrix[0]=inttof32(1);o->transformationMatrix[1]=0;o->transformationMatrix[2]=0;
-	o->transformationMatrix[3]=0;o->transformationMatrix[4]=inttof32(1);o->transformationMatrix[5]=0;
-	o->transformationMatrix[6]=0;o->transformationMatrix[7]=0;o->transformationMatrix[8]=inttof32(1);
-	
-	fifoSendValue32(FIFO_USER_08,PI_ADDBOX|((o->id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));	
-	fifoSendValue32(FIFO_USER_08,(o->size.z&((1<<16)-1))|((o->mass&((1<<16)-1))<<16));
-	fifoSendValue32(FIFO_USER_08,(o->position.x));
-	fifoSendValue32(FIFO_USER_08,(o->position.y));
-	fifoSendValue32(FIFO_USER_08,(o->position.z));
+	resetBox(o,pos);
 	
 	return o;
 }

@@ -95,7 +95,8 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 	
 	if(cd->active && !cd->oldActive)
 	{
-		cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
+		if(!cd->currentCube)cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
+		else resetBox(cd->currentCube, vectMultInt(cd->position,4));
 		changeAnimation(&cd->modelInstance,1,true);
 	}
 	

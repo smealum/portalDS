@@ -64,7 +64,7 @@ void drawPlatform(platform_struct* pf)
 		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT;
 		// setupObjectLighting(NULL, pf->position, &params);
 		renderModelFrameInterp(0, 0, 0, &platformModel, params, false, NULL);
-		//TEMP
+		
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 		applyMTL(platformTexture);
 		glBegin(GL_QUAD);

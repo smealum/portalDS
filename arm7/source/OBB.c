@@ -891,7 +891,7 @@ void updateOBBs(void)
 OBB_struct* createOBB(u8 id, vect3D size, vect3D position)
 {
 	int i=id;
-		if(!objects[i].used)
+		// if(!objects[i].used)
 		{
 			initOBB(&objects[i],size,position);
 			return &objects[i];

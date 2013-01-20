@@ -33,6 +33,7 @@ void createAAR(vect3D size, vect3D pos, vect3D normal);
 void addPlatform(vect3D pos);
 void changePlatform(u8 id, vect3D pos);
 
+void resetBox(OBB_struct* o, vect3D pos);
 OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model);
 
 void drawOBBs(void);

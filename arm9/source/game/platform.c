@@ -1,9 +1,12 @@
 #include "game/game_main.h"
 
-#define PLATFORMHEIGHT (64)
+#define LOGOSIZE (192)
+#define LOGOHEIGHT (64)
+#define PLATFORMHEIGHT (32)
 
 platform_struct platform[NUMPLATFORMS];
 mtlImg_struct* platformTexture;
+md2Model_struct platformModel;
 
 void initPlatforms(void)
 {
@@ -13,7 +16,8 @@ void initPlatforms(void)
 		platform[i].used=false;
 	}
 	
-	platformTexture=createTexture("platform.pcx","textures");
+	platformTexture=createTexture("logo.pcx","textures");
+	loadMd2Model("models/platform.md2", "", &platformModel);
 }
 
 void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF)
@@ -54,61 +58,38 @@ void drawPlatform(platform_struct* pf)
 {
 	if(!pf)return;
 	
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	applyMTL(platformTexture);
 	glPushMatrix();
 		glTranslate3f32(pf->position.x,pf->position.y,pf->position.z);
+		GFX_COLOR=RGB15(28,30,31);
+		renderModelFrameInterp(0, 0, 0, &platformModel, POLY_ALPHA(31) | POLY_CULL_FRONT, false, NULL);
 		//TEMP
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		applyMTL(platformTexture);
+		glBegin(GL_QUAD);
+			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 0<<4);
+			glVertex3v16(-LOGOSIZE, LOGOHEIGHT, LOGOSIZE);
+			GFX_TEX_COORD = TEXTURE_PACK(31<<4, 0<<4);
+			glVertex3v16(LOGOSIZE, LOGOHEIGHT, LOGOSIZE);
+			GFX_TEX_COORD = TEXTURE_PACK(31<<4, 31<<4);
+			glVertex3v16(LOGOSIZE, LOGOHEIGHT, -LOGOSIZE);
+			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 31<<4);
+			glVertex3v16(-LOGOSIZE, LOGOHEIGHT, -LOGOSIZE);
+		glPolyFmt(POLY_ALPHA(16) | POLY_ID(31) | POLY_CULL_BACK);
+		unbindMtl();
 		glBegin(GL_QUAD);
 			//top
 			// GFX_NORMAL=NORMAL_PACK(0, inttov10(1)-1, 0);
-			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 128<<4);
 			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-
-			GFX_TEX_COORD = TEXTURE_PACK(128<<4, 128<<4);
 			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-
-			GFX_TEX_COORD = TEXTURE_PACK(128<<4, 0<<4);
 			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
-			
-			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 0<<4);
 			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
 			
 			//bottom
 			// GFX_NORMAL=NORMAL_PACK(0, -(inttov10(1)-1), 0);
-			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 0<<4);
 			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
-
-			GFX_TEX_COORD = TEXTURE_PACK(128<<4, 0<<4);
 			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
-
-			GFX_TEX_COORD = TEXTURE_PACK(128<<4, 128<<4);
 			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-
-			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 128<<4);
 			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-		unbindMtl();
-		glBegin(GL_QUAD);
-			GFX_COLOR=RGB15(28,30,31);
-			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
-			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
-			
-			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-			
-			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
-			glVertex3v16(-PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(-PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
-			
-			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, -PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, PLATFORMSIZE);
-			glVertex3v16(PLATFORMSIZE, -PLATFORMHEIGHT, -PLATFORMSIZE);
 			
 	glPopMatrix(1);
 }

@@ -35,6 +35,13 @@ static inline void transposeMatrix33(int32* m1, int32* m2) //3x3
 	for(i=0;i<3;i++)for(j=0;j<3;j++)m2[j+i*3]=m1[i+j*3];
 }
 
+static inline vect3D evalVectMatrix33(int32* m, vect3D v) //3x3
+{
+	return vect((mulf32(v.x,m[0])+mulf32(v.y,m[1])+mulf32(v.z,m[2])),
+				(mulf32(v.x,m[3])+mulf32(v.y,m[4])+mulf32(v.z,m[5])),
+				(mulf32(v.x,m[6])+mulf32(v.y,m[7])+mulf32(v.z,m[8])));
+}
+
 static inline vect3D addVect(vect3D p1, vect3D p2)
 {
 	return vect(p1.x+p2.x,p1.y+p2.y,p1.z+p2.z);

@@ -31,6 +31,8 @@ typedef enum
 }message_type;
 
 #ifdef ARM7
+	void generateGuidAAR(portal_struct* p);
+	
 	static inline void computePortalPlane(portal_struct* p)
 	{
 		if(!p)return;
@@ -61,6 +63,9 @@ typedef enum
 		}
 		
 		p->plane[1]=vectProduct(p->normal,p->plane[0]);
+		
+		//TEST
+		generateGuidAAR(p);
 	}
 #else
 	static inline void computePortalPlane(portal_struct* p)

@@ -6,12 +6,12 @@
 
 typedef enum
 {
-	pX,
-	mX,
-	pY,
-	mY,
-	pZ,
-	mZ
+	pX=0,
+	mX=1,
+	pY=2,
+	mY=3,
+	pZ=4,
+	mZ=5
 }deviceOrientation_type;
 
 typedef struct
@@ -25,7 +25,9 @@ typedef struct
 
 typedef struct
 {
+	modelInstance_struct modelInstance;
 	vect3D position, direction;
+	int32 speed;
 	u16 life;
 	bool used;
 }energyBall_struct;

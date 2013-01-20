@@ -14,5 +14,6 @@ typedef struct
 void initTurrets(void);
 turret_struct* createTurret(vect3D position);
 void updateTurrets(void);
+void drawTurretsStuff(void);
 
 #endif

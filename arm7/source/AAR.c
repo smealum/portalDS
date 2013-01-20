@@ -257,7 +257,7 @@ void OBBAARContacts(AAR_struct* a, OBB_struct* o)
 	}
 }
 
-void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v)
+void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 {
 	if(!a || !o || !o->used || !a->used)return;
 
@@ -283,8 +283,11 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v)
 				if(p.y>a->position.y && p.y<a->position.y+a->size.y && p.z>a->position.z && p.z<a->position.z+a->size.z)
 				{
 					bool b=false;
-					if(portal[0].normal.x)b=pointInPortal(&portal[0],p);
-					if(!b&&portal[1].normal.x)b=pointInPortal(&portal[1],p);
+					if(port)
+					{
+						if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
+						if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+					}
 					if(!b)
 					{
 						o->contactPoints[o->numContactPoints].point=p;
@@ -314,8 +317,11 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v)
 				if(p.x>a->position.x && p.x<a->position.x+a->size.x && p.z>a->position.z && p.z<a->position.z+a->size.z)
 				{
 					bool b=false;
-					if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
-					if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+					if(port)
+					{
+						if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
+						if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+					}
 					if(!b)
 					{
 						o->contactPoints[o->numContactPoints].point=p;
@@ -344,8 +350,11 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v)
 				if(p.x>a->position.x && p.x<a->position.x+a->size.x && p.z>a->position.y && p.y<a->position.y+a->size.y)
 				{
 					bool b=false;
-					if(portal[0].normal.x)b=pointInPortal(&portal[0],p);
-					if(!b&&portal[1].normal.x)b=pointInPortal(&portal[1],p);
+					if(port)
+					{
+						if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
+						if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+					}
 					if(!b)
 					{
 						o->contactPoints[o->numContactPoints].point=p;
@@ -379,13 +388,61 @@ void AARsOBBContacts(OBB_struct* o)
 			node_struct* n=&AARgrid.nodes[i+j*AARgrid.width];
 			for(k=0;k<n->length;k++)
 			{
-				if(!lalala[n->data[k]])AAROBBContacts(&aaRectangles[n->data[k]], o, v);
+				if(!lalala[n->data[k]])AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
 				lalala[n->data[k]]=1;
 			}
 		}
 	}
+	AAROBBContacts(&portal[0].guideAAR[0], o, v, false);
+	AAROBBContacts(&portal[0].guideAAR[1], o, v, false);
+	AAROBBContacts(&portal[0].guideAAR[2], o, v, false);
+	AAROBBContacts(&portal[0].guideAAR[3], o, v, false);
+	
+	AAROBBContacts(&portal[1].guideAAR[0], o, v, false);
+	AAROBBContacts(&portal[1].guideAAR[1], o, v, false);
+	AAROBBContacts(&portal[1].guideAAR[2], o, v, false);
+	AAROBBContacts(&portal[1].guideAAR[3], o, v, false);
 	// for(i=0;i<NUMAARS;i++)
 	// {
 		// if(aaRectangles[i].used)AAROBBContacts(&aaRectangles[i], o, v);
 	// }
 }
+
+void fixAAR(AAR_struct* a)
+{
+	if(!a)return;
+	
+	if(a->size.x<0){a->position.x+=a->size.x;a->size.x=-a->size.x;}
+	if(a->size.y<0){a->position.y+=a->size.y;a->size.y=-a->size.y;}
+	if(a->size.z<0){a->position.z+=a->size.z;a->size.z=-a->size.z;}
+}
+
+void generateGuidAAR(portal_struct* p)
+{
+	if(!p)return;
+	
+	p->guideAAR[0].used=true;
+	p->guideAAR[0].position=vectDifference(p->position,vectMultInt(addVect(vectDivInt(p->plane[0],PORTALFRACTIONX),vectDivInt(p->plane[1],PORTALFRACTIONY)),4));
+	p->guideAAR[0].size=vectMultInt(addVect(vectDivInt(vectMultInt(p->plane[0],2),PORTALFRACTIONX),vectDivInt(p->normal,-8)),4);
+	p->guideAAR[0].normal=p->plane[1];
+	fixAAR(&p->guideAAR[0]);
+	
+	p->guideAAR[1].used=true;
+	p->guideAAR[1].position=vectDifference(p->position,vectMultInt(addVect(vectDivInt(p->plane[0],PORTALFRACTIONX),vectDivInt(p->plane[1],PORTALFRACTIONY)),4));
+	p->guideAAR[1].size=vectMultInt(addVect(vectDivInt(vectMultInt(p->plane[1],2),PORTALFRACTIONX),vectDivInt(p->normal,-8)),4);
+	p->guideAAR[1].normal=p->plane[0];
+	fixAAR(&p->guideAAR[1]);
+	
+	p->guideAAR[2].used=true;
+	p->guideAAR[2].position=addVect(p->position,vectMultInt(addVect(vectDivInt(p->plane[0],PORTALFRACTIONX),vectDivInt(p->plane[1],PORTALFRACTIONY)),4));
+	p->guideAAR[2].size=vectMultInt(addVect(vectDivInt(vectMultInt(p->plane[0],2),PORTALFRACTIONX),vectDivInt(p->normal,-8)),4);
+	p->guideAAR[2].normal=vectMultInt(p->plane[1],-1);
+	fixAAR(&p->guideAAR[2]);
+	
+	p->guideAAR[3].used=true;
+	p->guideAAR[3].position=vectDifference(p->position,vectMultInt(addVect(vectDivInt(p->plane[0],PORTALFRACTIONX),vectDivInt(p->plane[1],PORTALFRACTIONY)),4));
+	p->guideAAR[3].size=vectMultInt(addVect(vectDivInt(vectMultInt(p->plane[1],2),PORTALFRACTIONX),vectDivInt(p->normal,-8)),4);
+	p->guideAAR[3].normal=vectMultInt(p->plane[0],-1);
+	fixAAR(&p->guideAAR[3]);
+}
+	

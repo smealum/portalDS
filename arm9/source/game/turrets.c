@@ -3,6 +3,8 @@
 turret_struct turrets[NUMTURRETS];
 md2Model_struct turretModel;
 
+const vect3D laserOrigin=(vect3D){16,76,140};
+
 void initTurrets(void)
 {
 	int i;
@@ -34,6 +36,38 @@ turret_struct* createTurret(vect3D position)
 		}
 	}
 	return NULL;
+}
+
+void drawLaser(vect3D orig, vect3D target)
+{
+	unbindMtl();
+	GFX_COLOR=RGB15(31,0,0);
+	glBegin(GL_TRIANGLES);	
+		glVertex3v16(orig.x, orig.y, orig.z);
+		glVertex3v16(target.x, target.y, target.z);
+		glVertex3v16(target.x, target.y, target.z);
+}
+
+void drawTurretStuff(turret_struct* t)
+{
+	if(!t || !t->used)return;
+	
+	int32* m=t->OBB->transformationMatrix;
+	
+	vect3D pos=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
+	drawLaser(pos,addVect(pos,vect(m[2],m[5],m[8])));
+}
+
+void drawTurretsStuff(void)
+{
+	int i;
+	for(i=0;i<NUMTURRETS;i++)
+	{
+		if(turrets[i].used)
+		{
+			drawTurretStuff(&turrets[i]);
+		}
+	}
 }
 
 void updateTurret(turret_struct* t)

@@ -1,9 +1,13 @@
 #include "game/game_main.h"
 
+#define ENERGYBALLSIZE (128)
+
 energyDevice_struct energyDevice[NUMENERGYDEVICES];
 energyBall_struct energyBall[NUMENERGYBALLS];
 
-md2Model_struct energyCatcherModel, energyLauncherModel;
+md2Model_struct energyCatcherModel, energyLauncherModel, energyBallModel;
+
+const vect3D energyDeviceDirection[6]={(vect3D){inttof32(1),0,0},(vect3D){-inttof32(1),0,0},(vect3D){0,inttof32(1),0},(vect3D){0,-inttof32(1),0},(vect3D){0,0,inttof32(1)},(vect3D){0,0,-inttof32(1)}};
 
 void initEnergyBalls(void)
 {
@@ -19,6 +23,8 @@ void initEnergyBalls(void)
 	
 	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&energyCatcherModel);
 	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&energyLauncherModel);
+	loadMd2Model("models/energyball.md2","energyball.pcx",&energyBallModel);
+	generateModelDisplayLists(&energyBallModel);
 }
 
 void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, deviceOrientation_type or, bool type)
@@ -136,6 +142,12 @@ void updateEnergyDevice(energyDevice_struct* ed)
 {
 	if(!ed)return;
 	
+	if(ed->type) //TEMP
+	{
+		createEnergyBall(addVect(ed->position,vectDivInt(energyDeviceDirection[ed->orientation],8)),energyDeviceDirection[ed->orientation]);
+		ed->type=false;
+	}
+	
 	updateAnimation(&ed->modelInstance);
 }
 
@@ -152,6 +164,12 @@ void initEnergyBall(energyBall_struct* eb, vect3D pos, vect3D dir)
 {
 	if(!eb)return;
 	
+	initModelInstance(&eb->modelInstance, &energyBallModel);
+	
+	eb->position=pos;
+	eb->direction=dir;
+	eb->speed=128;
+	
 	eb->used=true;
 }
 
@@ -160,7 +178,7 @@ energyBall_struct* createEnergyBall(vect3D pos, vect3D dir)
 	int i;
 	for(i=0;i<NUMENERGYBALLS;i++)
 	{
-		if(energyBall[i].used)
+		if(!energyBall[i].used)
 		{
 			initEnergyBall(&energyBall[i],pos,dir);
 			return &energyBall[i];
@@ -169,9 +187,16 @@ energyBall_struct* createEnergyBall(vect3D pos, vect3D dir)
 	return NULL;
 }
 
+extern md2Model_struct storageCubeModel;
+
 void drawEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
+	
+	glPushMatrix();
+		glTranslate3f32(eb->position.x,eb->position.y,eb->position.z);
+		renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(26)|POLY_ID(8)|POLY_CULL_NONE,false,eb->modelInstance.palette);
+	glPopMatrix(1);
 }
 
 void drawEnergyBalls(void)
@@ -186,6 +211,27 @@ void drawEnergyBalls(void)
 void updateEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
+	
+	player_struct* p=getPlayer();
+	
+	vect3D l=vectDifference(eb->position,convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)));
+	
+	vect3D ip=l;
+	bool col=collideLineMap(p->currentRoom, NULL, l, eb->direction, eb->speed, &ip); //ADD CULLING
+	if(col)
+	{
+		ip=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
+		// vect3D v=vect(0,0,0);
+		// int32 z;
+		// bool portal=isPointInPortal(&portal1,ip,&v,&z,&z,&z);
+		eb->position=ip;
+		eb->direction=vectMultInt(eb->direction,-1); //TEMP, improve (mirror depending on rec normal)
+		eb->position=addVect(eb->position,vectMult(eb->direction,ENERGYBALLSIZE));
+	}else{
+		eb->position=addVect(eb->position,vectMult(eb->direction,eb->speed));
+	}
+	
+	updateAnimation(&eb->modelInstance);
 }
 
 void updateEnergyBalls(void)

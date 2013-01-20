@@ -1,7 +1,7 @@
 #ifndef AAR_H //axis aligned rectangle !
 #define AAR_H
 
-#define NUMAARS (150)
+#define NUMAARS (300)
 #define NUMAARSEGMENTS (4)
 
 #define NODESIZE (2048)

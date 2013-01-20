@@ -77,7 +77,7 @@ void resetPI(void)
 
 void sendBoxData(OBB_struct* o)
 {
-	if(!o)return NULL;
+	if(!o)return;
 	
 	fifoSendValue32(FIFO_USER_08,PI_ADDBOX|((o->id)<<PISIGNALDATA));
 	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));	
@@ -89,7 +89,7 @@ void sendBoxData(OBB_struct* o)
 
 void resetBox(OBB_struct* o, vect3D pos)
 {
-	if(!o)return NULL;
+	if(!o)return;
 	
 	o->position=pos;
 	o->transformationMatrix[0]=inttof32(1);o->transformationMatrix[1]=0;o->transformationMatrix[2]=0;

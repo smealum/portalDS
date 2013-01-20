@@ -10,6 +10,7 @@ typedef struct portal_struct
 {
 	vect3D position, normal, plane[2];
 	int32 cos, sin;
+	AAR_struct guideAAR[4];
 	struct portal_struct* targetPortal;
 }portal_struct;
 

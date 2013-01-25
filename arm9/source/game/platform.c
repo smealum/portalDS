@@ -14,6 +14,7 @@ void initPlatforms(void)
 	for(i=0;i<NUMPLATFORMS;i++)
 	{
 		platform[i].used=false;
+		platform[i].id=i;
 	}
 	
 	platformTexture=createTexture("logo.pcx","textures");
@@ -58,14 +59,17 @@ void drawPlatform(platform_struct* pf)
 {
 	if(!pf)return;
 	
+	u8 id=pf->id+50;
+	
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(id)|POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, pf->position, &params);
+		
 		glTranslate3f32(pf->position.x,pf->position.y,pf->position.z);
 		GFX_COLOR=RGB15(28,30,31);
-		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT;
-		// setupObjectLighting(NULL, pf->position, &params);
 		renderModelFrameInterp(0, 0, 0, &platformModel, params, false, NULL);
 		
-		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(id));
 		applyMTL(platformTexture);
 		glBegin(GL_QUAD);
 			GFX_TEX_COORD = TEXTURE_PACK(0<<4, 0<<4);

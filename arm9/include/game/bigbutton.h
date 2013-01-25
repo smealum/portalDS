@@ -11,6 +11,7 @@ typedef struct
 	vect3D position;
 	bool active;
 	bool used;
+	u8 id;
 }bigButton_struct;
 
 void initBigButtons(void);

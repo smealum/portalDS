@@ -314,6 +314,9 @@ void drawOBB(OBB_struct* o)
 
 	glPushMatrix();
 	
+	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(40+o->id)|POLY_TOON_HIGHLIGHT;
+	// setupObjectLighting(NULL, vectDivInt(o->position,4), &params);
+	
 	glTranslatef32(o->position.x/4,o->position.y/4,o->position.z/4);
 	multTMatrix(o->transformationMatrix);
 
@@ -322,25 +325,8 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
-	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0, true, o->modelInstance.palette);
-	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
-	// setupObjectLighting(NULL, vectMultInt(o->position,4), &params);
-	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette);
-	
-	// int i;
-	// glScalef32(inttof32(1)/4,inttof32(1)/4,inttof32(1)/4);
-	// glBegin(GL_QUADS);
-		// for(i=0;i<NUMOBBFACES;i++)
-		// {
-			// GFX_TEX_COORD=TEXTURE_PACK(0, 0);
-			// glVertex3v16((v[OBBFaces[i][0]].x),(v[OBBFaces[i][0]].y),(v[OBBFaces[i][0]].z));
-			// GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), 0);
-			// glVertex3v16((v[OBBFaces[i][1]].x),(v[OBBFaces[i][1]].y),(v[OBBFaces[i][1]].z));
-			// GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
-			// glVertex3v16((v[OBBFaces[i][2]].x),(v[OBBFaces[i][2]].y),(v[OBBFaces[i][2]].z));
-			// GFX_TEX_COORD=TEXTURE_PACK(0, inttot16(64));
-			// glVertex3v16((v[OBBFaces[i][3]].x),(v[OBBFaces[i][3]].y),(v[OBBFaces[i][3]].z));
-		// }
+	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette);
+	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, 0, o->modelInstance.model, params, true, o->modelInstance.palette);
 
 	glPopMatrix(1);
 }
@@ -357,7 +343,7 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
 }
 
-void drawWarpedOBB(portal_struct* p, OBB_struct* o) //warped md2 : no interpolation ? MORE : display list keyframes ?
+void drawWarpedOBB(portal_struct* p, OBB_struct* o)
 {
 	OBB_struct o2;
 	copyOBB(o,&o2);

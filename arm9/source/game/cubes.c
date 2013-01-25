@@ -9,6 +9,7 @@ void initCubes(void)
 	for(i=0;i<NUMCUBEDISPENSERS;i++)
 	{
 		cubeDispenser[i].used=false;
+		cubeDispenser[i].id=i;
 	}
 	
 	loadMd2Model("models/cube.md2","storagecube.pcx",&storageCubeModel);generateModelDisplayLists(&storageCubeModel);
@@ -73,9 +74,9 @@ void drawCubeDispenser(cubeDispenser_struct* cd)
 	if(!cd)return;
 	
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(20+cd->id)|POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, cd->position, &params);
 		glTranslate3f32(cd->position.x,cd->position.y,cd->position.z);
-		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE;
-		// setupObjectLighting(NULL, cd->position, &params);
 		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,params,false,cd->modelInstance.palette);
 	glPopMatrix(1);
 }

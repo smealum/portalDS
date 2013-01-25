@@ -1,6 +1,7 @@
 #include "game/game_main.h"
 
 particle_struct particles[NUMPARTICLES];
+u16 particleCnt;
 
 void initParticles(void)
 {
@@ -9,6 +10,7 @@ void initParticles(void)
 	{
 		particles[i].used=false;
 	}
+	particleCnt=0;
 }
 
 void createParticles(vect3D position, vect3D speed, u16 life, u16 color)
@@ -26,6 +28,7 @@ void createParticles(vect3D position, vect3D speed, u16 life, u16 color)
 			p->color=color;
 			p->alpha=31;
 			p->timer=0;
+			particleCnt++;
 			return;
 		}
 	}
@@ -56,11 +59,11 @@ void drawParticle(particle_struct* p)
 
 void drawParticles(void)
 {
-	int i;
+	int i, k=0;
 	unbindMtl();
-	for(i=0;i<NUMPARTICLES;i++)
+	for(i=0;i<NUMPARTICLES&&k<particleCnt;i++)
 	{
-		if(particles[i].used)drawParticle(&particles[i]);
+		if(particles[i].used){drawParticle(&particles[i]);k++;}
 	}
 }
 
@@ -70,17 +73,17 @@ void updateParticle(particle_struct* p)
 	p->position.y-=GRAVITY/4;
 	p->timer++;
 	p->alpha=31-(p->timer*30)/p->life;
-	if(p->timer>p->life)p->used=false;
+	if(p->timer>p->life){p->used=false;particleCnt--;}
 	p->position=addVect(p->position,p->speed);
 }
 
 void updateParticles(void)
 {
-	int i;
+	int i, k=0;
 	unbindMtl();
-	for(i=0;i<NUMPARTICLES;i++)
+	for(i=0;i<NUMPARTICLES&&k<particleCnt;i++)
 	{
-		if(particles[i].used)updateParticle(&particles[i]);
+		if(particles[i].used){updateParticle(&particles[i]);k++;}
 	}
 }
 

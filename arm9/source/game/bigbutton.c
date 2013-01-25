@@ -11,6 +11,7 @@ void initBigButtons(void)
 	{
 		bigButton[i].used=false;
 		bigButton[i].room=NULL;
+		bigButton[i].id=i;
 	}
 	
 	loadMd2Model("models/button1.md2","button1.pcx",&bigButtonModel);
@@ -72,9 +73,10 @@ void drawBigButton(bigButton_struct* bb)
 	if(!bb || !bb->used)return;
 	
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(10+bb->id)|POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, bb->position, &params);
+		
 		glTranslate3f32(bb->position.x,bb->position.y,bb->position.z);
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
-		// setupObjectLighting(NULL, bb->position, &params);
 		renderModelFrameInterp(0, 0, 0, &bigButtonModel, params, false, bb->active?(bigButtonBrightPalette):(NULL));
 	glPopMatrix(1);
 }

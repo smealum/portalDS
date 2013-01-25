@@ -21,6 +21,7 @@ typedef struct
 	vect3D position;
 	bool type; //true=launcher
 	bool used;
+	u8 id;
 }energyDevice_struct;
 
 typedef struct
@@ -30,6 +31,7 @@ typedef struct
 	int32 speed;
 	u16 life;
 	bool used;
+	u8 id;
 }energyBall_struct;
 
 void initEnergyBalls(void);

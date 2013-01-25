@@ -84,6 +84,9 @@ void drawPlayer(player_struct* p)
 	if(!p)p=&player;
 	
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(2)|POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, p->object->position, &params);
+		
 		camera_struct* c=getPlayerCamera();
 		glTranslatef32(c->position.x,c->position.y-600,c->position.z);
 		int32 m[9];transposeMatrix33(c->transformationMatrix,m);
@@ -92,8 +95,6 @@ void drawPlayer(player_struct* p)
 		m[2]=-m[2];m[5]=-m[5];m[8]=-m[8];
 		fixMatrix(m);
 		multMatrixGfx33(m);
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT;
-		// setupObjectLighting(NULL, p->object->position, &params);
 		// renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
 		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,0,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
 	glPopMatrix(1);
@@ -151,6 +152,9 @@ void renderGun(player_struct* p)
 {
 	if(!p)p=&player;
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(1) | POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, p->object->position, &params);
+		
 		glTranslate3f32((sinLerp(p->walkCnt>>1)>>11),(sinLerp(p->walkCnt)>>11),0);
 		glTranslate3f32(0,height,depth);
 		glRotateYi(-(1<<13));
@@ -159,11 +163,9 @@ void renderGun(player_struct* p)
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
-		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT;
 		room_struct* r=getPlayer()->currentRoom;
 		// vect3D v=reverseConvertVect(vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y))));
 		// NOGBA("%d %d %d",v.x,v.y,v.z);
-		// setupObjectLighting(NULL, p->object->position, &params);
 		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, params, false, p->modelInstance.palette);
 	glPopMatrix(1);
 }
@@ -349,7 +351,6 @@ void updatePlayer(player_struct* p)
 	
 	collidePlayer(p,p->currentRoom);
 	
-	// updatePhysicsObject(p->object);
 	updateCamera(NULL);
 	
 	p->tempAngle.x/=2;

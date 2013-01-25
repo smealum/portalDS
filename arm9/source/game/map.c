@@ -614,30 +614,124 @@ void getPathfindingData(room_struct* r)
 	NOGBA("got PF data %d %d",r->width,r->height);
 }
 
+void initRoomGrid(room_struct* r)
+{
+	if(!r)return;
+	
+	r->rectangleGridSize.x=r->width/CELLSIZE+1;
+	r->rectangleGridSize.y=r->height/CELLSIZE+1;
+	
+	r->rectangleGrid=malloc(sizeof(gridCell_struct)*r->rectangleGridSize.x*r->rectangleGridSize.y);
+	
+	int i;
+	for(i=0;i<r->rectangleGridSize.x*r->rectangleGridSize.y;i++)
+	{
+		r->rectangleGrid[i].rectangles=NULL;
+	}
+}
+
 void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 {
-	if(r)
+	if(!r)return;
+	
+	r->width=w;
+	r->height=h;
+	r->position=p;
+	
+	r->lmSlot=NULL;
+	
+	initRectangleList(&r->rectangles);
+	
+	if(r->height && r->width)
 	{
-		r->width=w;
-		r->height=h;
-		r->position=p;
+		r->floor=malloc(r->height*r->width);
+		r->ceiling=malloc(r->height*r->width);
+		r->materials=malloc(r->height*r->width*sizeof(material_struct*));
+		int i;for(i=0;i<r->height*r->width;i++){r->floor[i]=DEFAULTFLOOR;r->ceiling[i]=DEFAULTCEILING;r->materials[i]=NULL;}
+	}else {r->floor=r->ceiling=NULL;}
+	
+	r->lightMap=NULL;
+	r->lightMapBuffer=NULL;
+	r->pathfindingData=NULL;
+	r->doorWay=NULL;
 		
-		r->lmSlot=NULL;
-		
-		initRectangleList(&r->rectangles);
-		
-		if(r->height && r->width)
+	initRoomGrid(r);
+}
+
+gridCell_struct* getCurrentCell(room_struct* r, vect3D o)
+{
+	if(!r)return NULL;
+	
+	o=vectDifference(o,convertSize(vect(r->position.x,0,r->position.y)));
+	o=vectDivInt(o,CELLSIZE*TILESIZE*2);
+	
+	if(o.x>=0 && o.x<r->rectangleGridSize.x && o.z>=0 && o.z<r->rectangleGridSize.y)return &r->rectangleGrid[o.x+o.z*r->rectangleGridSize.x];
+	return NULL;
+}
+
+void drawCell(gridCell_struct* gc) //debug
+{
+	if(!gc)return;
+	
+	room_struct* r=getPlayer()->currentRoom;
+	if(!r)return;
+	glPushMatrix();
+	glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	int i;
+	for(i=0;i<gc->numRectangles;i++)
+	{
+		drawRect(*gc->rectangles[i],convertVect(gc->rectangles[i]->position),convertSize(gc->rectangles[i]->size),true);
+	}
+	glPopMatrix(1);
+}
+
+void generateGridCell(room_struct* r, gridCell_struct* gc, u16 x, u16 y)
+{
+	if(!r || !gc)return;
+	
+	if(gc->rectangles)free(gc->rectangles);
+	gc->numRectangles=0;
+	gc->lights[0]=NULL;gc->lights[1]=NULL;gc->lights[2]=NULL;
+	
+	x*=CELLSIZE*2;y*=CELLSIZE*2; //so getting the center isn't a problem
+	x+=CELLSIZE;y+=CELLSIZE; //center
+	
+	listCell_struct *lc=r->rectangles.first;
+	while(lc)
+	{
+		if((abs(x-(lc->data.position.x*2+lc->data.size.x))<=(CELLSIZE+abs(lc->data.size.x))) && (abs(y-(lc->data.position.z*2+lc->data.size.z))<=(CELLSIZE+abs(lc->data.size.z))))
 		{
-			r->floor=malloc(r->height*r->width);
-			r->ceiling=malloc(r->height*r->width);
-			r->materials=malloc(r->height*r->width*sizeof(material_struct*));
-			int i;for(i=0;i<r->height*r->width;i++){r->floor[i]=DEFAULTFLOOR;r->ceiling[i]=DEFAULTCEILING;r->materials[i]=NULL;}
-		}else {r->floor=r->ceiling=NULL;}
-		
-		r->lightMap=NULL;
-		r->lightMapBuffer=NULL;
-		r->pathfindingData=NULL;
-		r->doorWay=NULL;
+			gc->numRectangles++;
+		}
+		lc=lc->next;
+	}
+	gc->rectangles=malloc(sizeof(rectangle_struct*)*gc->numRectangles);
+	gc->numRectangles=0;
+	lc=r->rectangles.first;
+	while(lc)
+	{
+		if((abs(x-(lc->data.position.x*2+lc->data.size.x))<=(CELLSIZE+abs(lc->data.size.x))) && (abs(y-(lc->data.position.z*2+lc->data.size.z))<=(CELLSIZE+abs(lc->data.size.z))))
+		{
+			gc->rectangles[gc->numRectangles++]=&lc->data;
+		}
+		lc=lc->next;
+	}
+	
+	getClosestLights(r->entityCollection, vect(x/2,0,y/2), &gc->lights[0], &gc->lights[1], &gc->lights[2], &gc->lightDistances[0], &gc->lightDistances[1], &gc->lightDistances[2]);
+}
+
+void generateRoomGrid(room_struct* r)
+{
+	if(!r)return;
+	
+	int i, j;
+	for(i=0;i<r->rectangleGridSize.x;i++)
+	{
+		for(j=0;j<r->rectangleGridSize.y;j++)
+		{
+			generateGridCell(r,&r->rectangleGrid[i+j*r->rectangleGridSize.x],i,j);
+		}
 	}
 }
 
@@ -846,10 +940,18 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	entity_struct *l1, *l2, *l3;
 	int32 d1, d2, d3;
 	vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
-	getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
+	// getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
+	gridCell_struct* gc=getCurrentCell(r, pos);
+	if(!gc)return;
+	l1=gc->lights[0];
+	l2=gc->lights[1];
+	l3=gc->lights[2];
+	d1=gc->lightDistances[0];
+	d2=gc->lightDistances[1];
+	d3=gc->lightDistances[2];
 	// *params=POLY_ALPHA(31) | POLY_CULL_FRONT;
 	
-	glMaterialf(GL_AMBIENT, RGB15(2,2,2));
+	glMaterialf(GL_AMBIENT, RGB15(5,5,5));
 	glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
 	glMaterialf(GL_SPECULAR, RGB15(0,0,0));
 	glMaterialf(GL_EMISSION, RGB15(0,0,0));
@@ -857,20 +959,20 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	if(l1)
 	{
 		*params|=POLY_FORMAT_LIGHT0;
-		vect3D v=getVector(pos, l1);
+		vect3D v=vect(l1->position.x*(TILESIZE*2),l1->position.z*HEIGHTUNIT,l1->position.y*(TILESIZE*2));
 		d1*=64;
 		int32 v2=31-((31*d1)*(((lightData_struct*)l1->data)->intensity));
 		glLight(0, RGB15(v2,v2,v2), v.x, v.y, v.z);
 		if(l2)
 		{
 			*params|=POLY_FORMAT_LIGHT1;
-			vect3D v=getVector(pos, l2);
+			vect3D v=vect(l2->position.x*(TILESIZE*2),l2->position.z*HEIGHTUNIT,l2->position.y*(TILESIZE*2));
 			int32 v2=31-((31*d2)*(((lightData_struct*)l2->data)->intensity));
 			glLight(1, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			if(l3)
 			{
 				*params|=POLY_FORMAT_LIGHT2;
-				vect3D v=getVector(pos, l3);
+				vect3D v=vect(l3->position.x*(TILESIZE*2),l3->position.z*HEIGHTUNIT,l3->position.y*(TILESIZE*2));
 				int32 v2=31-((31*d3)*(((lightData_struct*)l3->data)->intensity));
 				glLight(2, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			}
@@ -885,6 +987,15 @@ void freeRoom(room_struct* r)
 		if(r->floor)free(r->floor);
 		if(r->ceiling)free(r->ceiling);
 		if(r->materials)free(r->materials);
+		if(r->rectangleGrid)
+		{
+			int i;
+			for(i=0;i<r->rectangleGridSize.x*r->rectangleGridSize.y;i++)
+			{
+				if(r->rectangleGrid[i].rectangles)free(r->rectangleGrid[i].rectangles);
+			}
+			free(r->rectangleGrid);
+		}
 		r->floor=NULL;
 		r->ceiling=NULL;
 		r->materials=NULL;

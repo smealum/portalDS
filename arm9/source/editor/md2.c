@@ -246,7 +246,7 @@ void generateFrameDisplayList(int n, const md2Model_struct *mdl)
 		for (j = 0; j < 3; ++j)
 		{
 			glTexCoordPACKED(mdl->packedTexcoords[mdl->triangles[i].st[j]]);
-			// glNormalDL(anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex]);
+			glNormalDL(anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex]);
 			// glVertexPackedDL(pframe->packedv10[mdl->triangles[i].vertex[j]]);
 			glVertexPackedDL(NORMAL_PACK(pframe->verts[mdl->triangles[i].vertex[j]].v[0]*2,pframe->verts[mdl->triangles[i].vertex[j]].v[1]*2,pframe->verts[mdl->triangles[i].vertex[j]].v[2]*2));
 		}
@@ -362,7 +362,7 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 						
 						GFX_TEX_COORD=mdl->packedTexcoords[mdl->triangles[i].st[j]];
 
-						// GFX_NORMAL=anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex];
+						GFX_NORMAL=anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex];
 									
 						vect3D v=vect((pvert->v[0]*2+((pvert2->v[0]-pvert->v[0])*m)/2),(pvert->v[1]*2+((pvert2->v[1]-pvert->v[1])*m)/2),(pvert->v[2]*2+((pvert2->v[2]-pvert->v[2])*m)/2));
 						

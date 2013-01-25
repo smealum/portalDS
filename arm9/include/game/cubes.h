@@ -11,6 +11,7 @@ typedef struct
 	bool active, oldActive;
 	OBB_struct* currentCube;
 	bool used;
+	u8 id;
 }cubeDispenser_struct;
 
 void initCubes(void);

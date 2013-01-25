@@ -5,6 +5,8 @@
 #define HEIGHTUNIT (128)
 #define SCALEFACT (inttof32(150))
 
+#define CELLSIZE (4)
+
 // #define MAXHEIGHT 31
 #define MAXHEIGHT 47
 #define STARTHEIGHT 16 //TEMP
@@ -38,6 +40,14 @@ typedef struct
 
 typedef struct
 {
+	rectangle_struct** rectangles;
+	entity_struct* lights[3];
+	int32 lightDistances[3];
+	u8 numRectangles;
+}gridCell_struct;
+
+typedef struct
+{
 	u8* floor;
 	u8* ceiling;
 	material_struct** materials;
@@ -49,6 +59,8 @@ typedef struct
 	void** doorWay;
 	mtlImg_struct* lightMap;
 	lightMapSlots_struct* lmSlot;
+	gridCell_struct* rectangleGrid;
+	vect3D rectangleGridSize;
 	entityCollection_struct* entityCollection;
 	rectangleList_struct rectangles;
 }room_struct;
@@ -86,6 +98,9 @@ u8 getHeightValue(room_struct* r, vect3D pos, bool floor);
 u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull);
 
 void setupObjectLighting(room_struct* r, vect3D pos, u32* params);
+
+void generateRoomGrid(room_struct* r);
+gridCell_struct* getCurrentCell(room_struct* r, vect3D o);
 
 //lightmaps.h
 void loadLightMap(room_struct* r);

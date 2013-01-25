@@ -14,6 +14,8 @@ bigButton_struct* testButton;
 bigButton_struct* testButton2;
 platform_struct* testPlatform;
 
+u16 vblCNT, frmCNT, FPS;
+
 void initGame(void)
 {
 	int oldv=getMemFree();
@@ -31,6 +33,11 @@ void initGame(void)
 	glEnable(GL_TEXTURE_2D);
 	// glEnable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
+	glEnable(GL_OUTLINE); //TEMP?
+	
+	glSetOutlineColor(0,RGB15(0,0,0)); //TEMP?
+	glSetToonTableRange(0, 15, RGB15(8,8,8)); //TEMP?
+	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?
 	
 	glClearColor(31,31,0,31);
 	glClearPolyID(63);
@@ -96,6 +103,7 @@ void initGame(void)
 	
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
+	generateRoomGrid(&roomEdits[0].data);
 	
 	getVramStatus();
 	
@@ -116,6 +124,15 @@ u16* ppStack[192*16];
 
 extern u8 selectID;
 extern OBB_struct objects[NUMOBJECTS];
+
+u32 prevTiming;
+
+u32 cpuEndSlice()
+{
+	u32 temp=prevTiming;
+	prevTiming=cpuGetTiming();
+	return prevTiming-temp;
+}
 
 static inline void render1(void)
 {
@@ -138,11 +155,11 @@ static inline void render1(void)
 			// updatePlayerPI(NULL);
 			changeAnimation(&getPlayer()->modelInstance,2,false);
 		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
+	iprintf("controls : %d  \n",cpuEndSlice());
 	
-	// cpuStartTiming(0);
 		updatePlayer(NULL);
-	// iprintf("player : %d  \n",cpuEndTiming());
-	// cpuStartTiming(0);
+	iprintf("player : %d  \n",cpuEndSlice());
+	
 		updatePortals();
 		updateTurrets();
 		updateBigButtons();
@@ -150,7 +167,7 @@ static inline void render1(void)
 		updateEnergyBalls();
 		updatePlatforms();
 		updateCubeDispensers();
-	// iprintf("updates : %d  \n",cpuEndTiming());
+	iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
@@ -175,22 +192,24 @@ static inline void render1(void)
 			// glPopMatrix(1);
 		// glPopMatrix(1);
 		
-		drawRoomsGame(128);
+		cpuEndSlice();
+			drawRoomsGame(128);
+			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
+		iprintf("room : %d  \n",cpuEndSlice());
 		
 		updateParticles();
 		drawParticles();
+		iprintf("particles : %d  \n",cpuEndSlice());
 		
-		// cpuStartTiming(0);
 			drawOBBs();
-		// iprintf("OBBs : %d  \n",cpuEndTiming());
-		// cpuStartTiming(0);
+		iprintf("OBBs : %d  \n",cpuEndSlice());
 			drawBigButtons();
 			drawEnergyDevices();
 			drawEnergyBalls();
 			drawPlatforms();
 			drawCubeDispensers();
 			drawTurretsStuff();
-		// iprintf("stuff : %d  \n",cpuEndTiming());
+		iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -201,7 +220,7 @@ static inline void render1(void)
 }
 
 static inline void render2(void)
-{	
+{
 	if(!(orangeSeen||blueSeen)){previousPortal=NULL;return;}
 	
 	if((switchPortal||!blueSeen)&&orangeSeen)currentPortal=&portal1;
@@ -273,14 +292,18 @@ void gameFrame(void)
 	{
 		case false:
 			iprintf("\x1b[0;0H");
-			// cpuStartTiming(0);
+			iprintf("%d FPS   \n", FPS);
+			cpuEndSlice();
 			postProcess1();
-			// iprintf("frm 1 : %d  \n",cpuGetTiming());
+			iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
-			// iprintf("frm 1 : %d  \n",cpuEndTiming());
+			iprintf("full frame : %d   \n",cpuEndTiming());
 			swiWaitForVBlank();
+			cpuStartTiming(0);
+			prevTiming=0;
 			if(previousPortal)dmaCopy(VRAM_C, previousPortal->viewPoint, 256*192*2);			
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
+			frmCNT++;
 			break;
 		case true:
 			// cpuStartTiming(0);
@@ -289,7 +312,10 @@ void gameFrame(void)
 			render2();
 			listenPI9();
 			// iprintf("frm 2 : %d  \n",cpuEndTiming());
-			swiWaitForVBlank();	
+			iprintf("fake frame : %d   \n",cpuEndTiming());
+			swiWaitForVBlank();
+			cpuStartTiming(0);
+			prevTiming=0;
 			dmaCopy(VRAM_C, mainScreen, 256*192*2);			
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
 			break;
@@ -310,5 +336,10 @@ void killGame(void)
 
 void gameVBL(void)
 {
-
+	vblCNT++;
+	if(vblCNT>=60)
+	{
+		FPS=frmCNT;
+		frmCNT=vblCNT=0;
+	}
 }

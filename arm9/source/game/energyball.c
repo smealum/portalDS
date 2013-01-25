@@ -15,10 +15,12 @@ void initEnergyBalls(void)
 	for(i=0;i<NUMENERGYDEVICES;i++)
 	{
 		energyDevice[i].used=false;
+		energyDevice[i].id=i;
 	}
 	for(i=0;i<NUMENERGYBALLS;i++)
 	{
 		energyBall[i].used=false;
+		energyBall[i].id=i;
 	}
 	
 	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&energyCatcherModel);
@@ -100,6 +102,9 @@ void drawEnergyDevice(energyDevice_struct* ed)
 	if(!ed)return;
 	
 	glPushMatrix();
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(30+ed->id)|POLY_TOON_HIGHLIGHT;
+		setupObjectLighting(NULL, ed->position, &params);
+		
 		glTranslate3f32(ed->position.x,ed->position.y,ed->position.z);
 		
 		switch(ed->orientation)
@@ -123,8 +128,6 @@ void drawEnergyDevice(energyDevice_struct* ed)
 				break;
 		}
 		
-		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE;
-		// setupObjectLighting(NULL, ed->position, &params);
 		renderModelFrameInterp(ed->modelInstance.currentFrame,ed->modelInstance.nextFrame,ed->modelInstance.interpCounter,ed->modelInstance.model,params,false,ed->modelInstance.palette);
 	glPopMatrix(1);
 }
@@ -187,15 +190,19 @@ energyBall_struct* createEnergyBall(vect3D pos, vect3D dir)
 	return NULL;
 }
 
-extern md2Model_struct storageCubeModel;
-
 void drawEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
 	
 	glPushMatrix();
+		u32 angle=(eb->modelInstance.currentFrame*4+eb->modelInstance.interpCounter);
 		glTranslate3f32(eb->position.x,eb->position.y,eb->position.z);
-		renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(26)|POLY_ID(8)|POLY_CULL_NONE,false,eb->modelInstance.palette);
+		glPushMatrix();
+			glRotateZi(angle*1024);glRotateXi(angle*512);glRotateYi(angle*256);
+			renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(27)|POLY_ID(8)|POLY_CULL_NONE,false,eb->modelInstance.palette);
+		glPopMatrix(1);
+		glRotateXi(angle*1024);glRotateYi(angle*512);glRotateZi(angle*256);
+		renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(29)|POLY_ID(16)|POLY_CULL_NONE,false,eb->modelInstance.palette);
 	glPopMatrix(1);
 }
 

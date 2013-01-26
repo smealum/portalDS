@@ -40,6 +40,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	rec->position=pos;
 	rec->size=size;
 	rec->normal=vect(0,0,0);
+	rec->touched=false;
 	if(!size.x)
 	{
 		x=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);
@@ -533,12 +534,12 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		glVertex3v16DL(v[3].x, v[3].y, v[3].z);
 }
 
-void transferRectangle(vect3D pos, vect3D size, vect3D normal)
+s16 transferRectangle(vect3D pos, vect3D size, vect3D normal)
 {
 	if(size.x<0){pos.x+=size.x;size.x=-size.x;}
 	if(size.y<0){pos.y+=size.y;size.y=-size.y;}
 	if(size.z<0){pos.z+=size.z;size.z=-size.z;}
-	createAAR(vectMultInt(size,4), vectMultInt(pos,4), vectMultInt(normal,-1));
+	return createAAR(vectMultInt(size,4), vectMultInt(pos,4), vectMultInt(normal,-1));
 }
 
 void transferRectangles(room_struct* r)
@@ -547,7 +548,7 @@ void transferRectangles(room_struct* r)
 	int i=0;
 	while(lc)
 	{
-		transferRectangle(addVect(convertSize(vect(r->position.x,0,r->position.y)),convertVect(lc->data.position)),convertSize(lc->data.size),lc->data.normal);
+		lc->data.AARid=transferRectangle(addVect(convertSize(vect(r->position.x,0,r->position.y)),convertVect(lc->data.position)),convertSize(lc->data.size),lc->data.normal);
 		lc=lc->next;
 		i++;
 		if(!(i%8))swiWaitForVBlank();

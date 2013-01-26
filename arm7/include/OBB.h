@@ -54,6 +54,7 @@ typedef struct
 	vect3D AABBo, AABBs;
 	u8 portal[2];
 	u8 oldPortal[2];
+	s16 groundID;
 	bool used;
 }OBB_struct;
 // 4 + 9*4*3 + 4 + 

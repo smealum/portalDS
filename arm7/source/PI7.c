@@ -214,7 +214,7 @@ void sendDataPI7(void)
 	{
 		if(objects[i].used)
 		{
-			fifoSendValue32(FIFO_USER_01,i);
+			fifoSendValue32(FIFO_USER_01,(((u16)(objects[i].groundID+1))<<16)|i);
 			fifoSendValue32(FIFO_USER_02,objects[i].position.x);
 			fifoSendValue32(FIFO_USER_03,objects[i].position.y);
 			fifoSendValue32(FIFO_USER_04,objects[i].position.z);

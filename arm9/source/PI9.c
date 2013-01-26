@@ -20,6 +20,7 @@ void initPI9(void)
 	for(i=0;i<NUMAARS;i++)
 	{
 		aaRectangles[i].used=false;
+		aaRectangles[i].touched=false;
 		aaRectangles[i].id=i;
 	}
 	selectID=0;
@@ -113,10 +114,10 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	return o;
 }
 
-void createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|normal][posx][posy][posz])
+s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|normal][posx][posy][posz])
 {
 	AAR_struct* a=newAAR();
-	if(!a)return;
+	if(!a)return -1;
 	a->size=size;
 	a->position=pos;
 	
@@ -131,7 +132,7 @@ void createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez
 	fifoSendValue32(FIFO_USER_08,(a->position.y));
 	fifoSendValue32(FIFO_USER_08,(a->position.z));
 	
-	NOGBA("aar : %d",a->id);
+	return a->id;
 }
 
 void addPlatform(vect3D pos)
@@ -202,7 +203,9 @@ void listenPI9(void)
 {
 	while(fifoCheckValue32(FIFO_USER_01))
 	{
-		const int k=fifoGetValue32(FIFO_USER_01);
+		const u32 x=fifoGetValue32(FIFO_USER_01);
+		const int k=x&((1<<16)-1);
+		const s16 groundID=(x>>16)-1;
 		while(!fifoCheckValue32(FIFO_USER_02));
 		while(!fifoCheckValue32(FIFO_USER_03));
 		while(!fifoCheckValue32(FIFO_USER_04));
@@ -211,6 +214,10 @@ void listenPI9(void)
 		while(!fifoCheckValue32(FIFO_USER_07));
 		if(k<NUMOBJECTS)
 		{
+			if(groundID>=0 && groundID<NUMAARS)
+			{
+				aaRectangles[groundID].touched=true;
+			}
 			OBB_struct* o=&objects[k];
 			// o->used=true;
 			o->position.x=fifoGetValue32(FIFO_USER_02);

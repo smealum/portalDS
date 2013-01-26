@@ -23,6 +23,7 @@ typedef struct
 {
 	vect3D position, size, lmSize, lmPos, normal;
 	material_struct* material;
+	s16 AARid;
 	bool rot, portalable, hide, touched;
 }rectangle_struct;
 

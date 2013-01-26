@@ -8,6 +8,7 @@ typedef struct
 	room_struct* room;
 	rectangle_struct* surface;
 	activator_struct activator;
+	modelInstance_struct modelInstance;
 	vect3D position;
 	bool active;
 	bool used;

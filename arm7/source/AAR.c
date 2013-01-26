@@ -381,6 +381,7 @@ void AARsOBBContacts(OBB_struct* o)
 	getOBBNodes(NULL, o, &x, &X, &z, &Z);
 	bool lalala[NUMAARS];
 	for(i=0;i<NUMAARS;i++)lalala[i]=0;
+	o->groundID=-1;
 	for(i=x;i<=X;i++)
 	{
 		for(j=z;j<=Z;j++)
@@ -388,7 +389,9 @@ void AARsOBBContacts(OBB_struct* o)
 			node_struct* n=&AARgrid.nodes[i+j*AARgrid.width];
 			for(k=0;k<n->length;k++)
 			{
+				u16 old=o->numContactPoints;
 				if(!lalala[n->data[k]])AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+				if(o->groundID<0 && o->numContactPoints>old && aaRectangles[n->data[k]].normal.y>0)o->groundID=n->data[k];
 				lalala[n->data[k]]=1;
 			}
 		}

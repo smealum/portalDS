@@ -5,7 +5,6 @@
 #include "../../arm7/include/PIC.h"
 
 #define NUMOBJECTS (16)
-#define NUMAARS (150)
 
 typedef struct
 {
@@ -20,16 +19,19 @@ typedef struct
 typedef struct
 {
 	vect3D position, size;
+	bool touched;
 	bool used;
 	u16 id;
 }AAR_struct;
+
+extern AAR_struct aaRectangles[NUMAARS];
 
 void initPI9(void);
 void startPI(void);
 void pausePI(void);
 void listenPI9(void);
 void applyForce(u8 id, vect3D pos, vect3D v);
-void createAAR(vect3D size, vect3D pos, vect3D normal);
+s16 createAAR(vect3D size, vect3D pos, vect3D normal);
 void addPlatform(vect3D pos);
 void changePlatform(u8 id, vect3D pos);
 

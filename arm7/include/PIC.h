@@ -13,6 +13,8 @@
 #define NUMPLATFORMS (8)
 #define PLATFORMSIZE (256*3) //half
 
+#define NUMAARS (300)
+
 typedef enum
 {
 	PI_START=1,  	    //ARG : 0

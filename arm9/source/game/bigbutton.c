@@ -24,6 +24,8 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 	
 	bb->room=r;
 	
+	initModelInstance(&bb->modelInstance,&bigButtonModel);
+	
 	pos.y=getHeightValue(r,pos,true);
 	
 	{//for collisions
@@ -77,7 +79,7 @@ void drawBigButton(bigButton_struct* bb)
 		setupObjectLighting(NULL, bb->position, &params);
 		
 		glTranslate3f32(bb->position.x,bb->position.y,bb->position.z);
-		renderModelFrameInterp(0, 0, 0, &bigButtonModel, params, false, bb->active?(bigButtonBrightPalette):(NULL));
+		renderModelFrameInterp(bb->modelInstance.currentFrame, bb->modelInstance.nextFrame, bb->modelInstance.interpCounter, bb->modelInstance.model, params, false, bb->active?(bigButtonBrightPalette):(NULL));
 	glPopMatrix(1);
 }
 
@@ -97,9 +99,23 @@ void updateBigButton(bigButton_struct* bb)
 {
 	if(!bb || !bb->used)return;
 	
-	bb->active=bb->surface->touched;
-	if(bb->active)useActivator(&bb->activator);
-	else unuseActivator(&bb->activator);
+	bb->active=false;
+	if(bb->surface->touched)bb->active=bb->surface->touched;
+	if(bb->surface->AARid>0)
+	{
+		if(!bb->active)bb->active=aaRectangles[bb->surface->AARid].touched;
+		aaRectangles[bb->surface->AARid].touched=false;
+	}
+	if(bb->active)
+	{
+		changeAnimation(&bb->modelInstance,1,false);
+		useActivator(&bb->activator);
+	}else{
+		changeAnimation(&bb->modelInstance,0,false);
+		unuseActivator(&bb->activator);
+	}
+	
+	updateAnimation(&bb->modelInstance);
 }
 
 void updateBigButtons(void)

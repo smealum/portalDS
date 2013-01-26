@@ -1,7 +1,7 @@
 #ifndef __ROOMEDIT9__
 #define __ROOMEDIT9__
 
-#define NUMROOMEDITS 256
+#define NUMROOMEDITS 8
 #define OUTLINEWIDTH (3<<6)
 #define SELECTIONOUTLINEWIDTH (1<<7)
 

@@ -110,6 +110,17 @@ void getAnimations(md2Model_struct *mdl)
 		oldstr=pframe->name;
 	}
 	mdl->animations[n].end=i-1;
+	
+	
+	for(i=0;i<mdl->numAnim;i++)
+	{
+		int j;
+		u16 n=mdl->animations[i].end-mdl->animations[i].start+1;
+		for(j=0;j<n;j++)
+		{
+			mdl->frames[mdl->animations[i].start+j].next=mdl->animations[i].start+((j+1)%n);
+		}
+	}
 }
 
 int loadMd2Model(const char *filename, char *texname, md2Model_struct *mdl)
@@ -163,7 +174,10 @@ int loadMd2Model(const char *filename, char *texname, md2Model_struct *mdl)
 		/* Memory allocation for vertices of this frame */
 		mdl->frames[i].verts = (md2_vertex_t *) malloc (sizeof (md2_vertex_t) * mdl->header.num_vertices);
 		mdl->frames[i].packedv10 = (u32 *) malloc (sizeof (u32) * mdl->header.num_vertices);
-		mdl->frames[i].displayList = NULL;
+		mdl->frames[i].displayList[0] = NULL;
+		mdl->frames[i].displayList[1] = NULL;
+		mdl->frames[i].displayList[2] = NULL;
+		mdl->frames[i].displayList[3] = NULL;
 		// mdl->frames[i].faceNormals = (vect3D *) malloc (sizeof (vect3D) * mdl->header.num_tris);		
 		
 	    vec3_t scale,trans;
@@ -217,7 +231,10 @@ void freeMd2Model(md2Model_struct *mdl)
 			free(mdl->frames[i].verts);
 			// free (mdl->frames[i].packedVerts);
 			free(mdl->frames[i].packedv10);
-			if(mdl->frames[i].displayList)free(mdl->frames[i].displayList);
+			if(mdl->frames[i].displayList[0])free(mdl->frames[i].displayList[0]);
+			if(mdl->frames[i].displayList[1])free(mdl->frames[i].displayList[1]);
+			if(mdl->frames[i].displayList[2])free(mdl->frames[i].displayList[2]);
+			if(mdl->frames[i].displayList[3])free(mdl->frames[i].displayList[3]);
 			mdl->frames[i].verts = NULL;
 			mdl->frames[i].packedVerts = NULL;
 			mdl->frames[i].packedv10 = NULL;
@@ -231,7 +248,7 @@ void freeMd2Model(md2Model_struct *mdl)
 	mdl->animations=NULL;
 }
 
-void generateFrameDisplayList(int n, const md2Model_struct *mdl)
+void generateFrameDisplayList(int n, const md2Model_struct *mdl, u8 normals)
 {
 	int i, j;
 	if(!mdl)return;
@@ -246,25 +263,73 @@ void generateFrameDisplayList(int n, const md2Model_struct *mdl)
 		for (j = 0; j < 3; ++j)
 		{
 			glTexCoordPACKED(mdl->packedTexcoords[mdl->triangles[i].st[j]]);
-			glNormalDL(anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex]);
-			// glVertexPackedDL(pframe->packedv10[mdl->triangles[i].vertex[j]]);
+			if(normals)glNormalDL(anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex]);
 			glVertexPackedDL(NORMAL_PACK(pframe->verts[mdl->triangles[i].vertex[j]].v[0]*2,pframe->verts[mdl->triangles[i].vertex[j]].v[1]*2,pframe->verts[mdl->triangles[i].vertex[j]].v[2]*2));
 		}
 	}
 	// glEndDL();
 	u32 size=glEndListDL();
-	pframe->displayList=malloc((size+1)*4);
-	if(pframe->displayList)memcpy(pframe->displayList,ptr,(size+1)*4);
+	pframe->displayList[0]=malloc((size+1)*4);
+	if(pframe->displayList)memcpy(pframe->displayList[0],ptr,(size+1)*4);
 }
 
-void generateModelDisplayLists(md2Model_struct *mdl)
+void generateFrameDisplayListInterp(int n, int n2, int m, const md2Model_struct *mdl, u8 normals)
+{
+	int i, j;
+	if(!mdl)return;
+	if((n < 0) || (n > mdl->header.num_frames - 1))return;
+	if((n2 < 0) || (n2 > mdl->header.num_frames - 1))return;
+	if(!m || m>3)return;
+
+	md2_frame_t *pframe=&mdl->frames[n];
+	md2_frame_t *pframe2=&mdl->frames[n2];
+	
+	u32* ptr=glBeginListDL();
+	glBeginDL(GL_TRIANGLES);
+	for (i = 0; i < mdl->header.num_tris; ++i)
+	{
+		for (j = 0; j < 3; ++j)
+		{
+			md2_vertex_t* pvert = &pframe->verts[mdl->triangles[i].vertex[j]];
+			md2_vertex_t* pvert2 = &pframe2->verts[mdl->triangles[i].vertex[j]];
+			
+			glTexCoordPACKED(mdl->packedTexcoords[mdl->triangles[i].st[j]]);
+
+			if(normals)glNormalDL(anorms_table[pframe->verts[mdl->triangles[i].vertex[j]].normalIndex]);
+						
+			vect3D v=vect((pvert->v[0]*2+((pvert2->v[0]-pvert->v[0])*m)/2),(pvert->v[1]*2+((pvert2->v[1]-pvert->v[1])*m)/2),(pvert->v[2]*2+((pvert2->v[2]-pvert->v[2])*m)/2));
+			
+			glVertexPackedDL(NORMAL_PACK(v.x,v.y,v.z));
+		}
+	}
+	// glEndDL();
+	u32 size=glEndListDL();
+	pframe->displayList[m]=malloc((size+1)*4);
+	if(pframe->displayList)memcpy(pframe->displayList[m],ptr,(size+1)*4);
+}
+
+void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 {
 	if(!mdl)return;
 	
 	int i;
 	for(i=0;i<mdl->header.num_tris;i++)
 	{
-		generateFrameDisplayList(i, mdl);
+		generateFrameDisplayList(i, mdl, normals);
+	}
+	if(interp)
+	{
+		for(i=0;i<mdl->numAnim;i++)
+		{
+			int j;
+			u16 n=mdl->animations[i].end-mdl->animations[i].start+1;
+			for(j=0;j<n;j++)
+			{
+				generateFrameDisplayListInterp(mdl->animations[i].start+j, mdl->animations[i].start+((j+1)%n), 1, mdl, normals);
+				generateFrameDisplayListInterp(mdl->animations[i].start+j, mdl->animations[i].start+((j+1)%n), 2, mdl, normals);
+				generateFrameDisplayListInterp(mdl->animations[i].start+j, mdl->animations[i].start+((j+1)%n), 3, mdl, normals);
+			}
+		}
 	}
 }
 
@@ -325,8 +390,11 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 	n2%=mdl->header.num_frames;
 	
 	if ((n < 0) || (n > mdl->header.num_frames - 1))return;
+	if ((n2 < 0) || (n2 > mdl->header.num_frames - 1))return;
+	if (m<0 || m>3)return;
 
 	md2_frame_t *pframe=&mdl->frames[n];
+	if(pframe->displayList[m])n2=pframe->next;	
 	md2_frame_t *pframe2=&mdl->frames[n2];
 		
 	applyMTL(mdl->texture);
@@ -346,9 +414,9 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 		glScalef32(inttof32(32),inttof32(32),inttof32(32)); // necessary for v10
 		GFX_COLOR=RGB15(31,31,31);
 		
-		if(pframe->displayList && (!m || n==n2))
+		if(pframe->displayList[m])
 		{
-			glCallList(pframe->displayList);
+			glCallList(pframe->displayList[m]);
 		}else{		
 			glBegin (GL_TRIANGLES);
 			for (i = 0; i < mdl->header.num_tris; ++i)

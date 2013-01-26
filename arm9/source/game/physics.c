@@ -208,6 +208,7 @@ const int32 transZ=inttof32(1);
 bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 {	
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+	o1.y-=128; //make us taller
 	
 	bool ret=false;
 	

@@ -315,7 +315,7 @@ void drawOBB(OBB_struct* o)
 	glPushMatrix();
 	
 	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(40+o->id)|POLY_TOON_HIGHLIGHT;
-	// setupObjectLighting(NULL, vectDivInt(o->position,4), &params);
+	setupObjectLighting(NULL, vectDivInt(o->position,4), &params);
 	
 	glTranslatef32(o->position.x/4,o->position.y/4,o->position.z/4);
 	multTMatrix(o->transformationMatrix);
@@ -325,8 +325,8 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
-	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette);
-	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, 0, o->modelInstance.model, params, true, o->modelInstance.palette);
+	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette);
+	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, 0, o->modelInstance.model, params, true, o->modelInstance.palette);
 
 	glPopMatrix(1);
 }

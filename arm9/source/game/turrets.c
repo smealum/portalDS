@@ -16,7 +16,7 @@ void initTurrets(void)
 	
 	loadMd2Model("models/turret.md2","turret.pcx",&turretModel);
 	NOGBA("turret1 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
-	generateModelDisplayLists(&turretModel);
+	generateModelDisplayLists(&turretModel, true, 1);
 	NOGBA("turret2 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 

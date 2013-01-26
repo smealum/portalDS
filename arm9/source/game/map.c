@@ -78,7 +78,7 @@ vect3D getUnitVect(rectangle_struct* rec)
 	return u;
 }
 
-bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i)
+bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n)
 {
 	listCell_struct *lc=r->rectangles.first;
 	vect3D v;
@@ -87,11 +87,26 @@ bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, i
 		if(&lc->data!=rec)
 		{
 			// NOGBA("%p vs %p",rec,&lc->data);
-			if(collideLineRectangle(&lc->data,l,u,d,NULL,&v)){if(i)*i=v;return true;}
+			if(collideLineRectangle(&lc->data,l,u,d,NULL,&v)){if(i)*i=v;if(n)*n=lc->data.normal;return true;}
 		}
 		lc=lc->next;
 	}
 	return false;
+}
+
+rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n)
+{
+	if(!gc)return NULL;
+	vect3D v;
+	int j;
+	for(j=0;j<gc->numRectangles;j++)
+	{
+		if(gc->rectangles[j]!=rec)
+		{
+			if(collideLineRectangle(gc->rectangles[j],l,u,d,NULL,&v)){if(i)*i=v;if(n)*n=gc->rectangles[j]->normal;return gc->rectangles[j];}
+		}
+	}
+	return NULL;
 }
 
 rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i)
@@ -125,7 +140,7 @@ u8 computeLighting(vect3D l, int32 intensity, vect3D p, rectangle_struct* rec, r
 		vect3D u=vectDifference(p,l);
 		u=divideVect(u,rdist);
 		// NOGBA("dv : %d, %d, %d",u.x,u.y,u.z);
-		if(collideLineMap(r, rec, l, u, rdist, NULL))return 0;
+		if(collideLineMap(r, rec, l, u, rdist, NULL, NULL))return 0;
 		int32 v=dotProduct(u,rec->normal);
 		v=max(0,v);
 		v*=3;
@@ -959,20 +974,20 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	if(l1)
 	{
 		*params|=POLY_FORMAT_LIGHT0;
-		vect3D v=vect(l1->position.x*(TILESIZE*2),l1->position.z*HEIGHTUNIT,l1->position.y*(TILESIZE*2));
+		vect3D v=getVector(pos, l1);
 		d1*=64;
 		int32 v2=31-((31*d1)*(((lightData_struct*)l1->data)->intensity));
 		glLight(0, RGB15(v2,v2,v2), v.x, v.y, v.z);
 		if(l2)
 		{
 			*params|=POLY_FORMAT_LIGHT1;
-			vect3D v=vect(l2->position.x*(TILESIZE*2),l2->position.z*HEIGHTUNIT,l2->position.y*(TILESIZE*2));
+			vect3D v=getVector(pos, l2);
 			int32 v2=31-((31*d2)*(((lightData_struct*)l2->data)->intensity));
 			glLight(1, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			if(l3)
 			{
 				*params|=POLY_FORMAT_LIGHT2;
-				vect3D v=vect(l3->position.x*(TILESIZE*2),l3->position.z*HEIGHTUNIT,l3->position.y*(TILESIZE*2));
+				vect3D v=getVector(pos, l3);
 				int32 v2=31-((31*d3)*(((lightData_struct*)l3->data)->intensity));
 				glLight(2, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			}

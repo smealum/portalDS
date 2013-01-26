@@ -68,8 +68,8 @@ void initPlayer(player_struct* p)
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
 	loadMd2Model("models/ratman.md2","ratman.pcx",&playerModel);
-	generateModelDisplayLists(&gun);
-	generateModelDisplayLists(&playerModel);
+	generateModelDisplayLists(&gun, true, 1);
+	generateModelDisplayLists(&playerModel, false, 1);
 	initModelInstance(&p->modelInstance,&gun);
 	initModelInstance(&p->playerModelInstance,&playerModel);
 	// crossHair=createTexture("crshair.pcx","textures");

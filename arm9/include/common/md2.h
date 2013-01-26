@@ -68,7 +68,8 @@ typedef struct
 	u32 *packedv10;
 	vect3D* faceNormals;
 	vect3D min, max;
-	u32* displayList;
+	u16 next;
+	u32* displayList[4];
 }md2_frame_t;
 
 typedef struct
@@ -108,7 +109,7 @@ void freeMd2Model(md2Model_struct *mdl);
 void renderModelFrame (int n, const md2Model_struct *mdl);
 void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal);
 
-void generateModelDisplayLists(md2Model_struct *mdl);
+void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals);
 
 void initModelInstance(modelInstance_struct* mi, md2Model_struct* mdl);
 void changeAnimation(modelInstance_struct* mi, u16 newAnim, bool oneshot);

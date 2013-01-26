@@ -18,8 +18,10 @@ typedef struct
 {
 	modelInstance_struct modelInstance;
 	deviceOrientation_type orientation;
+	rectangle_struct* surface;
 	vect3D position;
 	bool type; //true=launcher
+	bool active;
 	bool used;
 	u8 id;
 }energyDevice_struct;
@@ -27,9 +29,10 @@ typedef struct
 typedef struct
 {
 	modelInstance_struct modelInstance;
+	energyDevice_struct* launcher;
 	vect3D position, direction;
 	int32 speed;
-	u16 life;
+	u16 maxLife, life;
 	bool used;
 	u8 id;
 }energyBall_struct;
@@ -39,7 +42,7 @@ energyDevice_struct* createEnergyDevice(room_struct* r, vect3D pos, deviceOrient
 void drawEnergyDevices(void);
 void updateEnergyDevices(void);
 
-energyBall_struct* createEnergyBall(vect3D pos, vect3D dir);
+energyBall_struct* createEnergyBall(energyDevice_struct* launcher, vect3D pos, vect3D dir, u16 life);
 void drawEnergyBalls(void);
 void updateEnergyBalls(void);
 

@@ -96,7 +96,8 @@ void initGame(void)
 	updatePlayer(NULL);testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
-	createEnergyDevice(NULL, vect(0,7,7), pX, true); //TEMP
+	createEnergyDevice(NULL, vect(0,7,9), pX, true); //TEMP
+	createEnergyDevice(NULL, vect(20,0,9), pY, false); //TEMP
 	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
 	addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET);//
 	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//

@@ -111,6 +111,7 @@ rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, ve
 
 rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i)
 {
+	if(!r)return;
 	listCell_struct *lc=r->rectangles.first;
 	vect3D v;
 	int32 lowestK=d;

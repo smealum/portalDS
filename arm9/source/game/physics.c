@@ -205,16 +205,13 @@ const int32 transX=inttof32(1);
 const int32 transY=inttof32(5);
 const int32 transZ=inttof32(1);
 
-bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
-{	
+bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room_struct* r)
+{
+	if(!gc || !o || !r)return false;
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-	o1.y-=128; //make us taller
-	
-	bool ret=false;
-	
-	gridCell_struct* gc=getCurrentCell(getPlayer()->currentRoom,o->position);
-	if(!gc)return false;
+	// o1.y-=128; //make us taller
 	int i;
+	bool ret=false;
 	for(i=0;i<gc->numRectangles;i++)
 	{
 		rectangle_struct* rec=gc->rectangles[i];
@@ -239,8 +236,54 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 			ret=true;
 		}
 	}
+	return ret;
+}
+
+bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
+{	
+	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+	// o1.y-=128; //make us taller
+	
+	bool ret=false;
+	
+	gridCell_struct* gc=getCurrentCell(r,o->position);
+	if(!gc)return false;
+	ret=ret||checkObjectCollisionCell(gc,o,r);
+	/*vect3D v=vect(o1.x/(CELLSIZE*TILESIZE*2),0,o1.z/(CELLSIZE*TILESIZE*2));
+	vect3D v1=vect((o1.x+o->radius)/(CELLSIZE*TILESIZE*2),0,(o1.z+o->radius)/(CELLSIZE*TILESIZE*2));
+	vect3D v2=vect((o1.x+o->radius)/(CELLSIZE*TILESIZE*2),0,(o1.z+o->radius)/(CELLSIZE*TILESIZE*2));
+	if(v1.x!=v.x && v1.x>=0 && v1.x<r->rectangleGridSize.x)
+	{
+		ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(o->radius,0,0))),o,r);
+		if(v1.y!=v.y && v1.y>=0 && v1.y<r->rectangleGridSize.y)
+		{
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,o->radius))),o,r);
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(o->radius,0,o->radius))),o,r);
+		}else if(v2.y!=v.y && v2.y>=0 && v2.y<r->rectangleGridSize.y){
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,-o->radius))),o,r);
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(o->radius,0,-o->radius))),o,r);
+		}
+	}else if(v2.x!=v.x && v2.x>=0 && v2.x<r->rectangleGridSize.x)
+	{
+		ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(-o->radius,0,0))),o,r);
+		if(v1.y!=v.y && v1.y>=0 && v1.y<r->rectangleGridSize.y)
+		{
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,o->radius))),o,r);
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(-o->radius,0,o->radius))),o,r);
+		}else if(v2.y!=v.y && v2.y>=0 && v2.y<r->rectangleGridSize.y){
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,-o->radius))),o,r);
+			ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(-o->radius,0,-o->radius))),o,r);
+		}
+	}else if(v1.y!=v.y && v1.y>=0 && v1.y<r->rectangleGridSize.y)
+	{
+		ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,o->radius))),o,r);
+	}else if(v2.y!=v.y && v2.y>=0 && v2.y<r->rectangleGridSize.y)
+	{
+		ret=ret||checkObjectCollisionCell(getCurrentCell(r,addVect(o->position,vect(0,0,-o->radius))),o,r);
+	}*/
 	
 	//platforms
+	int i;
 	for(i=0;i<NUMPLATFORMS;i++)
 	{
 		if(platform[i].used) //add culling

@@ -7,6 +7,9 @@
 typedef struct
 {
 	OBB_struct* OBB;
+	vect3D laserOrigin, laserDestination;
+	vect3D laserOrigin2, laserDestination2;
+	bool laserThroughPortal;
 	u8 counter;
 	bool used;
 }turret_struct;

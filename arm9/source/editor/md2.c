@@ -393,6 +393,7 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 	if ((n2 < 0) || (n2 > mdl->header.num_frames - 1))return;
 	if (m<0 || m>3)return;
 
+	if(n==n2)m=0;
 	md2_frame_t *pframe=&mdl->frames[n];
 	if(pframe->displayList[m])n2=pframe->next;	
 	md2_frame_t *pframe2=&mdl->frames[n2];
@@ -421,7 +422,6 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 			glBegin (GL_TRIANGLES);
 			for (i = 0; i < mdl->header.num_tris; ++i)
 			{
-				// if(fakeDotProduct(pframe->faceNormals[i],u)>0)
 				{
 					for (j = 0; j < 3; ++j)
 					{

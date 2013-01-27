@@ -23,6 +23,7 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool a
 	if(!p)return;
 	p->position=pos;
 	p->normal=normal;
+	p->animCNT=0;
 	
 	p->angle=angle;
 	p->oldZ=-1;
@@ -37,8 +38,16 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool a
 		p->displayList=generateRoomDisplayList(NULL, p->position, p->normal, true);
 	}
 	
+	const vect3D v1=vectDivInt(p->plane[0],PORTALFRACTIONX);
+	const vect3D v2=vectDivInt(p->plane[1],PORTALFRACTIONY);
+	
 	freePolygon(&p->unprojectedPolygon);
-	p->unprojectedPolygon=createEllipse(vect(0,0,0), vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);	
+	p->unprojectedPolygon=createEllipse(vect(0,0,0), v1, v2, 32);	
+	
+	freePolygon(&p->unprojectedOutline);
+	p->unprojectedOutline=createEllipseOutline(vect(0,0,0), v1, v2, vectMult(v1,inttof32(11)/10), vectMult(v2,inttof32(11)/10), vect(0,0,0), 32);
+	freePolygon(&p->outline);
+	p->outline=createEllipseOutline(vect(0,0,0), v1, v2, vectMult(v1,inttof32(11)/10), vectMult(v2,inttof32(11)/10), vectDivInt(p->normal,256), 32);	
 	
 	NOGBA("PORTAL ! %d %d %d",p->position.x,p->position.y,p->position.z);
 }
@@ -61,6 +70,9 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 
 	p->polygon=NULL;
 	p->unprojectedPolygon=NULL;
+	
+	p->outline=NULL;
+	p->unprojectedOutline=NULL;
 }
 
 portal_struct portal1, portal2;
@@ -99,6 +111,13 @@ void drawPortal(portal_struct* p)
 			glPopMatrix(1);
 			glMatrixMode(GL_MODELVIEW);
 		glPopMatrix(1);
+		
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPushMatrix();
+			const vect3D v=p->position;
+			glTranslate3f32(v.x,v.y,v.z);
+			drawPolygonStrip(p->outline,p->color,p->outlineColor);
+		glPopMatrix(1);
 	}
 	else
 	{
@@ -109,6 +128,7 @@ void drawPortal(portal_struct* p)
 			unbindMtl();
 			GFX_COLOR=p->color;
 			drawPolygon(p->unprojectedPolygon);
+			drawPolygonStrip(p->unprojectedOutline,p->color,p->outlineColor);
 		glPopMatrix(1);
 	}
 }
@@ -173,6 +193,12 @@ void updatePortal(portal_struct* p)
 		p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);
 		projectPolygon(NULL, &p->polygon,v[0],u1,u2,d1,d2);
 	}
+	
+	const u16 range=10;
+	x=abs((((p->animCNT)/2)%(range*2))-range)-range/2;
+	p->outlineColor=(p->color==RGB15(31,31,0))?(RGB15(31,16+x,0)):(RGB15(0,16+x,31));
+	
+	p->animCNT++;
 }
 
 void updatePortals(void)

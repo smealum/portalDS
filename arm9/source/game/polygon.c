@@ -88,6 +88,29 @@ polygon_struct* createEllipse(vect3D po, vect3D v1, vect3D v2, int n)
 	return pp;
 }
 
+polygon_struct* createEllipseOutline(vect3D po, vect3D v1_1, vect3D v2_1, vect3D v1_2, vect3D v2_2, vect3D norm, int n)
+{
+	int i;
+	polygon_struct *p, *pp;
+	p=pp=createPolygon(addVect(po,v1_1));
+	p->next=createPolygon(addVect(norm,addVect(po,v1_2)));
+	p=p->next;
+	if(!p)return NULL;
+	for(i=1;i<=n;i++)
+	{
+		const u16 a1=i*32768/n;
+		vect3D v=addVect(po,addVect(vectMult(v1_1,cosLerp(a1)),vectMult(v2_1,sinLerp(a1))));
+		p->next=createPolygon(v);
+		p=p->next;
+		if(!p)return NULL;
+		v=addVect(po,addVect(vectMult(v1_2,cosLerp(a1)),vectMult(v2_2,sinLerp(a1))));
+		p->next=createPolygon(addVect(norm,v));
+		p=p->next;
+		if(!p)return NULL;
+	}
+	return pp;
+}
+
 void clipSegmentPlane(plane_struct* pl, polygon_struct** o, polygon_struct* pp1, polygon_struct* pp2)
 {
 	if(!pl || !o)return;
@@ -233,5 +256,23 @@ void drawPolygon(polygon_struct* p)
 		glVertex3v16(pp2->v.x, pp2->v.y, pp2->v.z);
 		pp1=pp2;
 		pp2=pp2->next;
+	}
+}
+
+void drawPolygonStrip(polygon_struct* p, u16 col1, u16 col2)
+{
+	if(!p || !p->next || !p->next->next || !p->next->next->next)return;	
+	polygon_struct* pp1=p;
+	u8 cnt=0;
+	
+	glBegin(GL_QUAD_STRIP);
+	while(pp1)
+	{
+		// GFX_TEX_COORD=TEXTURE_PACK(pp1->t.x,pp1->t.y);
+		GFX_COLOR=cnt?col2:col1;
+		glVertex3v16(pp1->v.x, pp1->v.y, pp1->v.z);
+		pp1=pp1->next;
+		cnt++;
+		cnt%=2;
 	}
 }

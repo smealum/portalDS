@@ -1,7 +1,7 @@
 #ifndef __POLYGON9__
 #define __POLYGON9__
 
-#define POLYPOOLSIZE 512
+#define POLYPOOLSIZE 1024
 
 typedef struct polygon_struct
 {
@@ -23,5 +23,7 @@ polygon_struct* clipPolygonFrustum(frustum_struct* f, polygon_struct* p);
 vect3D intersectSegmentPlane(plane_struct* pl, vect3D o, vect3D v, int32 d);
 void clipSegmentPlane(plane_struct* pl, polygon_struct** o, polygon_struct* pp1, polygon_struct* pp2);
 void projectPolygon(camera_struct* c, polygon_struct** p, vect3D o, vect3D u1, vect3D u2, int32 d1, int32 d2);
+polygon_struct* createEllipseOutline(vect3D po, vect3D v1_1, vect3D v2_1, vect3D v1_2, vect3D v2_2, vect3D norm, int n);
+void drawPolygonStrip(polygon_struct* p, u16 col1, u16 col2);
 
 #endif

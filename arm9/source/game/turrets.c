@@ -73,8 +73,8 @@ void laserProgression(room_struct* r, vect3D* origin, vect3D* destination, vect3
 {
 	if(!r || !origin || !destination)return;
 	vect3D ip;
-	vect3D l=addVect(*origin,vectMult(dir,TILESIZE));
-	vect3D v=vectDifference(*origin,convertSize(vect(r->position.x,0,r->position.y)));
+	vect3D l=*origin;
+	vect3D v=vectDifference(addVect(l,vectMult(dir,32)),convertSize(vect(r->position.x,0,r->position.y)));
 	gridCell_struct* gc=getCurrentCell(r,l);
 	while(gc && !collideGridCell(gc, NULL, v, dir, inttof32(100), &ip, NULL))
 	{

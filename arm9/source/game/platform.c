@@ -19,6 +19,7 @@ void initPlatforms(void)
 	
 	platformTexture=createTexture("logo.pcx","textures");
 	loadMd2Model("models/platform.md2", "", &platformModel);
+	generateModelDisplayLists(&platformModel, false, 0);
 }
 
 void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF)

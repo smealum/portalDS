@@ -14,7 +14,7 @@ void initBigButtons(void)
 		bigButton[i].id=i;
 	}
 	
-	loadMd2Model("models/button1.md2","button1.pcx",&bigButtonModel);
+	loadMd2Model("models/button1.md2","button1.pcx",&bigButtonModel);generateModelDisplayLists(&bigButtonModel, false, 1);
 	bigButtonBrightPalette=loadPalettePCX("button1b.pcx","textures");
 }
 

@@ -28,6 +28,8 @@ void initEnergyBalls(void)
 	loadMd2Model("models/balllauncher.md2","balllauncher.pcx",&energyLauncherModel);
 	loadMd2Model("models/energyball.md2","energyball.pcx",&energyBallModel);
 	activeDevicePalette=loadPalettePCX("balllauncheractive.pcx","textures");
+	generateModelDisplayLists(&energyCatcherModel, false, 0);
+	generateModelDisplayLists(&energyLauncherModel, false, 0);
 	generateModelDisplayLists(&energyBallModel, true, 0);
 }
 

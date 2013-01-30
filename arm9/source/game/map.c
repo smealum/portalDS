@@ -555,7 +555,7 @@ void transferRectangles(room_struct* r)
 	}
 }
 
-void drawRectangles(room_struct* r, u8 mode)
+void drawRectangles(room_struct* r, u8 mode, u16 color)
 {
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	
@@ -582,12 +582,12 @@ void drawRectangles(room_struct* r, u8 mode)
 			lc=lc->next;
 		}
 	}
-	if(mode&128 && currentPortal)
+	if(mode&128 && color)
 	{
 		lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_FRONT);
 		unbindMtl();
-		GFX_COLOR=currentPortal->color;
+		GFX_COLOR=color;
 		while(lc)
 		{
 			drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false);
@@ -846,7 +846,7 @@ void resizeRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	}
 }
 
-void drawRoom(room_struct* r, u8 mode) //obviously temp
+void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 {
 	if(!r)return;
 	int i, j;
@@ -860,7 +860,7 @@ void drawRoom(room_struct* r, u8 mode) //obviously temp
 	}
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
-		if(mode&1)drawRectangles(r, mode);
+		if(mode&1)drawRectangles(r, mode, color);
 		else{
 			unbindMtl();
 			glBegin(GL_QUAD);

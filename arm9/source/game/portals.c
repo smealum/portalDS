@@ -146,6 +146,29 @@ bool isPointInPortal(portal_struct* p, vect3D o, vect3D *v, int32* x, int32* y, 
 	return !(*x<-PORTALSIZEX || *y<-PORTALSIZEY || *x>=PORTALSIZEX || *y>=PORTALSIZEY);
 }
 
+u16 getCurrentPortalColor(vect3D o)
+{
+	u16 col=0;
+	u32 dist=inttof32(10);
+	int32 x, y, z;
+	vect3D v;
+	if(isPointInPortal(&portal1,o,&v,&x,&y,&z))
+	{
+		dist=abs(z);
+		col=portal1.color;
+	}
+	if(isPointInPortal(&portal2,o,&v,&x,&y,&z))
+	{
+		if(z<dist)
+		{
+			dist=abs(z);
+			col=portal2.color;
+		}
+	}
+	if(dist>512)col=0;
+	return col;
+}
+
 extern u16 mainScreen[256*192];
 
 void warpPlayer(portal_struct* p, player_struct* pl)
@@ -158,10 +181,12 @@ void warpPlayer(portal_struct* p, player_struct* pl)
 	pl->object->speed=warpVector(p,pl->object->speed);
 	NOGBA("cs2 %d %d %d",pl->object->speed.x,pl->object->speed.y,pl->object->speed.z);
 	memcpy(c->transformationMatrix,p->camera.transformationMatrix,9*sizeof(int32));
+	updateViewMatrix(c);
+	updateFrustum(c);
 	dmaCopy(mainScreen, p->targetPortal->viewPoint, 256*192*2);
 }
 
-void updatePortal(portal_struct* p)
+void checkPortalPlayerWarp(portal_struct* p)
 {
 	if(!p)return;
 	player_struct* pl=getPlayer();
@@ -173,6 +198,12 @@ void updatePortal(portal_struct* p)
 		if(z<0 && p->oldZ>=0){currentPortal=p;warpPlayer(p,pl);}
 	}
 	p->oldZ=z;
+}
+
+void updatePortal(portal_struct* p)
+{
+	if(!p)return;
+	player_struct* pl=getPlayer();
 		
 	int32 dist=distance(pl->object->position,p->position);
 	if(dist<inttof32(1)/6)
@@ -195,14 +226,16 @@ void updatePortal(portal_struct* p)
 	}
 	
 	const u16 range=10;
-	x=abs((((p->animCNT)/2)%(range*2))-range)-range/2;
+	s8 x=abs((((p->animCNT)/2)%(range*2))-range)-range/2;
 	p->outlineColor=(p->color==RGB15(31,31,0))?(RGB15(31,16+x,0)):(RGB15(0,16+x,31));
 	
 	p->animCNT++;
 }
 
 void updatePortals(void)
-{				
+{
+	checkPortalPlayerWarp(&portal1);
+	checkPortalPlayerWarp(&portal2);
 	updatePortal(&portal1);
 	updatePortal(&portal2);
 }

@@ -4,7 +4,7 @@
 #include "math.h"
 #include "../../arm7/include/PIC.h"
 
-#define NUMOBJECTS (16)
+#define NUMOBJECTS (8)
 
 typedef struct
 {

@@ -304,7 +304,7 @@ void drawRoomsPreview(void)
 	{
 		if(roomEdits[i].used)
 		{
-			drawRoom(&roomEdits[i].data,((roomEdits[i].lightUpToDate&&roomEdits[i].selected)<<1)|(roomEdits[i].quadsUpToDate));
+			drawRoom(&roomEdits[i].data,((roomEdits[i].lightUpToDate&&roomEdits[i].selected)<<1)|(roomEdits[i].quadsUpToDate), 0);
 			glPushMatrix();
 				glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
 				renderEntityCollection(&roomEdits[i].entityCollection);
@@ -313,7 +313,7 @@ void drawRoomsPreview(void)
 	}
 }
 
-void drawRoomsGame(u8 mode)
+void drawRoomsGame(u8 mode, u16 color)
 {
 	int i;
 	unbindMtl();
@@ -322,7 +322,7 @@ void drawRoomsGame(u8 mode)
 	{
 		if(roomEdits[i].used)
 		{
-			drawRoom(&roomEdits[i].data,((1)<<3)|((roomEdits[i].data.lmSlot!=0)<<2)|(1)|(mode));
+			drawRoom(&roomEdits[i].data,((1)<<3)|((roomEdits[i].data.lmSlot!=0)<<2)|(1)|(mode), color);
 			// glPushMatrix();
 				// glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
 				// renderEntityCollection(&roomEdits[i].entityCollection);

@@ -86,7 +86,7 @@ void resizeRoom(room_struct* r, u16 l, u16 w, vect3D p);
 // void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, bool portalable);
 void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size);
 void removeRectangles(room_struct* r);
-void drawRoom(room_struct* r, u8 mode);
+void drawRoom(room_struct* r, u8 mode, u16 color);
 void freeRoom(room_struct* r);
 void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c);
 bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n);

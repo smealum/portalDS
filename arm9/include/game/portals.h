@@ -32,6 +32,8 @@ void drawPortalRoom(portal_struct* p);
 
 void collidePortal(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* point);
 
+u16 getCurrentPortalColor(vect3D o);
+
 bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix);
 
 #endif

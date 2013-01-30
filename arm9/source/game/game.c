@@ -4,6 +4,8 @@ bool currentBuffer;
 int mainBG;
 u16 mainScreen[256*192];
 
+bool testStepByStep=false;
+
 PrintConsole bottomScreen;
 
 extern roomEdit_struct roomEdits[NUMROOMEDITS];
@@ -157,10 +159,10 @@ static inline void render1(void)
 			// updatePlayerPI(NULL);
 			changeAnimation(&getPlayer()->modelInstance,2,false);
 		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
-	iprintf("controls : %d  \n",cpuEndSlice());
+	// iprintf("controls : %d  \n",cpuEndSlice());
 	
 		updatePlayer(NULL);
-	iprintf("player : %d  \n",cpuEndSlice());
+	// iprintf("player : %d  \n",cpuEndSlice());
 	
 		updatePortals();
 		updateTurrets();
@@ -169,11 +171,13 @@ static inline void render1(void)
 		updateEnergyBalls();
 		updatePlatforms();
 		updateCubeDispensers();
-	iprintf("updates : %d  \n",cpuEndSlice());
+	// iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
-	GFX_CLEAR_COLOR=0;
+	u16 color=getCurrentPortalColor(getPlayer()->object->position);
+	// NOGBA("col %d",color);
+	GFX_CLEAR_COLOR=color|(31<<16);
 	
 		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}
 	
@@ -195,23 +199,23 @@ static inline void render1(void)
 		// glPopMatrix(1);
 		
 		cpuEndSlice();
-			drawRoomsGame(128);
+			drawRoomsGame(128, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
-		iprintf("room : %d  \n",cpuEndSlice());
+		// iprintf("room : %d  \n",cpuEndSlice());
 		
 		updateParticles();
 		drawParticles();
-		iprintf("particles : %d  \n",cpuEndSlice());
+		// iprintf("particles : %d  \n",cpuEndSlice());
 		
 			drawOBBs();
-		iprintf("OBBs : %d  \n",cpuEndSlice());
+		// iprintf("OBBs : %d  \n",cpuEndSlice());
 			drawBigButtons();
 			drawEnergyDevices();
 			drawEnergyBalls();
 			drawPlatforms();
 			drawCubeDispensers();
 			drawTurretsStuff();
-		iprintf("stuff : %d  \n",cpuEndSlice());
+		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
 		drawPortal(&portal2);
@@ -224,9 +228,13 @@ static inline void render1(void)
 static inline void render2(void)
 {
 	if(!(orangeSeen||blueSeen)){previousPortal=NULL;return;}
+	if((orangeSeen&&blueSeen)/*||(!orangeSeen&&!blueSeen)*/)
+	{
+		if(switchPortal)currentPortal=&portal1;
+		else currentPortal=&portal2;
+	}else if(orangeSeen)currentPortal=&portal1;
+	else if(blueSeen)currentPortal=&portal2;
 	
-	if((switchPortal||!blueSeen)&&orangeSeen)currentPortal=&portal1;
-	else currentPortal=&portal2;
 	previousPortal=currentPortal;
 	
 	switchPortal^=1;
@@ -272,19 +280,19 @@ static inline void postProcess2(void)
 	u16* p1=mainScreen;
 	u16* p2=portal1.viewPoint;
 	u16* p3=portal2.viewPoint;
-	
-		u16** stp;
-		u16* scrp=NULL, oscrp=NULL;
-		blueSeen=orangeSeen=false;
-		for(stp=ppStack;stp<stackEnd;stp++)
-		{
-			scrp=(*stp)-p1;
-			int val=(int)scrp;
-			if(val>256*192*2){blueSeen=true;val-=256*192*2;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p3+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-			else if(val>256*192){orangeSeen=true;val-=256*192;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p2+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-			else if((int)scrp-(int)oscrp>0){dmaCopy((void*)((int)p1+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-			oscrp=scrp;
-		}
+
+	u16** stp;
+	u16* scrp=NULL, oscrp=NULL;
+	blueSeen=orangeSeen=false;
+	for(stp=ppStack;stp<stackEnd;stp++)
+	{
+		scrp=(*stp)-p1;
+		int val=(int)scrp;
+		if(val>256*192*2){blueSeen=true;val-=256*192*2;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p3+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
+		else if(val>256*192){orangeSeen=true;val-=256*192;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p2+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
+		else if((int)scrp-(int)oscrp>0){dmaCopy((void*)((int)p1+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
+		oscrp=scrp;
+	}
 }
 
 void gameFrame(void)
@@ -293,13 +301,14 @@ void gameFrame(void)
 	switch(currentBuffer)
 	{
 		case false:
+			consoleClear();
 			iprintf("\x1b[0;0H");
 			iprintf("%d FPS   \n", FPS);
 			cpuEndSlice();
 			postProcess1();
-			iprintf("postproc : %d  \n",cpuEndSlice());
+			// iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
-			iprintf("full frame : %d   \n",cpuEndTiming());
+			iprintf("full : %d   \n",cpuEndTiming());
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;
@@ -322,6 +331,9 @@ void gameFrame(void)
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
 			break;
 	}
+	
+	if(testStepByStep){while(!(keysUp()&KEY_TOUCH))scanKeys();scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
+	else if(keysDown()&KEY_SELECT)testStepByStep=true;
 	
 	currentBuffer^=1;
 }

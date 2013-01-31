@@ -249,10 +249,10 @@ void listenPI9(void)
 		}
 	}
 	
-	if(fifoCheckValue32(FIFO_USER_08))
-	{
-		NOGBA("fifo 8 : %d",fifoGetValue32(FIFO_USER_08));
-	}
+	// if(fifoCheckValue32(FIFO_USER_08))
+	// {
+		// NOGBA("fifo 8 : %d",fifoGetValue32(FIFO_USER_08));
+	// }
 }
 
 //DEBUG stuff

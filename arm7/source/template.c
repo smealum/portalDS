@@ -58,6 +58,7 @@ void powerButtonCB() {
 OBB_struct *testOBB, *testOBB2;
 plane_struct testPlane;
 extern u32 coll, integ, impul;
+extern u8 sleeping;
 
 int32 sqrtv(int32 x)
 {
@@ -105,7 +106,7 @@ int main() {
 	{
 		if(getPI7Status())
 		{
-			// cpuStartTiming(0);
+			cpuStartTiming(0);
 	
 			coll=impul=integ=0;
 				updateOBBs();
@@ -125,7 +126,10 @@ int main() {
 			// fifoSendValue32(FIFO_USER_08,integ);
 			// fifoSendValue32(FIFO_USER_08,coll);
 			// fifoSendValue32(FIFO_USER_08,impul);
-			// fifoSendValue32(FIFO_USER_08,cpuEndTiming());
+			fifoSendValue32(FIFO_USER_08,cpuEndTiming());
+			fifoSendValue32(FIFO_USER_08,sleeping);
+			fifoSendValue32(FIFO_USER_08,objects[0].energy);
+			fifoSendValue32(FIFO_USER_08,objects[1].energy);
 			
 			sendDataPI7();
 			// u32 key=REG_KEYINPUT;

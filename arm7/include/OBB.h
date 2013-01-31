@@ -9,6 +9,9 @@
 #define PENETRATIONTHRESHOLD (1<<6)
 #define MAXPENETRATIONBOX (1<<6)
 
+#define SLEEPTHRESHOLD (204)
+#define SLEEPTIMETHRESHOLD (16)
+
 static const u8 OBBSegments[NUMOBBSEGMENTS][2]={{0,1},{1,2},{3,2},{0,3},
 										 {5,4},{5,6},{6,7},{4,7},
 										 {3,4},{0,5},{1,6},{2,7}};
@@ -54,7 +57,10 @@ typedef struct
 	vect3D AABBo, AABBs;
 	u8 portal[2];
 	u8 oldPortal[2];
+	u32 energy;
+	u16 counter;
 	s16 groundID;
+	bool sleep;
 	bool used;
 }OBB_struct;
 // 4 + 9*4*3 + 4 + 

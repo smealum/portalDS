@@ -92,6 +92,9 @@ void copyOBB(OBB_struct* o1, OBB_struct* o2)
 	o2->forces=o1->forces;
 	o2->moment=o1->moment;
 	
+	o2->energy=o1->energy;
+	o2->sleep=o1->sleep;
+	
 	//temporary
 	o2->contactPoints=contactPoints;
 	
@@ -772,6 +775,17 @@ void checkOBBCollisions(OBB_struct* o)
 	AARsOBBContacts(o);
 }
 
+void calculateOBBEnergy(OBB_struct* o)
+{
+	if(!o)return;
+	
+	u32 tmp=dotProduct(o->velocity,o->velocity)+dotProduct(o->angularVelocity,o->angularVelocity);
+	// o->energy=(o->energy*9+tmp)/10;
+	o->energy=tmp;
+}
+
+u8 sleeping;
+
 void simulate(OBB_struct* o, float dt2)
 {
 	if(!o)return;
@@ -783,46 +797,96 @@ void simulate(OBB_struct* o, float dt2)
 	applyOBBForce(o,o->position,vect(0,-inttof32(2),0)); //gravity
 	o->forces=addVect(o->forces,vectDivInt(o->velocity,-25));
 	o->moment=addVect(o->moment,vectDivInt(o->angularVelocity,-20));
+	
+	if(!o->sleep)
+	{
+		while(currentTime<dt)
+		{
+			OBB_struct bkp;
+			copyOBB(o,&bkp);
 
-    while(currentTime<dt)
-    {
-		OBB_struct bkp;
-		copyOBB(o,&bkp);
+			// cpuStartTiming(0);
+			integrate(o,targetTime-currentTime);
+			// integ+=cpuEndTiming();
 
-		// cpuStartTiming(0);
-        integrate(o,targetTime-currentTime);
-		// integ+=cpuEndTiming();
-
-		// cpuStartTiming(0);
-		checkOBBCollisions(o);
-		// coll+=cpuEndTiming();
-		
-		// cpuStartTiming(0);
-		if(o->numContactPoints && o->maxPenetration>PENETRATIONTHRESHOLD)
-        {
-            targetTime=(currentTime+targetTime)/2;
-			copyOBB(&bkp,o);
-			if(targetTime-currentTime<=0.000001f)
+			// cpuStartTiming(0);
+			checkOBBCollisions(o);
+			// coll+=cpuEndTiming();
+			
+			// cpuStartTiming(0);
+			if(o->numContactPoints && o->maxPenetration>PENETRATIONTHRESHOLD)
 			{
-				// printf("desp impulse\n");
-				checkOBBCollisions(o);
+				targetTime=(currentTime+targetTime)/2;
+				copyOBB(&bkp,o);
+				if(targetTime-currentTime<=0.000001f)
+				{
+					// printf("desp impulse\n");
+					checkOBBCollisions(o);
+					applyOBBImpulses(o);
+					currentTime=targetTime;
+					targetTime=dt;
+				}
+			}else if(o->numContactPoints)
+			{
+				// printf("impulse\n");
 				applyOBBImpulses(o);
 				currentTime=targetTime;
 				targetTime=dt;
+			}else{
+				currentTime=targetTime;
+				targetTime=dt;
 			}
-        }else if(o->numContactPoints)
-		{
-			// printf("impulse\n");
-			applyOBBImpulses(o);
-            currentTime=targetTime;
-			targetTime=dt;
-        }else{
-            currentTime=targetTime;
-			targetTime=dt;
+			// impul+=cpuEndTiming();
 		}
-		// impul+=cpuEndTiming();
-    }
-	collideSpherePlatforms(&o->position,o->size.x-8);
+		collideSpherePlatforms(&o->position,o->size.x-8);
+		calculateOBBEnergy(o);
+	}else sleeping++;
+
+	calculateOBBEnergy(o);
+	bool oldSleep=o->sleep;
+	if(o->energy>=SLEEPTHRESHOLD*10)o->sleep=false;
+	else if(o->energy<=SLEEPTHRESHOLD)
+	{
+		o->counter++;
+		if(o->counter>=SLEEPTIMETHRESHOLD)o->sleep=true;
+	}else o->counter=0;
+
+	if(o->sleep)
+	{
+		if(oldSleep)checkOBBCollisions(o);
+		int i;
+		bool canSleep=false;
+		for(i=0;i<o->numContactPoints;i++)
+		{
+			switch(o->contactPoints[i].type)
+			{
+				case AARCOLLISION:
+					canSleep=true;
+					break;
+				case PLANECOLLISION:
+					canSleep=true;
+					break;
+				case TESTPOINT:
+				case BOXCOLLISION:
+					{
+						OBB_struct* o2=(OBB_struct*)o->contactPoints[i].target;
+						if(o2->energy<=SLEEPTHRESHOLD && o->energy<=SLEEPTHRESHOLD)
+						{
+							canSleep=true;
+							o->sleep=true;
+							o2->sleep=true;
+							i=o->numContactPoints;
+						}else{
+							canSleep=false;
+							o2->sleep=false;
+							i=o->numContactPoints;
+						}
+					}
+					break;
+			}
+		}
+		if(!canSleep)o->sleep=false;
+	}
 		
 	o->forces=vect(0,0,0);
 	o->moment=vect(0,0,0);
@@ -879,6 +943,7 @@ void updateOBB(OBB_struct* o)
 void updateOBBs(void)
 {
 	int i;
+	sleeping=0;
 	for(i=0;i<NUMOBJECTS;i++)
 	{
 		if(objects[i].used)

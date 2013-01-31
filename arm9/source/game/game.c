@@ -134,7 +134,7 @@ u32 prevTiming;
 u32 cpuEndSlice()
 {
 	u32 temp=prevTiming;
-	prevTiming=cpuGetTiming();
+	// prevTiming=cpuGetTiming();
 	return prevTiming-temp;
 }
 
@@ -179,6 +179,7 @@ static inline void render1(void)
 	// NOGBA("col %d",color);
 	GFX_CLEAR_COLOR=color|(31<<16);
 	
+		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
 		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}
 	
 	projectCamera(NULL);
@@ -301,16 +302,15 @@ void gameFrame(void)
 	switch(currentBuffer)
 	{
 		case false:
-			consoleClear();
 			iprintf("\x1b[0;0H");
 			iprintf("%d FPS   \n", FPS);
 			cpuEndSlice();
 			postProcess1();
 			// iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
-			iprintf("full : %d   \n",cpuEndTiming());
+			// iprintf("full : %d   \n",cpuEndTiming());
 			swiWaitForVBlank();
-			cpuStartTiming(0);
+			// cpuStartTiming(0);
 			prevTiming=0;
 			if(previousPortal)dmaCopy(VRAM_C, previousPortal->viewPoint, 256*192*2);			
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
@@ -323,9 +323,9 @@ void gameFrame(void)
 			render2();
 			listenPI9();
 			// iprintf("frm 2 : %d  \n",cpuEndTiming());
-			iprintf("fake frame : %d   \n",cpuEndTiming());
+			// iprintf("fake frame : %d   \n",cpuEndTiming());
 			swiWaitForVBlank();
-			cpuStartTiming(0);
+			// cpuStartTiming(0);
 			prevTiming=0;
 			dmaCopy(VRAM_C, mainScreen, 256*192*2);			
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);

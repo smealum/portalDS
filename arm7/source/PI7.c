@@ -82,7 +82,12 @@ void listenPI7(void)
 						v.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
 						v.z=fifoGetValue32(FIFO_USER_08);
-					if(id<NUMOBJECTS && objects[id].used)applyOBBForce(&objects[id],addVect(objects[id].position,pos),v);
+					if(id<NUMOBJECTS && objects[id].used)
+					{
+						applyOBBForce(&objects[id],addVect(objects[id].position,pos),v);
+						objects[id].sleep=false;
+						objects[id].counter=0;
+					}
 				}
 				break;
 			case PI_ADDAAR:
@@ -126,7 +131,12 @@ void listenPI7(void)
 						v.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
 						v.z=fifoGetValue32(FIFO_USER_08);
-					if(id<NUMOBJECTS && objects[id].used)objects[id].velocity=v;
+					if(id<NUMOBJECTS && objects[id].used)
+					{
+						objects[id].velocity=v;
+						objects[id].sleep=false;
+						objects[id].counter=0;
+					}
 				}
 				break;
 			case PI_UPDATEPLAYER:

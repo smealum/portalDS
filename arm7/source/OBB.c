@@ -38,6 +38,9 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos)
 	o->mass=inttof32(1);
 	o->maxPenetration=0;
 	
+	o->energy=0;
+	o->sleep=false;
+	
 	o->velocity=vect(0,0,0);
 	o->angularVelocity=vect(0,0,0);
 	o->moment=vect(0,0,0);
@@ -759,7 +762,7 @@ void integrate(OBB_struct* o, float dt)
 extern plane_struct testPlane;
 extern OBB_struct *testOBB, *testOBB2;
 
-void checkOBBCollisions(OBB_struct* o)
+void checkOBBCollisions(OBB_struct* o, bool sleep)
 {
 	if(!o)return;
 	int i;
@@ -767,12 +770,12 @@ void checkOBBCollisions(OBB_struct* o)
 	// planeOBBContacts(&testPlane,o);
 	for(i=0;i<NUMOBJECTS;i++)
 	{
-		if(objects[i].used && o!=&objects[i])
+		if(objects[i].used && o!=&objects[i] && (!sleep || !objects[i].sleep))
 		{
 			collideOBBs(o,&objects[i]);
 		}
 	}
-	AARsOBBContacts(o);
+	if(!sleep)AARsOBBContacts(o);
 }
 
 void calculateOBBEnergy(OBB_struct* o)
@@ -810,7 +813,7 @@ void simulate(OBB_struct* o, float dt2)
 			// integ+=cpuEndTiming();
 
 			// cpuStartTiming(0);
-			checkOBBCollisions(o);
+			checkOBBCollisions(o, false);
 			// coll+=cpuEndTiming();
 			
 			// cpuStartTiming(0);
@@ -821,7 +824,7 @@ void simulate(OBB_struct* o, float dt2)
 				if(targetTime-currentTime<=0.000001f)
 				{
 					// printf("desp impulse\n");
-					checkOBBCollisions(o);
+					checkOBBCollisions(o, false);
 					applyOBBImpulses(o);
 					currentTime=targetTime;
 					targetTime=dt;
@@ -853,39 +856,41 @@ void simulate(OBB_struct* o, float dt2)
 
 	if(o->sleep)
 	{
-		if(oldSleep)checkOBBCollisions(o);
-		int i;
-		bool canSleep=false;
-		for(i=0;i<o->numContactPoints;i++)
+		if(oldSleep)checkOBBCollisions(o, true); //make it so sleeping collisions don't have to check vs AARs and other sleeping OBBs
 		{
-			switch(o->contactPoints[i].type)
+			int i;
+			bool canSleep=oldSleep;
+			for(i=0;i<o->numContactPoints;i++)
 			{
-				case AARCOLLISION:
-					canSleep=true;
-					break;
-				case PLANECOLLISION:
-					canSleep=true;
-					break;
-				case TESTPOINT:
-				case BOXCOLLISION:
-					{
-						OBB_struct* o2=(OBB_struct*)o->contactPoints[i].target;
-						if(o2->energy<=SLEEPTHRESHOLD && o->energy<=SLEEPTHRESHOLD)
+				switch(o->contactPoints[i].type)
+				{
+					case AARCOLLISION:
+						canSleep=true;
+						break;
+					case PLANECOLLISION:
+						canSleep=true;
+						break;
+					case TESTPOINT:
+					case BOXCOLLISION:
 						{
-							canSleep=true;
-							o->sleep=true;
-							o2->sleep=true;
-							i=o->numContactPoints;
-						}else{
-							canSleep=false;
-							o2->sleep=false;
-							i=o->numContactPoints;
+							OBB_struct* o2=(OBB_struct*)o->contactPoints[i].target;
+							if(o2->energy<=SLEEPTHRESHOLD && o2->counter>=SLEEPTIMETHRESHOLD && o->energy<=SLEEPTHRESHOLD)
+							{
+								canSleep=true;
+								o->sleep=true;
+								o2->sleep=true;
+								// i=o->numContactPoints; //get a similar system to work with more than 2 boxes in contact ? (only make it for !o2->sleep ?)
+							}else{
+								canSleep=false;
+								o2->sleep=false;
+								i=o->numContactPoints;
+							}
 						}
-					}
-					break;
+						break;
+				}
 			}
+			if(!canSleep)o->sleep=false;
 		}
-		if(!canSleep)o->sleep=false;
 	}
 		
 	o->forces=vect(0,0,0);

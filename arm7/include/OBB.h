@@ -78,6 +78,7 @@ void updateOBB(OBB_struct* o);
 void initOBBs(void);
 void updateOBBs(void);
 void drawOBBs(void);
+void wakeOBBs(void);
 OBB_struct* createOBB(u8 id, vect3D size, vect3D position);
 void collideOBBs(OBB_struct* o1, OBB_struct* o2);
 

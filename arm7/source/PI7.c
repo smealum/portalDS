@@ -179,6 +179,7 @@ void listenPI7(void)
 						portal[id].cos=(x&((1<<16)-1))-inttof32(1);
 						portal[id].sin=((x>>16)&((1<<16)-1))-inttof32(1);
 						computePortalPlane(&portal[id]);
+						wakeOBBs();
 					}
 				}
 				break;

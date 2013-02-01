@@ -778,6 +778,19 @@ void checkOBBCollisions(OBB_struct* o, bool sleep)
 	if(!sleep)AARsOBBContacts(o);
 }
 
+void wakeOBBs(void)
+{
+	int i;
+	for(i=0;i<NUMOBJECTS;i++)
+	{
+		if(objects[i].used)
+		{
+			objects[i].counter=0;
+			objects[i].sleep=false;
+		}
+	}
+}
+
 void calculateOBBEnergy(OBB_struct* o)
 {
 	if(!o)return;

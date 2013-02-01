@@ -285,8 +285,8 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 					bool b=false;
 					if(port)
 					{
-						if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
-						if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+						if(portal[0].normal.x)b=pointInPortal(&portal[0],p);
+						if(!b&&portal[1].normal.x)b=pointInPortal(&portal[1],p);
 					}
 					if(!b)
 					{
@@ -352,8 +352,8 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 					bool b=false;
 					if(port)
 					{
-						if(portal[0].normal.y)b=pointInPortal(&portal[0],p);
-						if(!b&&portal[1].normal.y)b=pointInPortal(&portal[1],p);
+						if(portal[0].normal.z)b=pointInPortal(&portal[0],p);
+						if(!b&&portal[1].normal.z)b=pointInPortal(&portal[1],p);
 					}
 					if(!b)
 					{

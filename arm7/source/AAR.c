@@ -347,7 +347,7 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 				const vect3D vv=u[OBBSegmentsPD[i][1]];
 				const int32 k=divv16(abs(uu.z-a->position.z),abs(vv.z));
 				const vect3D p=addVect(uu,vectMult(vv,k));
-				if(p.x>a->position.x && p.x<a->position.x+a->size.x && p.z>a->position.y && p.y<a->position.y+a->size.y)
+				if(p.x>a->position.x && p.x<a->position.x+a->size.x && p.y>a->position.y && p.y<a->position.y+a->size.y)
 				{
 					bool b=false;
 					if(port)
@@ -390,7 +390,11 @@ void AARsOBBContacts(OBB_struct* o)
 			for(k=0;k<n->length;k++)
 			{
 				u16 old=o->numContactPoints;
-				if(!lalala[n->data[k]])AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+				
+				if(!lalala[n->data[k]])
+				{
+					AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+				}
 				if(o->groundID<0 && o->numContactPoints>old && aaRectangles[n->data[k]].normal.y>0)o->groundID=n->data[k];
 				lalala[n->data[k]]=1;
 			}

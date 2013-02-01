@@ -222,7 +222,7 @@ void sendDataPI7(void)
 	int i;
 	for(i=0;i<NUMOBJECTS;i++)
 	{
-		if(objects[i].used)
+		if(objects[i].used && !objects[i].sleep)
 		{
 			fifoSendValue32(FIFO_USER_01,(((u16)(objects[i].groundID+1))<<16)|i);
 			fifoSendValue32(FIFO_USER_02,objects[i].position.x);

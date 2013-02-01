@@ -126,10 +126,10 @@ int main() {
 			// fifoSendValue32(FIFO_USER_08,integ);
 			// fifoSendValue32(FIFO_USER_08,coll);
 			// fifoSendValue32(FIFO_USER_08,impul);
-			fifoSendValue32(FIFO_USER_08,cpuEndTiming());
-			fifoSendValue32(FIFO_USER_08,sleeping);
-			fifoSendValue32(FIFO_USER_08,objects[0].energy);
-			fifoSendValue32(FIFO_USER_08,objects[1].energy);
+			// fifoSendValue32(FIFO_USER_08,cpuEndTiming());
+			// fifoSendValue32(FIFO_USER_08,sleeping);
+			// fifoSendValue32(FIFO_USER_08,objects[0].energy);
+			// fifoSendValue32(FIFO_USER_08,objects[1].energy);
 			
 			sendDataPI7();
 			// u32 key=REG_KEYINPUT;

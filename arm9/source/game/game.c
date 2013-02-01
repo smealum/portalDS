@@ -179,7 +179,8 @@ static inline void render1(void)
 	// NOGBA("col %d",color);
 	GFX_CLEAR_COLOR=color|(31<<16);
 	
-		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
+		// if(fifoCheckValue32(FIFO_USER_08))
+		iprintf("\x1b[0J");
 		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}
 	
 	projectCamera(NULL);

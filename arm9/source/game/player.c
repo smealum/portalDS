@@ -212,7 +212,7 @@ void shootPlayerGun(player_struct* p, bool R)
 			
 			portal_struct* por=R?(&portal1):(&portal2);
 			
-			vect3D oldp=por->position;vect3D oldn=por->normal;int32 olda=angle;
+			vect3D oldp=por->position;vect3D oldn=por->normal;int32 olda=por->angle;
 			movePortal(por, pos, vectMultInt(r->normal,-1), angle, false);
 			
 			isPortalOnWall(p->currentRoom,por,true);

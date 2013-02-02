@@ -105,7 +105,7 @@ void generateGrid(grid_struct* g)
 				}
 			}
 			if(n->length){n->data=allocateData(sizeof(u16)*n->length);memcpy(n->data,temp,n->length*sizeof(u16));}
-			else n->data==NULL;
+			else n->data=NULL;
 		}
 	}
 	fifoSendValue32(FIFO_USER_08,allocatorCounter);
@@ -172,26 +172,25 @@ void OBBAARContacts(AAR_struct* a, OBB_struct* o)
 		
 	vect3D v[4], vv[4];
 	vect3D uu[2], uuu[2];
-	int32 s[2];
 		v[0]=vectDifference(a->position,o->position);
 		v[2]=addVect(v[0],a->size);
 		if(a->normal.x)
 		{
-			uu[0]=vect(0,inttof32(1),0);s[0]=a->size.y;
-			uu[1]=vect(0,0,inttof32(1));s[1]=a->size.z;
+			uu[0]=vect(0,inttof32(1),0);
+			uu[1]=vect(0,0,inttof32(1));
 			
 			v[1]=addVect(v[0],vect(0,a->size.y,0));
 			v[3]=addVect(v[0],vect(0,0,a->size.z));
 		}else if(a->normal.y)
 		{
-			uu[0]=vect(inttof32(1),0,0);s[0]=a->size.x;
-			uu[1]=vect(0,0,inttof32(1));s[1]=a->size.z;
+			uu[0]=vect(inttof32(1),0,0);
+			uu[1]=vect(0,0,inttof32(1));
 			
 			v[1]=addVect(v[0],vect(a->size.x,0,0));
 			v[3]=addVect(v[0],vect(0,0,a->size.z));
 		}else{
-			uu[0]=vect(inttof32(1),0,0);s[0]=a->size.x;
-			uu[1]=vect(0,inttof32(1),0);s[1]=a->size.y;
+			uu[0]=vect(inttof32(1),0,0);
+			uu[1]=vect(0,inttof32(1),0);
 			
 			v[1]=addVect(v[0],vect(a->size.x,0,0));
 			v[3]=addVect(v[0],vect(0,a->size.y,0));

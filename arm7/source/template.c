@@ -100,8 +100,6 @@ int main() {
 	// createAAR(0, vect(-inttof32(0),-inttof32(1)/2,-inttof32(3)), vect(inttof32(6),0,inttof32(6)), vect(0,inttof32(1),0));
 	// createAAR(1, vect(-inttof32(0),-inttof32(1)/2-inttof32(6),-inttof32(3)), vect(0,inttof32(6),inttof32(6)), vect(-inttof32(1),0,0));
 
-	u32 tm=0;
-	u32 tm2=0;
 	while(!exitflag)
 	{
 		if(getPI7Status())

@@ -62,7 +62,7 @@ void listenPI7(void)
 						pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
 						pos.z=fifoGetValue32(FIFO_USER_08);
-					createOBB(id,size,pos);
+					createOBB(id,size,pos,mass);
 				}
 				break;
 			case PI_APPLYFORCE:
@@ -205,7 +205,6 @@ void listenPI7(void)
 			case PI_UPDATEPLATFORM:
 				{
 					vect3D pos;
-					vect3D normal=vect(0,0,0);
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
 						pos.x=fifoGetValue32(FIFO_USER_08);

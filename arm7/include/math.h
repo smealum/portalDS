@@ -168,7 +168,7 @@ static inline void rotateMatrixX(int32* tm, int32 x, bool r)
 static inline void rotateMatrixY(int32* tm, int32 x, bool r)
 {
 	int i;
-	int32 rm[9], m[16];
+	int32 rm[9], m[9];
 	for(i=0;i<9;i++)rm[i]=0;
 	rm[0]=cosLerp(x);
 	rm[2]=sinLerp(x);
@@ -183,7 +183,7 @@ static inline void rotateMatrixY(int32* tm, int32 x, bool r)
 static inline void rotateMatrixZ(int32* tm, int32 x, bool r)
 {
 	int i;
-	int32 rm[9], m[16];
+	int32 rm[9], m[9];
 	for(i=0;i<9;i++)rm[i]=0;
 	rm[0]=cosLerp(x);
 	rm[1]=sinLerp(x);

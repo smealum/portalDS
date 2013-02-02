@@ -67,7 +67,7 @@ typedef struct
 
 extern OBB_struct objects[NUMOBJECTS];
 
-void initOBB(OBB_struct* o, vect3D size, vect3D pos);
+void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass);
 void initTransformationMatrix(int32* m);
 void getOBBVertices(OBB_struct* o, vect3D* v);
 void drawOBB(OBB_struct* o);
@@ -79,7 +79,9 @@ void initOBBs(void);
 void updateOBBs(void);
 void drawOBBs(void);
 void wakeOBBs(void);
-OBB_struct* createOBB(u8 id, vect3D size, vect3D position);
+OBB_struct* createOBB(u8 id, vect3D size, vect3D position, int32 mass);
+void updateOBBPortals(OBB_struct* o, u8 id, bool init);
+void getVertices(vect3D s, vect3D p, vect3D u1, vect3D u2, vect3D u3, vect3D* v);
 void collideOBBs(OBB_struct* o1, OBB_struct* o2);
 
 bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, vect3D* uu1, vect3D* uu2, vect3D vv1, vect3D* n1, vect3D* n2, bool* b1, bool* b2, int32* k1, int32* k2);

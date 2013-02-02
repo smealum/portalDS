@@ -26,7 +26,7 @@ static inline int32 divv(int32 a, int32 b) // b in 1-4096
 	return divv16(a,b);
 }
 
-void initOBB(OBB_struct* o, vect3D size, vect3D pos)
+void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass)
 {
 	if(!o)return;
 	
@@ -35,7 +35,7 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos)
 	o->angularMomentum=vect(0,0,0);
 	o->numContactPoints=0;
 	o->size=size;
-	o->mass=inttof32(1);
+	o->mass=mass;
 	o->maxPenetration=0;
 	
 	o->energy=0;
@@ -374,7 +374,6 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 	}*/
 
 	//optimize by working in o2 space ?
-	int j;
 	vect3D vv2[8];
 	getOBBVertices(o2,vv2);
 	vect3D u[3];
@@ -402,43 +401,6 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 				  || (uu1.z<-ss[2] && uu2.z<-ss[2]) || (uu1.z>ss[2] && uu2.z>ss[2]));
 		if(t)
 		{
-			/*vect3D dir=u[OBBSegmentsPD[i][1]];
-			int32 l=s[OBBSegmentsPD[i][1]]*2;
-			u8 num=0;
-			o1->contactPoints[o1->numContactPoints].point=vect(0,0,0);
-			o1->contactPoints[o1->numContactPoints].normal=vect(0,0,0);
-			for(j=0;j<NUMOBBFACES;j++)
-			{
-				vect3D u1=uu[OBBFacesPDDN[j][1]];
-				vect3D u2=uu[OBBFacesPDDN[j][2]];
-				s8 d=OBBFacesPDDN[j][3];
-				vect3D n=uu[abs(d)-1];
-				if(d<0)n=vectMultInt(n,-1);
-				int32 s1=ss[OBBFacesPDDN[j][1]]*2;
-				int32 s2=ss[OBBFacesPDDN[j][2]]*2;
-				vect3D ip;
-				if(collideLineRectangle(vv2[OBBFacesPDDN[j][0]], u1, u2, n, s1, s2, v[OBBSegmentsPD[i][0]], dir, l, &ip))
-				{
-					o1->contactPoints[o1->numContactPoints].point=addVect(o1->contactPoints[o1->numContactPoints].point,ip);
-					o1->contactPoints[o1->numContactPoints].penetration=0;
-					o1->contactPoints[o1->numContactPoints].target=o2;
-					o1->contactPoints[o1->numContactPoints].type=TESTPOINT;
-					num++;
-				}
-			}
-			if(num)
-			{
-				o1->contactPoints[o1->numContactPoints].point=vectDivInt(o1->contactPoints[o1->numContactPoints].point,num);
-				vect3D vv=vectDifference(o1->contactPoints[o1->numContactPoints].point,o2->position);
-				vect3D n;
-				vv=vect(dotProduct(vv,u1),dotProduct(vv,u2),dotProduct(vv,u3));
-				vect3D p=projectPointAABB(o2->size,vv,&n);
-				//o1->contactPoints[o1->numContactPoints].normal=normalize(vect(n.x*u1.x+n.y*u2.x+n.z*u3.x,n.x*u1.y+n.y*u2.y+n.z*u3.y,n.x*u1.z+n.y*u2.z+n.z*u3.z));
-				o1->contactPoints[o1->numContactPoints].normal=(vect(n.x*u1.x+n.y*u2.x+n.z*u3.x,n.x*u1.y+n.y*u2.y+n.z*u3.y,n.x*u1.z+n.y*u2.z+n.z*u3.z));
-				o1->contactPoints[o1->numContactPoints].penetration=distance(vv,p);
-				//o1->numContactPoints++;
-			}
-			*/
 			do{
 				const vect3D vv=u[OBBSegmentsPD[i][1]];
 				const vect3D vv1=vect(dotProduct(vv,uu[0]),dotProduct(vv,uu[1]),dotProduct(vv,uu[2]));
@@ -970,12 +932,12 @@ void updateOBBs(void)
 	}
 }
 
-OBB_struct* createOBB(u8 id, vect3D size, vect3D position)
+OBB_struct* createOBB(u8 id, vect3D size, vect3D position, int32 mass)
 {
 	int i=id;
 		// if(!objects[i].used)
 		{
-			initOBB(&objects[i],size,position);
+			initOBB(&objects[i],size,position,mass);
 			return &objects[i];
 		}
 	return NULL;

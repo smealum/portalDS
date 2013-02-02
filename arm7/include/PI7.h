@@ -20,6 +20,8 @@ extern player_struct player;
 extern portal_struct portal[2];
 
 void initPI7(void);
+bool getPI7Status(void);
 void listenPI7(void);
+void sendDataPI7(void);
 
 #endif

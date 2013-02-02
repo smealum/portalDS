@@ -109,14 +109,19 @@ int main() {
 			// cpuStartTiming(0);
 	
 			coll=impul=integ=0;
+				updatePlatforms();
 				updateOBBs();
 				listenPI7();
+				updatePlatforms();
 				updateOBBs();
 				listenPI7();
+				updatePlatforms();
 				updateOBBs();
 				listenPI7();
+				updatePlatforms();
 				updateOBBs();
 				listenPI7();
+				updatePlatforms();
 				updateOBBs();
 				// updateOBBs();
 				// updateOBBs();

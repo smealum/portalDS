@@ -144,17 +144,15 @@ void getBoxAABB(OBB_struct* o, vect3D* s)
 	s->z=abs(mulf32(o->transformationMatrix[6],o->size.x/4))+abs(mulf32(o->transformationMatrix[7],o->size.y/4))+abs(mulf32(o->transformationMatrix[8],o->size.z/4));
 }
 
-void addPlatform(vect3D pos)
+void addPlatform(u8 id, vect3D orig, vect3D dest, bool BAF)
 {
-	AAR_struct* a=newAAR();
-	if(!a)return;
-	a->size=vect(PLATFORMSIZE*2*4,0,PLATFORMSIZE*2*4);
-	a->position=pos;
-	
-	fifoSendValue32(FIFO_USER_08,PI_ADDPLATFORM|((a->id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(a->position.x));
-	fifoSendValue32(FIFO_USER_08,(a->position.y));
-	fifoSendValue32(FIFO_USER_08,(a->position.z));
+	fifoSendValue32(FIFO_USER_08,PI_ADDPLATFORM|((id+(BAF?NUMPLATFORMS:0))<<PISIGNALDATA));
+	fifoSendValue32(FIFO_USER_08,(orig.x));
+	fifoSendValue32(FIFO_USER_08,(orig.y));
+	fifoSendValue32(FIFO_USER_08,(orig.z));
+	fifoSendValue32(FIFO_USER_08,(dest.x));
+	fifoSendValue32(FIFO_USER_08,(dest.y));
+	fifoSendValue32(FIFO_USER_08,(dest.z));
 }
 
 void changePlatform(u8 id, vect3D pos)
@@ -163,6 +161,12 @@ void changePlatform(u8 id, vect3D pos)
 	fifoSendValue32(FIFO_USER_08,(pos.x));
 	fifoSendValue32(FIFO_USER_08,(pos.y));
 	fifoSendValue32(FIFO_USER_08,(pos.z));
+}
+
+void togglePlatform(u8 id, bool active)
+{
+	fifoSendValue32(FIFO_USER_08,PI_TOGGLEPLATFORM|((id)<<PISIGNALDATA));
+	fifoSendValue32(FIFO_USER_08,(active));
 }
 
 void applyForce(u8 id, vect3D pos, vect3D v) //(id;[posx|posy][posz][vx][vy][vz])
@@ -214,47 +218,65 @@ void listenPI9(void)
 	{
 		const u32 x=fifoGetValue32(FIFO_USER_01);
 		const int k=x&((1<<16)-1);
-		const s16 groundID=(x>>16)-1;
-		while(!fifoCheckValue32(FIFO_USER_02));
-		while(!fifoCheckValue32(FIFO_USER_03));
-		while(!fifoCheckValue32(FIFO_USER_04));
-		while(!fifoCheckValue32(FIFO_USER_05));
-		while(!fifoCheckValue32(FIFO_USER_06));
-		while(!fifoCheckValue32(FIFO_USER_07));
 		if(k<NUMOBJECTS)
 		{
-			if(groundID>=0 && groundID<NUMAARS)
+			//OBB
+			const s16 groundID=(x>>16)-1;
+			while(!fifoCheckValue32(FIFO_USER_02));
+			while(!fifoCheckValue32(FIFO_USER_03));
+			while(!fifoCheckValue32(FIFO_USER_04));
+			while(!fifoCheckValue32(FIFO_USER_05));
+			while(!fifoCheckValue32(FIFO_USER_06));
+			while(!fifoCheckValue32(FIFO_USER_07));
+			// if(k<NUMOBJECTS)
 			{
-				aaRectangles[groundID].touched=true;
+				if(groundID>=0 && groundID<NUMAARS)
+				{
+					aaRectangles[groundID].touched=true;
+				}
+				OBB_struct* o=&objects[k];
+				// o->used=true;
+				o->position.x=fifoGetValue32(FIFO_USER_02);
+				o->position.y=fifoGetValue32(FIFO_USER_03);
+				o->position.z=fifoGetValue32(FIFO_USER_04);
+				
+				int32 x=fifoGetValue32(FIFO_USER_05);
+				o->transformationMatrix[0]=(s16)x-4096;
+				o->transformationMatrix[3]=(s16)(x>>16)-4096;
+				x=fifoGetValue32(FIFO_USER_06);
+				o->transformationMatrix[6]=(s16)(x)-4096;				
+				o->transformationMatrix[1]=(s16)(x>>16)-4096;
+				x=fifoGetValue32(FIFO_USER_07);
+				o->transformationMatrix[4]=(s16)x-4096;
+				o->transformationMatrix[7]=(s16)(x>>16)-4096;
+				
+				const vect3D v1=vect(o->transformationMatrix[0],o->transformationMatrix[3],o->transformationMatrix[6]);
+				const vect3D v2=vect(o->transformationMatrix[1],o->transformationMatrix[4],o->transformationMatrix[7]);
+				const vect3D v=normalize(vectProduct(v1,v2));
+				
+				// NOGBA("0 : %d %d %d",v1.x,v1.y,v1.z);
+				// NOGBA("1 : %d %d %d",v2.x,v2.y,v2.z);
+				// NOGBA("2 : %d %d %d",v.x,v.y,v.z);
+				// NOGBA("4 : %d %d %d",warpVector(&portal1,v1));
+				
+				o->transformationMatrix[2]=v.x;
+				o->transformationMatrix[5]=v.y;
+				o->transformationMatrix[8]=v.z;
 			}
-			OBB_struct* o=&objects[k];
-			// o->used=true;
-			o->position.x=fifoGetValue32(FIFO_USER_02);
-			o->position.y=fifoGetValue32(FIFO_USER_03);
-			o->position.z=fifoGetValue32(FIFO_USER_04);
+		}else if(k<NUMOBJECTS+NUMPLATFORMS)
+		{
+			while(!fifoCheckValue32(FIFO_USER_02));
+			while(!fifoCheckValue32(FIFO_USER_03));
+			while(!fifoCheckValue32(FIFO_USER_04));
 			
-			int32 x=fifoGetValue32(FIFO_USER_05);
-			o->transformationMatrix[0]=(s16)x-4096;
-			o->transformationMatrix[3]=(s16)(x>>16)-4096;
-			x=fifoGetValue32(FIFO_USER_06);
-			o->transformationMatrix[6]=(s16)(x)-4096;				
-			o->transformationMatrix[1]=(s16)(x>>16)-4096;
-			x=fifoGetValue32(FIFO_USER_07);
-			o->transformationMatrix[4]=(s16)x-4096;
-			o->transformationMatrix[7]=(s16)(x>>16)-4096;
-			
-			const vect3D v1=vect(o->transformationMatrix[0],o->transformationMatrix[3],o->transformationMatrix[6]);
-			const vect3D v2=vect(o->transformationMatrix[1],o->transformationMatrix[4],o->transformationMatrix[7]);
-			const vect3D v=normalize(vectProduct(v1,v2));
-			
-			// NOGBA("0 : %d %d %d",v1.x,v1.y,v1.z);
-			// NOGBA("1 : %d %d %d",v2.x,v2.y,v2.z);
-			// NOGBA("2 : %d %d %d",v.x,v.y,v.z);
-			// NOGBA("4 : %d %d %d",warpVector(&portal1,v1));
-			
-			o->transformationMatrix[2]=v.x;
-			o->transformationMatrix[5]=v.y;
-			o->transformationMatrix[8]=v.z;
+			platform_struct* p=&platform[k-NUMOBJECTS];
+			vect3D oldpos=p->position;
+			p->position.x=fifoGetValue32(FIFO_USER_02);
+			p->position.y=fifoGetValue32(FIFO_USER_03);
+			p->position.z=fifoGetValue32(FIFO_USER_04);
+			p->position=vectDivInt(p->position,4);
+			p->velocity=addVect(p->velocity,vectDifference(p->position,oldpos));
+			NOGBA("lala %d",p->velocity.x);
 		}
 	}
 	

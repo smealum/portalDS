@@ -30,6 +30,7 @@ typedef enum
 	PI_UPDATEPORTAL=11, //ARG : 5 (id;[px][py][pz][n][cos|sin])
 	PI_ADDPLATFORM=12,  //ARG : 3 (id;[posx][posy][posz])
 	PI_UPDATEPLATFORM=13,//ARG : 3 (id;[posx][posy][posz])
+	PI_TOGGLEPLATFORM=14,//ARG : 1 (id;[active])
 }message_type;
 
 #ifdef ARM7

@@ -37,7 +37,9 @@ void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF
 	pf->touched=false;
 	pf->backandforth=true;
 	
-	addPlatform(vectMultInt(orig,4)); //TEMP
+	pf->oldactive=pf->active=false;
+	
+	addPlatform(id,vectMultInt(orig,4),vectMultInt(dest,4),BAF); //TEMP
 	
 	pf->used=true;
 }
@@ -115,44 +117,19 @@ void updatePlatform(platform_struct* pf)
 {
 	if(!pf)return;
 	
-	if(pf->active)
+	player_struct* p=getPlayer();
+	
+	if(pf->touched && p->object->position.y>pf->position.y+p->object->radius*2)
 	{
-		player_struct* p=getPlayer();
-		
-		if(pf->touched && p->object->position.y>pf->position.y+p->object->radius*2)
-		{
-			p->object->position=addVect(p->object->position,pf->velocity);
-		}else if(pf->oldTouched){
-			p->object->speed=addVect(p->object->speed,pf->velocity);
-		}
-		
-		switch(pf->direction)
-		{
-			case true:
-				if(dotProduct(vectDifference(pf->position,pf->destination),pf->velocity)>0)
-				{
-					if(pf->backandforth)
-					{
-						pf->velocity=vectMultInt(pf->velocity,-1);
-						pf->direction=false;
-					}else{
-						pf->velocity=vect(0,0,0);
-						pf->active=false;
-					}
-				}
-				break;
-			default:
-				if(dotProduct(vectDifference(pf->position,pf->origin),pf->velocity)>0)
-				{
-					pf->velocity=vectMultInt(pf->velocity,-1);
-					pf->direction=true;
-				}
-				break;
-		}
-		pf->position=addVect(pf->position,pf->velocity);
-		changePlatform(pf->id,vectMultInt(pf->position,4));
+		p->object->position=addVect(p->object->position,pf->velocity);
+	}else if(pf->oldTouched){
+		p->object->speed=addVect(p->object->speed,pf->velocity);
 	}
 	
+	if(pf->oldactive!=pf->active)togglePlatform(pf->id, pf->active);
+	
+	pf->oldactive=pf->active;
+	pf->velocity=vect(0,0,0);
 	pf->oldTouched=pf->touched;
 	pf->touched=false;
 }

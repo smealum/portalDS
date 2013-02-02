@@ -257,9 +257,11 @@ void OBBAARContacts(AAR_struct* a, OBB_struct* o)
 	}
 }
 
-void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
+bool AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 {
-	if(!a || !o || !o->used || !a->used)return;
+	if(!a || !o || !o->used || !a->used)return false;
+	
+	u16 oldnum=o->numContactPoints;
 
 	vect3D u[3];
 		u[0]=vect(o->transformationMatrix[0],o->transformationMatrix[3],o->transformationMatrix[6]);
@@ -268,7 +270,7 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 
 	if(a->normal.x)
 	{
-		if(a->position.x>o->AABBo.x+o->AABBs.x || a->position.x<o->AABBo.x)return;
+		if(a->position.x>o->AABBo.x+o->AABBs.x || a->position.x<o->AABBo.x)return false;
 		int i;
 		bool vb[8];
 		for(i=0;i<8;i++)vb[i]=v[i].x>a->position.x;
@@ -302,7 +304,7 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 		}
 	}else if(a->normal.y)
 	{
-		if(a->position.y>o->AABBo.y+o->AABBs.y || a->position.y<o->AABBo.y)return;
+		if(a->position.y>o->AABBo.y+o->AABBs.y || a->position.y<o->AABBo.y)return false;
 		int i;
 		bool vb[8];
 		for(i=0;i<8;i++)vb[i]=v[i].y>a->position.y;
@@ -335,7 +337,7 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 			}
 		}
 	}else{
-		if(a->position.z>o->AABBo.z+o->AABBs.z || a->position.z<o->AABBo.z)return;
+		if(a->position.z>o->AABBo.z+o->AABBs.z || a->position.z<o->AABBo.z)return false;
 		int i;
 		bool vb[8];
 		for(i=0;i<8;i++)vb[i]=v[i].z>a->position.z;
@@ -370,49 +372,51 @@ void AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 	}
 
 	OBBAARContacts(a, o);
+	
+	return o->numContactPoints>oldnum;
 }
 
-void AARsOBBContacts(OBB_struct* o)
+void AARsOBBContacts(OBB_struct* o, bool sleep)
 {
 	int i, j, k;
 	vect3D v[8];
 	getOBBVertices(o,v);
-	u16 x, X, z, Z;
-	getOBBNodes(NULL, o, &x, &X, &z, &Z);
-	bool lalala[NUMAARS];
-	for(i=0;i<NUMAARS;i++)lalala[i]=0;
-	o->groundID=-1;
-	for(i=x;i<=X;i++)
+	if(!sleep)
 	{
-		for(j=z;j<=Z;j++)
+		u16 x, X, z, Z;
+		getOBBNodes(NULL, o, &x, &X, &z, &Z);
+		bool lalala[NUMAARS];
+		for(i=0;i<NUMAARS;i++)lalala[i]=0;
+		o->groundID=-1;
+		for(i=x;i<=X;i++)
 		{
-			node_struct* n=&AARgrid.nodes[i+j*AARgrid.width];
-			for(k=0;k<n->length;k++)
+			for(j=z;j<=Z;j++)
 			{
-				u16 old=o->numContactPoints;
-				
-				if(!lalala[n->data[k]])
+				node_struct* n=&AARgrid.nodes[i+j*AARgrid.width];
+				for(k=0;k<n->length;k++)
 				{
-					AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+					u16 old=o->numContactPoints;
+					
+					if(!lalala[n->data[k]])
+					{
+						AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+					}
+					if(o->groundID<0 && o->numContactPoints>old && aaRectangles[n->data[k]].normal.y>0)o->groundID=n->data[k];
+					lalala[n->data[k]]=1;
 				}
-				if(o->groundID<0 && o->numContactPoints>old && aaRectangles[n->data[k]].normal.y>0)o->groundID=n->data[k];
-				lalala[n->data[k]]=1;
 			}
-		}
+		}	
+		AAROBBContacts(&portal[0].guideAAR[0], o, v, false);
+		AAROBBContacts(&portal[0].guideAAR[1], o, v, false);
+		AAROBBContacts(&portal[0].guideAAR[2], o, v, false);
+		AAROBBContacts(&portal[0].guideAAR[3], o, v, false);
+
+		AAROBBContacts(&portal[1].guideAAR[0], o, v, false);
+		AAROBBContacts(&portal[1].guideAAR[1], o, v, false);
+		AAROBBContacts(&portal[1].guideAAR[2], o, v, false);
+		AAROBBContacts(&portal[1].guideAAR[3], o, v, false);
 	}
-	AAROBBContacts(&portal[0].guideAAR[0], o, v, false);
-	AAROBBContacts(&portal[0].guideAAR[1], o, v, false);
-	AAROBBContacts(&portal[0].guideAAR[2], o, v, false);
-	AAROBBContacts(&portal[0].guideAAR[3], o, v, false);
-	
-	AAROBBContacts(&portal[1].guideAAR[0], o, v, false);
-	AAROBBContacts(&portal[1].guideAAR[1], o, v, false);
-	AAROBBContacts(&portal[1].guideAAR[2], o, v, false);
-	AAROBBContacts(&portal[1].guideAAR[3], o, v, false);
-	// for(i=0;i<NUMAARS;i++)
-	// {
-		// if(aaRectangles[i].used)AAROBBContacts(&aaRectangles[i], o, v);
-	// }
+	collideOBBPlatforms(o, v);
 }
 
 void fixAAR(AAR_struct* a)

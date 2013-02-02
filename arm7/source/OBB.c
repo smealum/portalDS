@@ -775,7 +775,7 @@ void checkOBBCollisions(OBB_struct* o, bool sleep)
 			collideOBBs(o,&objects[i]);
 		}
 	}
-	if(!sleep)AARsOBBContacts(o);
+	AARsOBBContacts(o, sleep);
 }
 
 void wakeOBBs(void)
@@ -854,8 +854,7 @@ void simulate(OBB_struct* o, float dt2)
 			}
 			// impul+=cpuEndTiming();
 		}
-		collideSpherePlatforms(&o->position,o->size.x-8);
-		calculateOBBEnergy(o);
+		// collideSpherePlatforms(&o->position,o->size.x-8);
 	}else sleeping++;
 
 	calculateOBBEnergy(o);

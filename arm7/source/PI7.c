@@ -185,16 +185,21 @@ void listenPI7(void)
 				break;
 			case PI_ADDPLATFORM:
 				{
-					vect3D pos;
-					vect3D normal=vect(0,0,0);
+					vect3D orig, dest;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.x=fifoGetValue32(FIFO_USER_08);
+						orig.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.y=fifoGetValue32(FIFO_USER_08);
+						orig.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.z=fifoGetValue32(FIFO_USER_08);
-					createPlatform(id,pos);
+						orig.z=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						dest.x=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						dest.y=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						dest.z=fifoGetValue32(FIFO_USER_08);
+					createPlatform(id%NUMPLATFORMS,orig,dest,id>=NUMPLATFORMS);
 				}
 				break;
 			case PI_UPDATEPLATFORM:
@@ -208,7 +213,15 @@ void listenPI7(void)
 						pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
 						pos.z=fifoGetValue32(FIFO_USER_08);
-					updatePlatform(id,pos);
+					movePlatform(id,pos);
+				}
+				break;
+			case PI_TOGGLEPLATFORM:
+				{
+					u8 id=signal>>PISIGNALDATA;
+					while(!fifoCheckValue32(FIFO_USER_08));
+						bool active=fifoGetValue32(FIFO_USER_08);
+					togglePlatform(id,active);
 				}
 				break;
 			default:
@@ -232,6 +245,16 @@ void sendDataPI7(void)
 			fifoSendValue32(FIFO_USER_05,((objects[i].transformationMatrix[3]+4096)<<16)|((u16)objects[i].transformationMatrix[0]+4096));
 			fifoSendValue32(FIFO_USER_06,((objects[i].transformationMatrix[1]+4096)<<16)|((u16)objects[i].transformationMatrix[6]+4096));
 			fifoSendValue32(FIFO_USER_07,((objects[i].transformationMatrix[7]+4096)<<16)|((u16)objects[i].transformationMatrix[4]+4096));
+		}
+	}
+	for(i=0;i<NUMPLATFORMS;i++)
+	{
+		if(platform[i].used)
+		{
+			fifoSendValue32(FIFO_USER_01,i+NUMOBJECTS);
+			fifoSendValue32(FIFO_USER_02,platform[i].position.x);
+			fifoSendValue32(FIFO_USER_03,platform[i].position.y);
+			fifoSendValue32(FIFO_USER_04,platform[i].position.z);
 		}
 	}
 }

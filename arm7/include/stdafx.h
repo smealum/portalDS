@@ -15,8 +15,8 @@
 #include "OBB.h"
 #include "plane.h"
 #include "AAR.h"
-#include "platform.h"
 #include "PI7.h"
+#include "platform.h"
 
 #include "debug.h"
 

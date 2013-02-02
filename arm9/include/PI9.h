@@ -32,7 +32,7 @@ void pausePI(void);
 void listenPI9(void);
 void applyForce(u8 id, vect3D pos, vect3D v);
 s16 createAAR(vect3D size, vect3D pos, vect3D normal);
-void addPlatform(vect3D pos);
+void addPlatform(u8 id, vect3D orig, vect3D dest, bool BAF);
 void changePlatform(u8 id, vect3D pos);
 
 void resetBox(OBB_struct* o, vect3D pos);

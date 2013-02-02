@@ -135,6 +135,15 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|
 	return a->id;
 }
 
+void getBoxAABB(OBB_struct* o, vect3D* s)
+{
+	if(!o || !s)return;
+	
+	s->x=abs(mulf32(o->transformationMatrix[0],o->size.x/4))+abs(mulf32(o->transformationMatrix[1],o->size.y/4))+abs(mulf32(o->transformationMatrix[2],o->size.z/4));
+	s->y=abs(mulf32(o->transformationMatrix[3],o->size.x/4))+abs(mulf32(o->transformationMatrix[4],o->size.y/4))+abs(mulf32(o->transformationMatrix[5],o->size.z/4));
+	s->z=abs(mulf32(o->transformationMatrix[6],o->size.x/4))+abs(mulf32(o->transformationMatrix[7],o->size.y/4))+abs(mulf32(o->transformationMatrix[8],o->size.z/4));
+}
+
 void addPlatform(vect3D pos)
 {
 	AAR_struct* a=newAAR();
@@ -350,6 +359,20 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
 }
 
+bool intersectOBBPortal(portal_struct* p, OBB_struct* o)
+{
+	if(!p || !o)return false;
+	
+	vect3D s;
+	getBoxAABB(o, &s);
+	vect3D sp=vect(abs(p->plane[0].x/PORTALFRACTIONX)+abs(p->plane[1].x/PORTALFRACTIONY),abs(p->plane[0].y/PORTALFRACTIONX)+abs(p->plane[1].y/PORTALFRACTIONY),abs(p->plane[0].z/PORTALFRACTIONX)+abs(p->plane[1].z/PORTALFRACTIONY));
+	vect3D v=vectDifference(p->position,vectDivInt(o->position,4));
+	
+	if(p->normal.x)return !((v.x>s.x || v.x<-s.x) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
+	else if(p->normal.y)return !((v.y>s.y || v.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
+	else return !((v.z>s.z || v.z<-s.z) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x));
+}
+
 void drawWarpedOBB(portal_struct* p, OBB_struct* o)
 {
 	OBB_struct o2;
@@ -367,8 +390,8 @@ void drawOBBs(void)
 		if(objects[i].used)
 		{
 			drawOBB(&objects[i]);
-			drawWarpedOBB(&portal1,&objects[i]);
-			drawWarpedOBB(&portal2,&objects[i]);
+			if(intersectOBBPortal(&portal1,&objects[i]))drawWarpedOBB(&portal1,&objects[i]);
+			if(intersectOBBPortal(&portal2,&objects[i]))drawWarpedOBB(&portal2,&objects[i]);
 		}
 	}
 }

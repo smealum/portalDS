@@ -106,7 +106,7 @@ int main() {
 	{
 		if(getPI7Status())
 		{
-			cpuStartTiming(0);
+			// cpuStartTiming(0);
 	
 			coll=impul=integ=0;
 				updateOBBs();

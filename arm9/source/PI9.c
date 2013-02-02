@@ -108,7 +108,7 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	initModelInstance(&o->modelInstance,model);
 	
 	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
-	o->mass=mass>>3; //reduce precision to improve range
+	o->mass=mass; //reduce precision to improve range
 	resetBox(o,pos);
 	
 	return o;

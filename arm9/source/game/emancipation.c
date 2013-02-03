@@ -137,7 +137,13 @@ void updateEmancipationGrid(emancipationGrid_struct* eg)
 {
 	if(!eg)return;
 	
-	
+	player_struct* pl=getPlayer();
+	vect3D pos, sp;
+	getEmancipationGridAAR(eg,&pos,&sp);
+	if(intersectAABBAAR(pl->object->position, vect(PLAYERRADIUS,PLAYERRADIUS*5,PLAYERRADIUS), pos, sp))
+	{
+		resetPortals();
+	}
 }
 
 void updateEmancipationGrids(void)
@@ -193,15 +199,22 @@ void drawEmancipationGrids(void)
 	}
 }
 
+void getEmancipationGridAAR(emancipationGrid_struct* eg, vect3D* pos, vect3D* sp)
+{
+	if(!eg || !pos || !sp)return;
+	
+	*sp=vect(eg->direction?(0):(eg->length/2),EMANCIPATIONGRIDHEIGHT/2,eg->direction?(eg->length/2):(0));
+	*pos=addVect(eg->position,*sp);
+	sp->x=abs(sp->x);sp->z=abs(sp->z);
+}
+
 bool emancipationGridBoxCollision(emancipationGrid_struct* eg, OBB_struct* o)
 {
 	if(!eg || !o)return false;
 	
-	vect3D s;
+	vect3D s, pos, sp;
 	getBoxAABB(o,&s);
-	vect3D sp=vect(eg->direction?(0):(eg->length/2),EMANCIPATIONGRIDHEIGHT/2,eg->direction?(eg->length/2):(0));
-	vect3D pos=addVect(eg->position,sp);
-	sp.x=abs(sp.x);sp.z=abs(sp.z);
+	getEmancipationGridAAR(eg,&pos,&sp);
 	
 	return intersectAABBAAR(vectDivInt(o->position,4), s, pos, sp);
 }

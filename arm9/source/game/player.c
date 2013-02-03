@@ -1,9 +1,5 @@
 #include "game/game_main.h"
 
-#define PLAYERRADIUS (256)
-#define ERRORMARGIN (2)
-#define SQPLAYERRADIUS ((PLAYERRADIUS*PLAYERRADIUS)>>12)
-
 player_struct player;
 md2Model_struct gun, playerModel;
 mtlImg_struct* crossHair;

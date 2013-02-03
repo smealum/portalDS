@@ -12,6 +12,7 @@ typedef struct portal_struct
 	int32 cos, sin;
 	AAR_struct guideAAR[4];
 	struct portal_struct* targetPortal;
+	bool used;
 }portal_struct;
 
 #include "PIC.h"

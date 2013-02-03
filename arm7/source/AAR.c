@@ -161,7 +161,7 @@ bool pointInPortal(portal_struct* p, vect3D pos) //assuming correct normal
 	return (abs(v.z)<16 && v.y>-PORTALSIZEY*4 && v.y<PORTALSIZEY*4 && v.x>-PORTALSIZEX*4 && v.x<PORTALSIZEX*4);
 }
 
-void OBBAARContacts(AAR_struct* a, OBB_struct* o)
+void OBBAARContacts(AAR_struct* a, OBB_struct* o, bool port)
 {
 	if(!a || !o || !o->used || !a->used)return;
 	
@@ -223,8 +223,11 @@ void OBBAARContacts(AAR_struct* a, OBB_struct* o)
 			if(b1)
 			{
 				bool b=false;
-				if((portal[0].normal.x&&a->normal.x)||(portal[0].normal.y&&a->normal.y)||(portal[0].normal.z&&a->normal.z))b=pointInPortal(&portal[0],p1);
-				if(!b&&((portal[1].normal.x&&a->normal.x)||(portal[1].normal.y&&a->normal.y)||(portal[1].normal.z&&a->normal.z)))b=pointInPortal(&portal[1],p1);
+				if(port)
+				{
+					if((portal[0].normal.x&&a->normal.x)||(portal[0].normal.y&&a->normal.y)||(portal[0].normal.z&&a->normal.z))b=pointInPortal(&portal[0],p1);
+					if(!b&&((portal[1].normal.x&&a->normal.x)||(portal[1].normal.y&&a->normal.y)||(portal[1].normal.z&&a->normal.z)))b=pointInPortal(&portal[1],p1);
+				}
 				if(!b)
 				{
 					//p1=addVect(p1,vectMult(vv,k1));
@@ -239,8 +242,11 @@ void OBBAARContacts(AAR_struct* a, OBB_struct* o)
 			if(b2)
 			{
 				bool b=false;
-				if((portal[0].normal.x&&a->normal.x)||(portal[0].normal.y&&a->normal.y)||(portal[0].normal.z&&a->normal.z))b=pointInPortal(&portal[0],p2);
-				if(!b&&((portal[1].normal.x&&a->normal.x)||(portal[1].normal.y&&a->normal.y)||(portal[1].normal.z&&a->normal.z)))b=pointInPortal(&portal[1],p2);
+				if(port)
+				{
+					if((portal[0].normal.x&&a->normal.x)||(portal[0].normal.y&&a->normal.y)||(portal[0].normal.z&&a->normal.z))b=pointInPortal(&portal[0],p2);
+					if(!b&&((portal[1].normal.x&&a->normal.x)||(portal[1].normal.y&&a->normal.y)||(portal[1].normal.z&&a->normal.z)))b=pointInPortal(&portal[1],p2);
+				}
 				if(!b)
 				{
 					//p2=addVect(p2,vectMult(vv,k2));
@@ -370,7 +376,7 @@ bool AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 		}
 	}
 
-	OBBAARContacts(a, o);
+	OBBAARContacts(a, o, port);
 	
 	return o->numContactPoints>oldnum;
 }
@@ -378,6 +384,7 @@ bool AAROBBContacts(AAR_struct* a, OBB_struct* o, vect3D* v, bool port)
 void AARsOBBContacts(OBB_struct* o, bool sleep)
 {
 	int i, j, k;
+	bool port=portal[0].used&&portal[1].used;
 	vect3D v[8];
 	getOBBVertices(o,v);
 	if(!sleep)
@@ -398,22 +405,25 @@ void AARsOBBContacts(OBB_struct* o, bool sleep)
 					
 					if(!lalala[n->data[k]])
 					{
-						AAROBBContacts(&aaRectangles[n->data[k]], o, v, true);
+						AAROBBContacts(&aaRectangles[n->data[k]], o, v, port);
 					}
 					if(o->groundID<0 && o->numContactPoints>old && aaRectangles[n->data[k]].normal.y>0)o->groundID=n->data[k];
 					lalala[n->data[k]]=1;
 				}
 			}
-		}	
-		AAROBBContacts(&portal[0].guideAAR[0], o, v, false);
-		AAROBBContacts(&portal[0].guideAAR[1], o, v, false);
-		AAROBBContacts(&portal[0].guideAAR[2], o, v, false);
-		AAROBBContacts(&portal[0].guideAAR[3], o, v, false);
+		}
+		if(port)
+		{
+			AAROBBContacts(&portal[0].guideAAR[0], o, v, false);
+			AAROBBContacts(&portal[0].guideAAR[1], o, v, false);
+			AAROBBContacts(&portal[0].guideAAR[2], o, v, false);
+			AAROBBContacts(&portal[0].guideAAR[3], o, v, false);
 
-		AAROBBContacts(&portal[1].guideAAR[0], o, v, false);
-		AAROBBContacts(&portal[1].guideAAR[1], o, v, false);
-		AAROBBContacts(&portal[1].guideAAR[2], o, v, false);
-		AAROBBContacts(&portal[1].guideAAR[3], o, v, false);
+			AAROBBContacts(&portal[1].guideAAR[0], o, v, false);
+			AAROBBContacts(&portal[1].guideAAR[1], o, v, false);
+			AAROBBContacts(&portal[1].guideAAR[2], o, v, false);
+			AAROBBContacts(&portal[1].guideAAR[3], o, v, false);
+		}
 	}
 	collideOBBPlatforms(o, v);
 }

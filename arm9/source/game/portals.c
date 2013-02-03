@@ -18,6 +18,12 @@ void initPortals(void)
 	currentPortal=&portal1;
 }
 
+void resetPortals(void)
+{
+	portal1.used=portal2.used=false;
+	resetPortalsPI();
+}
+
 void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool actualMove)
 {
 	if(!p)return;
@@ -36,6 +42,7 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool a
 		if(p->displayList)free(p->displayList);
 		p->displayList=NULL;
 		p->displayList=generateRoomDisplayList(NULL, p->position, p->normal, true);
+		p->used=true;
 	}
 	
 	const vect3D v1=vectDivInt(p->plane[0],PORTALFRACTIONX);
@@ -64,6 +71,7 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	p->angle=0;
 	p->oldZ=-1;
 	p->normal=normal;
+	p->used=false;
 	computePortalPlane(p);
 	
 	p->displayList=NULL;
@@ -79,7 +87,7 @@ portal_struct portal1, portal2;
 
 void drawPortal(portal_struct* p)
 {
-	if(!p)return;
+	if(!p || !p->used)return;
 	// glPolyFmt(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK | POLY_ID(32));
 	// glPolyFmt(POLY_ALPHA(31) | POLY_DECAL | POLY_CULL_BACK);
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
@@ -202,27 +210,31 @@ void checkPortalPlayerWarp(portal_struct* p)
 
 void updatePortal(portal_struct* p)
 {
-	if(!p)return;
-	player_struct* pl=getPlayer();
-		
-	int32 dist=distance(pl->object->position,p->position);
-	if(dist<inttof32(1)/6)
+	if(!p || !p->used)return;
+	
+	if(portal1.used&&portal2.used)
 	{
-		vect3D v[4];
-		
-		v[0]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
-		v[1]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
-		v[2]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
-		v[3]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
-		
-		const vect3D u1=normalize(vectDifference(v[1],v[0]));
-		const vect3D u2=normalize(vectDifference(v[3],v[0]));
-		const int32 d1=distance(v[0],v[1]);
-		const int32 d2=distance(v[0],v[3]);
-		
-		freePolygon(&p->polygon);
-		p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);
-		projectPolygon(NULL, &p->polygon,v[0],u1,u2,d1,d2);
+		player_struct* pl=getPlayer();
+			
+		int32 dist=distance(pl->object->position,p->position);
+		if(dist<inttof32(1)/6)
+		{
+			vect3D v[4];
+			
+			v[0]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
+			v[1]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
+			v[2]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
+			v[3]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
+			
+			const vect3D u1=normalize(vectDifference(v[1],v[0]));
+			const vect3D u2=normalize(vectDifference(v[3],v[0]));
+			const int32 d1=distance(v[0],v[1]);
+			const int32 d2=distance(v[0],v[3]);
+			
+			freePolygon(&p->polygon);
+			p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);
+			projectPolygon(NULL, &p->polygon,v[0],u1,u2,d1,d2);
+		}
 	}
 	
 	const u16 range=10;
@@ -234,8 +246,11 @@ void updatePortal(portal_struct* p)
 
 void updatePortals(void)
 {
-	checkPortalPlayerWarp(&portal1);
-	checkPortalPlayerWarp(&portal2);
+	if(portal1.used&&portal2.used)
+	{
+		checkPortalPlayerWarp(&portal1);
+		checkPortalPlayerWarp(&portal2);
+	}
 	updatePortal(&portal1);
 	updatePortal(&portal2);
 }

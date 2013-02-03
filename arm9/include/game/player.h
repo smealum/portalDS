@@ -1,6 +1,10 @@
 #ifndef __PLAYER9__
 #define __PLAYER9__
 
+#define PLAYERRADIUS (256)
+#define ERRORMARGIN (2)
+#define SQPLAYERRADIUS ((PLAYERRADIUS*PLAYERRADIUS)>>12)
+
 #define PLAYERGROUNDSPEED (inttof32(3)>>8)
 #define PLAYERAIRSPEED (inttof32(1)>>9)
 

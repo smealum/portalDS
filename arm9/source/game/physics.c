@@ -216,10 +216,13 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 	{
 		rectangle_struct* rec=gc->rectangles[i];
 		vect3D o2=getClosestPointRectangleStruct(rec,o1);
-			o2=addVect(o2,convertVect(vect(r->position.x,0,r->position.y)));
-			collidePortal(r,rec,&portal1,&o2);
-			collidePortal(r,rec,&portal2,&o2);
-			o2=vectDifference(o2,convertVect(vect(r->position.x,0,r->position.y)));
+			if(portal1.used&&portal2.used)
+			{
+				o2=addVect(o2,convertVect(vect(r->position.x,0,r->position.y)));
+				collidePortal(r,rec,&portal1,&o2);
+				collidePortal(r,rec,&portal2,&o2);
+				o2=vectDifference(o2,convertVect(vect(r->position.x,0,r->position.y)));
+			}
 		vect3D v=vectDifference(o2,o1);
 		rec->touched=false;
 		// int sqd=sqMagnitude(v);

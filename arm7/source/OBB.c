@@ -66,8 +66,11 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass)
 	//rotateMatrixX(o->transformationMatrix,4096,false);
 	//rotateMatrixZ(o->transformationMatrix,4096,false);
 	
-	updateOBBPortals(o,0,true);
-	updateOBBPortals(o,1,true);
+	if(portal[0].used&&portal[1].used)
+	{
+		updateOBBPortals(o,0,true);
+		updateOBBPortals(o,1,true);
+	}
 }
 
 void initOBBs(void)
@@ -915,8 +918,11 @@ void updateOBB(OBB_struct* o)
 	
 	simulate(o,20);
 	
-	updateOBBPortals(o,0,false);
-	updateOBBPortals(o,1,false);
+	if(portal[0].used&&portal[1].used)
+	{
+		updateOBBPortals(o,0,false);
+		updateOBBPortals(o,1,false);
+	}
 }
 
 void updateOBBs(void)

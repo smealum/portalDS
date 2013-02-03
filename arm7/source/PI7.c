@@ -14,6 +14,7 @@ void initPI7(void)
 	
 	portal[0].targetPortal=&portal[1];
 	portal[1].targetPortal=&portal[0];
+	portal[0].used=false;portal[1].used=false;
 	
 	PI7running=false;
 }
@@ -174,6 +175,7 @@ void listenPI7(void)
 						x=fifoGetValue32(FIFO_USER_08);
 					if(id<2)
 					{
+						portal[id].used=true;
 						portal[id].position=pos;
 						portal[id].normal=normal;
 						portal[id].cos=(x&((1<<16)-1))-inttof32(1);
@@ -232,6 +234,12 @@ void listenPI7(void)
 					{
 						objects[id].used=false;
 					}
+				}
+				break;
+			case PI_RESETPORTALS:
+				{
+					portal[0].used=false;
+					portal[1].used=false;
 				}
 				break;
 			default:

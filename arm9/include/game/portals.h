@@ -16,12 +16,14 @@ typedef struct portal_struct
 	polygon_struct *outline, *unprojectedOutline;
 	polygon_struct *polygon, *unprojectedPolygon;
 	struct portal_struct* targetPortal;
+	bool used;
 }portal_struct;
 
 extern portal_struct portal1, portal2;
 extern portal_struct* currentPortal;
 
 void initPortals(void);
+void resetPortals(void);
 void updatePortals(void);
 void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color);
 void drawPortal(portal_struct* p);

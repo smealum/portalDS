@@ -108,6 +108,11 @@ void resetBox(OBB_struct* o, vect3D pos)
 	sendBoxData(o);
 }
 
+void resetPortalsPI(void)
+{
+	fifoSendValue32(FIFO_USER_08,PI_RESETPORTALS);
+}
+
 OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
 {
 	OBB_struct* o=newBox();

@@ -362,7 +362,7 @@ void drawOBB(OBB_struct* o)
 	
 	GFX_COLOR=RGB15(31,31,31);
 	
-	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette);
+	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette, RGB15(31,31,31));
 	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, 0, o->modelInstance.model, params, true, o->modelInstance.palette);
 
 	glPopMatrix(1);

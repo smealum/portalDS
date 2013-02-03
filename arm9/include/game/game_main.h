@@ -23,5 +23,6 @@
 #include "game/cubes.h"
 #include "game/activator.h"
 #include "game/bigbutton.h"
+#include "game/emancipation.h"
 
 #endif

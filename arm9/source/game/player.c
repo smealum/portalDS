@@ -95,8 +95,8 @@ void drawPlayer(player_struct* p)
 		m[2]=-m[2];m[5]=-m[5];m[8]=-m[8];
 		fixMatrix(m);
 		multMatrixGfx33(m);
-		// renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
-		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,0,p->playerModelInstance.model,params,false,p->playerModelInstance.palette);
+		// renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette,RGB15(31,31,31));
+		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,0,p->playerModelInstance.model,params,false,p->playerModelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);
 }
 
@@ -166,7 +166,7 @@ void renderGun(player_struct* p)
 		room_struct* r=getPlayer()->currentRoom;
 		// vect3D v=reverseConvertVect(vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y))));
 		// NOGBA("%d %d %d",v.x,v.y,v.z);
-		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, params, false, p->modelInstance.palette);
+		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, params, false, p->modelInstance.palette, RGB15(31,31,31));
 	glPopMatrix(1);
 }
 

@@ -107,7 +107,7 @@ typedef struct
 int loadMd2Model (const char *filename, char *texname, md2Model_struct *mdl);
 void freeMd2Model(md2Model_struct *mdl);
 void renderModelFrame (int n, const md2Model_struct *mdl);
-void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal);
+void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal, u16 color);
 
 void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals);
 

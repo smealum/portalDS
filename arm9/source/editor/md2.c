@@ -380,7 +380,7 @@ void renderModelFrame(int n, const md2Model_struct *mdl)
 	glPopMatrix(1);
 }
 
-void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal)
+void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u32 params, bool center, u32* pal, u16 color)
 {
 	int i, j;
 	
@@ -413,7 +413,7 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 		glScalef32((pframe->scale.x+((pframe2->scale.x-pframe->scale.x)*m)/4),(pframe->scale.y+((pframe2->scale.y-pframe->scale.y)*m)/4),(pframe->scale.z+((pframe2->scale.z-pframe->scale.z)*m)/4));
 
 		glScalef32(inttof32(32),inttof32(32),inttof32(32)); // necessary for v10
-		GFX_COLOR=RGB15(31,31,31);
+		GFX_COLOR=color;
 		
 		if(pframe->displayList[m])
 		{

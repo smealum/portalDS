@@ -79,7 +79,7 @@ void drawBigButton(bigButton_struct* bb)
 		setupObjectLighting(NULL, bb->position, &params);
 		
 		glTranslate3f32(bb->position.x,bb->position.y,bb->position.z);
-		renderModelFrameInterp(bb->modelInstance.currentFrame, bb->modelInstance.nextFrame, bb->modelInstance.interpCounter, bb->modelInstance.model, params, false, bb->active?(bigButtonBrightPalette):(NULL));
+		renderModelFrameInterp(bb->modelInstance.currentFrame, bb->modelInstance.nextFrame, bb->modelInstance.interpCounter, bb->modelInstance.model, params, false, bb->active?(bigButtonBrightPalette):(NULL), RGB15(31,31,31));
 	glPopMatrix(1);
 }
 

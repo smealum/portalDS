@@ -70,7 +70,7 @@ void drawPlatform(platform_struct* pf)
 		
 		glTranslate3f32(pf->position.x,pf->position.y,pf->position.z);
 		GFX_COLOR=RGB15(28,30,31);
-		renderModelFrameInterp(0, 0, 0, &platformModel, params, false, NULL);
+		renderModelFrameInterp(0, 0, 0, &platformModel, params, false, NULL, RGB15(26,26,26));
 		
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(id));
 		applyMTL(platformTexture);

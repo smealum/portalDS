@@ -77,7 +77,7 @@ void drawCubeDispenser(cubeDispenser_struct* cd)
 		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(20+cd->id)|POLY_TOON_HIGHLIGHT;
 		setupObjectLighting(NULL, cd->position, &params);
 		glTranslate3f32(cd->position.x,cd->position.y,cd->position.z);
-		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,params,false,cd->modelInstance.palette);
+		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,params,false,cd->modelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);
 }
 
@@ -97,7 +97,10 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 	if(cd->active && !cd->oldActive)
 	{
 		if(!cd->currentCube)cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
-		else resetBox(cd->currentCube, vectMultInt(cd->position,4));
+		else{
+			createEmancipator(&cd->currentCube->modelInstance,vectDivInt(cd->currentCube->position,4),cd->currentCube->transformationMatrix);
+			resetBox(cd->currentCube, vectMultInt(cd->position,4));
+		}
 		changeAnimation(&cd->modelInstance,1,true);
 	}
 	

@@ -73,6 +73,7 @@ void initGame(void)
 	initEnergyBalls();
 	initPlatforms();
 	initCubes();
+	initEmancipation();
 		
 	readMap("lalala.map", true);
 	
@@ -172,6 +173,7 @@ static inline void render1(void)
 		updateEnergyBalls();
 		updatePlatforms();
 		updateCubeDispensers();
+		updateEmancipators();
 	// iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
@@ -217,6 +219,7 @@ static inline void render1(void)
 			drawPlatforms();
 			drawCubeDispensers();
 			drawTurretsStuff();
+			drawEmancipators();
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
@@ -266,6 +269,7 @@ static inline void render2(void)
 		drawPlatforms();
 		drawCubeDispensers();
 		drawTurretsStuff();
+		drawEmancipators();
 
 	glPopMatrix(1);
 	

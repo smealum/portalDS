@@ -54,6 +54,7 @@ void initVramBanks(u8 banks);
 void getVramStatus();
 void unbindMtl();
 void addToBank(mtlImg_struct *mtl, u8* data, int b);
+void getPaletteFromBank(mtlImg_struct *mtl, u16* data, size_t size);
 void setTextureParameter(mtlImg_struct *mtl, uint8 sizeX, uint8 sizeY, const uint32* addr, GL_TEXTURE_TYPE_ENUM mode, uint32 param);
 void* getTextureAddress(mtlImg_struct *mtl);
 void addPaletteToBank(mtlImg_struct *mtl, u16* data, size_t size);

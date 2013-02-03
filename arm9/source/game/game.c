@@ -97,7 +97,8 @@ void initGame(void)
 	//PHYSICS
 	initPI9();
 	
-	updatePlayer(NULL);testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
+	getPlayer()->currentRoom=&roomEdits[0].data;
+	testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
 	createEnergyDevice(NULL, vect(0,7,9), pX, true); //TEMP

@@ -274,6 +274,15 @@ void addPaletteToBank(mtlImg_struct *mtl, u16* data, size_t size)
 	loadPaletteToBank(mtl, data, size);
 }
 
+void getPaletteFromBank(mtlImg_struct *mtl, u16* data, size_t size)
+{
+	if(!mtl || !data || !size)return;
+
+	vramSetBankE(VRAM_E_LCD);
+		memcpy(data, mtl->pal, size);
+	vramSetBankE(VRAM_E_TEX_PALETTE);
+}
+
 void editPalette(u16* addr, u8 index, u16 color)
 {
 	if(!addr)return;

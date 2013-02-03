@@ -3,6 +3,7 @@
 emancipator_struct emancipators[NUMEMANCIPATORS];
 emancipationGrid_struct emancipationGrids[NUMEMANCIPATIONGRIDS];
 md2Model_struct gridModel;
+mtlImg_struct* gridMtl;
 
 void initEmancipation(void)
 {
@@ -18,6 +19,8 @@ void initEmancipation(void)
 	
 	loadMd2Model("models/grid.md2","balllauncher.pcx",&gridModel);
 	generateModelDisplayLists(&gridModel, false, 1);
+	gridMtl=createTexture("grid.pcx", "textures");
+	
 }
 
 void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos, int32* m)
@@ -175,14 +178,18 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 			renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
 		glPopMatrix(1);
 		
-		unbindMtl();
+		applyMTL(gridMtl);
 		GFX_COLOR=RGB15(31,31,31);
 		glPolyFmt(POLY_ALPHA(20) | POLY_ID(21) | POLY_CULL_NONE);
 		glScalef32(l,EMANCIPATIONGRIDHEIGHT,inttof32(1));
 		glBegin(GL_QUADS);
+			GFX_TEX_COORD = TEXTURE_PACK(0*16, 0*16);
 			glVertex3v16(0, inttof32(1), 0);
+			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE, 0*16);
 			glVertex3v16(inttof32(1), inttof32(1), 0);
+			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE*16, 256*16);
 			glVertex3v16(inttof32(1), 0, 0);
+			GFX_TEX_COORD = TEXTURE_PACK(0*16, 256*16);
 			glVertex3v16(0, 0, 0);
 	glPopMatrix(1);
 }

@@ -52,7 +52,7 @@ AAR_struct* newAAR(void)
 		}
 	}
 	return NULL;
-} 
+}
 
 void startPI(void)
 {
@@ -276,7 +276,6 @@ void listenPI9(void)
 			p->position.z=fifoGetValue32(FIFO_USER_04);
 			p->position=vectDivInt(p->position,4);
 			p->velocity=addVect(p->velocity,vectDifference(p->position,oldpos));
-			NOGBA("lala %d",p->velocity.x);
 		}
 	}
 	
@@ -393,6 +392,21 @@ bool intersectOBBPortal(portal_struct* p, OBB_struct* o)
 	if(p->normal.x)return !((v.x>s.x || v.x<-s.x) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
 	else if(p->normal.y)return !((v.y>s.y || v.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
 	else return !((v.z>s.z || v.z<-s.z) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x));
+}
+
+void ejectPortalOBBs(portal_struct* p)
+{
+	if(!p)return;
+	
+	int i;
+	for(i=0;i<NUMOBJECTS;i++)
+	{
+		if(objects[i].used && intersectOBBPortal(p, &objects[i]))
+		{
+			NOGBA("ejecting %d...", i);
+			applyForce(i, vect(0,0,0), vectMultInt(p->normal,200));
+		}
+	}
 }
 
 void drawWarpedOBB(portal_struct* p, OBB_struct* o)

@@ -38,6 +38,8 @@ void changePlatform(u8 id, vect3D pos);
 void resetBox(OBB_struct* o, vect3D pos);
 OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model);
 void getBoxAABB(OBB_struct* o, vect3D* s);
+bool intersectOBBPortal(portal_struct* p, OBB_struct* o);
+void ejectPortalOBBs(portal_struct* p);
 
 void drawOBBs(void);
 void drawAARs(void);

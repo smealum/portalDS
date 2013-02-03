@@ -219,7 +219,11 @@ void shootPlayerGun(player_struct* p, bool R)
 			
 			if(isPortalOnWall(p->currentRoom,por,false))
 			{
-				movePortal(por, por->position, vectMultInt(r->normal,-1), angle, true);
+				pos=por->position;
+				movePortal(por, oldp, oldn, olda, false); //terribly inelegant, please forgive me	
+				ejectPortalOBBs(por);
+				
+				movePortal(por, pos, vectMultInt(r->normal,-1), angle, true);
 			}else{
 				movePortal(por, oldp, oldn, olda, false);
 			}

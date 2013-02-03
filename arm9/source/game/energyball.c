@@ -285,10 +285,13 @@ void updateEnergyBall(energyBall_struct* eb)
 	{
 		ip=addVect(convertSize(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 		energyDevice_struct* ed=isEnergyCatcherSurface(col);
-		if(ed)
+		if(ed && !ed->active)
 		{
 			//caught
+			changeAnimation(&ed->modelInstance,2,false);
+			changeAnimation(&ed->modelInstance,1,true);
 			killEnergyBall(eb);
+			if(eb->launcher)eb->launcher->active=false;
 			ed->active=true;
 			return;
 		}

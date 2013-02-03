@@ -88,6 +88,8 @@ void updateTurret(turret_struct* t)
 {
 	if(!t || !t->used)return;
 	
+	if(!t->OBB || !t->OBB->used){t->OBB=NULL;t->used=false;return;}
+	
 	t->counter+=2;t->counter%=63; //TEMP
 	editPalette((u16*)t->OBB->modelInstance.palette,0,RGB15(abs(31-t->counter),0,0)); //TEMP
 	

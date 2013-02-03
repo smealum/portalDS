@@ -223,6 +223,17 @@ void listenPI7(void)
 					togglePlatform(id,active);
 				}
 				break;
+			case PI_KILLBOX:
+				{
+					vect3D pos, size;
+					u32 mass;
+					u8 id=signal>>PISIGNALDATA;
+					if(id<NUMOBJECTS)
+					{
+						objects[id].used=false;
+					}
+				}
+				break;
 			default:
 				while(fifoCheckValue32(FIFO_USER_08))fifoGetValue32(FIFO_USER_08);
 				break;

@@ -76,6 +76,14 @@ void resetPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESET);
 }
 
+void killBox(OBB_struct* o)
+{
+	if(!o)return;
+	
+	o->used=false;
+	fifoSendValue32(FIFO_USER_08,PI_KILLBOX|((o->id)<<PISIGNALDATA));
+}
+
 void sendBoxData(OBB_struct* o)
 {
 	if(!o)return;
@@ -262,6 +270,12 @@ void listenPI9(void)
 				o->transformationMatrix[2]=v.x;
 				o->transformationMatrix[5]=v.y;
 				o->transformationMatrix[8]=v.z;
+				
+				if(o->used && collideBoxEmancipationGrids(o))
+				{
+					createEmancipator(&o->modelInstance,vectDivInt(o->position,4),o->transformationMatrix);
+					killBox(o);
+				}
 			}
 		}else if(k<NUMOBJECTS+NUMPLATFORMS)
 		{
@@ -292,7 +306,7 @@ void listenPI9(void)
 const u8 OBBSegments[NUMOBBSEGMENTS][2]={{0,1},{1,2},{3,2},{0,3},
 										 {5,4},{5,6},{6,7},{4,7},
 										 {3,4},{0,5},{1,6},{2,7}};
-										 
+
 void getOBBVertices(OBB_struct* o, vect3D* v)
 {
 	if(!o || !v)return;
@@ -380,6 +394,15 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
 }
 
+bool intersectAABBAAR(vect3D o1, vect3D s, vect3D o2, vect3D sp)
+{
+	const vect3D v=vectDifference(o2,o1);
+	
+	if(!sp.x)return !((v.x>s.x || v.x<-s.x) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
+	else if(!sp.y)return !((v.y>s.y || v.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
+	else return !((v.z>s.z || v.z<-s.z) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x));
+}
+
 bool intersectOBBPortal(portal_struct* p, OBB_struct* o)
 {
 	if(!p || !o)return false;
@@ -387,11 +410,8 @@ bool intersectOBBPortal(portal_struct* p, OBB_struct* o)
 	vect3D s;
 	getBoxAABB(o, &s);
 	vect3D sp=vect(abs(p->plane[0].x/PORTALFRACTIONX)+abs(p->plane[1].x/PORTALFRACTIONY),abs(p->plane[0].y/PORTALFRACTIONX)+abs(p->plane[1].y/PORTALFRACTIONY),abs(p->plane[0].z/PORTALFRACTIONX)+abs(p->plane[1].z/PORTALFRACTIONY));
-	vect3D v=vectDifference(p->position,vectDivInt(o->position,4));
-	
-	if(p->normal.x)return !((v.x>s.x || v.x<-s.x) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
-	else if(p->normal.y)return !((v.y>s.y || v.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
-	else return !((v.z>s.z || v.z<-s.z) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x));
+		
+	return intersectAABBAAR(vectDivInt(o->position,4),s,p->position,sp);
 }
 
 void ejectPortalOBBs(portal_struct* p)

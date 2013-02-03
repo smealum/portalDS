@@ -35,9 +35,11 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal);
 void addPlatform(u8 id, vect3D orig, vect3D dest, bool BAF);
 void changePlatform(u8 id, vect3D pos);
 
+void killBox(OBB_struct* o);
 void resetBox(OBB_struct* o, vect3D pos);
 OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model);
 void getBoxAABB(OBB_struct* o, vect3D* s);
+bool intersectAABBAAR(vect3D o1, vect3D s1, vect3D o2, vect3D sp);
 bool intersectOBBPortal(portal_struct* p, OBB_struct* o);
 void ejectPortalOBBs(portal_struct* p);
 

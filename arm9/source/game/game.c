@@ -104,8 +104,9 @@ void initGame(void)
 	createEnergyDevice(NULL, vect(20,0,9), pY, false); //TEMP
 	createPlatform(vect(TILESIZE*2,TILESIZE,TILESIZE*4),vect(TILESIZE*10,TILESIZE,TILESIZE*4), true); //TEMP
 	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
-	addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET);//
-	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET);//
+	addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET); //TEMP
+	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET); //TEMP
+	createEmancipationGrid(NULL,vect(0,0,7),TILESIZE*8,false);
 	
 	transferRectangles(&roomEdits[0].data);
 	makeGrid();
@@ -174,6 +175,7 @@ static inline void render1(void)
 		updatePlatforms();
 		updateCubeDispensers();
 		updateEmancipators();
+		updateEmancipationGrids();
 	// iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
@@ -220,6 +222,7 @@ static inline void render1(void)
 			drawCubeDispensers();
 			drawTurretsStuff();
 			drawEmancipators();
+			drawEmancipationGrids();
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
@@ -270,6 +273,7 @@ static inline void render2(void)
 		drawCubeDispensers();
 		drawTurretsStuff();
 		drawEmancipators();
+		drawEmancipationGrids();
 
 	glPopMatrix(1);
 	

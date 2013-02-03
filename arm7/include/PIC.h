@@ -31,6 +31,7 @@ typedef enum
 	PI_ADDPLATFORM=12,  //ARG : 3 (id;[posx][posy][posz])
 	PI_UPDATEPLATFORM=13,//ARG : 3 (id;[posx][posy][posz])
 	PI_TOGGLEPLATFORM=14,//ARG : 1 (id;[active])
+	PI_KILLBOX=15,       //ARG : 0 (id)
 }message_type;
 
 #ifdef ARM7

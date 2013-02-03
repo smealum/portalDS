@@ -94,6 +94,7 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 {
 	if(!cd)return;
 	
+	if(cd->currentCube && !cd->currentCube->used)cd->currentCube=NULL;
 	if(cd->active && !cd->oldActive)
 	{
 		if(!cd->currentCube)cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));

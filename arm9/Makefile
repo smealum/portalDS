@@ -15,7 +15,7 @@ include $(DEVKITARM)/ds_rules
 # all directories are relative to this makefile
 #---------------------------------------------------------------------------------
 BUILD		:=	build
-SOURCES		:=	source source/debug source/game source/editor source/acotmenu
+SOURCES		:=	source source/debug source/game source/editor source/acotmenu source/neweditor
 INCLUDES	:=	include
 DATA		:=  data
 MUSIC       :=  maxmod_data

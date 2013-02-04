@@ -36,6 +36,7 @@
 
 #include "game/game_ex.h"
 #include "editor/editor_ex.h"
+#include "neweditor/editor_ex.h"
 #include "acotmenu/acotmenu_ex.h"
 
 #include "debug/xmem.h"

@@ -4,6 +4,7 @@ emancipator_struct emancipators[NUMEMANCIPATORS];
 emancipationGrid_struct emancipationGrids[NUMEMANCIPATIONGRIDS];
 md2Model_struct gridModel;
 mtlImg_struct* gridMtl;
+u32* gridPalettes[6];
 
 void initEmancipation(void)
 {
@@ -19,8 +20,25 @@ void initEmancipation(void)
 	
 	loadMd2Model("models/grid.md2","balllauncher.pcx",&gridModel);
 	generateModelDisplayLists(&gridModel, false, 1);
-	gridMtl=createTexture("grid.pcx", "textures");
+	gridMtl=createTexture("gridcolor1.pcx", "textures");
+	gridPalettes[0]=loadPalettePCX("gridcolor1.pcx","textures");
+	gridPalettes[1]=loadPalettePCX("gridcolor2.pcx","textures");
+	gridPalettes[2]=loadPalettePCX("gridcolor3.pcx","textures");
+	gridPalettes[3]=loadPalettePCX("gridcolor4.pcx","textures");
+	gridPalettes[4]=loadPalettePCX("gridcolor5.pcx","textures");
+	gridPalettes[5]=loadPalettePCX("gridcolor6.pcx","textures");
+
+	u16 paletteTest[16];
+	getPaletteFromBank(gridMtl, paletteTest, 16*2);
 	
+	for(i=0;i<5;i++)
+	{
+		int j;
+		for(j=0;j<6;j++)
+		{
+			editPalette((u16*)gridPalettes[j],i,paletteTest[(i+j)%5]);
+		}
+	}
 }
 
 void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos, int32* m)
@@ -161,6 +179,8 @@ void updateEmancipationGrids(void)
 	}
 }
 
+u16 counter=0;
+
 void drawEmancipationGrid(emancipationGrid_struct* eg)
 {
 	if(!eg)return;
@@ -179,8 +199,9 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 		glPopMatrix(1);
 		
 		applyMTL(gridMtl);
+		bindPaletteAddr(gridPalettes[(((counter++)/4)%6)]);
 		GFX_COLOR=RGB15(31,31,31);
-		glPolyFmt(POLY_ALPHA(20) | POLY_ID(21) | POLY_CULL_NONE);
+		glPolyFmt(POLY_ALPHA(12) | POLY_ID(21) | POLY_CULL_NONE);
 		glScalef32(l,EMANCIPATIONGRIDHEIGHT,inttof32(1));
 		glBegin(GL_QUADS);
 			GFX_TEX_COORD = TEXTURE_PACK(0*16, 0*16);

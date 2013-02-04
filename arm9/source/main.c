@@ -3,6 +3,7 @@
 extern state_struct* currentState;
 state_struct gameState;
 state_struct editorState;
+state_struct newEditorState;
 state_struct ACOTMenuState;
 
 void doSPALSH()
@@ -38,13 +39,15 @@ int main(int argc, char **argv)
 	
 	createState(&gameState, initGame, gameFrame, killGame, gameVBL);
 	createState(&editorState, initEditor, editorFrame, killEditor, editorVBL);
+	createState(&newEditorState, initNewEditor, newEditorFrame, killNewEditor, newEditorVBL);
 	createState(&ACOTMenuState, initACOTMenu, ACOTMenuFrame, killACOTMenu, ACOTMenuVBL);
 	
 	// doSPALSH();
 	
 	// changeState(&ACOTMenuState);
 	// changeState(&editorState);
-	changeState(&gameState);
+	// changeState(&gameState);
+	changeState(&newEditorState);
 	applyState();
 
 	while(1)

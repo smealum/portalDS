@@ -35,7 +35,7 @@ void initGame(void)
 	glEnable(GL_TEXTURE_2D);
 	// glEnable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
-	glEnable(GL_OUTLINE); //TEMP?
+	glEnable(GL_OUTLINE);
 	
 	glSetOutlineColor(0,RGB15(0,0,0)); //TEMP?
 	glSetOutlineColor(7,RGB15(31,0,0)); //TEMP?

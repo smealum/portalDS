@@ -3,12 +3,13 @@
 blockFace_struct* blockFacePool=NULL;
 
 vect3D normals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
-u32 packedVertex[6][4]={{NORMAL_PACK((1<<6),-(1<<6),-(1<<6)), NORMAL_PACK((1<<6),-(1<<6),(1<<6)), NORMAL_PACK((1<<6),(1<<6),(1<<6)), NORMAL_PACK((1<<6),(1<<6),-(1<<6))},
-						{NORMAL_PACK(-(1<<6),-(1<<6),-(1<<6)), NORMAL_PACK(-(1<<6),(1<<6),-(1<<6)), NORMAL_PACK(-(1<<6),(1<<6),(1<<6)), NORMAL_PACK(-(1<<6),-(1<<6),(1<<6))},
-						{NORMAL_PACK(-(1<<6),(1<<6),-(1<<6)), NORMAL_PACK(-(1<<6),(1<<6),(1<<6)), NORMAL_PACK((1<<6),(1<<6),(1<<6)), NORMAL_PACK((1<<6),(1<<6),-(1<<6))},
-						{NORMAL_PACK(-(1<<6),-(1<<6),-(1<<6)), NORMAL_PACK((1<<6),-(1<<6),-(1<<6)), NORMAL_PACK((1<<6),-(1<<6),(1<<6)), NORMAL_PACK(-(1<<6),-(1<<6),(1<<6))},
-						{NORMAL_PACK(-(1<<6),-(1<<6),(1<<6)), NORMAL_PACK(-(1<<6),(1<<6),(1<<6)), NORMAL_PACK((1<<6),(1<<6),(1<<6)), NORMAL_PACK((1<<6),-(1<<6),(1<<6))},
-						{NORMAL_PACK(-(1<<6),-(1<<6),-(1<<6)), NORMAL_PACK((1<<6),-(1<<6),-(1<<6)), NORMAL_PACK((1<<6),(1<<6),-(1<<6)), NORMAL_PACK(-(1<<6),(1<<6),-(1<<6))}};
+u16 faceColors[]={RGB15(31,31,31),RGB15(25,25,25),RGB15(20,20,20),RGB15(15,15,15),RGB15(10,10,10),RGB15(5,5,5)}; //TEMP
+u32 packedVertex[6][4]={{NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5))},
+						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),-(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),-(1<<5))},
+						{NORMAL_PACK(-(1<<5),(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5))},
+						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),-(1<<5),(1<<5))},
+						{NORMAL_PACK(-(1<<5),-(1<<5),(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5))},
+						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),-(1<<5))}};
 
 void initBlockFacePool(void)
 {
@@ -50,7 +51,7 @@ void initBlockArray(u8* ba)
 		{
 			for(k=0;k<ROOMARRAYSIZEZ;k++)
 			{
-				if(i<16 || j<16 || k<16 || i>=48 || j>=48 || k>=48)setBlock(ba,i,j,k,1);
+				if(i<28 || j<28 || k<28 || i>=36 || j>=36 || k>=36)setBlock(ba,i,j,k,1);
 				else setBlock(ba,i,j,k,0);
 			}
 		}
@@ -109,16 +110,22 @@ blockFace_struct* createBlockFace(u8 x, u8 y, u8 z, u8 dir)
 	return bf;
 }
 
+int cnt=0;
+
 void addBlockFace(blockFace_struct** l, blockFace_struct* bf)
 {
-	if(!l || !*l || !bf)return;
+	if(!l || !bf)return;	
 	bf->next=*l;
 	*l=bf;
+		NOGBA("lala %d",cnt++);
 }
 
 void generateBlockFaces(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
 {
-	if(!ba || !l || !*l || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return;
+	if(!ba || !l || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return;
+	
+	u8 v=getBlock(ba,x,y,z);
+	if(!v)return;
 	
 	if(!getBlock(ba,x+1,y,z))addBlockFace(l, createBlockFace(x,y,z,0));
 	if(!getBlock(ba,x-1,y,z))addBlockFace(l, createBlockFace(x,y,z,1));
@@ -151,18 +158,26 @@ void drawBlockFace(blockFace_struct* bf)
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
-	GFX_BEGIN=GL_QUADS;
+	glPushMatrix();
 	
-	GFX_VERTEX10=*vtxPtr++;
-	GFX_VERTEX10=*vtxPtr++;
-	GFX_VERTEX10=*vtxPtr++;
-	GFX_VERTEX10=*vtxPtr++;
+		glTranslate3f32(inttof32(bf->x),inttof32(bf->y),inttof32(bf->z));
+	
+		GFX_COLOR=faceColors[bf->direction];
+	
+		GFX_BEGIN=GL_QUADS;
+		
+		GFX_VERTEX10=*vtxPtr++;
+		GFX_VERTEX10=*vtxPtr++;
+		GFX_VERTEX10=*vtxPtr++;
+		GFX_VERTEX10=*vtxPtr++;
+	
+	glPopMatrix(1);
 }
 
 void drawBlockFaceList(blockFace_struct* l)
 {
 	if(!l)return;
-	
+		
 	while(l)
 	{
 		drawBlockFace(l);
@@ -173,6 +188,14 @@ void drawBlockFaceList(blockFace_struct* l)
 void drawEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
+		
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	GFX_COLOR=RGB15(31,31,31);
 	
-	drawBlockFaceList(er->blockFaceList);
+	glPushMatrix();
+	
+		glTranslate3f32(inttof32(-ROOMARRAYSIZEX/2),inttof32(-ROOMARRAYSIZEY/2),inttof32(-ROOMARRAYSIZEZ/2));		
+		drawBlockFaceList(er->blockFaceList);
+		
+	glPopMatrix(1);
 }

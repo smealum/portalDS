@@ -1,12 +1,8 @@
 #include "neweditor/editor.h"
 
-#define BLOCKSIZEX inttof32(10)//(TILESIZE*2)
-#define BLOCKSIZEY inttof32(10)//(TILESIZE*2)
-#define BLOCKSIZEZ inttof32(10)//(TILESIZE*2)
-
 blockFace_struct* blockFacePool=NULL;
 
-vect3D normals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
+vect3D faceNormals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
 u16 faceColors[]={RGB15(31,31,31),RGB15(25,25,25),RGB15(20,20,20),RGB15(15,15,15),RGB15(10,10,10),RGB15(5,5,5)}; //TEMP
 u32 packedVertex[6][4]={{NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5))},
 						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),-(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),-(1<<5))},
@@ -20,6 +16,8 @@ vect3D faceOrigin[]={vect(inttof32(1),-inttof32(1),-inttof32(1)), vect(-inttof32
 vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(1)),
 					vect(inttof32(1),0,inttof32(1)), vect(inttof32(1),0,inttof32(1)),
 					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
+
+mtlImg_struct* wallTexture;
 
 void initBlockFacePool(void)
 {
@@ -44,6 +42,8 @@ void initBlocks(void)
 		faceOrigin[i]=vect(mulf32(faceOrigin[i].x,BLOCKSIZEX)/2,mulf32(faceOrigin[i].y,BLOCKSIZEY)/2,mulf32(faceOrigin[i].z,BLOCKSIZEZ)/2);
 		faceSize[i]=vect(mulf32(faceSize[i].x,BLOCKSIZEX),mulf32(faceSize[i].y,BLOCKSIZEY),mulf32(faceSize[i].z,BLOCKSIZEZ));
 	}
+	
+	wallTexture=createTexture("floor6.pcx", "textures");
 }
 
 u8 getBlock(u8* ba, s8 x, s8 y, s8 z)
@@ -68,7 +68,7 @@ void initBlockArray(u8* ba)
 		{
 			for(k=0;k<ROOMARRAYSIZEZ;k++)
 			{
-				if(i<28 || j<28 || k<28 || i>=36 || j>=36 || k>=36)setBlock(ba,i,j,k,1);
+				if(i<28 || j<30 || k<28 || i>=36 || j>=34 || k>=36 || (k==31 && i==31))setBlock(ba,i,j,k,1);
 				else setBlock(ba,i,j,k,0);
 			}
 		}
@@ -172,18 +172,18 @@ vect3D getBlockPosition(u8 x, u8 y, u8 z)
 	return vect((x-ROOMARRAYSIZEX/2)*BLOCKSIZEX,(y-ROOMARRAYSIZEY/2)*BLOCKSIZEY,(z-ROOMARRAYSIZEZ/2)*BLOCKSIZEZ);
 }
 
-bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d)
+bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d, int32* dist)
 {
-	vect3D n=normals[bf->direction];
+	vect3D n=faceNormals[bf->direction];
 	int32 p1=dotProduct(v,n);
-	if(!equals(p1,0))
+	if(!equals(p1,0) && p1<0)
 	{
 		vect3D p=addVect(faceOrigin[bf->direction],getBlockPosition(bf->x,bf->y,bf->z));
 		vect3D s=faceSize[bf->direction];
 		
 		int32 p2=dotProduct(vectDifference(p,o),n);
 		int32 k=divf32(p2,p1);
-		// if(k<0 || k>d){return false;}
+		if(k>d){return false;}
 		vect3D i=addVect(o,vectMult(v,k));
 		i=vectDifference(i,p);
 		
@@ -203,24 +203,28 @@ bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d)
 			if(s.z>0)r=r&&i.z<s.z&&i.z>=0;
 			else r=r&&i.z>s.z&&i.z<=0;
 		}
+		if(r && dist)*dist=k;
 		return r;
 	}
 	return false;
 }
 
-void collideLineBlockFaceList(blockFace_struct* l, vect3D o, vect3D v, int32 d)
+blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v)
 {
-	if(!l)return;
+	if(!l)return NULL;
+	
+	int32 closestDist=1<<26;
+	blockFace_struct* bf=NULL;
 		
 	while(l)
 	{
-		if(collideLineBlockFace(l, o, v, d))
+		if(collideLineBlockFace(l, o, v, closestDist, &closestDist))
 		{
-			NOGBA("HERE %p", l);
-			l->draw=false;
+			bf=l;
 		}
 		l=l->next;
 	}
+	return bf;
 }
 
 void drawBlockFace(blockFace_struct* bf)
@@ -228,6 +232,8 @@ void drawBlockFace(blockFace_struct* bf)
 	if(!bf || !bf->draw)return;
 	
 	u32* vtxPtr=packedVertex[bf->direction];
+	
+	applyMTL(wallTexture);
 	
 	glPushMatrix();
 	
@@ -237,9 +243,13 @@ void drawBlockFace(blockFace_struct* bf)
 	
 		GFX_BEGIN=GL_QUADS;
 		
+		GFX_TEX_COORD=TEXTURE_PACK(0*16, 0*16);
 		GFX_VERTEX10=*vtxPtr++;
+		GFX_TEX_COORD=TEXTURE_PACK(64*16, 0*16);
 		GFX_VERTEX10=*vtxPtr++;
+		GFX_TEX_COORD=TEXTURE_PACK(64*16, 64*16);
 		GFX_VERTEX10=*vtxPtr++;
+		GFX_TEX_COORD=TEXTURE_PACK(0*16, 64*16);
 		GFX_VERTEX10=*vtxPtr++;
 	
 	glPopMatrix(1);

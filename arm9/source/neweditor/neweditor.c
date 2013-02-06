@@ -7,13 +7,16 @@ void newEditorVBL(void)
 
 void initNewEditor(void)
 {
+	lcdMainOnBottom();
 	videoSetMode(MODE_5_3D);
 	videoSetModeSub(MODE_0_2D);
+	
+	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_LCD,VRAM_D_MAIN_BG_0x06000000);	
 	
 	glInit();
 	
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_ANTIALIAS);
+	// glEnable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
 	glEnable(GL_OUTLINE);
 	
@@ -24,7 +27,7 @@ void initNewEditor(void)
 	initVramBanks(1);
 	initTextures();
 	
-	initRoomEditor();	
+	initRoomEditor();
 }
 
 int cnd=0;

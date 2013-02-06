@@ -3,5 +3,7 @@
 
 #include "common/general.h"
 #include "neweditor/blocks.h"
+#include "neweditor/roomeditor.h"
+#include "game/game_main.h"
 
 #endif

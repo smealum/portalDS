@@ -501,90 +501,90 @@ void updateEntityPropertyWindow(void)
 
 void initEditor(void)
 {
-	NOGBA("initializing...");
-	videoSetMode(MODE_0_3D);
+	// NOGBA("initializing...");
+	// videoSetMode(MODE_0_3D);
 	
-	glInit();
+	// glInit();
 	
-	initD3D();
+	// initD3D();
 	
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
+	// glEnable(GL_TEXTURE_2D);
+	// glEnable(GL_BLEND);
 	
-	glClearColor(0,0,0,31);
-	glClearPolyID(63);
-	glClearDepth(0x7FFF);
+	// glClearColor(0,0,0,31);
+	// glClearPolyID(63);
+	// glClearDepth(0x7FFF);
 
-	glViewport(0,0,255,191);
+	// glViewport(0,0,255,191);
 	
 	// initVramBanks(2);
-	initVramBanks(1);
-	initTextures();
+	// initVramBanks(1);
+	// initTextures();
 	
-	initCamera(NULL);
+	// initCamera(NULL);
 
-	initText();
-	initGrid();
-	initRoomEditor();
-	initGui();
+	// initText();
+	// initGrid();
+	// initRoomEditor();
+	// initGui();
 	
-	initMaterials();
-	initDoorCollection(NULL);
+	// initMaterials();
+	// initDoorCollection(NULL);
 	
-	fileToolWindow=createWindow(-120+24+8,8,64,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	actionButtons[13]=createButtonFather(4, 3, RGB15(31,31,31), callNewLevelWindow, fileToolWindow, "", "icon21.pcx", false);
-	actionButtons[14]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), loadLevelButton, fileToolWindow, "", "icon22.pcx", false);
-	actionButtons[15]=createButtonFather(4+(16+4)*2, 3, RGB15(31,31,31), saveLevelButton, fileToolWindow, "", "icon23.pcx", false);
+	// fileToolWindow=createWindow(-120+24+8,8,64,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// actionButtons[13]=createButtonFather(4, 3, RGB15(31,31,31), callNewLevelWindow, fileToolWindow, "", "icon21.pcx", false);
+	// actionButtons[14]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), loadLevelButton, fileToolWindow, "", "icon22.pcx", false);
+	// actionButtons[15]=createButtonFather(4+(16+4)*2, 3, RGB15(31,31,31), saveLevelButton, fileToolWindow, "", "icon23.pcx", false);
 	
 	
-	roomToolWindow=createWindow(-120,8,24,88,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	toolButtons[0]=createButtonFather(3, 4, RGB15(31,31,31), buttonCreateRoom, roomToolWindow, "", "icon1.pcx", false);
-	toolButtons[1]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonSelectRoom, roomToolWindow, "", "icon2.pcx", false);
-	toolButtons[2]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonResizeRoom, roomToolWindow, "", "icon3.pcx", false);
-	toolButtons[3]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonMoveRoom, roomToolWindow, "", "icon4.pcx", false);
+	// roomToolWindow=createWindow(-120,8,24,88,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// toolButtons[0]=createButtonFather(3, 4, RGB15(31,31,31), buttonCreateRoom, roomToolWindow, "", "icon1.pcx", false);
+	// toolButtons[1]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonSelectRoom, roomToolWindow, "", "icon2.pcx", false);
+	// toolButtons[2]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonResizeRoom, roomToolWindow, "", "icon3.pcx", false);
+	// toolButtons[3]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonMoveRoom, roomToolWindow, "", "icon4.pcx", false);
 	
-	resetRoomButtons();
-	buttonCreateRoom(toolButtons[0]);
+	// resetRoomButtons();
+	// buttonCreateRoom(toolButtons[0]);
 	
-	selectedRoomToolWindow=createWindow(-200,f32toint(roomToolWindow->Position.y+roomToolWindow->Size.y)+8,24,88,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	toolButtons[4]=createButtonFather(3, 4, RGB15(31,31,31), buttonSelectTiles, selectedRoomToolWindow, "", "icon5.pcx", false);
-	actionButtons[0]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDeleteRoom, selectedRoomToolWindow, "", "icon6.pcx", false);
-	actionButtons[1]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonSwapData, selectedRoomToolWindow, "", "icon7.pcx", false);
-	actionButtons[8]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonRenderRoom, selectedRoomToolWindow, "", "icon14.pcx", false);
+	// selectedRoomToolWindow=createWindow(-200,f32toint(roomToolWindow->Position.y+roomToolWindow->Size.y)+8,24,88,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// toolButtons[4]=createButtonFather(3, 4, RGB15(31,31,31), buttonSelectTiles, selectedRoomToolWindow, "", "icon5.pcx", false);
+	// actionButtons[0]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDeleteRoom, selectedRoomToolWindow, "", "icon6.pcx", false);
+	// actionButtons[1]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonSwapData, selectedRoomToolWindow, "", "icon7.pcx", false);
+	// actionButtons[8]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonRenderRoom, selectedRoomToolWindow, "", "icon14.pcx", false);
 
-	tileToolWindow=createWindow(200,8,24,64,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	actionButtons[2]=createButtonFather(3, 4, RGB15(31,31,31), buttonUpTiles, tileToolWindow, "", "icon8.pcx", false);
-	actionButtons[3]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDownTiles, tileToolWindow, "", "icon9.pcx", false);
-	actionButtons[4]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonMakeWall, tileToolWindow, "", "icon10.pcx", false);
+	// tileToolWindow=createWindow(200,8,24,64,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// actionButtons[2]=createButtonFather(3, 4, RGB15(31,31,31), buttonUpTiles, tileToolWindow, "", "icon8.pcx", false);
+	// actionButtons[3]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDownTiles, tileToolWindow, "", "icon9.pcx", false);
+	// actionButtons[4]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonMakeWall, tileToolWindow, "", "icon10.pcx", false);
 
-	entityToolWindow=createWindow(-260,8,86,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	toolButtons[5]=createButtonFather(4, 3, RGB15(31,31,31), buttonSelectEntityTool, entityToolWindow, "", "icon13.pcx", false);
-	toolButtons[6]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), buttonCreateLightTool, entityToolWindow, "", "icon11.pcx", false);
-	toolButtons[7]=createButtonFather(4+(16+4)*2, 3, RGB15(31,31,31), buttonCreateEnemyTool, entityToolWindow, "", "icon12.pcx", false);
-	toolButtons[8]=createButtonFather(4+(16+4)*3, 3, RGB15(31,31,31), buttonCreateDoorTool, entityToolWindow, "", "icon20.pcx", false);
+	// entityToolWindow=createWindow(-260,8,86,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// toolButtons[5]=createButtonFather(4, 3, RGB15(31,31,31), buttonSelectEntityTool, entityToolWindow, "", "icon13.pcx", false);
+	// toolButtons[6]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), buttonCreateLightTool, entityToolWindow, "", "icon11.pcx", false);
+	// toolButtons[7]=createButtonFather(4+(16+4)*2, 3, RGB15(31,31,31), buttonCreateEnemyTool, entityToolWindow, "", "icon12.pcx", false);
+	// toolButtons[8]=createButtonFather(4+(16+4)*3, 3, RGB15(31,31,31), buttonCreateDoorTool, entityToolWindow, "", "icon20.pcx", false);
 
-	entityPropertyWindow=createWindow(200,8,24,104,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	actionButtons[5]=createButtonFather(3, 4, RGB15(31,31,31), buttonUpEntity, entityPropertyWindow, "", "icon8.pcx", false);
-	actionButtons[6]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDownEntity, entityPropertyWindow, "", "icon9.pcx", false);
-	actionButtons[7]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonUpLight, entityPropertyWindow, "", "icon17.pcx", false);
-	actionButtons[9]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonDownLight, entityPropertyWindow, "", "icon18.pcx", false);
-	actionButtons[10]=createButtonFather(3, 4+(16+4)*4, RGB15(31,31,31), buttonDeleteEntity, entityPropertyWindow, "", "icon19.pcx", false);
+	// entityPropertyWindow=createWindow(200,8,24,104,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// actionButtons[5]=createButtonFather(3, 4, RGB15(31,31,31), buttonUpEntity, entityPropertyWindow, "", "icon8.pcx", false);
+	// actionButtons[6]=createButtonFather(3, 4+(16+4), RGB15(31,31,31), buttonDownEntity, entityPropertyWindow, "", "icon9.pcx", false);
+	// actionButtons[7]=createButtonFather(3, 4+(16+4)*2, RGB15(31,31,31), buttonUpLight, entityPropertyWindow, "", "icon17.pcx", false);
+	// actionButtons[9]=createButtonFather(3, 4+(16+4)*3, RGB15(31,31,31), buttonDownLight, entityPropertyWindow, "", "icon18.pcx", false);
+	// actionButtons[10]=createButtonFather(3, 4+(16+4)*4, RGB15(31,31,31), buttonDeleteEntity, entityPropertyWindow, "", "icon19.pcx", false);
 
-	materialToolWindow=createWindow(-120+24+8,191-24,140,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
-	actionButtons[11]=createButtonFather(4, 3, RGB15(31,31,31), buttonSelectMaterial, materialToolWindow, "", "icon15.pcx", false);
-	actionButtons[12]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), buttonApplyMaterial, materialToolWindow, "", "icon16.pcx", false);
-	createLabelFather(4+(16+4)*2, 2, RGB15(31,31,31), materialToolWindow, "selected :", false);
-	materialWindowLabel=createLabelFather(4+(16+4)*2+4, 2+12, RGB15(31,31,31), materialToolWindow, "material0", false);
+	// materialToolWindow=createWindow(-120+24+8,191-24,140,24,31,RGB15(31,31,31),1,RGB15(0,0,0),"");
+	// actionButtons[11]=createButtonFather(4, 3, RGB15(31,31,31), buttonSelectMaterial, materialToolWindow, "", "icon15.pcx", false);
+	// actionButtons[12]=createButtonFather(4+(16+4), 3, RGB15(31,31,31), buttonApplyMaterial, materialToolWindow, "", "icon16.pcx", false);
+	// createLabelFather(4+(16+4)*2, 2, RGB15(31,31,31), materialToolWindow, "selected :", false);
+	// materialWindowLabel=createLabelFather(4+(16+4)*2+4, 2+12, RGB15(31,31,31), materialToolWindow, "material0", false);
 	
-	initListWindow(NULL);
-	initNewLevelWindow();
+	// initListWindow(NULL);
+	// initNewLevelWindow();
 	
-	loadMaterialSlices("slices.ini");
-	loadMaterials("materials.ini");
+	// loadMaterialSlices("slices.ini");
+	// loadMaterials("materials.ini");
 	
-	getVramStatus();
-	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
-	fadeIn();
+	// getVramStatus();
+	// NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	// fadeIn();
 }
 
 int frm=0;
@@ -593,7 +593,7 @@ int testTime=0;
 
 void editorFrame(void)
 {
-	touchPosition touchPos;
+	/*touchPosition touchPos;
 	switch(d3dScreen)
 	{
 		case true:
@@ -662,31 +662,6 @@ void editorFrame(void)
 				
 				transformCamera(NULL);				
 				
-				/*				
-				glPushMatrix();
-					// TEST
-						glLight(0, RGB15(16,16,16), 0, 0, floattov10(-1)+1);
-						
-						glMaterialf(GL_AMBIENT, RGB15(2,2,2));
-						glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
-						glMaterialf(GL_SPECULAR, RGB15(0,0,0));
-						glMaterialf(GL_EMISSION, RGB15(0,0,0));
-					// TEST
-					PROF_START();
-							renderModelFrameInterp(frm,frm2,&testModel);
-							// renderModelFrame(frm,&testModel);
-						glTranslate3f32(floattof32(20.0f),0,0);
-							renderModelFrameInterp(frm,frm2,&testModel);
-							// renderModelFrame(frm,&testModel);
-						glTranslate3f32(floattof32(20.0f),0,0);
-							renderModelFrameInterp(frm,frm2,&testModel);
-							// renderModelFrame(frm,&testModel);
-						glTranslate3f32(floattof32(20.0f),0,0);
-							renderModelFrameInterp(frm,frm2,&testModel);
-							// renderModelFrame(frm,&testModel);
-					PROF_END(testTime);
-					testTime/=4;
-				glPopMatrix(1);*/
 				frm2++;
 				if(frm2>=4){frm++;frm2=0;}
 				
@@ -701,17 +676,17 @@ void editorFrame(void)
 	}
 	
 	swiWaitForVBlank();
-	updateD3D();
+	updateD3D();*/
 }
 
 void killEditor(void)
 {
-	fadeOut();
-	NOGBA("KILLING IT");
-	cleanUpGui();
-	wipeMapEdit();
-	freeState(NULL);
-	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	// fadeOut();
+	// NOGBA("KILLING IT");
+	// cleanUpGui();
+	// wipeMapEdit();
+	// freeState(NULL);
+	// NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 
 void editorVBL(void)

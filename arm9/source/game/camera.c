@@ -59,6 +59,33 @@ void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, 
 	// m[15] = 0;
 }
 
+//this too
+void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->projectionMatrix;
+		
+	*(m++) = divf32(inttof32(2), right - left);
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = 0;
+	*(m++) = divf32(inttof32(2), top - bottom);
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = divf32(inttof32(-2), zFar - zNear);
+	*(m++) = 0;
+
+	*(m++) = -divf32(right + left, right - left);
+	*(m++) = -divf32(top + bottom, top - bottom);
+	*(m++) = -divf32(zFar + zNear, zFar - zNear);
+	*(m++) = inttof32(1);
+}
+
 void initTransformationMatrix(camera_struct* c)
 {
 	if(!c)c=&playerCamera;

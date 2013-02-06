@@ -38,9 +38,14 @@ void rotateCamera(camera_struct* c, vect3D a);
 vect3D getCameraPosition(camera_struct* c);
 void setCamera(camera_struct* c, vect3D v);
 void updateCamera(camera_struct* c);
-void updateCameraPreview(room_struct* r, camera_struct* c);
+// void updateCameraPreview(room_struct* r, camera_struct* c);
 camera_struct* getPlayerCamera(void);
 vect3D getUnitVector(camera_struct* c);
+void updateViewMatrix(camera_struct* c);
+void fixMatrix(int32* m);
+void updateFrustum(camera_struct* c);
+
+void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);
 
 void changeBase(int32* tm, vect3D x, vect3D y, vect3D z, bool r);
 

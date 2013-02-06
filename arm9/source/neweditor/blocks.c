@@ -1,5 +1,9 @@
 #include "neweditor/editor.h"
 
+#define BLOCKSIZEX inttof32(10)//(TILESIZE*2)
+#define BLOCKSIZEY inttof32(10)//(TILESIZE*2)
+#define BLOCKSIZEZ inttof32(10)//(TILESIZE*2)
+
 blockFace_struct* blockFacePool=NULL;
 
 vect3D normals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
@@ -10,6 +14,12 @@ u32 packedVertex[6][4]={{NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5)
 						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),-(1<<5),(1<<5))},
 						{NORMAL_PACK(-(1<<5),-(1<<5),(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5))},
 						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),-(1<<5),-(1<<5))}};
+vect3D faceOrigin[]={vect(inttof32(1),-inttof32(1),-inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1)),
+					vect(-inttof32(1),inttof32(1),-inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1)),
+					vect(-inttof32(1),-inttof32(1),inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1))};
+vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(1)),
+					vect(inttof32(1),0,inttof32(1)), vect(inttof32(1),0,inttof32(1)),
+					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
 
 void initBlockFacePool(void)
 {
@@ -27,6 +37,13 @@ void initBlocks(void)
 {
 	blockFacePool=NULL;
 	initBlockFacePool();
+	
+	int i;
+	for(i=0;i<6;i++)
+	{
+		faceOrigin[i]=vect(mulf32(faceOrigin[i].x,BLOCKSIZEX)/2,mulf32(faceOrigin[i].y,BLOCKSIZEY)/2,mulf32(faceOrigin[i].z,BLOCKSIZEZ)/2);
+		faceSize[i]=vect(mulf32(faceSize[i].x,BLOCKSIZEX),mulf32(faceSize[i].y,BLOCKSIZEY),mulf32(faceSize[i].z,BLOCKSIZEZ));
+	}
 }
 
 u8 getBlock(u8* ba, s8 x, s8 y, s8 z)
@@ -106,18 +123,16 @@ blockFace_struct* createBlockFace(u8 x, u8 y, u8 z, u8 dir)
 	if(!bf)return bf;
 	bf->x=x;bf->y=y;bf->z=z;
 	bf->direction=dir;
+	bf->draw=true;
 	bf->next=NULL;
 	return bf;
 }
-
-int cnt=0;
 
 void addBlockFace(blockFace_struct** l, blockFace_struct* bf)
 {
 	if(!l || !bf)return;	
 	bf->next=*l;
 	*l=bf;
-		NOGBA("lala %d",cnt++);
 }
 
 void generateBlockFaces(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
@@ -152,9 +167,65 @@ void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 	}	
 }
 
+vect3D getBlockPosition(u8 x, u8 y, u8 z)
+{
+	return vect((x-ROOMARRAYSIZEX/2)*BLOCKSIZEX,(y-ROOMARRAYSIZEY/2)*BLOCKSIZEY,(z-ROOMARRAYSIZEZ/2)*BLOCKSIZEZ);
+}
+
+bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d)
+{
+	vect3D n=normals[bf->direction];
+	int32 p1=dotProduct(v,n);
+	if(!equals(p1,0))
+	{
+		vect3D p=addVect(faceOrigin[bf->direction],getBlockPosition(bf->x,bf->y,bf->z));
+		vect3D s=faceSize[bf->direction];
+		
+		int32 p2=dotProduct(vectDifference(p,o),n);
+		int32 k=divf32(p2,p1);
+		// if(k<0 || k>d){return false;}
+		vect3D i=addVect(o,vectMult(v,k));
+		i=vectDifference(i,p);
+		
+		bool r=true;
+		if(s.x)
+		{
+			if(s.x>0)r=r&&i.x<s.x&&i.x>=0;
+			else r=r&&i.x>s.x&&i.x<=0;
+		}
+		if(s.y)
+		{
+			if(s.y>0)r=r&&i.y<s.y&&i.y>=0;
+			else r=r&&i.y>s.y&&i.y<=0;
+		}
+		if(s.z)
+		{
+			if(s.z>0)r=r&&i.z<s.z&&i.z>=0;
+			else r=r&&i.z>s.z&&i.z<=0;
+		}
+		return r;
+	}
+	return false;
+}
+
+void collideLineBlockFaceList(blockFace_struct* l, vect3D o, vect3D v, int32 d)
+{
+	if(!l)return;
+		
+	while(l)
+	{
+		if(collideLineBlockFace(l, o, v, d))
+		{
+			NOGBA("HERE %p", l);
+			l->draw=false;
+		}
+		l=l->next;
+	}
+}
+
 void drawBlockFace(blockFace_struct* bf)
 {
-	if(!bf)return;
+	if(!bf || !bf->draw)return;
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
@@ -189,13 +260,12 @@ void drawEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
 		
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_ID(1));
 	GFX_COLOR=RGB15(31,31,31);
 	
 	glPushMatrix();
-	
+		glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
 		glTranslate3f32(inttof32(-ROOMARRAYSIZEX/2),inttof32(-ROOMARRAYSIZEY/2),inttof32(-ROOMARRAYSIZEZ/2));		
 		drawBlockFaceList(er->blockFaceList);
-		
 	glPopMatrix(1);
 }

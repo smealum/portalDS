@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "arm7"
+		},
+		{
+			"path": "arm9/source"
+		},
+		{
+			"path": "arm9/include"
+		}
+	]
+}

@@ -33,6 +33,7 @@ typedef struct
 }editorRoom_struct;
 
 extern vect3D faceNormals[6];
+extern vect3D faceOrigin[6];
 extern u32 packedVertex[6][4];
 
 void initEditorRoom(editorRoom_struct* er);
@@ -41,6 +42,7 @@ void drawEditorRoom(editorRoom_struct* er);
 
 void initBlocks(void);
 blockFace_struct* popBlockFace(blockFace_struct** l);
+vect3D getBlockPosition(u8 x, u8 y, u8 z);
 void addBlockFace(blockFace_struct** l, blockFace_struct* bf);
 void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
 blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v);

@@ -7,6 +7,8 @@ selection_struct editorSelection;
 vect3D editorTranslation;
 int32 editorScale;
 
+vect3D lineOfTouchOrigin, lineOfTouchVector;
+
 
 void initSelection(selection_struct* s)
 {
@@ -27,6 +29,8 @@ void initRoomEditor(void)
 	editorCamera.position=vect(0,0,0);
 	editorTranslation=vect(0,0,0);
 	editorScale=inttof32(1);
+	lineOfTouchOrigin=vect(0,0,0);
+	lineOfTouchVector=vect(0,0,0);
 }
 
 void updateSelection(selection_struct* s)
@@ -35,7 +39,7 @@ void updateSelection(selection_struct* s)
 	if(!s->active || !s->firstFace || !s->secondFace)return;
 	
 	s->planar=(s->firstFace->direction==s->secondFace->direction) && 
-			(((s->firstFace->direction==0 || s->firstFace->direction==1) && s->firstFace->x==s->secondFace->x)
+				(((s->firstFace->direction==0 || s->firstFace->direction==1) && s->firstFace->x==s->secondFace->x)
 			 || ((s->firstFace->direction==2 || s->firstFace->direction==3) && s->firstFace->y==s->secondFace->y)
 			 || ((s->firstFace->direction==4 || s->firstFace->direction==5) && s->firstFace->z==s->secondFace->z));
 	
@@ -71,6 +75,24 @@ void updateSelection(selection_struct* s)
 	s->size.x++;s->size.y++;s->size.z++;
 }
 
+bool isFaceInSelection(blockFace_struct* bf, selection_struct* s)
+{
+	if(!bf || !s || !s->firstFace || !s->secondFace)return false;
+
+	if(s->planar)
+	{
+		if(bf->direction!=s->firstFace->direction)return false;
+		switch(bf->direction)
+		{
+			case 0: case 1: return (bf->x==s->origin.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
+			case 2: case 3: return (bf->y==s->origin.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
+			default:		return (bf->y==s->origin.y && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x);
+		}
+	}else{
+		return (bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
+	}
+}
+
 void updateEditorCamera(void)
 {
 	camera_struct* c=&editorCamera;
@@ -90,13 +112,48 @@ void transformRay(vect3D* o, vect3D* v)
 	*v=evalVectMatrix33(m,*v);
 }
 
-blockFace_struct* getBlockFaceCoordinates(s16 x, s16 y)
-{	
+blockFace_struct* getBlockFaceCoordinates(void)
+{
+	return collideLineBlockFaceListClosest(editorRoom.blockFaceList, lineOfTouchOrigin, lineOfTouchVector);
+}
+
+void updateLineOfTouch(s16 x, s16 y)
+{
 	vect3D o=vect(inttof32(x),inttof32(y),inttof32(0));
 	vect3D v=vect(0,0,-inttof32(1));
 	transformRay(&o, &v);
-	
-	return collideLineBlockFaceListClosest(editorRoom.blockFaceList, o, v);
+	lineOfTouchOrigin=o;
+	lineOfTouchVector=v;
+}
+
+bool collideLinePlane(vect3D p, vect3D n, vect3D o, vect3D v, vect3D* ip)
+{
+	int32 p1=dotProduct(v,n);
+	if(!equals(p1,0))
+	{		
+		int32 p2=dotProduct(vectDifference(p,o),n);
+		int32 k=divf32(p2,p1);
+		if(ip)*ip=addVect(o,vectMult(v,k));
+		return true;
+	}
+	return false;
+}
+
+vect3D getDragPosition(blockFace_struct* bf, vect3D o, vect3D v, vect3D los)
+{
+	if(!bf)return vect(0,0,0);
+	vect3D n, ip;
+	n=los;
+	switch(bf->direction)
+	{
+		case 0: case 1: n.x=0; break;
+		case 2: case 3: n.y=0; break;
+		case 4: case 5: n.z=0; break;
+	}
+	n=normalize(n);
+	if(!collideLinePlane(addVect(faceOrigin[bf->direction],getBlockPosition(bf->x,bf->y,bf->z)), n, o, v, &ip))return faceOrigin[bf->direction];
+	NOGBA("indeed");
+	return ip;
 }
 
 void updateRoomEditor(void)
@@ -104,6 +161,7 @@ void updateRoomEditor(void)
 	touchPosition touchCurrent;
 	touchRead(&touchCurrent);
 	
+	updateLineOfTouch(touchCurrent.px-128, 96-touchCurrent.py);
 	updateEditorCamera();
 	
 	//TEMP CONTROLS
@@ -122,11 +180,18 @@ void updateRoomEditor(void)
 	
 	if(keysDown() & KEY_TOUCH)
 	{
-		blockFace_struct* bf=getBlockFaceCoordinates(touchCurrent.px-128, 96-touchCurrent.py);
+		blockFace_struct* bf=getBlockFaceCoordinates();
 		if(bf)
 		{
-			editorSelection.firstFace=editorSelection.secondFace=bf;
-			editorSelection.active=true;
+			if(editorSelection.active && isFaceInSelection(bf, &editorSelection))
+			{
+				editorSelection.currentFace=bf;
+				editorSelection.selecting=false;
+			}else{
+				editorSelection.firstFace=editorSelection.secondFace=bf;
+				editorSelection.active=true;
+				editorSelection.selecting=true;
+			}
 		}else{
 			editorSelection.active=false;
 		}
@@ -134,8 +199,14 @@ void updateRoomEditor(void)
 	{
 		if(editorSelection.active)
 		{
-			blockFace_struct* bf=getBlockFaceCoordinates(touchCurrent.px-128, 96-touchCurrent.py);
-			if(bf)editorSelection.secondFace=bf;
+			if(editorSelection.selecting)
+			{
+				blockFace_struct* bf=getBlockFaceCoordinates();
+				if(bf)editorSelection.secondFace=bf;
+			}else{
+				vect3D p=getDragPosition(editorSelection.currentFace, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
+				NOGBA("%d %d %d (%d %d %d)",p.x,p.y,p.z,lineOfTouchOrigin.x,lineOfTouchOrigin.y,lineOfTouchOrigin.z);
+			}
 		}else{
 			
 		}

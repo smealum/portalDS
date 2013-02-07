@@ -3,9 +3,9 @@
 
 typedef struct
 {
-	blockFace_struct *firstFace, *secondFace;
+	blockFace_struct *firstFace, *secondFace, *currentFace;
 	vect3D origin, size;
-	bool active, planar;
+	bool active, selecting, planar;
 }selection_struct;
 
 void initRoomEditor(void);

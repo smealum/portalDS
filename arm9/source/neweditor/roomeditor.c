@@ -31,6 +31,11 @@ void initRoomEditor(void)
 	editorScale=inttof32(1);
 	lineOfTouchOrigin=vect(0,0,0);
 	lineOfTouchVector=vect(0,0,0);
+
+	//initial camera setup
+	rotateMatrixY(editorCamera.transformationMatrix, 2048+384, true);
+	rotateMatrixX(editorCamera.transformationMatrix, 1024+128, false);
+	editorScale=inttof32(2);
 }
 
 void updateSelection(selection_struct* s)
@@ -86,7 +91,7 @@ bool isFaceInSelection(blockFace_struct* bf, selection_struct* s)
 		{
 			case 0: case 1: return (bf->x==s->origin.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
 			case 2: case 3: return (bf->y==s->origin.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
-			default:		return (bf->y==s->origin.y && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x);
+			default:		return (bf->z==s->origin.z && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x);
 		}
 	}else{
 		return (bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
@@ -155,6 +160,21 @@ vect3D getDragPosition(blockFace_struct* bf, vect3D o, vect3D v, vect3D los)
 	return ip;
 }
 
+void adjustSelection(selection_struct* s, blockFace_struct of, blockFace_struct os, blockFace_struct oc, vect3D v)
+{
+	if(!s)return;
+
+	of.x+=v.x;of.y+=v.y;of.z+=v.z;
+	os.x+=v.x;os.y+=v.y;os.z+=v.z;
+	oc.x+=v.x;oc.y+=v.y;oc.z+=v.z;
+
+	s->firstFace=findBlockFace(editorRoom.blockFaceList, of.x, of.y, of.z, of.direction);
+	s->secondFace=findBlockFace(editorRoom.blockFaceList, os.x, os.y, os.z, os.direction);
+	s->currentFace=findBlockFace(editorRoom.blockFaceList, oc.x, oc.y, oc.z, oc.direction);
+
+	if(!s->firstFace || !s->secondFace || !s->currentFace)s->active=false;
+}
+
 void updateRoomEditor(void)
 {
 	touchPosition touchCurrent;
@@ -185,6 +205,7 @@ void updateRoomEditor(void)
 			if(editorSelection.active && isFaceInSelection(bf, &editorSelection))
 			{
 				editorSelection.currentFace=bf;
+				editorSelection.currentPosition=vect(bf->x,bf->y,bf->z);
 				editorSelection.selecting=false;
 			}else{
 				editorSelection.firstFace=editorSelection.secondFace=bf;
@@ -204,18 +225,35 @@ void updateRoomEditor(void)
 				if(bf)editorSelection.secondFace=bf;
 			}else{
 				blockFace_struct* bf=editorSelection.currentFace;
+				bool fill=true;
 				vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
-				p=vect(p.x/BLOCKSIZEX+ROOMARRAYSIZEX/2,p.y/BLOCKSIZEY+ROOMARRAYSIZEY/2,p.z/BLOCKSIZEZ+ROOMARRAYSIZEZ/2);
+				p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ)/2)/BLOCKSIZEZ);
 				switch(bf->direction)
 				{
-					case 0: case 1: p.y=bf->y; p.z=bf->z; break;
-					case 2: case 3: p.x=bf->x; p.z=bf->z; break;
-					case 4: case 5: p.x=bf->x; p.y=bf->y; break;
+					case 0: p.y=bf->y; p.z=bf->z; fill=p.x>editorSelection.currentPosition.x; break;
+					case 1: p.y=bf->y; p.z=bf->z; fill=p.x<editorSelection.currentPosition.x; break;
+					case 2: p.x=bf->x; p.z=bf->z; fill=p.y>editorSelection.currentPosition.y; break;
+					case 3: p.x=bf->x; p.z=bf->z; fill=p.y<editorSelection.currentPosition.y; break;
+					case 4: p.x=bf->x; p.y=bf->y; fill=p.z>editorSelection.currentPosition.z; break;
+					default:p.x=bf->x; p.y=bf->y; fill=p.z<editorSelection.currentPosition.z; break;
 				}
-				//TEST STUFF
-				p=vect((p.x/BLOCKSIZEX)+ROOMARRAYSIZEX/2,(p.y/BLOCKSIZEY)+ROOMARRAYSIZEY/2,(p.z/BLOCKSIZEZ)+ROOMARRAYSIZEZ/2);
-				NOGBA("%d %d %d (%d %d %d)",p.x,p.y,p.z,lineOfTouchOrigin.x,lineOfTouchOrigin.y,lineOfTouchOrigin.z);
-				fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, editorSelection.origin, addVect(vect(1,1,1),vectDifference(p, editorSelection.origin)));
+
+				if(p.x!=editorSelection.currentPosition.x || p.y!=editorSelection.currentPosition.y || p.z!=editorSelection.currentPosition.z)
+				{
+					blockFace_struct oldFirstFace=*editorSelection.firstFace;
+					blockFace_struct oldSecondFace=*editorSelection.secondFace;
+					blockFace_struct oldCurrentFace=*editorSelection.currentFace;
+
+					vect3D v=vectDifference(p, editorSelection.currentPosition);
+					vect3D o=adjustVectForNormal(bf->direction, editorSelection.origin); vect3D s=v;
+					fixOriginSize(&o, &s); s=adjustVectForNormal(oppositeDirection[bf->direction], addVect(s,editorSelection.size));
+
+					if(fill)fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+					else emptyBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+
+					adjustSelection(&editorSelection, oldFirstFace, oldSecondFace, oldCurrentFace, v);
+					editorSelection.currentPosition=p;
+				}
 			}
 		}else{
 			
@@ -299,6 +337,7 @@ void drawRoomEditor(void)
 void freeRoomEditor(void)
 {
 	freeEditorRoom(&editorRoom);
+	freeBlockFacePool();
 }
 
 

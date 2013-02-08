@@ -41,8 +41,13 @@ void initRoomEditor(void)
 	rotateMatrixX(editorCamera.transformationMatrix, 1024+128, false);
 	editorScale=inttof32(2);
 
+	//controls stuff
 	touchRead(&currentTouch);
 	oldTouch=currentTouch;
+
+	//cosmetics
+	glSetOutlineColor(0,RGB15(0,0,0));
+	glSetOutlineColor(1,RGB15(29,15,3));
 }
 
 void updateSelection(selection_struct* s)
@@ -233,7 +238,8 @@ void updateRoomEditor(void)
 				blockFace_struct* bf=editorSelection.currentFace;
 				bool fill=true;
 				vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
-				p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ)/2)/BLOCKSIZEZ);
+				p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX+BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY+BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ+BLOCKSIZEZ)/2)/BLOCKSIZEZ);
+				
 				switch(bf->direction)
 				{
 					case 0: p.y=bf->y; p.z=bf->z; fill=p.x>editorSelection.currentPosition.x; break;
@@ -251,8 +257,8 @@ void updateRoomEditor(void)
 					blockFace_struct oldCurrentFace=*editorSelection.currentFace;
 
 					vect3D v=vectDifference(p, editorSelection.currentPosition);
-					vect3D o=adjustVectForNormal(bf->direction, editorSelection.origin); vect3D s=v;
-					fixOriginSize(&o, &s); s=adjustVectForNormal(oppositeDirection[bf->direction], addVect(s,editorSelection.size));
+					vect3D o=(bf->direction%2)?(editorSelection.origin):(adjustVectForNormal(bf->direction, editorSelection.origin)); vect3D s=v;
+					fixOriginSize(&o, &s); s=adjustVectForNormal((bf->direction%2)?(bf->direction):(oppositeDirection[bf->direction]), addVect(s,editorSelection.size));
 
 					if(fill)fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
 					else emptyBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
@@ -285,7 +291,7 @@ void drawSelection(selection_struct* s)
 		
 		unbindMtl();
 		
-		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE | POLY_ID(8));
 		
 		glPushMatrix();		
 			glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
@@ -295,7 +301,7 @@ void drawSelection(selection_struct* s)
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
 			
-			GFX_COLOR=RGB15(31,0,0);		
+			GFX_COLOR=RGB15(29,15,3);		
 			GFX_BEGIN=GL_QUADS;
 			
 			GFX_VERTEX10=*vtxPtr++;
@@ -308,7 +314,7 @@ void drawSelection(selection_struct* s)
 		
 		unbindMtl();
 		
-		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE);
 		
 		glPushMatrix();		
 			glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
@@ -317,7 +323,7 @@ void drawSelection(selection_struct* s)
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
 			
-			GFX_COLOR=RGB15(31,0,0);		
+			GFX_COLOR=RGB15(29,15,3);		
 			GFX_BEGIN=GL_QUADS;
 			int i;for(i=0;i<6*4;i++)GFX_VERTEX10=*vtxPtr++;	
 		glPopMatrix(1);

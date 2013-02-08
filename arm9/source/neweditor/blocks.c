@@ -19,7 +19,7 @@ vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(
 					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
 u8 oppositeDirection[]={1,0,3,2,5,4};
 
-mtlImg_struct* wallTexture;
+mtlImg_struct *wallTexture, *floorTexture, *unportalableTexture;
 
 void initBlockFacePool(void)
 {
@@ -52,6 +52,8 @@ void initBlocks(void)
 	}
 	
 	wallTexture=createTexture("floor6.pcx", "textures");
+	floorTexture=createTexture("floor3.pcx", "textures");
+	unportalableTexture=createTexture("floor7.pcx", "textures");
 }
 
 u8 getBlock(u8* ba, s8 x, s8 y, s8 z)
@@ -397,7 +399,8 @@ void drawBlockFace(blockFace_struct* bf)
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
-	applyMTL(wallTexture);
+	if(bf->direction==2)applyMTL(floorTexture);
+	else applyMTL(wallTexture);
 	
 	glPushMatrix();
 	

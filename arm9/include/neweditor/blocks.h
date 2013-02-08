@@ -47,4 +47,10 @@ void addBlockFace(blockFace_struct** l, blockFace_struct* bf);
 void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
 blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v);
 
+
+void fixOriginSize(vect3D* o, vect3D* s);
+void freeBlockFaceList(blockFace_struct** l);
+void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
+void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
+
 #endif

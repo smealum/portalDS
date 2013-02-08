@@ -58,6 +58,36 @@ void setBlock(u8* ba, u8 x, u8 y, u8 z, u8 v)
 	ba[x+y*ROOMARRAYSIZEX+z*ROOMARRAYSIZEX*ROOMARRAYSIZEY]=v;
 }
 
+void fixOriginSize(vect3D* o, vect3D* s)
+{
+	if(!o || !s)return;
+	if(s->x<0){o->x-=s->x=-s->x;}
+	if(s->y<0){o->y-=s->y=-s->y;}
+	if(s->z<0){o->z-=s->z=-s->z;}
+}
+
+void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
+{
+	if(!ba)return;
+
+	int i, j, k;
+	for(i=o.x;i<o.x+s.x;i++)
+	{
+		for(j=o.y;j<o.y+s.y;j++)
+		{
+			for(k=o.z;k<o.z+s.z;k++)
+			{
+				setBlock(ba, i, j, k, 1);
+			}
+		}
+	}
+	NOGBA("o : %d %d %d",o.x,o.y,o.z);
+	NOGBA("s : %d %d %d",s.x,s.y,s.z);
+	//TEMP
+	freeBlockFaceList(l);
+	generateBlockFacesRange(ba, l, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ));
+}
+
 void initBlockArray(u8* ba)
 {
 	if(!ba)return;
@@ -93,12 +123,18 @@ void freeBlockFace(blockFace_struct* bf)
 	blockFacePool=bf;
 }
 
+void freeBlockFaceList(blockFace_struct** l)
+{
+	if(!l)return;
+	while(*l)freeBlockFace(popBlockFace(l));
+}
+
 void freeEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
 	
 	if(er->blockArray)free(er->blockArray);
-	while(er->blockFaceList)freeBlockFace(popBlockFace(&er->blockFaceList));
+	freeBlockFaceList(&er->blockFaceList);
 }
 
 blockFace_struct* popBlockFace(blockFace_struct** l)

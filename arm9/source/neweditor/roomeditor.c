@@ -1,5 +1,8 @@
 #include "neweditor/editor.h"
 
+#define TOUCHSPEEDX (-32)
+#define TOUCHSPEEDY (32)
+
 camera_struct editorCamera;
 editorRoom_struct editorRoom;
 selection_struct editorSelection;
@@ -8,6 +11,7 @@ vect3D editorTranslation;
 int32 editorScale;
 
 vect3D lineOfTouchOrigin, lineOfTouchVector;
+touchPosition currentTouch, oldTouch;
 
 
 void initSelection(selection_struct* s)
@@ -36,6 +40,9 @@ void initRoomEditor(void)
 	rotateMatrixY(editorCamera.transformationMatrix, 2048+384, true);
 	rotateMatrixX(editorCamera.transformationMatrix, 1024+128, false);
 	editorScale=inttof32(2);
+
+	touchRead(&currentTouch);
+	oldTouch=currentTouch;
 }
 
 void updateSelection(selection_struct* s)
@@ -177,10 +184,9 @@ void adjustSelection(selection_struct* s, blockFace_struct of, blockFace_struct 
 
 void updateRoomEditor(void)
 {
-	touchPosition touchCurrent;
-	touchRead(&touchCurrent);
+	touchRead(&currentTouch);
 	
-	updateLineOfTouch(touchCurrent.px-128, 96-touchCurrent.py);
+	updateLineOfTouch(currentTouch.px-128, 96-currentTouch.py);
 	updateEditorCamera();
 	
 	//TEMP CONTROLS
@@ -256,11 +262,13 @@ void updateRoomEditor(void)
 				}
 			}
 		}else{
-			
+			if(abs(oldTouch.px-currentTouch.px)>2)rotateMatrixY(editorCamera.transformationMatrix, -TOUCHSPEEDX*(oldTouch.px-currentTouch.px), true);
+			if(abs(oldTouch.py-currentTouch.py)>2)rotateMatrixX(editorCamera.transformationMatrix, -TOUCHSPEEDY*(oldTouch.py-currentTouch.py), false);
 		}
 	}
 	
 	updateSelection(NULL);
+	oldTouch=currentTouch;
 }
 
 void drawSelection(selection_struct* s)

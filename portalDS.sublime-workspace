@@ -3,6 +3,22 @@
 	{
 		"selected_items":
 		[
+			[
+				"line",
+				"lineOfSightVector"
+			],
+			[
+				"editor",
+				"editorSelection"
+			],
+			[
+				"ed",
+				"editorSelection"
+			],
+			[
+				"y",
+				"y"
+			]
 		]
 	},
 	"buffers":
@@ -19,7 +35,7 @@
 			"file": "arm9/include/neweditor/blocks.h",
 			"settings":
 			{
-				"buffer_size": 1079,
+				"buffer_size": 1151,
 				"line_ending": "Unix"
 			}
 		},
@@ -35,7 +51,7 @@
 			"file": "arm9/source/neweditor/roomeditor.c",
 			"settings":
 			{
-				"buffer_size": 6783,
+				"buffer_size": 9062,
 				"line_ending": "Windows"
 			}
 		},
@@ -43,7 +59,7 @@
 			"file": "arm9/include/neweditor/roomeditor.h",
 			"settings":
 			{
-				"buffer_size": 284,
+				"buffer_size": 309,
 				"line_ending": "Windows"
 			}
 		}
@@ -51,7 +67,7 @@
 	"build_system": "Packages/User/devkitarm.sublime-build",
 	"command_palette":
 	{
-		"height": 127.0,
+		"height": 392.0,
 		"selected_items":
 		[
 			[
@@ -100,14 +116,41 @@
 	},
 	"file_history":
 	[
+		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/C++/C++.sublime-build",
+		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/User/devkitarm.sublime-build",
+		"/C/devkitPro/portalDS/arm9/source/textures.c",
+		"/C/devkitPro/portalDS/arm9/source/dual3D.c",
+		"/C/devkitPro/portalDS/arm9/source/files.c",
+		"/C/devkitPro/portalDS/arm9/source/font.c",
+		"/C/devkitPro/portalDS/arm9/source/GUI.c",
+		"/C/devkitPro/portalDS/arm9/source/iniparser.c",
+		"/C/devkitPro/portalDS/arm9/source/keyboard.c",
+		"/C/devkitPro/portalDS/arm9/include/common/keyboard.h",
+		"/C/devkitPro/portalDS/arm9/source/main.c",
+		"/C/devkitPro/portalDS/arm9/source/math.c",
+		"/C/devkitPro/portalDS/arm9/source/memory.c",
+		"/C/devkitPro/portalDS/arm9/source/pcx.c",
+		"/C/devkitPro/portalDS/arm9/source/PI9.c",
+		"/C/devkitPro/portalDS/arm9/source/state.c",
+		"/C/devkitPro/portalDS/arm9/include/engine/state.h",
+		"/C/devkitPro/portalDS/arm9/source/game/activator.c",
+		"/C/devkitPro/portalDS/arm9/include/game/activator.h",
+		"/C/devkitPro/portalDS/arm9/source/game/camera.c",
+		"/C/devkitPro/portalDS/arm9/source/game/cubes.c",
+		"/C/devkitPro/portalDS/arm9/source/game/displaylist.c",
+		"/C/devkitPro/portalDS/arm9/source/game/doors.c",
+		"/C/devkitPro/portalDS/arm9/source/game/energyball.c",
+		"/C/devkitPro/portalDS/arm9/source/game/lightmaps.c",
+		"/C/devkitPro/portalDS/arm9/source/game/map.c",
+		"/C/devkitPro/portalDS/arm9/source/game/particles.c",
+		"/C/devkitPro/portalDS/arm9/source/game/physics.c",
+		"/C/devkitPro/portalDS/arm9/include/game/physics.h",
 		"/C/devkitPro/portalDS/arm7/include/PI7.h",
 		"/C/devkitPro/portalDS/arm7/source/PI7.c",
 		"/C/devkitPro/portalDS/arm7/include/OBB.h",
 		"/C/devkitPro/portalDS/arm7/source/OBB.c",
 		"/C/devkitPro/portalDS/arm9/include/dual3D.h",
-		"/C/devkitPro/portalDS/arm9/source/dual3D.c",
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/User/Default (Windows).sublime-keymap",
-		"/C/devkitPro/portalDS/arm9/source/math.c",
 		"/C/devkitPro/portalDS/arm7/include/math.h",
 		"/C/devkitPro/portalDS/arm9/source/game/emancipation.c",
 		"/C/devkitPro/portalDS/arm9/include/game/emancipation.h",
@@ -115,7 +158,6 @@
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/Default/switch_file.py",
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/Default/switch_file.pyc",
 		"/C/devkitPro/portalDS/portalDS.sublime-project",
-		"/C/devkitPro/portalDS/arm9/source/PI9.c",
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/User/portalDS.sublime-build",
 		"/C/Users/smea/AppData/Roaming/Sublime Text 2/Packages/User/Default (Linux).sublime-keymap"
@@ -126,7 +168,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 90.0,
 		"where_history":
 		[
 			""
@@ -137,6 +179,15 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"updateLineOfTouch",
+			"lineOfSight",
+			"lineOfSightOrigin",
+			"lineOfSigh",
+			"lineOf",
+			"z",
+			"y",
+			"getBlockPosition",
+			"transformRay",
 			"path",
 			"col",
 			"ctrl",
@@ -181,8 +232,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								5459,
+								5417
 							]
 						],
 						"settings":
@@ -191,7 +242,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2764.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -201,15 +252,15 @@
 					"file": "arm9/include/neweditor/blocks.h",
 					"settings":
 					{
-						"buffer_size": 1079,
+						"buffer_size": 1151,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								907,
+								907
 							]
 						],
 						"settings":
@@ -217,7 +268,7 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 270.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -254,15 +305,15 @@
 					"file": "arm9/source/neweditor/roomeditor.c",
 					"settings":
 					{
-						"buffer_size": 6783,
+						"buffer_size": 9062,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2089,
-								2089
+								6312,
+								6312
 							]
 						],
 						"settings":
@@ -271,7 +322,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 486.0,
+						"translation.y": 2856.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -281,15 +332,15 @@
 					"file": "arm9/include/neweditor/roomeditor.h",
 					"settings":
 					{
-						"buffer_size": 284,
+						"buffer_size": 309,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								115,
+								115
 							]
 						],
 						"settings":
@@ -380,7 +431,7 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 123.0,
+	"side_bar_visible": false,
+	"side_bar_width": 81.0,
 	"status_bar_visible": true
 }

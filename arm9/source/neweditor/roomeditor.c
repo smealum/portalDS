@@ -204,8 +204,16 @@ void updateRoomEditor(void)
 				blockFace_struct* bf=getBlockFaceCoordinates();
 				if(bf)editorSelection.secondFace=bf;
 			}else{
-				vect3D p=getDragPosition(editorSelection.currentFace, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
-				NOGBA("%d %d %d (%d %d %d)",p.x,p.y,p.z,lineOfTouchOrigin.x,lineOfTouchOrigin.y,lineOfTouchOrigin.z);
+				blockFace_struct* bf=editorSelection.currentFace;
+				vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
+				p=vect(p.x/BLOCKSIZEX+ROOMARRAYSIZEX/2,p.y/BLOCKSIZEY+ROOMARRAYSIZEY/2,p.z/BLOCKSIZEZ+ROOMARRAYSIZEZ/2);
+				switch(bf->direction)
+				{
+					case 0: case 1: p.y=bf->y; p.z=bf->z; break;
+					case 2: case 3: p.x=bf->x; p.z=bf->z; break;
+					case 4: case 5: p.x=bf->x; p.y=bf->y; break;
+				}
+				NOGBA("%d %d %d",p.x,p.y,p.z);
 			}
 		}else{
 			

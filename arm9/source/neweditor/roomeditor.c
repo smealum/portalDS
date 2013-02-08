@@ -39,7 +39,7 @@ void updateSelection(selection_struct* s)
 	if(!s->active || !s->firstFace || !s->secondFace)return;
 	
 	s->planar=(s->firstFace->direction==s->secondFace->direction) && 
-				(((s->firstFace->direction==0 || s->firstFace->direction==1) && s->firstFace->x==s->secondFace->x)
+			   (((s->firstFace->direction==0 || s->firstFace->direction==1) && s->firstFace->x==s->secondFace->x)
 			 || ((s->firstFace->direction==2 || s->firstFace->direction==3) && s->firstFace->y==s->secondFace->y)
 			 || ((s->firstFace->direction==4 || s->firstFace->direction==5) && s->firstFace->z==s->secondFace->z));
 	
@@ -152,7 +152,6 @@ vect3D getDragPosition(blockFace_struct* bf, vect3D o, vect3D v, vect3D los)
 	}
 	n=normalize(n);
 	if(!collideLinePlane(addVect(faceOrigin[bf->direction],getBlockPosition(bf->x,bf->y,bf->z)), n, o, v, &ip))return faceOrigin[bf->direction];
-	NOGBA("indeed");
 	return ip;
 }
 
@@ -213,7 +212,10 @@ void updateRoomEditor(void)
 					case 2: case 3: p.x=bf->x; p.z=bf->z; break;
 					case 4: case 5: p.x=bf->x; p.y=bf->y; break;
 				}
-				NOGBA("%d %d %d",p.x,p.y,p.z);
+				//TEST STUFF
+				p=vect((p.x/BLOCKSIZEX)+ROOMARRAYSIZEX/2,(p.y/BLOCKSIZEY)+ROOMARRAYSIZEY/2,(p.z/BLOCKSIZEZ)+ROOMARRAYSIZEZ/2);
+				NOGBA("%d %d %d (%d %d %d)",p.x,p.y,p.z,lineOfTouchOrigin.x,lineOfTouchOrigin.y,lineOfTouchOrigin.z);
+				fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, editorSelection.origin, addVect(vect(1,1,1),vectDifference(p, editorSelection.origin)));
 			}
 		}else{
 			

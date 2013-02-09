@@ -39,7 +39,7 @@ void initRoomEditor(void)
 	//initial camera setup
 	rotateMatrixY(editorCamera.transformationMatrix, 2048+384, true);
 	rotateMatrixX(editorCamera.transformationMatrix, 1024+128, false);
-	editorScale=inttof32(2);
+	editorScale=inttof32(8*20);
 
 	//controls stuff
 	touchRead(&currentTouch);
@@ -195,18 +195,20 @@ void updateRoomEditor(void)
 	updateEditorCamera();
 	
 	//TEMP CONTROLS
-	if(keysHeld() & KEY_R)editorScale+=inttof32(1)/16;
-	if(keysHeld() & KEY_L)editorScale-=inttof32(1)/16;
+	if(keysHeld() & KEY_R)editorScale+=inttof32(2);
+	if(keysHeld() & KEY_L)editorScale-=inttof32(2);
 	
-	if(keysHeld() & KEY_UP)editorTranslation.y-=inttof32(1);
-	else if(keysHeld() & KEY_DOWN)editorTranslation.y+=inttof32(1);
-	if(keysHeld() & KEY_RIGHT)editorTranslation.x-=inttof32(1);
-	else if(keysHeld() & KEY_LEFT)editorTranslation.x+=inttof32(1);
+	if(keysHeld() & KEY_UP)editorTranslation.y-=inttof32(1)/64;
+	else if(keysHeld() & KEY_DOWN)editorTranslation.y+=inttof32(1)/64;
+	if(keysHeld() & KEY_RIGHT)editorTranslation.x-=inttof32(1)/64;
+	else if(keysHeld() & KEY_LEFT)editorTranslation.x+=inttof32(1)/64;
 	
 	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, 64, true);
 	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, -64, true);
 	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
 	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
+	
+	if(keysHeld() & KEY_START)editorRoom.rectangleList=generateOptimizedRectangles(editorRoom.blockArray);
 	
 	if(keysDown() & KEY_TOUCH)
 	{
@@ -341,6 +343,10 @@ void drawRoomEditor(void)
 		glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);
 		transformCamera(&editorCamera);
 		drawEditorRoom(&editorRoom);
+
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+		drawRectangleList(&editorRoom.rectangleList);
+
 		drawSelection(NULL);
 		
 	glPopMatrix(1);

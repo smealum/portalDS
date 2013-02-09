@@ -66,6 +66,13 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	rec->hide=false;
 }
 
+rectangle_struct createRectangle(vect3D pos, vect3D size)
+{
+	rectangle_struct rec;
+	initRectangle(&rec, pos, size);
+	return rec;
+}
+
 vect3D getUnitVect(rectangle_struct* rec)
 {
 	vect3D u=vect(0,0,0);
@@ -112,7 +119,7 @@ rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, ve
 
 rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i)
 {
-	if(!r)return;
+	if(!r)return NULL;
 	listCell_struct *lc=r->rectangles.first;
 	vect3D v;
 	int32 lowestK=d;
@@ -555,23 +562,28 @@ void transferRectangles(room_struct* r)
 	}
 }
 
+void drawRectangleList(rectangleList_struct* rl)
+{
+	if(!rl)return;
+
+	listCell_struct *lc=rl->first;
+	unbindMtl();
+	GFX_COLOR=RGB15(31,31,31);
+	while(lc)
+	{
+		drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false);
+		lc=lc->next;
+	}
+}
+
 void drawRectangles(room_struct* r, u8 mode, u16 color)
 {
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	
-	listCell_struct *lc=r->rectangles.first;
-	unbindMtl();
-	GFX_COLOR=RGB15(31,31,31);
-	int i=0;
-	while(lc)
-	{
-		drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),true);
-		i++;
-		lc=lc->next;
-	}
+	drawRectangleList(&r->rectangles);
 	if(mode&6)
 	{
-		lc=r->rectangles.first;
+		listCell_struct *lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
 		if(mode&2)applyMTL(r->lightMap);
 		else if(r->lmSlot)applyMTL(r->lmSlot->mtl);
@@ -584,7 +596,7 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	}
 	if(mode&128 && color)
 	{
-		lc=r->rectangles.first;
+		listCell_struct *lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_FRONT);
 		unbindMtl();
 		GFX_COLOR=color;

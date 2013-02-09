@@ -7,9 +7,13 @@
 #define ROOMARRAYSIZEY (64)
 #define ROOMARRAYSIZEZ (64)
 
-#define BLOCKSIZEX inttof32(10)//(TILESIZE*2)
-#define BLOCKSIZEY inttof32(10)//(TILESIZE*2)
-#define BLOCKSIZEZ inttof32(10)//(TILESIZE*2)
+#define BLOCKMULTX (1)
+#define BLOCKMULTY (2)
+#define BLOCKMULTZ (1)
+
+#define BLOCKSIZEX (TILESIZE*2*BLOCKMULTX)
+#define BLOCKSIZEY (HEIGHTUNIT*2*BLOCKMULTY)
+#define BLOCKSIZEZ (TILESIZE*2*BLOCKMULTZ)
 
 //DIR : 0 X
 //		1 -X
@@ -30,6 +34,7 @@ typedef struct
 {
 	u8* blockArray;
 	blockFace_struct* blockFaceList;
+	rectangleList_struct rectangleList;
 }editorRoom_struct;
 
 extern vect3D faceNormals[6];
@@ -57,5 +62,7 @@ void freeBlockFaceList(blockFace_struct** l);
 void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts);
 void emptyBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
 void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
+
+rectangleList_struct generateOptimizedRectangles(u8* ba);
 
 #endif

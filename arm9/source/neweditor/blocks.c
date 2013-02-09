@@ -181,6 +181,7 @@ void initBlockArray(u8* ba)
 void initEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
+	initRectangleList(&er->rectangleList);
 	er->blockFaceList=NULL;
 	er->blockArray=malloc(sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
@@ -331,6 +332,122 @@ void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, b
 			}
 		}
 	}
+}
+
+vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMULTY,v.z*BLOCKMULTZ};}
+
+rectangleList_struct generateOptimizedRectangles(u8* ba)
+{
+	rectangleList_struct rl;
+	initRectangleList(&rl);
+	if(!ba)return rl;
+	int i, j, k;
+	u8 *data1, *data2;
+	s16 cnt1, cnt2;
+	u16 maxSize=max(ROOMARRAYSIZEX, max(ROOMARRAYSIZEY, ROOMARRAYSIZEZ));
+	data1=malloc(maxSize*maxSize*sizeof(u8));if(!data1)return rl;
+	data2=malloc(maxSize*maxSize*sizeof(u8));if(!data2){free(data1);return rl;}
+
+	cnt1=0; cnt2=0;
+	for(i=0;i<ROOMARRAYSIZEX;i++)
+	{
+		for(j=0;j<ROOMARRAYSIZEY;j++)
+		{
+			for(k=0;k<ROOMARRAYSIZEZ;k++)
+			{
+				data1[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i+1,j,k);
+				data2[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i-1,j,k);
+				if(data1[j+k*ROOMARRAYSIZEY])cnt1++;
+				if(data2[j+k*ROOMARRAYSIZEY])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	cnt1=0; cnt2=0;
+	for(j=0;j<ROOMARRAYSIZEY;j++)
+	{
+		for(i=0;i<ROOMARRAYSIZEX;i++)
+		{
+			for(k=0;k<ROOMARRAYSIZEZ;k++)
+			{
+				data1[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j+1,k);
+				data2[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j-1,k);
+				if(data1[i+k*ROOMARRAYSIZEX])cnt1++;
+				if(data2[i+k*ROOMARRAYSIZEX])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	cnt1=0; cnt2=0;
+	for(k=0;k<ROOMARRAYSIZEZ;k++)
+	{
+		for(i=0;i<ROOMARRAYSIZEX;i++)
+		{
+			for(j=0;j<ROOMARRAYSIZEY;j++)
+			{
+				data1[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k+1);
+				data2[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k-1);
+				if(data1[i+j*ROOMARRAYSIZEX])cnt1++;
+				if(data2[i+j*ROOMARRAYSIZEX])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k+1)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	if(data1)free(data1);
+	if(data2)free(data2);
+
+	return rl;
 }
 
 vect3D getBlockPosition(u8 x, u8 y, u8 z)

@@ -1198,7 +1198,6 @@ void readRoom(FILE* f, bool game)
 void readMap(char* filename, bool game)
 {
 	char fn[1024];
-	NOGBA("hmm");
 	FILE* f=NULL;
 	if(fsMode==1||fsMode==2)
 	{
@@ -1220,7 +1219,6 @@ void readMap(char* filename, bool game)
 		NOGBA("lala : %s",fn);
 		f=fopen(fn,"rb");
 	}
-	NOGBA("hmmm");
 	if(!f)return;
 	int k;
 	fread(&k,sizeof(int),1,f);

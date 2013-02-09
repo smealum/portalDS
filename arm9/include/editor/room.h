@@ -21,7 +21,6 @@
 
 typedef struct
 {
-	entityCollection_struct entityCollection;
 	room_struct data;
 	vect3D position;
 	vect3D origin;
@@ -61,13 +60,12 @@ void moveData(s8 v, roomEdit_struct* re, vect3D* so, vect3D* ss);
 void applyMaterial(material_struct* mat, roomEdit_struct* re, vect3D* so, vect3D* ss);
 void makeWall(roomEdit_struct* re, vect3D* so, vect3D* ss);
 void swapData(roomEdit_struct* re);
-rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat, bool portalable);
-void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_struct* ec);
+rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, material_struct* mat, bool portalable);
+void generateLightmaps(roomEdit_struct* re, room_struct* r);
 void changeRoom(roomEdit_struct* re, bool both);
 void wipeMapEdit(void);
 void writeMap(char* filename);
 void readMap(char* filename, bool game);
 void getRoomDoorWays(void);
-entityCollection_struct* getEntityCollection(room_struct* r);
 
 #endif

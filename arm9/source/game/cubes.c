@@ -28,15 +28,15 @@ void initCubeDispenser(room_struct* r, cubeDispenser_struct* cd, vect3D pos, boo
 		rectangle_struct* recp;
 		rec.material=NULL;
 		
-		rec.position=addVect(pos,vect(-1,-8,1));rec.size=vect(2,0,-2);rec.normal=vect(0,-inttof32(1),0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,-8,1));rec.size=vect(2,0,-2);rec.normal=vect(0,-inttof32(1),0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(-1,-8,-1));rec.size=vect(2,8,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,-8,-1));rec.size=vect(2,8,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(-1,0,1));rec.size=vect(2,-8,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,0,1));rec.size=vect(2,-8,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(-1,-8,-1));rec.size=vect(0,8,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,-8,-1));rec.size=vect(0,8,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(1,0,-1));rec.size=vect(0,-8,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(1,0,-1));rec.size=vect(0,-8,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
 	}	
 	

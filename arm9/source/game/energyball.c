@@ -49,37 +49,37 @@ void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, devic
 		
 			if(or!=mY)
 			{
-				rec.position=addVect(pos,vect(-1,4,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(-1,4,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==pY)ed->surface=recp;
 			}
 			if(or!=pY)
 			{
-				rec.position=addVect(pos,vect(1,-4,1));rec.size=vect(-2,0,-2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(1,-4,1));rec.size=vect(-2,0,-2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==mY)ed->surface=recp;
 			}
 			if(or!=mZ)
 			{
-				rec.position=addVect(pos,vect(-1,-4,-1));rec.size=vect(2,8,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(-1,-4,-1));rec.size=vect(2,8,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==pZ)ed->surface=recp;
 			}
 			if(or!=pZ)
 			{
-				rec.position=addVect(pos,vect(-1,4,1));rec.size=vect(2,-8,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(-1,4,1));rec.size=vect(2,-8,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==mZ)ed->surface=recp;
 			}
 			if(or!=pX)
 			{
-				rec.position=addVect(pos,vect(-1,-4,-1));rec.size=vect(0,8,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(-1,-4,-1));rec.size=vect(0,8,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==mX)ed->surface=recp;
 			}
 			if(or!=mX)
 			{
-				rec.position=addVect(pos,vect(1,4,-1));rec.size=vect(0,-8,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+				rec.position=addVect(pos,vect(1,4,-1));rec.size=vect(0,-8,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 				if(recp)recp->hide=true;
 				if(or==pX)ed->surface=recp;
 			}

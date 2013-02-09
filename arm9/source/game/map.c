@@ -158,25 +158,19 @@ u8 computeLighting(vect3D l, int32 intensity, vect3D p, rectangle_struct* rec, r
 	}else return 0;
 }
 
-u8 computeLightings(entityCollection_struct* ec, vect3D p, rectangle_struct* rec, room_struct* r)
+u8 computeLightings(vect3D p, rectangle_struct* rec, room_struct* r)
 {
-	if(ec)
+	int v=AMBIENTLIGHT;
+	int i;
+	for(i=0;i<NUMLIGHTS;i++)
 	{
-		int v=AMBIENTLIGHT;
-		int i;
-		for(i=0;i<ENTITYCOLLECTIONNUM;i++)
+		if(lights[i].used)
 		{
-			if(ec->entity[i].used && ec->entity[i].type==lightEntity && ec->entity[i].data)
-			{
-				entity_struct* e=&ec->entity[i];
-				lightData_struct* d=ec->entity[i].data;
-				// NOGBA("%d LIGHT ! %d, %d, %d, %d",i,e->position.x,e->position.y,e->position.z,d->intensity);
-				v+=computeLighting(vect(e->position.x*TILESIZE*2,e->position.z*HEIGHTUNIT,e->position.y*TILESIZE*2), d->intensity, p, rec, r);
-			}
+			light_struct* l=&lights[i];
+			v+=computeLighting(vect(l->position.x*TILESIZE*2,l->position.z*HEIGHTUNIT,l->position.y*TILESIZE*2), l->intensity, p, rec, r);
 		}
-		return (u8)(31-min(max(v,0),31));
 	}
-	return 0;
+	return (u8)(31-min(max(v,0),31));
 }
 
 void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
@@ -207,7 +201,7 @@ void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
 	}
 }
 
-rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat, bool portalable)
+rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, material_struct* mat, bool portalable)
 {
 	if((!rec.size.x && (!rec.size.z || !rec.size.y)) || (!rec.size.y && !rec.size.z))return NULL;
 	initRectangle(&rec, rec.position, rec.size);
@@ -226,7 +220,7 @@ rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, 
 	return addRectangle(rec, &r->rectangles);
 }
 
-void generateLightmap(entityCollection_struct* ec, rectangle_struct* rec, room_struct* r, u8* b)
+void generateLightmap(rectangle_struct* rec, room_struct* r, u8* b)
 {
 	if(rec && r->lightMap)// && rec->lightMap)
 	{
@@ -248,13 +242,13 @@ void generateLightmap(entityCollection_struct* ec, rectangle_struct* rec, room_s
 			{
 				// data[i+j*rec->lightMap->width]=max(max(31-j,31-i),0);
 				#ifdef A5I3
-					if(!rec->size.x)data[i+j*x]=computeLightings(ec,addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r)<<3;
-					else if(rec->size.y)data[i+j*x]=computeLightings(ec,addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r)<<3;
-					else data[i+j*x]=computeLightings(ec,addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r)<<3;
+					if(!rec->size.x)data[i+j*x]=computeLightings(addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r)<<3;
+					else if(rec->size.y)data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r)<<3;
+					else data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r)<<3;
 				#else
-					if(!rec->size.x)data[i+j*x]=computeLightings(ec,addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r);//<<3;
-					else if(rec->size.y)data[i+j*x]=computeLightings(ec,addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r);//<<3;
-					else data[i+j*x]=computeLightings(ec,addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r);//<<3;
+					if(!rec->size.x)data[i+j*x]=computeLightings(addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r);//<<3;
+					else if(rec->size.y)data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r);//<<3;
+					else data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r);//<<3;
 				#endif
 			}
 		}
@@ -268,9 +262,9 @@ void generateLightmap(entityCollection_struct* ec, rectangle_struct* rec, room_s
 	}else NOGBA("NOTHING?");
 }
 
-void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_struct* ec)
+void generateLightmaps(roomEdit_struct* re, room_struct* r)
 {
-	if(!re || !r || !ec || re->lightUpToDate)return;
+	if(!re || !r || re->lightUpToDate)return;
 	listCell_struct *lc=r->rectangles.first;
 	rectangle2DList_struct rl;
 	initRectangle2DList(&rl);
@@ -303,7 +297,7 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 	lc=r->rectangles.first;
 	while(lc)
 	{
-		generateLightmap(ec, &lc->data, r, r->lightMapBuffer);
+		generateLightmap(&lc->data, r, r->lightMapBuffer);
 		lc=lc->next;
 	}
 	
@@ -483,7 +477,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 	if(c)
 	{
 		c=false;
-		glColor3b(255,255,255);
+		glColorDL(RGB15(31,31,31));
 		
 		bindMaterial(rec.material,&rec,t,true);
 		t1=t[0];
@@ -675,7 +669,7 @@ void generateGridCell(room_struct* r, gridCell_struct* gc, u16 x, u16 y)
 		lc=lc->next;
 	}
 	
-	getClosestLights(r->entityCollection, vect(x/2,0,y/2), &gc->lights[0], &gc->lights[1], &gc->lights[2], &gc->lightDistances[0], &gc->lightDistances[1], &gc->lightDistances[2]);
+	getClosestLights(vect(x/2,0,y/2), &gc->lights[0], &gc->lights[1], &gc->lights[2], &gc->lightDistances[0], &gc->lightDistances[1], &gc->lightDistances[2]);
 }
 
 void generateRoomGrid(room_struct* r)
@@ -730,9 +724,9 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	return displayList;
 }
 
-vect3D getVector(vect3D pos, entity_struct* ent)
+vect3D getVector(vect3D pos, light_struct* l)
 {
-	vect3D p=ent->position;
+	vect3D p=l->position;
 	vect3D v=vectDifference(pos,vect(p.x*(TILESIZE*2),p.z*HEIGHTUNIT,p.y*(TILESIZE*2)));
 	v=vectMultInt(v,100);
 	int32 dist=magnitude(v);
@@ -745,7 +739,7 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 {
 	if(!r)r=getPlayer()->currentRoom;
 	if(!r)return;
-	entity_struct *l1, *l2, *l3;
+	light_struct *l1, *l2, *l3;
 	int32 d1, d2, d3;
 	// vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
 	// getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
@@ -769,19 +763,19 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 		*params|=POLY_FORMAT_LIGHT0;
 		vect3D v=getVector(pos, l1);
 		d1*=64;
-		int32 v2=31-((31*d1)*(((lightData_struct*)l1->data)->intensity));
+		int32 v2=31-((31*d1)*(l1->intensity));
 		glLight(0, RGB15(v2,v2,v2), v.x, v.y, v.z);
 		if(l2)
 		{
 			*params|=POLY_FORMAT_LIGHT1;
 			vect3D v=getVector(pos, l2);
-			int32 v2=31-((31*d2)*(((lightData_struct*)l2->data)->intensity));
+			int32 v2=31-((31*d2)*(l2->intensity));
 			glLight(1, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			if(l3)
 			{
 				*params|=POLY_FORMAT_LIGHT2;
 				vect3D v=getVector(pos, l3);
-				int32 v2=31-((31*d3)*(((lightData_struct*)l3->data)->intensity));
+				int32 v2=31-((31*d3)*(l3->intensity));
 				glLight(2, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			}
 		}

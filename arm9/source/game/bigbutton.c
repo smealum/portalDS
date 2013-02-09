@@ -31,15 +31,15 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 		rectangle_struct* recp;
 		rec.material=NULL;
 		
-		rec.position=addVect(pos,vect(-1,1,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,1,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp){recp->hide=true;bb->surface=recp;}
-		rec.position=addVect(pos,vect(-1,0,-1));rec.size=vect(2,1,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,0,-1));rec.size=vect(2,1,0);rec.normal=vect(0,0,-inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(-1,1,1));rec.size=vect(2,-1,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,1,1));rec.size=vect(2,-1,0);rec.normal=vect(0,0,inttof32(1));recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(-1,0,-1));rec.size=vect(0,1,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(-1,0,-1));rec.size=vect(0,1,2);rec.normal=vect(-inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
-		rec.position=addVect(pos,vect(1,1,-1));rec.size=vect(0,-1,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, NULL, rec, NULL, false);
+		rec.position=addVect(pos,vect(1,1,-1));rec.size=vect(0,-1,2);rec.normal=vect(inttof32(1),0,0);recp=addRoomRectangle(r, rec, NULL, false);
 		if(recp)recp->hide=true;
 	}
 	

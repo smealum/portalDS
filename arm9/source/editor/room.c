@@ -4,7 +4,6 @@ roomEdit_struct roomEdits[NUMROOMEDITS];
 u8 roomEditorMode=0;
 u8 oldEditorMode=0;
 roomEdit_struct *currentRoom, *selectedRoom, *oldSelectedRoom;
-entity_struct *currentEntity;
 vect3D selectionOrigin,selectionSize;
 u8 selectionMode, oldSelectionMode;
 
@@ -18,7 +17,6 @@ void initRoomEditor(void)
 	}
 	roomEditorMode=0;
 	oldEditorMode=0;
-	currentEntity=NULL;
 	currentRoom=NULL;
 	selectedRoom=oldSelectedRoom=NULL;
 	selectionMode=oldSelectionMode=0;
@@ -33,7 +31,6 @@ void initRoomEdit(roomEdit_struct* re)
 		re->used=false;
 		re->quadsUpToDate=false;
 		re->lightUpToDate=false;
-		re->data.entityCollection=&re->entityCollection;
 	}
 }
 
@@ -53,7 +50,6 @@ roomEdit_struct* createRoomEdit(vect3D position, vect3D size)
 			re->lightUpToDate=false;
 			re->size=size;
 			re->id=i;
-			initEntityCollection(&re->entityCollection);
 			
 			return re;
 		}
@@ -66,7 +62,6 @@ void deleteRoomEdit(roomEdit_struct* re)
 	if(!re){re=selectedRoom;selectedRoom=NULL;}
 	if(re)
 	{
-		wipeEntityCollection(&re->entityCollection);
 		freeRoom(&re->data);
 		re->used=false;
 	}
@@ -180,16 +175,6 @@ room_struct* getRoomByID(s16 id)
 	for(i=0;i<NUMROOMEDITS;i++)
 	{
 		if(roomEdits[i].used && roomEdits[i].id==id)return &roomEdits[i].data;
-	}
-	return NULL;
-}
-
-entityCollection_struct* getEntityCollection(room_struct* r)
-{
-	int i;
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used && &roomEdits[i].data==r)return &roomEdits[i].entityCollection;
 	}
 	return NULL;
 }
@@ -313,42 +298,7 @@ void readRectangles(room_struct* r, FILE* f)
 	{
 		rectangle_struct rec;
 		readRectangle(&rec, f);
-		addRoomRectangle(r, NULL, rec, rec.material, true);
-	}
-}
-
-void readEntity(room_struct* r, entity_struct* e, FILE* f, bool game)
-{
-	if(!e || !f)return;
-	
-	fread(&e->type,sizeof(entity_type),1,f);
-	readVect(&e->position,f);
-	
-	switch(e->type)
-	{
-		case lightEntity:
-			initLight(e,0);
-			fread(e->data,sizeof(lightData_struct),1,f);
-			break;
-		case enemyEntity:
-			initEnemy(e,0);
-			e->data=malloc(sizeof(enemyData_struct));
-			fread(e->data,sizeof(enemyData_struct),1,f);
-			// createEn(r,vect(e->position.x,e->position.z,e->position.y));
-			break;
-	}
-}
-
-void readEntityCollection(room_struct* r, entityCollection_struct* ec, FILE* f, bool game)
-{
-	if(!ec || !f)return;
-	int i;
-	int k=ec->num;
-	ec->num=0;
-	for(i=0;i<k;i++)
-	{
-		entity_struct* e=createEntity(ec,vect(0,0,0));
-		readEntity(r, e, f, game);
+		addRoomRectangle(r, rec, rec.material, true);
 	}
 }
 
@@ -379,7 +329,7 @@ void readRoom(FILE* f, bool game)
 	initRoom(&re->data, re->size.x, re->size.y, re->position);
 	
 	fread(&re->data.rectangles.num, sizeof(int), 1, f);
-	fread(&re->entityCollection.num, sizeof(u16), 1, f);
+	fseek(f, sizeof(u16), SEEK_CUR);
 	
 	u16* mat=malloc(sizeof(u16)*re->size.x*re->size.y);
 	
@@ -402,15 +352,7 @@ void readRoom(FILE* f, bool game)
 		re->data.lightMap=createReservedTextureBufferA5I3(NULL,palette,re->data.lmSize.x,re->data.lmSize.y,(void*)(0x6800000+0x0020000));
 	} //TEMP
 	
-	NOGBA("%d %d %d",re->position.x,re->position.y,re->position.z);
-	NOGBA("%d %d %d",re->size.x,re->size.y,re->size.z);
-	NOGBA("%d %d %d",re->data.lmSize.x,re->data.lmSize.y,re->data.lmSize.z);
-	
-	NOGBA("%d",re->data.rectangles.num);
-	NOGBA("%d",re->entityCollection.num);
-	
 	readRectangles(&re->data, f);
-	readEntityCollection(&re->data,&re->entityCollection, f, game);
 	
 	re->quadsUpToDate=re->lightUpToDate=true;
 }

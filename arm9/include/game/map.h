@@ -42,7 +42,7 @@ typedef struct
 typedef struct
 {
 	rectangle_struct** rectangles;
-	entity_struct* lights[3];
+	light_struct* lights[3];
 	int32 lightDistances[3];
 	u8 numRectangles;
 }gridCell_struct;
@@ -60,7 +60,6 @@ typedef struct
 	lightMapSlots_struct* lmSlot;
 	gridCell_struct* rectangleGrid;
 	vect3D rectangleGridSize;
-	entityCollection_struct* entityCollection;
 	rectangleList_struct rectangles;
 }room_struct;
 

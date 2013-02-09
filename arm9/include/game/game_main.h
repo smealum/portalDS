@@ -5,6 +5,7 @@
 #include "editor/material.h"
 #include "game/lightmaps.h"
 #include "editor/entity.h"
+#include "game/lights.h"
 #include "game/map.h"
 #include "game/physics.h"
 #include "game/camera.h"

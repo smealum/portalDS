@@ -2,8 +2,6 @@
 
 #define A5I3
 
-extern doorCollection_struct doorCollection;
-
 u32* testDL=NULL;
 
 void initRectangleList(rectangleList_struct* p)
@@ -274,36 +272,12 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 {
 	if(!re || !r || !ec || re->lightUpToDate)return;
 	listCell_struct *lc=r->rectangles.first;
-	getRoomDoorRectangles(NULL, &re->data);
 	rectangle2DList_struct rl;
 	initRectangle2DList(&rl);
 	while(lc)
 	{
 		insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),vect2(abs(lc->data.size.x?(lc->data.size.x*LIGHTMAPRESOLUTION):(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((lc->data.size.y&&lc->data.size.x)?(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(lc->data.size.z*LIGHTMAPRESOLUTION))),&lc->data,false});
 		lc=lc->next;
-	}
-	int i;
-	doorCollection_struct* dc=&doorCollection;
-	for(i=0;i<NUMDOORS;i++)
-	{
-		if(dc->door[i].used)
-		{
-			door_struct* d=&dc->door[i];
-			if(r==d->primaryRoom)
-			{
-				rectangle_struct* rec=&d->primaryRec;
-				vect2D s=vect2(abs(rec->size.x?(rec->size.x*LIGHTMAPRESOLUTION):(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((rec->size.y&&rec->size.x)?(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(rec->size.z*LIGHTMAPRESOLUTION)));
-				rec->lmSize=vect(s.x,s.y,0);
-				insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),s,rec,false});
-			}
-			if(r==d->secondaryRoom)
-			{
-				rectangle_struct* rec=&d->secondaryRec;
-				vect2D s=vect2(abs(rec->size.x?(rec->size.x*LIGHTMAPRESOLUTION):(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((rec->size.y&&rec->size.x)?(rec->size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(rec->size.z*LIGHTMAPRESOLUTION))*LIGHTMAPRESOLUTION);
-				rec->lmSize=vect(s.x,s.y,0);
-				insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),s,rec,false});
-			}
-		}
 	}
 	short w=32, h=32;
 	// packRectangles(&rl, 512, 256);
@@ -315,11 +289,11 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 	{
 		#ifdef A5I3
 			u16 palette[8];
-			for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
+			int i;for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
 			r->lightMap=createReservedTextureBufferA5I3(NULL,palette,w,h,(void*)(0x6800000+0x0020000));
 		#else
 			u16 palette[256];
-			for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
+			int i;for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
 			r->lightMap=createTextureBuffer(NULL,palette,w,h);
 		#endif
 	}else changeTextureSizeA5I3(r->lightMap,w,h);
@@ -331,16 +305,6 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_str
 	{
 		generateLightmap(ec, &lc->data, r, r->lightMapBuffer);
 		lc=lc->next;
-	}
-	
-	for(i=0;i<NUMDOORS;i++)
-	{
-		if(dc->door[i].used)
-		{
-			door_struct* d=&dc->door[i];
-			if(r==d->primaryRoom)generateLightmap(ec, &d->primaryRec, r, r->lightMapBuffer);
-			if(r==d->secondaryRoom)generateLightmap(ec, &d->secondaryRec, r, r->lightMapBuffer);
-		}
 	}
 	
 	NOGBA("done generating, loading...");
@@ -771,67 +735,6 @@ u8 getHeightValue(room_struct* r, vect3D pos, bool floor)
 	return floor?(r->floor[pos.x+pos.z*r->width]):(r->ceiling[pos.x+pos.z*r->width]);
 }
 
-void getDoorWayData(doorCollection_struct* dc, room_struct* r)
-{
-	if(!r || r->doorWay)return;
-	if(!dc)dc=&doorCollection;
-	r->doorWay=malloc(sizeof(void*)*(r->width+r->height)*4);
-	int i, j;
-	void** dw=r->doorWay;
-	for(j=0;j<2;j++)for(i=0;i<r->width;i++)
-	{
-		door_struct* d=inDoorWay(NULL, r, i, j-2, false, true);
-		if(d){dw[i+j*r->width]=(void*)d;}
-		else
-		{
-			d=inDoorWay(NULL, r, i, j-2, true, true);
-			if(d){dw[i+j*r->width]=(void*)d;}
-			else dw[i+j*r->width]=NULL;
-		}
-	}
-	dw=&r->doorWay[r->width*2];
-	
-	for(j=0;j<2;j++)for(i=0;i<r->width;i++)
-	{
-		door_struct* d=inDoorWay(NULL, r, i, r->height+j, false, true);
-		if(d)dw[i+j*r->width]=(void*)d;
-		else
-		{
-			d=inDoorWay(NULL, r, i, r->height+j, true, true);
-			if(d){dw[i+j*r->width]=(void*)d;}
-			else dw[i+j*r->width]=NULL;
-		}
-	}
-	
-	dw=&r->doorWay[r->width*4];
-	
-	for(j=0;j<2;j++)for(i=0;i<r->height;i++)
-	{
-		door_struct* d=inDoorWay(NULL, r, j-2, i, false, true);
-		if(d)dw[i+j*r->height]=(void*)d;
-		else
-		{
-			d=inDoorWay(NULL, r, j-2, i, true, true);
-			if(d)dw[i+j*r->height]=(void*)d;
-			else dw[i+j*r->height]=NULL;
-		}
-	}
-	
-	dw=&r->doorWay[r->width*4+r->height*2];
-	
-	for(j=0;j<2;j++)for(i=0;i<r->height;i++)
-	{
-		door_struct* d=inDoorWay(NULL, r, r->width+j, i, false, true);
-		if(d)dw[i+j*r->height]=(void*)d;
-		else
-		{
-			d=inDoorWay(NULL, r, r->width+j, i, true, true);
-			if(d)dw[i+j*r->height]=(void*)d;
-			else dw[i+j*r->height]=NULL;
-		}
-	}
-}
-
 void resizeRoom(room_struct* r, u16 w, u16 h, vect3D p)
 {
 	if(r)
@@ -861,64 +764,9 @@ void resizeRoom(room_struct* r, u16 w, u16 h, vect3D p)
 void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 {
 	if(!r)return;
-	int i, j;
-	u8* f=r->floor;
-	if(mode&8)
-	{
-		room_struct* r2=getCurrentRoom();
-		if(r->lmSlot && r2 && r!=r2 && !isDoorOpen(NULL,r,r2)){NOGBA("HAPPENED");r->lmSlot->used=false;r->lmSlot=NULL;}
-		if(r->lmSlot && !r->lmSlot->used)r->lmSlot=NULL;
-		if(!r->lmSlot)return;
-	}
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
 		if(mode&1)drawRectangles(r, mode, color);
-		else{
-			unbindMtl();
-			glBegin(GL_QUAD);
-			for(j=0;j<r->height;j++)
-			{
-				for(i=0;i<r->width;i++)
-				{
-					s16 v=HEIGHTUNIT*(*(f++));
-					s16 x=TILESIZE*2*i, y=TILESIZE*2*j;
-					glColor3b(255,0,0);
-					glVertex3v16(-TILESIZE+x, v, -TILESIZE+y);
-
-					glColor3b(0,255,0);
-					glVertex3v16(TILESIZE+x, v, -TILESIZE+y);
-
-					glColor3b(0,0,255);
-					glVertex3v16(TILESIZE+x, v, TILESIZE+y);
-
-					glColor3b(255,0,255);
-					glVertex3v16(-TILESIZE+x, v, TILESIZE+y);
-				}
-			}
-			
-			f=r->ceiling;
-			
-			for(j=0;j<r->height;j++)
-			{
-				for(i=0;i<r->width;i++)
-				{
-					s16 v=HEIGHTUNIT*(*(f++));
-					s16 x=TILESIZE*2*i, y=TILESIZE*2*j;
-					glColor3b(255,0,0);
-					glVertex3v16(-TILESIZE+x, v, -TILESIZE+y);
-
-					glColor3b(0,255,0);
-					glVertex3v16(TILESIZE+x, v, -TILESIZE+y);
-
-					glColor3b(0,0,255);
-					glVertex3v16(TILESIZE+x, v, TILESIZE+y);
-
-					glColor3b(255,0,255);
-					glVertex3v16(-TILESIZE+x, v, TILESIZE+y);
-				}
-			}
-			glEnd();
-		}
 	glPopMatrix(1);
 }
 

@@ -63,7 +63,6 @@ void initGame(void)
 	
 	initLightMaps();
 	initMaterials();
-	initDoorCollection(NULL);
 	
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");

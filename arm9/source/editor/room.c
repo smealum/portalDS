@@ -4,7 +4,6 @@ roomEdit_struct roomEdits[NUMROOMEDITS];
 u8 roomEditorMode=0;
 u8 oldEditorMode=0;
 roomEdit_struct *currentRoom, *selectedRoom, *oldSelectedRoom;
-door_struct *selectedDoor;
 entity_struct *currentEntity;
 vect3D selectionOrigin,selectionSize;
 u8 selectionMode, oldSelectionMode;
@@ -112,16 +111,6 @@ void makeWall(roomEdit_struct* re, vect3D* so, vect3D* ss)
 	}
 }
 
-void getRoomDoorWays(void)
-{
-	int i;
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used)getDoorWayData(NULL, &roomEdits[i].data);
-	}
-	
-}
-
 roomEdit_struct* createRoomEdit(vect3D position, vect3D size)
 {
 	int i;
@@ -166,7 +155,6 @@ void wipeMapEdit(void)
 	{
 		if(roomEdits[i].used)deleteRoomEdit(&roomEdits[i]);
 	}
-	initDoorCollection(NULL); //TEMP?
 }
 
 void drawRectangle(vect3D position, vect3D size, u16 width, bool cull)
@@ -225,8 +213,6 @@ void drawRoomEdit(roomEdit_struct* re)
 		else glColor3b(255,201,14);
 		
 		drawRectangle(vect(re->position.x,re->position.y,32), re->size, OUTLINEWIDTH, true);
-		
-		drawRoomDoors(NULL, re);
 		
 		if(re->selected)
 		{
@@ -329,7 +315,6 @@ void drawRoomsGame(u8 mode, u16 color)
 			// glPopMatrix(1);
 			glPushMatrix();
 				glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
-				renderRoomDoors(NULL,&roomEdits[i].data);
 			glPopMatrix(1);
 		}
 	}
@@ -445,9 +430,6 @@ void setRoomEditorMode(u8 mode)
 void optimizeRoom(roomEdit_struct* re)
 {
 	if(!re)return;
-	// confirmRoomDoors(NULL, &re->data);
-	confirmDoors(NULL);
-	getSecondaryRooms(NULL);
 	if(!re->quadsUpToDate)
 	{
 		removeRectangles(&re->data);
@@ -535,319 +517,9 @@ void optimizeRoom(roomEdit_struct* re)
 	NOGBA("mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 
-void getDoorPosition(roomEdit_struct* re, int x, int y, doorDirection* d, u16* p)
-{
-	u16 d1=abs(y);
-	u16 d2=abs(re->size.y-y);
-	u16 d3=abs(x);
-	u16 d4=abs(re->size.x-x);
-	if(d1<=d2 && d1<=d3 && d1<=d4)
-	{
-		*p=min(abs(x),re->size.x-1-DOORSIZE);
-		*d=doorUp;
-	}else if(d2<=d1 && d2<=d3 && d2<=d4)
-	{
-		*p=min(abs(x),re->size.x-1-DOORSIZE);
-		*d=doorDown;
-	}else if(d3<=d1 && d3<=d2 && d3<=d4)
-	{
-		*p=min(abs(y),re->size.y-1-DOORSIZE);
-		*d=doorLeft;
-	}else{
-		*p=min(abs(y),re->size.y-1-DOORSIZE);
-		*d=doorRight;
-	}
-	if(*p<1)*p=1;
-}
-
 int oldpx, oldpy;
 extern int32 gridScale;
 bool moving=false;
-
-// void updateRoomEditor(int px, int py)
-// {
-	// oldSelectedRoom=selectedRoom;
-	// oldSelectionMode=selectionMode;
-	// if(selectionMode!=3 && currentEntity){currentEntity->selected=false;currentEntity=NULL;}
-	// switch(roomEditorMode)
-	// {
-		// case ROOMCREATION:
-			// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-			// {
-				// int x, y;
-				// getGridCell(&x,&y,px,py);
-				// roomEdit_struct* re=roomEditorCollision(x,y,false);
-				// if(!re)
-				// {
-					// currentRoom=createRoomEdit(vect(x,y,0),vect(1,1,0));
-					// currentRoom->origin=currentRoom->position;
-					// initRoom(&currentRoom->data,0,0,currentRoom->position);
-					// setRoomEditorMode(ROOMSIZING);
-				// }
-			// }
-			// break;
-		// case ROOMSIZING:
-			// if(currentRoom && (keysHeld()&KEY_TOUCH))
-			// {
-				// int x, y, sx, sy;
-				// vect3D rPos=currentRoom->position;
-				// vect3D rSize=currentRoom->size;
-				
-				// getGridCell(&x,&y,px,py);
-				// sx=x-currentRoom->origin.x;
-				// sy=y-currentRoom->origin.y;
-				
-				// if(sx>0){sx++;currentRoom->position.x=currentRoom->origin.x;}
-				// else{
-					// sx=abs(sx)+1;
-					// currentRoom->position.x=x;
-				// }
-				// currentRoom->size.x=sx;
-				// if(collideEditorRoom(currentRoom)){currentRoom->position=rPos;currentRoom->size=rSize;}
-				// if(sy>0){sy++;currentRoom->position.y=currentRoom->origin.y;}
-				// else{
-					// sy=abs(sy)+1;
-					// currentRoom->position.y=y;
-				// }
-				// currentRoom->size.y=sy;
-				// if(collideEditorRoom(currentRoom)){currentRoom->position.y=rPos.y;currentRoom->size.y=rSize.y;}
-			// }else{selectionMode=0;changeRoom(currentRoom,true);resizeRoom(&currentRoom->data,currentRoom->size.x,currentRoom->size.y,currentRoom->position);roomEditorMode=oldEditorMode;}
-			// break;
-		// case ROOMSELECTMOVE:
-			// if(!collideGui(NULL,px,py))
-			// {
-				// if(keysDown()&(KEY_TOUCH))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// roomEdit_struct* re=roomEditorCollision(x,y,false);
-					// if(re)
-					// {
-						// currentRoom=re;
-						// currentRoom->origin.x=x-currentRoom->position.x;
-						// currentRoom->origin.y=y-currentRoom->position.y;
-						// setRoomEditorMode(ROOMMOVING);
-						// moving=false;
-					// }else moving=true;
-					// oldpx=px;
-					// oldpy=py;
-				// }else if(keysHeld()&(KEY_TOUCH) && moving)
-				// {
-					// int vx=divf32((px-oldpx)*(1<<6),gridScale),vy=divf32((py-oldpy)*(1<<6),gridScale);
-					// translateGrid(vect(vx,vy,0));
-					// oldpx=px;
-					// oldpy=py;
-				// }
-			// }else moving=false;
-			// break;
-		// case ROOMMOVING:
-			// if(currentRoom && (keysHeld()&KEY_TOUCH))
-			// {
-				// int x, y;
-				// getGridCell(&x,&y,px,py);
-				// vect3D rPos=currentRoom->position;
-				// currentRoom->position.x=x-currentRoom->origin.x;
-				// if(collideEditorRoom(currentRoom)){currentRoom->position=rPos;}
-				// currentRoom->position.y=y-currentRoom->origin.y;
-				// if(collideEditorRoom(currentRoom)){currentRoom->position.y=rPos.y;}
-				// currentRoom->data.position=currentRoom->position;
-			// }else roomEditorMode=oldEditorMode;
-			// break;
-		// case ROOMSELECTRESIZE:
-			// if(keysHeld()&(KEY_TOUCH))
-			// {
-				// int x, y;
-				// getGridCell(&x,&y,px,py);
-				// roomEdit_struct* re=roomEditorCollision(x,y,true);
-				// if(re)
-				// {
-					// currentRoom=re;
-					// setRoomEditorMode(ROOMSIZING);
-				// }
-			// }
-			// break;
-		// case ROOMSELECTION:
-			// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-			// {
-				// int x, y;
-				// getGridCell(&x,&y,px,py);
-				// roomEdit_struct* os=selectedRoom;
-				// if(selectedRoom)selectedRoom->selected=false;
-				// selectedRoom=roomEditorCollision(x,y,false);
-				// if(selectedRoom){selectedRoom->selected=true;if(os!=selectedRoom && selectedRoom->lightUpToDate)loadToBank(selectedRoom->data.lightMap,selectedRoom->data.lightMapBuffer);}
-				// else selectionMode=0;
-			// }
-			// break;
-		// case TILESELECTION:
-			// if(!selectedRoom){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// selectionOrigin=vect(x,y,0);
-					// selectionSize=vect(1,1,0);
-					// selectionMode=1;					
-				// }else if(keysHeld()&(KEY_TOUCH)&&selectionMode==1)
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// selectionSize.x=x-selectionOrigin.x;
-					// selectionSize.y=y-selectionOrigin.y;
-					// if(selectionSize.x>=0)selectionSize.x++;
-					// if(selectionSize.y>=0)selectionSize.y++;
-					// GFX_COLOR=RGB15(0,31,0);
-					// unbindMtl();
-					// drawRectangle(vect(selectionOrigin.x,selectionOrigin.y,48), selectionSize, SELECTIONOUTLINEWIDTH, false);
-				// }else if(keysUp()&(KEY_TOUCH)&&selectionMode==1)
-				// {
-					// selectionMode=2;
-					// if(selectionSize.x<0){selectionOrigin.x+=selectionSize.x;selectionSize.x=-selectionSize.x;}
-					// if(selectionSize.y<0){selectionOrigin.y+=selectionSize.y;selectionSize.y=-selectionSize.y;}
-					
-					/*if(!collideRectangles(selectionOrigin,selectionSize,selectedRoom->position,selectedRoom->size)){optimizeRoom(selectedRoom);selectionMode=0;}*/
-					// if(!collideRectangles(selectionOrigin,selectionSize,selectedRoom->position,selectedRoom->size)){selectionMode=0;}
-					// else
-					// {
-						// if(selectionSize.x+selectionOrigin.x>selectedRoom->position.x+selectedRoom->size.x)selectionSize.x+=selectedRoom->position.x+selectedRoom->size.x-(selectionSize.x+selectionOrigin.x);
-						// if(selectionSize.y+selectionOrigin.y>selectedRoom->position.y+selectedRoom->size.y)selectionSize.y+=selectedRoom->position.y+selectedRoom->size.y-(selectionSize.y+selectionOrigin.y);
-						// if(selectionOrigin.x<selectedRoom->position.x)
-						// {
-							// selectionSize.x-=selectedRoom->position.x-selectionOrigin.x;
-							// selectionOrigin.x=selectedRoom->position.x;
-						// }
-						// if(selectionOrigin.y<selectedRoom->position.y)
-						// {
-							// selectionSize.y-=selectedRoom->position.y-selectionOrigin.y;
-							// selectionOrigin.y=selectedRoom->position.y;
-						// }
-						// selectionOrigin.x-=selectedRoom->position.x;
-						// selectionOrigin.y-=selectedRoom->position.y;
-					// }
-				// }
-			// }
-			// break;
-		// case ENTITYSELECTION:
-			// if(!selectedRoom){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysHeld()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// selectedDoor=false;
-					// if(currentEntity)currentEntity->selected=false;
-					// currentEntity=collideEntityCollection(&selectedRoom->entityCollection,x-selectedRoom->position.x,y-selectedRoom->position.y);
-					// if(currentEntity){currentEntity->selected=true;setRoomEditorMode(ENTITYMOVING);selectionMode=3;}
-					// else{
-						// selectionMode=0;
-						// x-=selectedRoom->position.x;
-						// y-=selectedRoom->position.y;
-						// selectedDoor=doorTouches(NULL,selectedRoom,x,y,false);
-						// if(selectedDoor)
-						// {
-							// setRoomEditorMode(DOORMOVING);
-						// }
-					// }
-				// }
-			// }
-			// break;
-		// case ENTITYMOVING:
-			// if(!selectedRoom||!currentEntity){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysHeld()&(KEY_TOUCH))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// vect3D op=currentEntity->position;
-					// currentEntity->position.x=x-selectedRoom->position.x;
-					// currentEntity->position.y=y-selectedRoom->position.y;
-					// if(currentEntity->position.x<0)currentEntity->position.x=0;
-					// if(currentEntity->position.y<0)currentEntity->position.y=0;
-					// if(currentEntity->position.x>=selectedRoom->size.x)currentEntity->position.x=selectedRoom->size.x-1;
-					// if(currentEntity->position.y>=selectedRoom->size.y)currentEntity->position.y=selectedRoom->size.y-1;
-					// if(op.x!=currentEntity->position.x||op.y!=currentEntity->position.y)changeRoom(selectedRoom,false);
-				// }else roomEditorMode=oldEditorMode;
-			// }
-			// break;
-		// case DOORMOVING:
-			// if(!selectedRoom||!selectedDoor){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysHeld()&(KEY_TOUCH))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// x-=selectedRoom->position.x;
-					// y-=selectedRoom->position.y;
-					// doorDirection d=doorUp;
-					// u16 p=0;
-					// getDoorPosition(selectedRoom, x, y, &d, &p);
-					// if(!doorCollides(NULL, &selectedRoom->data, d, p, selectedDoor))
-					// {
-						// selectedDoor->position=p;
-						// selectedDoor->direction=d;
-						// changeRoom(selectedRoom,true);
-					// }
-				// }else roomEditorMode=oldEditorMode;
-			// }
-			// break;
-		// case LIGHTCREATION:
-			// if(!selectedRoom){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// x-=selectedRoom->position.x;
-					// y-=selectedRoom->position.y;
-					// if(x>=0&&y>=0&&x<selectedRoom->size.x&&y<selectedRoom->size.y)
-					// {
-						// createLight(&selectedRoom->entityCollection,vect(x,y,16),TILESIZE*24);
-						// changeRoom(selectedRoom,false);
-					// }
-				// }
-			// }
-			// break;
-		// case ENEMYCREATION:
-			// if(!selectedRoom){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// x-=selectedRoom->position.x;
-					// y-=selectedRoom->position.y;
-					// if(x>=0&&y>=0&&x<selectedRoom->size.x&&y<selectedRoom->size.y)
-					// {
-						// createEnemy(&selectedRoom->entityCollection,vect(x,y,16),0);
-					// }
-				// }
-			// }
-			// break;
-		// case DOORCREATION:
-			// if(!selectedRoom){selectionMode=0;roomEditorMode=oldEditorMode;}
-			// else{
-				// if(keysDown()&(KEY_TOUCH) && !collideGui(NULL,px,py))
-				// {
-					// int x, y;
-					// getGridCell(&x,&y,px,py);
-					// x-=selectedRoom->position.x;
-					// y-=selectedRoom->position.y;
-					// if(x>=0&&y>=0&&x<selectedRoom->size.x&&y<selectedRoom->size.y)
-					// {
-						// doorDirection d=doorUp;
-						// u16 p=0;
-						// getDoorPosition(selectedRoom, x, y, &d, &p);
-						// createDoor(NULL, &selectedRoom->data, p, d, false);
-						// changeRoom(selectedRoom,true);
-					// }
-				// }
-			// }
-			// break;
-		// default:
-			// roomEditorMode=0;
-			// break;
-	// }
-// }
 
 //WRITE AREA
 
@@ -950,50 +622,6 @@ void writeRoom(roomEdit_struct* re, FILE* f)
 	writeEntityCollection(&re->entityCollection, f);
 }
 
-void writeDoor(door_struct* d, FILE* f)
-{
-	if(!d || !d->primaryRoom || !d->used)return;
-	s16 id1=getRoomID(d->primaryRoom);
-	s16 id2=-1;
-	if(d->secondaryRoom)id2=getRoomID(d->secondaryRoom);
-	
-	fwrite(&id1,sizeof(s16),1,f);
-	fwrite(&id2,sizeof(s16),1,f);
-	fwrite(&d->direction,sizeof(doorDirection),1,f);
-	fwrite(&d->position,sizeof(u16),1,f);
-	fwrite(&d->height,sizeof(u16),1,f);
-	
-	rectangle_struct* rec=&d->primaryRec;
-	writeVect(&rec->lmSize,f);
-	writeVect(&rec->lmPos,f);
-	fwrite(&rec->rot,sizeof(bool),1,f);
-	
-	NOGBA("%d %d, %d %d",rec->lmPos.x,rec->lmPos.y,rec->lmSize.x,rec->lmSize.y);
-	
-	rec=&d->secondaryRec;
-	writeVect(&rec->lmSize,f);
-	writeVect(&rec->lmPos,f);
-	fwrite(&rec->rot,sizeof(bool),1,f);
-	
-	NOGBA("%d %d, %d %d",rec->lmPos.x,rec->lmPos.y,rec->lmSize.x,rec->lmSize.y);
-}
-
-extern doorCollection_struct doorCollection;
-
-void writeDoors(doorCollection_struct* dc, FILE* f)
-{
-	if(!dc)dc=&doorCollection;
-	int i;
-	int k=0;for(i=0;i<NUMDOORS;i++)if(dc->door[i].used)k++;
-	
-	fwrite(&k,sizeof(int),1,f);
-	
-	for(i=0;i<NUMDOORS;i++)
-	{
-		if(dc->door[i].used)writeDoor(&dc->door[i], f);
-	}
-}
-
 extern char* basePath;
 
 void writeMap(char* filename)
@@ -1012,8 +640,6 @@ void writeMap(char* filename)
 	{
 		if(roomEdits[i].used)writeRoom(&roomEdits[i], f);
 	}
-	
-	writeDoors(NULL, f);
 	
 	fclose(f);
 }
@@ -1095,53 +721,6 @@ void convertBackMaterialArray(roomEdit_struct* re, u16* mat)
 		{
 			re->data.materials[i+j*re->size.x]=getMaterial(mat[i+j*re->size.x]);
 		}
-	}
-}
-
-void readDoor(door_struct* d, FILE* f)
-{
-	if(!d)return;
-	
-	s16 id1, id2;
-	
-	fread(&id1,sizeof(s16),1,f);
-	fread(&id2,sizeof(s16),1,f);
-	
-	d->primaryRoom=getRoomByID(id1);
-	d->secondaryRoom=getRoomByID(id2);
-	
-	fread(&d->direction,sizeof(doorDirection),1,f);
-	fread(&d->position,sizeof(u16),1,f);
-	fread(&d->height,sizeof(u16),1,f);
-	
-	getDoorRectangle(d,true,&d->primaryRec);
-	getDoorRectangle(d,false,&d->secondaryRec);	
-	
-	rectangle_struct* rec=&d->primaryRec;
-	readVect(&rec->lmSize,f);
-	readVect(&rec->lmPos,f);
-	fread(&rec->rot,sizeof(bool),1,f);
-	
-	NOGBA("%d %d, %d %d",rec->lmPos.x,rec->lmPos.y,rec->lmSize.x,rec->lmSize.y);
-	
-	rec=&d->secondaryRec;
-	readVect(&rec->lmSize,f);
-	readVect(&rec->lmPos,f);
-	fread(&rec->rot,sizeof(bool),1,f);
-	
-	NOGBA("%d %d, %d %d",rec->lmPos.x,rec->lmPos.y,rec->lmSize.x,rec->lmSize.y);
-}
-
-void readDoors(doorCollection_struct* dc, FILE* f)
-{
-	if(!dc)dc=&doorCollection;
-	int i, k=0;
-	
-	fread(&k,sizeof(int),1,f);
-	
-	for(i=0;i<k;i++)
-	{
-		readDoor(createDoor(NULL,NULL,0,doorUp,true), f);
 	}
 }
 
@@ -1227,10 +806,6 @@ void readMap(char* filename, bool game)
 	
 	int i;
 	for(i=0;i<k;i++)readRoom(f, game);
-	
-	readDoors(NULL,f);
-	
-	getRoomDoorWays();
 	
 	fclose(f);
 }

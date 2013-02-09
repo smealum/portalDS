@@ -247,9 +247,6 @@ void scanEdge(roomEdit_struct* re, u8* data, int w, int h, vect2D* pos, vect2D* 
 static inline u8 getVEdgeWall(roomEdit_struct* re, int w, u8* ceiling, int i, int j, u8* hh)
 {
 	u8 v=ceiling[i+j*w];
-	door_struct* d;
-	if((d=doorTouches(NULL, re, i, j, false))){v+=MAXHEIGHT;(*hh)=d->height;}
-	else if((d=doorTouches(NULL, re, i, j, true))){v+=MAXHEIGHT;(*hh)=d->height;}
 	return v;
 }
 

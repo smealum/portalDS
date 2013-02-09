@@ -1,11 +1,11 @@
 #include "neweditor/editor.h"
 
-void newEditorVBL(void)
+void editorVBL(void)
 {
 
 }
 
-void initNewEditor(void)
+void initEditor(void)
 {
 	lcdMainOnBottom();
 	videoSetMode(MODE_5_3D);
@@ -32,7 +32,7 @@ void initNewEditor(void)
 
 int cnd=0;
 
-void newEditorFrame(void)
+void editorFrame(void)
 {
 	scanKeys();
 	GFX_CLEAR_COLOR=RGB15(27,27,27)|(31<<16);
@@ -43,7 +43,7 @@ void newEditorFrame(void)
 	swiWaitForVBlank();
 }
 
-void killNewEditor(void)
+void killEditor(void)
 {
 	freeRoomEditor();
 }

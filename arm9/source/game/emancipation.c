@@ -20,6 +20,7 @@ void initEmancipation(void)
 	
 	loadMd2Model("models/grid.md2","balllauncher.pcx",&gridModel);
 	generateModelDisplayLists(&gridModel, false, 1);
+	getVramStatus();
 	gridMtl=createTexture("gridcolor1.pcx", "textures");
 	gridPalettes[0]=loadPalettePCX("gridcolor1.pcx","textures");
 	gridPalettes[1]=loadPalettePCX("gridcolor2.pcx","textures");

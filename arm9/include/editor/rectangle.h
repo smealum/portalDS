@@ -50,9 +50,6 @@ void freeRectangle2DList(rectangle2DList_struct* l);
 
 void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size);
 void getMaxRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size);
-void scanEdge(roomEdit_struct* re, u8* data, int w, int h, vect2D* pos, vect2D* size, u8 edge, u8 reverse, bool ceil);
-void scanEdgeWall(roomEdit_struct* re, u8* floor, u8* ceiling, int w, int h, vect2D* pos, vect2D* size, u8 edge);
-void scanEdgeInnerWall(roomEdit_struct* re, u8* floor, u8* ceiling, int w, int h, vect2D* pos, vect2D* size, u8 edge);
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip);
 vect3D getClosestPointRectangleStruct(rectangle_struct* rec, vect3D o);
 vect3D getClosestPointRectangle(vect3D p, vect3D s, vect3D o);

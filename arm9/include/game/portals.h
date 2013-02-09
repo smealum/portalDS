@@ -8,7 +8,7 @@ typedef struct portal_struct
 	camera_struct camera;
 	vect3D position;
 	u16 viewPoint[256*192];
-	u16 color, outlineColor;
+	u16 color, innerOutlineColor, outlineColor;
 	u16 animCNT;
 	vect3D normal, plane[2];
 	int32 angle, oldZ;

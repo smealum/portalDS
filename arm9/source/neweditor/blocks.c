@@ -1,6 +1,7 @@
 #include "neweditor/editor.h"
 
 blockFace_struct* blockFacePool=NULL;
+blockFace_struct* blockFacePoolHead=NULL;
 
 vect3D faceNormals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
 u16 faceColors[]={RGB15(31,31,31),RGB15(25,25,25),RGB15(20,20,20),RGB15(15,15,15),RGB15(10,10,10),RGB15(5,5,5)}; //TEMP
@@ -16,12 +17,13 @@ vect3D faceOrigin[]={vect(inttof32(1),-inttof32(1),-inttof32(1)), vect(-inttof32
 vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(1)),
 					vect(inttof32(1),0,inttof32(1)), vect(inttof32(1),0,inttof32(1)),
 					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
+u8 oppositeDirection[]={1,0,3,2,5,4};
 
-mtlImg_struct* wallTexture;
+mtlImg_struct *wallTexture, *floorTexture, *unportalableTexture;
 
 void initBlockFacePool(void)
 {
-	blockFacePool=malloc(sizeof(blockFace_struct)*BLOCKFACEPOOLSIZE);
+	blockFacePoolHead=blockFacePool=malloc(sizeof(blockFace_struct)*BLOCKFACEPOOLSIZE);
 	if(!blockFacePool)return;
 	int i;
 	for(i=0;i<BLOCKFACEPOOLSIZE-1;i++)
@@ -29,6 +31,12 @@ void initBlockFacePool(void)
 		blockFacePool[i].next=&blockFacePool[i+1];
 	}
 	blockFacePool[i].next=NULL;
+}
+
+void freeBlockFacePool(void)
+{
+	if(blockFacePoolHead)free(blockFacePoolHead);
+	blockFacePoolHead=NULL;
 }
 
 void initBlocks(void)
@@ -44,6 +52,8 @@ void initBlocks(void)
 	}
 	
 	wallTexture=createTexture("floor6.pcx", "textures");
+	floorTexture=createTexture("floor3.pcx", "textures");
+	unportalableTexture=createTexture("floor7.pcx", "textures");
 }
 
 u8 getBlock(u8* ba, s8 x, s8 y, s8 z)
@@ -66,9 +76,36 @@ void fixOriginSize(vect3D* o, vect3D* s)
 	if(s->z<0){o->z-=s->z=-s->z;}
 }
 
+void searchAndDestroyBlockFacesRange(blockFace_struct** l, vect3D o, vect3D s)
+{
+	if(!l || !*l)return;
+
+	blockFace_struct** bf=l;
+	blockFace_struct* nbf=*bf;
+	vect3D e=addVect(o, s);
+	while(bf && *bf && nbf)
+	{
+		if((nbf->x>=o.x && nbf->x<e.x && nbf->y>=o.y && nbf->y<e.y && nbf->z>=o.z && nbf->z<e.z)
+		|| (nbf->direction==0 && nbf->x==o.x-1 && nbf->y>=o.y && nbf->y<e.y && nbf->z>=o.z && nbf->z<e.z)
+		|| (nbf->direction==1 && nbf->x==e.x   && nbf->y>=o.y && nbf->y<e.y && nbf->z>=o.z && nbf->z<e.z)
+		|| (nbf->direction==2 && nbf->y==o.y-1 && nbf->x>=o.x && nbf->x<e.x && nbf->z>=o.z && nbf->z<e.z)
+		|| (nbf->direction==3 && nbf->y==e.y   && nbf->x>=o.x && nbf->x<e.x && nbf->z>=o.z && nbf->z<e.z)
+		|| (nbf->direction==4 && nbf->z==o.z-1 && nbf->x>=o.x && nbf->x<e.x && nbf->y>=o.y && nbf->y<e.y)
+		|| (nbf->direction==5 && nbf->z==e.z   && nbf->x>=o.x && nbf->x<e.x && nbf->y>=o.y && nbf->y<e.y))
+		{
+			freeBlockFace(popBlockFace(bf));
+		}else{
+			bf=&((*bf)->next);
+		}
+		nbf=*bf;
+	}
+}
+
 void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 {
 	if(!ba)return;
+
+	fixOriginSize(&o, &s);
 
 	int i, j, k;
 	for(i=o.x;i<o.x+s.x;i++)
@@ -81,11 +118,47 @@ void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 			}
 		}
 	}
-	NOGBA("o : %d %d %d",o.x,o.y,o.z);
-	NOGBA("s : %d %d %d",s.x,s.y,s.z);
-	//TEMP
-	freeBlockFaceList(l);
-	generateBlockFacesRange(ba, l, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ));
+
+	searchAndDestroyBlockFacesRange(l, o, s);
+	generateBlockFacesRange(ba, l, o, s, false);
+}
+
+void emptyBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
+{
+	if(!ba)return;
+
+	fixOriginSize(&o, &s);
+
+	NOGBA("%d %d %d",s.x,s.y,s.z);
+
+	int i, j, k;
+	for(i=o.x;i<o.x+s.x;i++)
+	{
+		for(j=o.y;j<o.y+s.y;j++)
+		{
+			for(k=o.z;k<o.z+s.z;k++)
+			{
+				setBlock(ba, i, j, k, 0);
+			}
+		}
+	}
+
+	searchAndDestroyBlockFacesRange(l, o, s);
+	generateBlockFacesRange(ba, l, o, s, true);
+}
+
+vect3D adjustVectForNormal(u8 dir, vect3D v)
+{
+	switch(dir)
+	{
+		case 0: v.x++; break;
+		case 1: v.x--; break;
+		case 2: v.y++; break;
+		case 3: v.y--; break;
+		case 4: v.z++; break;
+		case 5: v.z--; break;
+	}
+	return v;
 }
 
 void initBlockArray(u8* ba)
@@ -108,11 +181,12 @@ void initBlockArray(u8* ba)
 void initEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
+	initRectangleList(&er->rectangleList);
 	er->blockFaceList=NULL;
 	er->blockArray=malloc(sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
 	initBlockArray(er->blockArray);
-	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ));
+	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 }
 
 void freeBlockFace(blockFace_struct* bf)
@@ -171,6 +245,23 @@ void addBlockFace(blockFace_struct** l, blockFace_struct* bf)
 	*l=bf;
 }
 
+void generateBlockFace(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z, u8 dir)
+{
+	if(!ba || !l)return;
+	if(!getBlock(ba,x,y,z))return;
+	bool add=false;
+	switch(dir)
+	{
+		case 0: add=!getBlock(ba,x+1,y,z); break;
+		case 1: add=!getBlock(ba,x-1,y,z); break;
+		case 2: add=!getBlock(ba,x,y+1,z); break;
+		case 3: add=!getBlock(ba,x,y-1,z); break;
+		case 4: add=!getBlock(ba,x,y,z+1); break;
+		case 5: add=!getBlock(ba,x,y,z-1); break;
+	}
+	if(add)addBlockFace(l, createBlockFace(x,y,z,dir));
+}
+
 void generateBlockFaces(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
 {
 	if(!ba || !l || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return;
@@ -178,15 +269,25 @@ void generateBlockFaces(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
 	u8 v=getBlock(ba,x,y,z);
 	if(!v)return;
 	
-	if(!getBlock(ba,x+1,y,z))addBlockFace(l, createBlockFace(x,y,z,0));
-	if(!getBlock(ba,x-1,y,z))addBlockFace(l, createBlockFace(x,y,z,1));
-	if(!getBlock(ba,x,y+1,z))addBlockFace(l, createBlockFace(x,y,z,2));
-	if(!getBlock(ba,x,y-1,z))addBlockFace(l, createBlockFace(x,y,z,3));
-	if(!getBlock(ba,x,y,z+1))addBlockFace(l, createBlockFace(x,y,z,4));
-	if(!getBlock(ba,x,y,z-1))addBlockFace(l, createBlockFace(x,y,z,5));
+	generateBlockFace(ba, l, x, y, z, 0);
+	generateBlockFace(ba, l, x, y, z, 1);
+	generateBlockFace(ba, l, x, y, z, 2);
+	generateBlockFace(ba, l, x, y, z, 3);
+	generateBlockFace(ba, l, x, y, z, 4);
+	generateBlockFace(ba, l, x, y, z, 5);
 }
 
-void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
+blockFace_struct* findBlockFace(blockFace_struct* l, u8 x, u8 y, u8 z, u8 direction)
+{
+	while(l)
+	{
+		if(l->x==x && l->y==y && l->z==z && l->direction==direction)return l;
+		l=l->next;
+	}
+	return NULL;
+}
+
+void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts)
 {
 	if(!ba)return;
 	
@@ -200,7 +301,153 @@ void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 				generateBlockFaces(ba, l, i, j, k);
 			}
 		}
-	}	
+	}
+
+	if(outskirts)
+	{
+		for(i=o.x;i<o.x+s.x;i++)
+		{
+			for(j=o.y;j<o.y+s.y;j++)
+			{
+				generateBlockFace(ba, l,i,j,o.z-1,4);
+				generateBlockFace(ba, l,i,j,o.z+s.z,5);
+			}
+		}
+
+		for(k=o.z;k<o.z+s.z;k++)
+		{
+			for(j=o.y;j<o.y+s.y;j++)
+			{
+				generateBlockFace(ba, l,o.x-1,j,k,0);
+				generateBlockFace(ba, l,o.x+s.x,j,k,1);
+			}
+		}
+
+		for(k=o.z;k<o.z+s.z;k++)
+		{
+			for(i=o.x;i<o.x+s.x;i++)
+			{
+				generateBlockFace(ba, l,i,o.y-1,k,2);
+				generateBlockFace(ba, l,i,o.y+s.y,k,3);
+			}
+		}
+	}
+}
+
+vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMULTY,v.z*BLOCKMULTZ};}
+
+rectangleList_struct generateOptimizedRectangles(u8* ba)
+{
+	rectangleList_struct rl;
+	initRectangleList(&rl);
+	if(!ba)return rl;
+	int i, j, k;
+	u8 *data1, *data2;
+	s16 cnt1, cnt2;
+	u16 maxSize=max(ROOMARRAYSIZEX, max(ROOMARRAYSIZEY, ROOMARRAYSIZEZ));
+	data1=malloc(maxSize*maxSize*sizeof(u8));if(!data1)return rl;
+	data2=malloc(maxSize*maxSize*sizeof(u8));if(!data2){free(data1);return rl;}
+
+	cnt1=0; cnt2=0;
+	for(i=0;i<ROOMARRAYSIZEX;i++)
+	{
+		for(j=0;j<ROOMARRAYSIZEY;j++)
+		{
+			for(k=0;k<ROOMARRAYSIZEZ;k++)
+			{
+				data1[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i+1,j,k);
+				data2[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i-1,j,k);
+				if(data1[j+k*ROOMARRAYSIZEY])cnt1++;
+				if(data2[j+k*ROOMARRAYSIZEY])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	cnt1=0; cnt2=0;
+	for(j=0;j<ROOMARRAYSIZEY;j++)
+	{
+		for(i=0;i<ROOMARRAYSIZEX;i++)
+		{
+			for(k=0;k<ROOMARRAYSIZEZ;k++)
+			{
+				data1[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j+1,k);
+				data2[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j-1,k);
+				if(data1[i+k*ROOMARRAYSIZEX])cnt1++;
+				if(data2[i+k*ROOMARRAYSIZEX])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	cnt1=0; cnt2=0;
+	for(k=0;k<ROOMARRAYSIZEZ;k++)
+	{
+		for(i=0;i<ROOMARRAYSIZEX;i++)
+		{
+			for(j=0;j<ROOMARRAYSIZEY;j++)
+			{
+				data1[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k+1);
+				data2[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k-1);
+				if(data1[i+j*ROOMARRAYSIZEX])cnt1++;
+				if(data2[i+j*ROOMARRAYSIZEX])cnt2++;
+			}
+		}
+
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k+1)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			cnt2-=s.x*s.y;
+		}
+	}
+
+	if(data1)free(data1);
+	if(data2)free(data2);
+
+	return rl;
 }
 
 vect3D getBlockPosition(u8 x, u8 y, u8 z)
@@ -269,7 +516,8 @@ void drawBlockFace(blockFace_struct* bf)
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
-	applyMTL(wallTexture);
+	if(bf->direction==2)applyMTL(floorTexture);
+	else applyMTL(wallTexture);
 	
 	glPushMatrix();
 	

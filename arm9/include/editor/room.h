@@ -49,7 +49,7 @@ static inline void drawTile(u16 x, u16 y, u16 color)
 }
 
 void drawRoomEdits(void);
-// void initRoomEditor(void);
+void initRoomEditor(void);
 void drawRoomsGame(u8 mode, u16 color);
 void drawRoomsPreview(void);
 void setRoomEditorMode(u8 mode);
@@ -63,7 +63,6 @@ void makeWall(roomEdit_struct* re, vect3D* so, vect3D* ss);
 void swapData(roomEdit_struct* re);
 rectangle_struct* addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, material_struct* mat, bool portalable);
 void generateLightmaps(roomEdit_struct* re, room_struct* r, entityCollection_struct* ec);
-void optimizeRoom(roomEdit_struct* re);
 void changeRoom(roomEdit_struct* re, bool both);
 void wipeMapEdit(void);
 void writeMap(char* filename);

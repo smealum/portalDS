@@ -391,13 +391,6 @@ void rotateCamera(camera_struct* c, vect3D a)
 	// if(c->angle.x<-4096-2048)c->angle.x=-4096-2048;
 }
 
-void updateCameraPreview(room_struct* r, camera_struct* c)
-{
-	if(!c)c=&playerCamera;
-	updatePhysicsObjectRoom(r,&c->object,true);
-	c->position=c->object.position;
-}
-
 bool pointInFrustum(frustum_struct* f, vect3D v)
 {
 	if(!f)f=&playerCamera.frustum;

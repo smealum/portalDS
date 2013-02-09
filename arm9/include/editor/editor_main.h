@@ -10,8 +10,6 @@
 #include "game/camera.h"
 #include "editor/grid.h"
 #include "editor/room.h"
-#include "game/pathfinding.h"
-#include "game/doors.h"
 #include "game/player.h"
 #include "editor/rectangle.h"
 

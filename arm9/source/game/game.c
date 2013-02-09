@@ -8,8 +8,6 @@ bool testStepByStep=false;
 
 PrintConsole bottomScreen;
 
-extern roomEdit_struct roomEdits[NUMROOMEDITS];
-
 // extern md2Model_struct storageCubeModel, companionCubeModel, cubeDispenserModel; //TEMP
 cubeDispenser_struct* testDispenser;
 bigButton_struct* testButton;
@@ -51,8 +49,6 @@ void initGame(void)
 	initVramBanks(1);
 	initTextures();
 	
-	initRoomEditor();
-	
 	initCamera(NULL);
 	
 	initPlayer(NULL);
@@ -74,7 +70,7 @@ void initGame(void)
 	
 	NOGBA("lalala");
 
-	readMap("lalala.map", true);
+	readMap("lalala.map", NULL);
 	
 	currentBuffer=false;
 	
@@ -96,7 +92,7 @@ void initGame(void)
 	//PHYSICS
 	initPI9();
 	
-	getPlayer()->currentRoom=&roomEdits[0].data;
+	getPlayer()->currentRoom=&gameRoom;
 	testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
 	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
@@ -108,9 +104,9 @@ void initGame(void)
 	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET); //TEMP
 	createEmancipationGrid(NULL,vect(0,0,7),TILESIZE*8,false);
 	
-	transferRectangles(&roomEdits[0].data);
+	transferRectangles(&gameRoom);
 	makeGrid();
-	generateRoomGrid(&roomEdits[0].data);
+	generateRoomGrid(&gameRoom);
 	
 	getVramStatus();
 	
@@ -352,7 +348,6 @@ void killGame(void)
 {
 	fadeOut();
 	NOGBA("KILLING IT");
-	wipeMapEdit();
 	freePlayer();
 	freeState(NULL);
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());

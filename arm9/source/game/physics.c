@@ -6,7 +6,6 @@
 
 #define BOXNUM 10
 
-extern roomEdit_struct roomEdits[NUMROOMEDITS];
 extern platform_struct platform[NUMPLATFORMS];
 
 vect3D boxDefinition[]={vect(0,-PLAYERSIZEY,0),
@@ -33,19 +32,6 @@ bool objectInRoom(room_struct* r, physicsObject_struct* o, vect3D* v)
 {
 	if(!r || !o)return false;
 	return pointInRoom(r,o->position,v);
-}
-
-room_struct* getRoomPoint(vect3D p)
-{
-	int i;
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used && pointInRoom(&roomEdits[i].data, p, NULL))
-		{
-			return &roomEdits[i].data;
-		}
-	}
-	return NULL;
 }
 
 vect3D convertCoord(room_struct* r, vect3D p)

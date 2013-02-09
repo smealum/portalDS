@@ -19,50 +19,6 @@
 #define LIGHTCONST (0)
 #define AMBIENTLIGHT (8) //portal is pretty bright, right ?
 
-typedef struct
-{
-	vect3D position, size, lmSize, lmPos, normal;
-	material_struct* material;
-	s16 AARid;
-	bool rot, portalable, hide, touched;
-}rectangle_struct;
-
-typedef struct listCell_struct
-{
-	rectangle_struct data;
-	struct listCell_struct* next;
-}listCell_struct;
-
-typedef struct
-{
-	listCell_struct* first;
-	int num;
-}rectangleList_struct;
-
-typedef struct
-{
-	rectangle_struct** rectangles;
-	light_struct* lights[3];
-	int32 lightDistances[3];
-	u8 numRectangles;
-}gridCell_struct;
-
-typedef struct
-{
-	material_struct** materials;
-	vect3D position;
-	vect3D lmSize;
-	u16 width, height;
-	u8* lightMapBuffer;
-	u8* pathfindingData;
-	void** doorWay;
-	mtlImg_struct* lightMap;
-	lightMapSlots_struct* lmSlot;
-	gridCell_struct* rectangleGrid;
-	vect3D rectangleGridSize;
-	rectangleList_struct rectangles;
-}room_struct;
-
 static inline vect3D reverseConvertVect(vect3D v)
 {
 	return vect((v.x+TILESIZE)/(TILESIZE*2),v.y/HEIGHTUNIT,(v.z+TILESIZE)/(TILESIZE*2));
@@ -78,11 +34,13 @@ static inline vect3D convertSize(vect3D v)
 	return vect(v.x*TILESIZE*2,v.y*HEIGHTUNIT,v.z*TILESIZE*2);
 }
 
+extern room_struct gameRoom;
+
 void initRectangleList(rectangleList_struct* p);
 rectangle_struct* addRectangle(rectangle_struct r, rectangleList_struct* p);
 void initRoom(room_struct* r, u16 w, u16 h, vect3D p);
 void resizeRoom(room_struct* r, u16 l, u16 w, vect3D p);
-// void addRoomRectangle(room_struct* r, entityCollection_struct* ec, rectangle_struct rec, bool portalable);
+rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, material_struct* mat, bool portalable);
 void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size);
 rectangle_struct createRectangle(vect3D pos, vect3D size);
 void removeRectangles(room_struct* r);

@@ -2,6 +2,8 @@
 
 #define A5I3
 
+room_struct gameRoom;
+
 u32* testDL=NULL;
 
 void initRectangleList(rectangleList_struct* p)
@@ -262,9 +264,9 @@ void generateLightmap(rectangle_struct* rec, room_struct* r, u8* b)
 	}else NOGBA("NOTHING?");
 }
 
-void generateLightmaps(roomEdit_struct* re, room_struct* r)
+void generateLightmaps(room_struct* r)
 {
-	if(!re || !r || re->lightUpToDate)return;
+	if(!r)return;
 	listCell_struct *lc=r->rectangles.first;
 	rectangle2DList_struct rl;
 	initRectangle2DList(&rl);
@@ -307,8 +309,6 @@ void generateLightmaps(roomEdit_struct* re, room_struct* r)
 	
 	freeRectangle2DList(&rl);
 	NOGBA("freed.");
-	
-	re->lightUpToDate=true;
 }
 
 void removeRectangles(room_struct* r)

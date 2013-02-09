@@ -63,14 +63,3 @@ void unloadLightMaps(room_struct* r, room_struct* r2)
 		}
 	}
 }
-
-extern roomEdit_struct roomEdits[NUMROOMEDITS];
-
-void unloadAllLightMaps(room_struct* r)
-{
-	int i;
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(!roomEdits[i].used && &roomEdits[i].data!=r && roomEdits[i].data.lmSlot)unloadLightMap(&roomEdits[i].data);
-	}
-}

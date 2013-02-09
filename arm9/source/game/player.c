@@ -334,7 +334,7 @@ void updatePlayer(player_struct* p)
 {
 	if(!p)p=&player;
 	// updatePhysicsObjectRoom(NULL,p->object,true);
-	room_struct* r=getRoomPoint(p->object->position);
+	room_struct* r=&gameRoom;
 	if(r)p->currentRoom=r;
 	if(p->currentRoom)
 	{

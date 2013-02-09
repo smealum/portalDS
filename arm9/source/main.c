@@ -46,8 +46,8 @@ int main(int argc, char **argv)
 	
 	// changeState(&ACOTMenuState);
 	// changeState(&editorState);
-	// changeState(&gameState);
-	changeState(&newEditorState);
+	changeState(&gameState);
+	// changeState(&newEditorState);
 	applyState();
 
 	while(1)

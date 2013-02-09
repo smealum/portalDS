@@ -74,7 +74,9 @@ void initGame(void)
 	initPlatforms();
 	initCubes();
 	initEmancipation();
-		
+	
+	NOGBA("lalala");
+
 	readMap("lalala.map", true);
 	
 	currentBuffer=false;
@@ -293,16 +295,15 @@ static inline void postProcess2(void)
 	u16* p3=portal2.viewPoint;
 
 	u16** stp;
-	u16* scrp=NULL, oscrp=NULL;
 	blueSeen=orangeSeen=false;
+	int oval=0;
 	for(stp=ppStack;stp<stackEnd;stp++)
 	{
-		scrp=(*stp)-p1;
-		int val=(int)scrp;
-		if(val>256*192*2){blueSeen=true;val-=256*192*2;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p3+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-		else if(val>256*192){orangeSeen=true;val-=256*192;scrp=(u16*)val;if((int)scrp-(int)oscrp>0)dmaCopy((void*)((int)p2+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-		else if((int)scrp-(int)oscrp>0){dmaCopy((void*)((int)p1+(int)oscrp*2), (void*)((int)bgGetGfxPtr(mainBG)+(int)oscrp*2), (int)((int)scrp-(int)oscrp)*2);}
-		oscrp=scrp;
+		int val=(int)((*stp)-p1);
+		if(val>256*192*2){blueSeen=true;val-=256*192*2;if(p1[oval-1]==65504)oval--;if(p1[val]==65504)val++;if(val-oval>0)dmaCopy(&(p3[oval]), &(bgGetGfxPtr(mainBG)[oval]), (val-oval)*2);}
+		else if(val>256*192){orangeSeen=true;val-=256*192;if(p1[oval-1]==33791)oval--;if(p1[val]==33791)val++;if(val-oval>0)dmaCopy(&(p2[oval]), &(bgGetGfxPtr(mainBG)[oval]), (val-oval)*2);}
+		else {if(val-oval>0)dmaCopy(&(p1[oval]), &(bgGetGfxPtr(mainBG)[oval]), (val-oval)*2);}
+		oval=val;
 	}
 }
 
@@ -318,7 +319,9 @@ void gameFrame(void)
 			postProcess1();
 			// iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
-			iprintf("full : %d   \n",cpuEndTiming());
+
+			if(keysDown()&KEY_SELECT)testStepByStep^=1; //TEMP
+			iprintf("full : %d (%d)  \n",cpuEndTiming(),testStepByStep);
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;
@@ -342,8 +345,8 @@ void gameFrame(void)
 			break;
 	}
 	
-	if(testStepByStep){while(!(keysUp()&KEY_TOUCH))scanKeys();scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
-	else if(keysDown()&KEY_SELECT)testStepByStep=true;
+	// if(testStepByStep){while(!(keysUp()&KEY_TOUCH))scanKeys();scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
+	// else if(keysDown()&KEY_SELECT)testStepByStep=true;
 	
 	currentBuffer^=1;
 }

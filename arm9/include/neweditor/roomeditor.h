@@ -8,7 +8,7 @@ typedef struct
 	bool active, selecting, planar;
 }selection_struct;
 
-void initRoomEditor(void);
+void initRoomEdition(void);
 void drawRoomEditor(void);
 void freeRoomEditor(void);
 void updateRoomEditor(void);

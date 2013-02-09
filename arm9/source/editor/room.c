@@ -9,21 +9,21 @@ entity_struct *currentEntity;
 vect3D selectionOrigin,selectionSize;
 u8 selectionMode, oldSelectionMode;
 
-// void initRoomEditor(void)
-// {
-	// int i;
-	// for(i=0;i<NUMROOMEDITS;i++)
-	// {
-		// initRoomEdit(&roomEdits[i]);
-		// roomEdits[i].id=i;
-	// }
-	// roomEditorMode=0;
-	// oldEditorMode=0;
-	// currentEntity=NULL;
-	// currentRoom=NULL;
-	// selectedRoom=oldSelectedRoom=NULL;
-	// selectionMode=oldSelectionMode=0;
-// }
+void initRoomEditor(void)
+{
+	int i;
+	for(i=0;i<NUMROOMEDITS;i++)
+	{
+		initRoomEdit(&roomEdits[i]);
+		roomEdits[i].id=i;
+	}
+	roomEditorMode=0;
+	oldEditorMode=0;
+	currentEntity=NULL;
+	currentRoom=NULL;
+	selectedRoom=oldSelectedRoom=NULL;
+	selectionMode=oldSelectionMode=0;
+}
 
 void initRoomEdit(roomEdit_struct* re)
 {
@@ -1198,6 +1198,7 @@ void readRoom(FILE* f, bool game)
 void readMap(char* filename, bool game)
 {
 	char fn[1024];
+	NOGBA("hmm");
 	FILE* f=NULL;
 	if(fsMode==1||fsMode==2)
 	{
@@ -1219,6 +1220,7 @@ void readMap(char* filename, bool game)
 		NOGBA("lala : %s",fn);
 		f=fopen(fn,"rb");
 	}
+	NOGBA("hmmm");
 	if(!f)return;
 	int k;
 	fread(&k,sizeof(int),1,f);

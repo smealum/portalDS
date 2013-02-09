@@ -124,7 +124,7 @@ void drawPortal(portal_struct* p)
 		glPushMatrix();
 			const vect3D v=p->position;
 			glTranslate3f32(v.x,v.y,v.z);
-			drawPolygonStrip(p->outline,p->color,p->outlineColor);
+			drawPolygonStrip(p->outline,p->innerOutlineColor,p->outlineColor);
 		glPopMatrix(1);
 	}
 	else
@@ -136,7 +136,7 @@ void drawPortal(portal_struct* p)
 			unbindMtl();
 			GFX_COLOR=p->color;
 			drawPolygon(p->unprojectedPolygon);
-			drawPolygonStrip(p->unprojectedOutline,p->color,p->outlineColor);
+			drawPolygonStrip(p->unprojectedOutline,p->innerOutlineColor,p->outlineColor);
 		glPopMatrix(1);
 	}
 }
@@ -239,6 +239,8 @@ void updatePortal(portal_struct* p)
 	
 	const u16 range=10;
 	s8 x=abs((((p->animCNT)/2)%(range*2))-range)-range/2;
+
+	p->innerOutlineColor=(p->color==RGB15(31,31,0))?(RGB15(27,27,0)):(RGB15(0,27,27));
 	p->outlineColor=(p->color==RGB15(31,31,0))?(RGB15(31,16+x,0)):(RGB15(0,16+x,31));
 	
 	p->animCNT++;

@@ -571,7 +571,7 @@ void drawRectangleList(rectangleList_struct* rl)
 	GFX_COLOR=RGB15(31,31,31);
 	while(lc)
 	{
-		drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false);
+		drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),true);
 		lc=lc->next;
 	}
 }
@@ -968,7 +968,7 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	if(!r)return;
 	entity_struct *l1, *l2, *l3;
 	int32 d1, d2, d3;
-	vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
+	// vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
 	// getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
 	gridCell_struct* gc=getCurrentCell(r, pos);
 	if(!gc)return;

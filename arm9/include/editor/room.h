@@ -49,7 +49,7 @@ static inline void drawTile(u16 x, u16 y, u16 color)
 }
 
 void drawRoomEdits(void);
-// void initRoomEditor(void);
+void initRoomEditor(void);
 void drawRoomsGame(u8 mode, u16 color);
 void drawRoomsPreview(void);
 void setRoomEditorMode(u8 mode);

@@ -27,7 +27,7 @@ void initNewEditor(void)
 	initVramBanks(1);
 	initTextures();
 	
-	initRoomEditor();
+	initRoomEdition();
 }
 
 int cnd=0;

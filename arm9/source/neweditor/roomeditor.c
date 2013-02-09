@@ -23,7 +23,7 @@ void initSelection(selection_struct* s)
 	s->active=false;
 }
 
-void initRoomEditor(void)
+void initRoomEdition(void)
 {
 	initBlocks();
 	initEditorRoom(&editorRoom);
@@ -208,7 +208,7 @@ void updateRoomEditor(void)
 	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
 	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
 	
-	if(keysHeld() & KEY_START)editorRoom.rectangleList=generateOptimizedRectangles(editorRoom.blockArray);
+	if(keysHeld() & KEY_START){editorRoom.rectangleList=generateOptimizedRectangles(editorRoom.blockArray);NOGBA("%d",editorRoom.rectangleList.num);}
 	
 	if(keysDown() & KEY_TOUCH)
 	{

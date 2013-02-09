@@ -3,6 +3,18 @@
 	{
 		"selected_items":
 		[
+			[
+				"edit",
+				"editorSelection"
+			],
+			[
+				"fre",
+				"freeBlockFace"
+			],
+			[
+				"y",
+				"y"
+			]
 		]
 	},
 	"buffers":
@@ -11,7 +23,7 @@
 			"file": "arm9/source/neweditor/blocks.c",
 			"settings":
 			{
-				"buffer_size": 7761,
+				"buffer_size": 8441,
 				"line_ending": "Unix"
 			}
 		},
@@ -19,7 +31,7 @@
 			"file": "arm9/include/neweditor/blocks.h",
 			"settings":
 			{
-				"buffer_size": 1079,
+				"buffer_size": 1397,
 				"line_ending": "Unix"
 			}
 		},
@@ -35,7 +47,7 @@
 			"file": "arm9/source/neweditor/roomeditor.c",
 			"settings":
 			{
-				"buffer_size": 6783,
+				"buffer_size": 9342,
 				"line_ending": "Windows"
 			}
 		},
@@ -43,7 +55,7 @@
 			"file": "arm9/include/neweditor/roomeditor.h",
 			"settings":
 			{
-				"buffer_size": 284,
+				"buffer_size": 309,
 				"line_ending": "Windows"
 			}
 		}
@@ -51,9 +63,13 @@
 	"build_system": "Packages/User/devkitarm.sublime-build",
 	"command_palette":
 	{
-		"height": 127.0,
+		"height": 75.0,
 		"selected_items":
 		[
+			[
+				"packe",
+				"Package Control: Enable Package"
+			],
 			[
 				"packin",
 				"Package Control: Install Package"
@@ -83,7 +99,7 @@
 				"View: Toggle Menu"
 			]
 		],
-		"width": 400.0
+		"width": 449.0
 	},
 	"console":
 	{
@@ -100,6 +116,12 @@
 	},
 	"file_history":
 	[
+		"/partages/telesun/rabetj/partage/Bureau/Sublime Text 2/Data/Packages/User/devkitarm.sublime-build",
+		"/partages/telesun/rabetj/partage/Bureau/Sublime Text 2/Data/Packages/Default/Default (Windows).sublime-mousemap",
+		"/partages/telesun/rabetj/partage/Bureau/Sublime Text 2/Data/Packages/Default/Default (Linux).sublime-mousemap",
+		"/partages/telesun/rabetj/partage/Bureau/Sublime Text 2/Data/Packages/Default/Default (Linux).sublime-keymap",
+		"/partages/telesun/rabetj/partage/Bureau/Sublime Text 2/Data/Packages/Default/Default (Windows).sublime-keymap",
+		"/home/rabetj/Bureau/devkitpro/portalDS/portalDS/Makefile",
 		"/C/devkitPro/portalDS/arm7/include/PI7.h",
 		"/C/devkitPro/portalDS/arm7/source/PI7.c",
 		"/C/devkitPro/portalDS/arm7/include/OBB.h",
@@ -137,6 +159,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"NORMAL_PACK",
+			"x",
+			"o",
+			"i",
+			"x",
 			"path",
 			"col",
 			"ctrl",
@@ -166,7 +193,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -174,15 +201,15 @@
 					"file": "arm9/source/neweditor/blocks.c",
 					"settings":
 					{
-						"buffer_size": 7761,
+						"buffer_size": 8441,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1824,
+								1824
 							]
 						],
 						"settings":
@@ -201,15 +228,15 @@
 					"file": "arm9/include/neweditor/blocks.h",
 					"settings":
 					{
-						"buffer_size": 1079,
+						"buffer_size": 1397,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1186,
+								1186
 							]
 						],
 						"settings":
@@ -234,8 +261,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								175,
+								175
 							]
 						],
 						"settings":
@@ -254,15 +281,15 @@
 					"file": "arm9/source/neweditor/roomeditor.c",
 					"settings":
 					{
-						"buffer_size": 6783,
+						"buffer_size": 9342,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2089,
-								2089
+								6832,
+								6832
 							]
 						],
 						"settings":
@@ -271,7 +298,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 486.0,
+						"translation.y": 2988.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -281,7 +308,7 @@
 					"file": "arm9/include/neweditor/roomeditor.h",
 					"settings":
 					{
-						"buffer_size": 284,
+						"buffer_size": 309,
 						"regions":
 						{
 						},
@@ -380,7 +407,7 @@
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 123.0,
+	"side_bar_visible": false,
+	"side_bar_width": 139.0,
 	"status_bar_visible": true
 }

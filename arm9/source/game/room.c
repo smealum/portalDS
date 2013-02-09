@@ -9,10 +9,6 @@ void drawRoomsGame(u8 mode, u16 color)
 	drawRoom(&gameRoom,((1)<<3)|((gameRoom.lmSlot!=0)<<2)|(1)|(mode), color);
 }
 
-int oldpx, oldpy;
-extern int32 gridScale;
-bool moving=false;
-
 //WRITE AREA
 
 void writeRectangle(rectangle_struct* rec, FILE* f)

@@ -1,4 +1,4 @@
-#include "neweditor/editor.h"
+#include "editor/editor_main.h"
 
 blockFace_struct* blockFacePool=NULL;
 blockFace_struct* blockFacePoolHead=NULL;

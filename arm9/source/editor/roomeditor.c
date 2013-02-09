@@ -1,4 +1,4 @@
-#include "neweditor/editor.h"
+#include "editor/editor_main.h"
 
 #define TOUCHSPEEDX (-32)
 #define TOUCHSPEEDY (32)

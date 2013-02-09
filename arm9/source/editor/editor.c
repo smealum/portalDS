@@ -1,4 +1,4 @@
-#include "neweditor/editor.h"
+#include "editor/editor_main.h"
 
 void editorVBL(void)
 {

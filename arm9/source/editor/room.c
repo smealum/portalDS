@@ -37,80 +37,6 @@ void initRoomEdit(roomEdit_struct* re)
 	}
 }
 
-void swapData(roomEdit_struct* re)
-{
-	if(!re)re=selectedRoom;
-	if(re)re->floor^=1;
-}
-
-void moveData(s8 v, roomEdit_struct* re, vect3D* so, vect3D* ss)
-{
-	if(!v || selectionMode!=2)return;
-	if(!re)re=selectedRoom;
-	if(!so || !ss)
-	{
-		so=&selectionOrigin;
-		ss=&selectionSize;
-	}
-	if(re && so && ss)
-	{
-		int i;
-		u8* data=re->data.floor;
-		if(!re->floor)data=re->data.ceiling;
-		for(i=so->x;i<so->x+ss->x;i++)
-		{
-			int j;
-			for(j=so->y;j<so->y+ss->y;j++)
-			{
-				if(data[i+j*re->data.width]+v>=MAXHEIGHT)data[i+j*re->data.width]=MAXHEIGHT;
-				else if(data[i+j*re->data.width]+v<=0)data[i+j*re->data.width]=0;
-				else data[i+j*re->data.width]+=v;
-			}		
-		}
-		changeRoom(re,true);
-	}
-}
-
-void applyMaterial(material_struct* mat, roomEdit_struct* re, vect3D* so, vect3D* ss)
-{
-	if(selectionMode!=2)return;
-	if(!re)re=selectedRoom;
-	if(!so || !ss)
-	{
-		so=&selectionOrigin;
-		ss=&selectionSize;
-	}
-	if(re && so && ss)
-	{
-		int i;
-		material_struct** data=re->data.materials;
-		for(i=so->x;i<so->x+ss->x;i++)
-		{
-			int j;
-			for(j=so->y;j<so->y+ss->y;j++)
-			{
-				data[i+j*re->data.width]=mat;
-			}		
-		}
-		changeRoom(re,true);
-	}
-}
-
-void changeRoom(roomEdit_struct*re, bool both){if(!re)return;if(both){re->quadsUpToDate=false;removeRectangles(&re->data);}re->lightUpToDate=false;}
-
-void makeWall(roomEdit_struct* re, vect3D* so, vect3D* ss)
-{
-	if(!re)re=selectedRoom;
-	if(re)
-	{
-		bool r=re->floor;
-		re->floor=false;
-		moveData(-31,re,so,ss);
-		re->floor=r;
-		changeRoom(re,true);
-	}
-}
-
 roomEdit_struct* createRoomEdit(vect3D position, vect3D size)
 {
 	int i;
@@ -121,8 +47,6 @@ roomEdit_struct* createRoomEdit(vect3D position, vect3D size)
 			roomEdit_struct* re=&roomEdits[i];
 			re->used=true;
 			re->floor=true;
-			re->data.floor=NULL;
-			re->data.ceiling=NULL;
 			re->selected=false;
 			re->position=position;
 			re->quadsUpToDate=false;
@@ -204,101 +128,6 @@ void drawRectangle(vect3D position, vect3D size, u16 width, bool cull)
 	glPopMatrix(1);
 }
 
-void drawRoomEdit(roomEdit_struct* re)
-{
-	if(re && re->used)
-	{
-		unbindMtl();
-		if(re->selected)glColor3b(255,0,0);
-		else glColor3b(255,201,14);
-		
-		drawRectangle(vect(re->position.x,re->position.y,32), re->size, OUTLINEWIDTH, true);
-		
-		if(re->selected)
-		{
-			glPushMatrix();
-				glTranslate3f32(re->position.x*(1<<9),re->position.y*(1<<9),0);
-				int w=min(re->data.width,re->size.x);
-				int h=min(re->data.height,re->size.y);
-				int j;
-				for(j=0;j<h;j++)
-				{
-					int i;
-					for(i=0;i<w;i++)
-					{
-						if(re->data.floor[i+j*re->data.width]>=re->data.ceiling[i+j*re->data.width])
-						{
-							//wall
-							drawTile(i, j, RGB15(22,0,0));
-						}else{
-							int v;
-							if(re->floor)v=re->data.floor[i+j*re->data.width];
-							else v=re->data.ceiling[i+j*re->data.width];
-							drawTile(i, j, RGB15(v,v,v));
-						}
-					}
-					for(;i<re->size.x;i++)
-					{
-						drawTile(i, j, RGB15(0,0,0));
-					}
-				}
-				for(j=0;j<re->size.y;j++)
-				{
-					int i;
-					for(i=0;i<re->size.x;i++)
-					{
-						drawTile(i, j, RGB15(0,0,0));
-					}
-				}
-				drawEntityCollection(&re->entityCollection);
-			glPopMatrix(1);
-		}
-		
-		/*glBegin(GL_QUADS);
-			glColor3b(200,200,0);
-		
-			glVertex3v16(0, inttof32(1), 0);
-			glVertex3v16(inttof32(1), inttof32(1), 0);
-			glVertex3v16(inttof32(1), 0, 0);
-			glVertex3v16(0, 0, 0);
-		
-		glPopMatrix(1);*/
-	}
-}
-
-void drawRoomEdits(void)
-{
-	int i;
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used)drawRoomEdit(&roomEdits[i]);
-	}
-	if(selectionMode==2 && selectedRoom)
-	{
-		unbindMtl();
-		GFX_COLOR=RGB15(0,31,0);
-		drawRectangle(vect(selectionOrigin.x+selectedRoom->position.x,selectionOrigin.y+selectedRoom->position.y,48), selectionSize, SELECTIONOUTLINEWIDTH, true);
-	}
-}
-
-void drawRoomsPreview(void)
-{
-	int i;
-	unbindMtl();
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used)
-		{
-			drawRoom(&roomEdits[i].data,((roomEdits[i].lightUpToDate&&roomEdits[i].selected)<<1)|(roomEdits[i].quadsUpToDate), 0);
-			glPushMatrix();
-				glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
-				renderEntityCollection(&roomEdits[i].entityCollection);
-			glPopMatrix(1);
-		}
-	}
-}
-
 void drawRoomsGame(u8 mode, u16 color)
 {
 	int i;
@@ -309,13 +138,6 @@ void drawRoomsGame(u8 mode, u16 color)
 		if(roomEdits[i].used)
 		{
 			drawRoom(&roomEdits[i].data,((1)<<3)|((roomEdits[i].data.lmSlot!=0)<<2)|(1)|(mode), color);
-			// glPushMatrix();
-				// glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
-				// renderEntityCollection(&roomEdits[i].entityCollection);
-			// glPopMatrix(1);
-			glPushMatrix();
-				glTranslate3f32(TILESIZE*2*roomEdits[i].data.position.x, 0, TILESIZE*2*roomEdits[i].data.position.y);
-			glPopMatrix(1);
 		}
 	}
 }
@@ -460,101 +282,9 @@ void writeRectangles(room_struct* r, FILE* f)
 	}
 }
 
-void writeEntity(entity_struct* e, FILE* f)
-{
-	if(!e || !f)return;
-	
-	fwrite(&e->type,sizeof(entity_type),1,f);
-	writeVect(&e->position,f);
-	
-	switch(e->type)
-	{
-		case lightEntity:
-			fwrite(e->data,sizeof(lightData_struct),1,f);
-			break;
-		case enemyEntity:
-			fwrite(e->data,sizeof(enemyData_struct),1,f);
-			break;
-	}
-}
-
-void writeEntityCollection(entityCollection_struct* ec, FILE* f)
-{
-	if(!ec || !f)return;
-	int i;
-	for(i=0;i<ENTITYCOLLECTIONNUM;i++)
-	{
-		if(ec->entity[i].used)
-		{
-			writeEntity(&ec->entity[i], f);
-		}
-	}
-}
-
-void convertMaterialArray(roomEdit_struct* re, u16* mat)
-{
-	int i, j;
-	for(i=0;i<re->size.x;i++)
-	{
-		for(j=0;j<re->size.y;j++)
-		{
-			mat[i+j*re->size.x]=getMaterialID(re->data.materials[i+j*re->size.x]);
-		}
-	}
-}
-
-void writeRoom(roomEdit_struct* re, FILE* f)
-{
-	if(!re || !f)return;
-	if(!re->quadsUpToDate || !re->lightUpToDate){return;}//temp
-	
-	fwrite(&re->id, sizeof(s16), 1, f);
-	
-	writeVect(&re->position,f);
-	writeVect(&re->size,f);
-	writeVect(&re->data.lmSize,f);
-	
-	fwrite(&re->data.rectangles.num, sizeof(int), 1, f);
-	fwrite(&re->entityCollection.num, sizeof(u16), 1, f);
-	
-	u16* mat=malloc(sizeof(u16)*re->size.x*re->size.y);
-	
-	if(mat)convertMaterialArray(re, mat);
-	
-	fwrite(re->data.floor,sizeof(u8),re->size.x*re->size.y,f);
-	fwrite(re->data.ceiling,sizeof(u8),re->size.x*re->size.y,f);
-	fwrite(mat,sizeof(u16),re->size.x*re->size.y,f);
-	fwrite(re->data.lightMapBuffer,sizeof(u8),re->data.lmSize.x*re->data.lmSize.y,f);
-	
-	if(mat)free(mat);
-	
-	writeRectangles(&re->data, f);
-	writeEntityCollection(&re->entityCollection, f);
-}
+//READ AREA
 
 extern char* basePath;
-
-void writeMap(char* filename)
-{
-	int i;
-	char fn[1024];
-	sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
-	FILE* f=fopen(fn,"wb");
-	if(!f)return;
-	
-	int k=0;for(i=0;i<NUMROOMEDITS;i++)if(roomEdits[i].used)k++;
-	
-	fwrite(&k,sizeof(int),1,f);
-	
-	for(i=0;i<NUMROOMEDITS;i++)
-	{
-		if(roomEdits[i].used)writeRoom(&roomEdits[i], f);
-	}
-	
-	fclose(f);
-}
-
-//READ AREA
 
 void readRectangle(rectangle_struct* rec, FILE* f)
 {
@@ -653,8 +383,9 @@ void readRoom(FILE* f, bool game)
 	
 	u16* mat=malloc(sizeof(u16)*re->size.x*re->size.y);
 	
-	fread(re->data.floor,sizeof(u8),re->size.x*re->size.y,f);
-	fread(re->data.ceiling,sizeof(u8),re->size.x*re->size.y,f);
+	fseek(f,sizeof(u8)*re->size.x*re->size.y, SEEK_CUR);
+	fseek(f,sizeof(u8)*re->size.x*re->size.y, SEEK_CUR);
+
 	fread(mat,sizeof(u16),re->size.x*re->size.y,f);
 	
 	convertBackMaterialArray(re,mat);

@@ -40,9 +40,6 @@ void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, devic
 	initModelInstance(&ed->modelInstance, type?(&energyLauncherModel):(&energyCatcherModel));
 	ed->orientation=or;
 	
-	if(or==pY)pos.y=getHeightValue(r,pos,true);
-	else if(or==mY)pos.y=getHeightValue(r,pos,false);
-	
 	ed->surface=NULL;
 	
 	{//for collisions

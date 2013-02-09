@@ -26,8 +26,6 @@ void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 	
 	initModelInstance(&bb->modelInstance,&bigButtonModel);
 	
-	pos.y=getHeightValue(r,pos,true);
-	
 	{//for collisions
 		rectangle_struct rec;
 		rectangle_struct* recp;

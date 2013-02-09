@@ -49,8 +49,6 @@ typedef struct
 
 typedef struct
 {
-	u8* floor;
-	u8* ceiling;
 	material_struct** materials;
 	vect3D position;
 	vect3D lmSize;

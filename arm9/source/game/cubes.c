@@ -23,8 +23,6 @@ void initCubeDispenser(room_struct* r, cubeDispenser_struct* cd, vect3D pos, boo
 	
 	initModelInstance(&cd->modelInstance,&cubeDispenserModel);
 	
-	pos.y=getHeightValue(r,pos,false);
-	
 	{//for collisions
 		rectangle_struct rec;
 		rectangle_struct* recp;

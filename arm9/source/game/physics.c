@@ -63,33 +63,6 @@ vect3D convertCoord(room_struct* r, vect3D p)
 	return rp;
 }
 
-s16 updateSimplePhysicsObjectRoom(room_struct* r, physicsObject_struct* o)
-{
-	s16 v1=-1;
-	if(r && o)
-	{
-		// o->speed.y-=GRAVITY;
-		// vect3D p=addVect(o->position,vect(0,0,0));
-		
-		// collidePoint(r,p,&o->speed,true,true);
-		
-		vect3D t2=vectDivInt(o->position,TILESIZE*2);
-		v1=r->floor[t2.x+t2.z*r->width];
-		o->position.y=v1*HEIGHTUNIT+16;
-		// vect3D* v=&o->speed;
-		// if(v1*HEIGHTUNIT>=p.y+v->y){v->y=v1*HEIGHTUNIT-p.y+16;}
-		// else{
-			// u8 v2=r->ceiling[t2.x+t2.z*r->width];
-			// p=addVect(o->position,vect(0,PLAYERSIZEY2,0));
-			// if(v2*HEIGHTUNIT<p.y+v->y){v->y=v2*HEIGHTUNIT-p.y-4;}
-		// }
-	}
-	
-	o->position=addVect(o->position,o->speed);
-	o->speed=vect(0,0,0);
-	return v1;
-}
-
 bool boxInRoom(room_struct* r, physicsObject_struct* o)
 {
 	int j;
@@ -257,56 +230,4 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 	else {o->speed.x-=o->speed.x/32;o->speed.z-=o->speed.z/32;} //air friction
 	if(abs(o->speed.x)<3)o->speed.x=0;
 	if(abs(o->speed.z)<3)o->speed.z=0;
-}
-
-void updatePhysicsObject(physicsObject_struct* o)
-{
-	if(o)
-	{
-		// o->speed.y-=GRAVITY;
-		// bool changed=false;
-		/*int i;
-		for(i=0;i<NUMROOMEDITS;i++)
-		{
-			if(roomEdits[i].used && boxInRoom(&roomEdits[i].data,o))
-			{
-				int j;
-				for(j=0;j<BOXNUM;j++)
-				{
-					vect3D p=addVect(o->position,boxDefinition[j]);
-					// vect3D t;
-					// if(pointInRoom(&roomEdits[i].data,p,&t))
-					{
-						collidePoint(&roomEdits[i].data,p,&o->speed,!j, false);
-					}
-				}
-			}
-		}
-		o->position=addVect(o->position,vect(o->speed.x,0,o->speed.z));
-		o->speed=vect(0,o->speed.y,0);
-		for(i=0;i<NUMROOMEDITS;i++)
-		{
-			vect3D t;
-			if(roomEdits[i].used)
-			{
-				vect3D p=addVect(o->position,vect(0,-PLAYERSIZEY,0));
-				if(pointInRoom(&roomEdits[i].data,p,&t))
-				{
-					room_struct* r=&roomEdits[i].data;
-					vect3D t2=vectDivInt(t,TILESIZE*2);
-					u8 v1=r->floor[t2.x+t2.z*r->width];
-					vect3D* v=&o->speed;
-					if(v1*HEIGHTUNIT>=p.y+v->y){changed=true;v->y=v1*HEIGHTUNIT-p.y+4;break;}
-					u8 v2=r->ceiling[t2.x+t2.z*r->width];
-					p=addVect(o->position,vect(0,PLAYERSIZEY2,0));
-					if(v2*HEIGHTUNIT<p.y+v->y){changed=true;v->y=v2*HEIGHTUNIT-p.y-4;break;}
-					break;
-				}
-			}
-		}*/
-		o->position=addVect(o->position,o->speed);
-		// o->speed=vect(0,o->speed.y,0);
-		// if(changed)o->speed.y/=2;
-		o->speed=vect(0,0,0);
-	}
 }

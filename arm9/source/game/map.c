@@ -603,11 +603,9 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	
 	if(r->height && r->width)
 	{
-		r->floor=malloc(r->height*r->width);
-		r->ceiling=malloc(r->height*r->width);
 		r->materials=malloc(r->height*r->width*sizeof(material_struct*));
-		int i;for(i=0;i<r->height*r->width;i++){r->floor[i]=DEFAULTFLOOR;r->ceiling[i]=DEFAULTCEILING;r->materials[i]=NULL;}
-	}else {r->floor=r->ceiling=NULL;}
+		int i;for(i=0;i<r->height*r->width;i++){r->materials[i]=NULL;}
+	}else {r->materials=NULL;}
 	
 	r->lightMap=NULL;
 	r->lightMapBuffer=NULL;
@@ -691,39 +689,6 @@ void generateRoomGrid(room_struct* r)
 		{
 			generateGridCell(r,&r->rectangleGrid[i+j*r->rectangleGridSize.x],i,j);
 		}
-	}
-}
-
-u8 getHeightValue(room_struct* r, vect3D pos, bool floor)
-{
-	if(!r)return 0;
-	if(pos.x<0 || pos.z<0 || pos.x>=r->width || pos.z>=r->height)return 0;
-	return floor?(r->floor[pos.x+pos.z*r->width]):(r->ceiling[pos.x+pos.z*r->width]);
-}
-
-void resizeRoom(room_struct* r, u16 w, u16 h, vect3D p)
-{
-	if(r)
-	{
-		if(!r->height || ! r->width || !r->floor || !r->ceiling){initRoom(r, w, h, p);return;}
-		int i, j;
-		int h2=h, w2=w;
-		r->position=p;
-		u8* temp1=r->floor;
-		u8* temp2=r->ceiling;
-		material_struct** temp3=r->materials;
-		r->floor=malloc(h*w);
-		r->ceiling=malloc(h*w);
-		r->materials=malloc(sizeof(material_struct*)*h*w);
-		if(w>r->width)w2=r->width;
-		if(h>r->height)h2=r->height;
-		for(j=0;j<h2;j++){for(i=0;i<w2;i++){r->floor[i+j*w]=temp1[i+j*r->width];r->ceiling[i+j*w]=temp2[i+j*r->width];r->materials[i+j*w]=temp3[i+j*r->width];}for(;i<w;i++){r->floor[i+j*w]=DEFAULTFLOOR;r->ceiling[i+j*w]=DEFAULTCEILING;r->materials[i+j*w]=NULL;}}
-		for(;j<h;j++)for(i=0;i<w;i++){r->floor[i+j*w]=DEFAULTFLOOR;r->ceiling[i+j*w]=DEFAULTCEILING;r->materials[i+j*w]=NULL;}
-		r->height=h;
-		r->width=w;
-		free(temp1);
-		free(temp2);
-		free(temp3);
 	}
 }
 
@@ -827,8 +792,6 @@ void freeRoom(room_struct* r)
 {
 	if(r)
 	{
-		if(r->floor)free(r->floor);
-		if(r->ceiling)free(r->ceiling);
 		if(r->materials)free(r->materials);
 		if(r->rectangleGrid)
 		{
@@ -839,8 +802,6 @@ void freeRoom(room_struct* r)
 			}
 			free(r->rectangleGrid);
 		}
-		r->floor=NULL;
-		r->ceiling=NULL;
 		r->materials=NULL;
 		if(r->lightMapBuffer)free(r->lightMapBuffer);
 		r->lightMapBuffer=NULL;

@@ -51,8 +51,6 @@ void initGame(void)
 	initVramBanks(1);
 	initTextures();
 	
-	initPathfindingGlobal();
-	
 	initRoomEditor();
 	
 	initCamera(NULL);

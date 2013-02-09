@@ -573,40 +573,6 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 }
 
-bool compare(room_struct* r, u8 v, int i, int j)
-{
-	if(i<0 || j<0 || i>r->width-1 || j>r->height-1)return false;
-	u8 v2=r->floor[i+j*r->width];
-	u8 v3=r->ceiling[i+j*r->width];
-	if(v2>=v3)return false;
-	return (v2<=v+MAXSTEP);
-}
-
-void getPathfindingData(room_struct* r)
-{
-	if(!r)return;
-	// if(r->pathfindingData)free(r->pathfindingData);
-	r->pathfindingData=malloc(sizeof(u8)*r->width*r->height);
-	if(!r->pathfindingData)return;
-	int i, j;
-	for(i=0;i<r->width;i++)
-	{
-		for(j=0;j<r->height;j++)
-		{
-			u8 v=r->floor[i+j*r->width];
-			u8* v2=&r->pathfindingData[i+j*r->width];
-			*v2=0;
-			if(compare(r, v, i, j-1))*v2|=DIRUP;
-			if(compare(r, v, i, j+1))*v2|=DIRDOWN;
-			if(compare(r, v, i-1, j))*v2|=DIRLEFT;
-			if(compare(r, v, i+1, j))*v2|=DIRRIGHT;
-			// if(i==5)NOGBA("v %d : %d %d %d %d",j,(*v2)&DIRUP,(*v2)&DIRDOWN,(*v2)&DIRLEFT,(*v2)&DIRRIGHT);
-			// *v2=DIRUP|DIRDOWN|DIRLEFT|DIRRIGHT;
-		}
-	}
-	NOGBA("got PF data %d %d",r->width,r->height);
-}
-
 void initRoomGrid(room_struct* r)
 {
 	if(!r)return;

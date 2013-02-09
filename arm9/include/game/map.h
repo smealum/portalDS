@@ -97,8 +97,6 @@ bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, i
 rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n);
 rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i);
 
-void getPathfindingData(room_struct* r);
-
 u8 getHeightValue(room_struct* r, vect3D pos, bool floor);
 
 u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull);

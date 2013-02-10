@@ -9,6 +9,7 @@ typedef struct
 	bool active, selecting, planar;
 }selection_struct;
 
+extern selection_struct editorSelection;
 
 void initSelection(selection_struct* s);
 void drawSelection(selection_struct* s);

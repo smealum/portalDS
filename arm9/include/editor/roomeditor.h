@@ -6,4 +6,6 @@ void drawRoomEditor(void);
 void freeRoomEditor(void);
 void updateRoomEditor(void);
 
+void switchScreens(void);
+
 #endif

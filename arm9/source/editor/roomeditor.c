@@ -5,7 +5,6 @@
 
 camera_struct editorCamera;
 editorRoom_struct editorRoom;
-extern selection_struct editorSelection;
 
 vect3D editorTranslation;
 int32 editorScale;
@@ -48,7 +47,7 @@ void initRoomEdition(void)
 	glSetOutlineColor(1,RGB15(29,15,3));
 
 	//TEMP entity test
-	createEntity(vect(32,32,32));
+	createEntity(vect(32,32,32), 0, true);
 }
 
 void updateEditorCamera(void)
@@ -144,7 +143,7 @@ void switchScreens(void)
 void roomEditorCursor(selection_struct* sel)
 {
 	if(!sel)sel=&editorSelection;
-	if(keysDown() & KEY_TOUCH)
+	if((keysDown() & KEY_TOUCH) && !(sel->entity && !sel->entity->placed))
 	{
 		u8 type;
 		void* ptr=getBlockEntityTouch(&type);
@@ -187,6 +186,7 @@ void roomEditorCursor(selection_struct* sel)
 				if(bf)
 				{
 					sel->entity->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
+					sel->entity->placed=true;
 				}
 			}else{
 				if(sel->selecting)

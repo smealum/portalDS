@@ -125,7 +125,8 @@ void drawSelection(selection_struct* s)
 			GFX_VERTEX10=*vtxPtr++;
 			GFX_VERTEX10=*vtxPtr++;		
 		glPopMatrix(1);
-	}else{
+	}else if(!(s->entity && !s->entity->placed))
+	{
 		u32* vtxPtr=(u32*)packedVertex;
 		
 		unbindMtl();

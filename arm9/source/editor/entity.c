@@ -42,23 +42,31 @@ void initEntities(void)
 	initEntityTypes();
 }
 
-void initEntity(entity_struct* e, vect3D pos)
+void initEntity(entity_struct* e, entityType_struct* et, vect3D pos, bool placed)
 {
 	if(!e)return;
 
 	e->position=pos;
-	e->type=NULL;
+	e->type=et;
+	e->placed=placed;
 	e->used=true;
 }
 
-entity_struct* createEntity(vect3D pos)
+void changeEntityType(entity_struct* e, u8 type)
 {
+	if(!e || type>=NUMENTITYTYPES)return;
+	e->type=&entityTypes[type];
+}
+
+entity_struct* createEntity(vect3D pos, u8 type, bool placed)
+{
+	if(type>=NUMENTITYTYPES)return NULL;
 	int i;
 	for(i=0;i<NUMENTITIES;i++)
 	{
 		if(!entity[i].used)
 		{
-			initEntity(&entity[i], pos);
+			initEntity(&entity[i], &entityTypes[type], pos, placed);
 			return &entity[i];
 		}
 	}
@@ -101,7 +109,7 @@ extern camera_struct editorCamera;
 
 void drawEntity(entity_struct* e)
 {
-	if(!e)return;
+	if(!e || !e->placed)return;
 	entityType_struct* et=e->type;
 	if(!et)et=&entityTypes[0];
 
@@ -113,13 +121,13 @@ void drawEntity(entity_struct* e)
 		untransformCamera(&editorCamera);
 		applyMTL(et->spriteTexture);
 		GFX_BEGIN=GL_QUADS;
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
-			GFX_VERTEX10=NORMAL_PACK(-(1<<5),-(1<<5), 0);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(0));
-			GFX_VERTEX10=NORMAL_PACK( (1<<5),-(1<<5), 0);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
-			GFX_VERTEX10=NORMAL_PACK( (1<<5), (1<<5), 0);
 			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(64));
+			GFX_VERTEX10=NORMAL_PACK(-(1<<5),-(1<<5), 0);
+			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
+			GFX_VERTEX10=NORMAL_PACK( (1<<5),-(1<<5), 0);
+			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(0));
+			GFX_VERTEX10=NORMAL_PACK( (1<<5), (1<<5), 0);
+			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 			GFX_VERTEX10=NORMAL_PACK(-(1<<5), (1<<5), 0);
 	glPopMatrix(1);
 }

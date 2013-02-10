@@ -465,7 +465,7 @@ bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d, int
 		
 		int32 p2=dotProduct(vectDifference(p,o),n);
 		int32 k=divf32(p2,p1);
-		if(k>d){return false;}
+		if(k>d || k<0){return false;}
 		vect3D i=addVect(o,vectMult(v,k));
 		i=vectDifference(i,p);
 		

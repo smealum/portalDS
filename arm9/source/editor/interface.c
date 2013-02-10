@@ -2,17 +2,17 @@
 
 #define NUMINTERFACEBUTTONS (11)
 
-interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){34,35,"storagecube2_ui.pcx",NULL,false},
-											(interfaceButton_struct){66,35,"pressurebttn2_ui.pcx",NULL,false},
-											(interfaceButton_struct){98,35,"platform2_ui.pcx",NULL,false},
-											(interfaceButton_struct){130,35,"grid2_ui.pcx",NULL,false},
-											(interfaceButton_struct){162,35,"door2_ui.pcx",NULL,false},
-											(interfaceButton_struct){194,35,"dispenser2_ui.pcx",NULL,false},
-											(interfaceButton_struct){34,68,"companion2_ui.pcx",NULL,false},
-											(interfaceButton_struct){66,68,"button2_ui.pcx",NULL,false},
-											(interfaceButton_struct){98,68,"balllauncher2_ui.pcx",NULL,false},
-											(interfaceButton_struct){130,68,"ballcatcher2_ui.pcx",NULL,false},
-											(interfaceButton_struct){162,68,"turret2_ui.pcx",NULL,false}};
+interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){34,35,"storagecube2_ui.pcx",NULL,6,false},
+											(interfaceButton_struct){66,35,"pressurebttn2_ui.pcx",NULL,3,false},
+											(interfaceButton_struct){98,35,"platform2_ui.pcx",NULL,9,false},
+											(interfaceButton_struct){130,35,"grid2_ui.pcx",NULL,8,false},
+											(interfaceButton_struct){162,35,"door2_ui.pcx",NULL,10,false},
+											(interfaceButton_struct){194,35,"dispenser2_ui.pcx",NULL,7,false},
+											(interfaceButton_struct){34,68,"companion2_ui.pcx",NULL,5,false},
+											(interfaceButton_struct){66,68,"button2_ui.pcx",NULL,2,false},
+											(interfaceButton_struct){98,68,"balllauncher2_ui.pcx",NULL,1,false},
+											(interfaceButton_struct){130,68,"ballcatcher2_ui.pcx",NULL,0,false},
+											(interfaceButton_struct){162,68,"turret2_ui.pcx",NULL,4,false}};
 
 struct gl_texture_t *interfaceBackground;
 int bgSub;
@@ -66,6 +66,21 @@ void eraseInterfaceButton(interfaceButton_struct* ib)
 	}
 }
 
+void activateInterfaceButton(interfaceButton_struct* ib)
+{
+	if(!ib)return;
+
+	if(ib->argument>=0 && ib->argument<12)
+	{
+		entity_struct* e=NULL;
+		if(!(editorSelection.entity && !editorSelection.entity->placed))e=createEntity(vect(32,32,32), ib->argument, false);
+		else{e=editorSelection.entity;changeEntityType(e,ib->argument);}
+		editorSelection.active=true;
+		editorSelection.entity=e;
+		switchScreens();
+	}
+}
+
 void updateInterfaceButton(interfaceButton_struct* ib, u8 x, u8 y)
 {
 	if(!ib || !ib->imageData)return;
@@ -81,6 +96,7 @@ void updateInterfaceButton(interfaceButton_struct* ib, u8 x, u8 y)
 			}
 		}else if(keysUp() & KEY_TOUCH)
 		{
+			activateInterfaceButton(ib);
 			eraseInterfaceButton(ib);
 			ib->down=false;
 		}
@@ -93,21 +109,21 @@ void updateInterfaceButton(interfaceButton_struct* ib, u8 x, u8 y)
 	}
 }
 
-void pauseEditorInterface(void)
-{
-	int i;
-	for(i=0;i<NUMINTERFACEBUTTONS;i++)
-	{
-		updateInterfaceButton(&interfaceButtons[i], 0, 0);
-	}
-}
-
 void updateInterfaceButtons(u8 x, u8 y)
 {
 	int i;
 	for(i=0;i<NUMINTERFACEBUTTONS;i++)
 	{
 		updateInterfaceButton(&interfaceButtons[i], x, y);
+	}
+}
+
+void pauseEditorInterface(void)
+{
+	int i;
+	for(i=0;i<NUMINTERFACEBUTTONS;i++)
+	{
+		updateInterfaceButton(&interfaceButtons[i], 0, 0);
 	}
 }
 

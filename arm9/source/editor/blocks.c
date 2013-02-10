@@ -491,7 +491,7 @@ bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d, int
 	return false;
 }
 
-blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v)
+blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v, int32* d)
 {
 	if(!l)return NULL;
 	
@@ -506,6 +506,7 @@ blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o,
 		}
 		l=l->next;
 	}
+	if(d)*d=closestDist;
 	return bf;
 }
 

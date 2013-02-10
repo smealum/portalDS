@@ -352,6 +352,16 @@ void transformCamera(camera_struct* c)
 	glTranslatef32(-c->position.x,-c->position.y,-c->position.z);
 }
 
+void untransformCamera(camera_struct* c)
+{
+	if(!c)c=&playerCamera;
+
+	int32 m[9];
+	transposeMatrix33(c->transformationMatrix,m);
+	
+	multMatrixGfx33(m);
+}
+
 vect3D getCameraPosition(camera_struct* c)
 {
 	if(!c)c=&playerCamera;

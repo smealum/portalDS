@@ -33,6 +33,7 @@ static inline int32 evaluatePlanePoint(plane_struct* p, vect3D v)
 void initCamera(camera_struct* c);
 void projectCamera(camera_struct* c);
 void transformCamera(camera_struct* c);
+void untransformCamera(camera_struct* c);
 void moveCamera(camera_struct* c, vect3D v);
 void rotateCamera(camera_struct* c, vect3D a);
 vect3D getCameraPosition(camera_struct* c);

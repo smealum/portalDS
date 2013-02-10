@@ -5,25 +5,16 @@
 
 camera_struct editorCamera;
 editorRoom_struct editorRoom;
-selection_struct editorSelection;
+extern selection_struct editorSelection;
 
 vect3D editorTranslation;
 int32 editorScale;
 
 vect3D lineOfTouchOrigin, lineOfTouchVector;
+vect3D planeOfTouch[2];
 touchPosition currentTouch, oldTouch;
 
 bool currentScreen;
-
-
-void initSelection(selection_struct* s)
-{
-	if(!s)s=&editorSelection;
-	
-	s->firstFace=s->secondFace=NULL;
-	s->origin=s->size=vect(0,0,0);
-	s->active=false;
-}
 
 void initRoomEdition(void)
 {
@@ -32,7 +23,7 @@ void initRoomEdition(void)
 	initEntities();
 	initInterface();
 	initEditorRoom(&editorRoom);
-	initSelection(&editorSelection);
+	initSelection(NULL);
 	initCamera(&editorCamera);
 	initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
 	editorCamera.position=vect(0,0,0);
@@ -54,66 +45,9 @@ void initRoomEdition(void)
 	//cosmetics
 	glSetOutlineColor(0,RGB15(0,0,0));
 	glSetOutlineColor(1,RGB15(29,15,3));
-}
 
-void updateSelection(selection_struct* s)
-{
-	if(!s)s=&editorSelection;
-	if(!s->active || !s->firstFace || !s->secondFace)return;
-	
-	s->planar=(s->firstFace->direction==s->secondFace->direction) && 
-			   (((s->firstFace->direction==0 || s->firstFace->direction==1) && s->firstFace->x==s->secondFace->x)
-			 || ((s->firstFace->direction==2 || s->firstFace->direction==3) && s->firstFace->y==s->secondFace->y)
-			 || ((s->firstFace->direction==4 || s->firstFace->direction==5) && s->firstFace->z==s->secondFace->z));
-	
-	if(s->planar)
-	{
-		s->origin=vect(s->firstFace->x,s->firstFace->y,s->firstFace->z);
-		s->size=vectDifference(vect(s->secondFace->x,s->secondFace->y,s->secondFace->z),s->origin);
-	}else{
-		s->origin=vect(s->firstFace->x,s->firstFace->y,s->firstFace->z);
-		switch(s->firstFace->direction)
-		{
-			case 0: if(s->secondFace->x>s->origin.x)s->origin.x++; break;
-			case 1: if(s->secondFace->x<s->origin.x)s->origin.x--; break;
-			case 2: if(s->secondFace->y>s->origin.y)s->origin.y++; break;
-			case 3: if(s->secondFace->y<s->origin.y)s->origin.y--; break;
-			case 4: if(s->secondFace->z>s->origin.z)s->origin.z++; break;
-			case 5: if(s->secondFace->z<s->origin.z)s->origin.z--; break;
-		}
-		s->size=vectDifference(vect(s->secondFace->x,s->secondFace->y,s->secondFace->z),s->origin);
-		switch(s->secondFace->direction)
-		{
-			case 0: if(s->firstFace->x>s->secondFace->x)s->size.x++; break;
-			case 1: if(s->firstFace->x<s->secondFace->x)s->size.x--; break;
-			case 2: if(s->firstFace->y>s->secondFace->y)s->size.y++; break;
-			case 3: if(s->firstFace->y<s->secondFace->y)s->size.y--; break;
-			case 4: if(s->firstFace->z>s->secondFace->z)s->size.z++; break;
-			case 5: if(s->firstFace->z<s->secondFace->z)s->size.z--; break;
-		}
-	}
-	if(s->size.x<0){s->origin.x+=s->size.x;s->size.x=-s->size.x;}
-	if(s->size.y<0){s->origin.y+=s->size.y;s->size.y=-s->size.y;}
-	if(s->size.z<0){s->origin.z+=s->size.z;s->size.z=-s->size.z;}
-	s->size.x++;s->size.y++;s->size.z++;
-}
-
-bool isFaceInSelection(blockFace_struct* bf, selection_struct* s)
-{
-	if(!bf || !s || !s->firstFace || !s->secondFace)return false;
-
-	if(s->planar)
-	{
-		if(bf->direction!=s->firstFace->direction)return false;
-		switch(bf->direction)
-		{
-			case 0: case 1: return (bf->x==s->origin.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
-			case 2: case 3: return (bf->y==s->origin.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
-			default:		return (bf->z==s->origin.z && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x);
-		}
-	}else{
-		return (bf->x>=s->origin.x && bf->x<s->origin.x+s->size.x && bf->y>=s->origin.y && bf->y<s->origin.y+s->size.y && bf->z>=s->origin.z && bf->z<s->origin.z+s->size.z);
-	}
+	//TEMP entity test
+	createEntity(vect(32,32,32));
 }
 
 void updateEditorCamera(void)
@@ -135,9 +69,20 @@ void transformRay(vect3D* o, vect3D* v)
 	*v=evalVectMatrix33(m,*v);
 }
 
-blockFace_struct* getBlockFaceCoordinates(void)
+blockFace_struct* getBlockFaceTouch(int32* d)
 {
-	return collideLineBlockFaceListClosest(editorRoom.blockFaceList, lineOfTouchOrigin, lineOfTouchVector);
+	return collideLineBlockFaceListClosest(editorRoom.blockFaceList, lineOfTouchOrigin, lineOfTouchVector, d);
+}
+
+void* getBlockEntityTouch(u8* t)
+{
+	int32 d1, d2;
+	if(t)*t=0;
+	entity_struct* e=collideLineEntities(lineOfTouchOrigin, lineOfTouchVector, planeOfTouch[0], planeOfTouch[1], &d1);
+	blockFace_struct* bf=getBlockFaceTouch(&d2);
+	if(!e || d1>d2)return (void*)bf;
+	if(t)*t=1;
+	return (void*)e;
 }
 
 void updateLineOfTouch(s16 x, s16 y)
@@ -147,6 +92,8 @@ void updateLineOfTouch(s16 x, s16 y)
 	transformRay(&o, &v);
 	lineOfTouchOrigin=o;
 	lineOfTouchVector=v;
+	planeOfTouch[0]=evalVectMatrix33(editorCamera.transformationMatrix,vect(inttof32(1),0,0));
+	planeOfTouch[1]=evalVectMatrix33(editorCamera.transformationMatrix,vect(0,inttof32(1),0));
 }
 
 bool collideLinePlane(vect3D p, vect3D n, vect3D o, vect3D v, vect3D* ip)
@@ -178,27 +125,13 @@ vect3D getDragPosition(blockFace_struct* bf, vect3D o, vect3D v, vect3D los)
 	return ip;
 }
 
-void adjustSelection(selection_struct* s, blockFace_struct of, blockFace_struct os, blockFace_struct oc, vect3D v)
-{
-	if(!s)return;
-
-	of.x+=v.x;of.y+=v.y;of.z+=v.z;
-	os.x+=v.x;os.y+=v.y;os.z+=v.z;
-	oc.x+=v.x;oc.y+=v.y;oc.z+=v.z;
-
-	s->firstFace=findBlockFace(editorRoom.blockFaceList, of.x, of.y, of.z, of.direction);
-	s->secondFace=findBlockFace(editorRoom.blockFaceList, os.x, os.y, os.z, os.direction);
-	s->currentFace=findBlockFace(editorRoom.blockFaceList, oc.x, oc.y, oc.z, oc.direction);
-
-	if(!s->firstFace || !s->secondFace || !s->currentFace)s->active=false;
-}
-
 void switchScreens(void)
 {
 	if(currentScreen)
 	{
 		pauseEditorInterface();
 	}else{
+		editorSelection.entity=NULL;
 		editorSelection.active=false;
 		editorSelection.selecting=false;
 	}
@@ -206,65 +139,90 @@ void switchScreens(void)
 	lcdSwap();
 }
 
-void roomEditorCursor(void)
+void roomEditorCursor(selection_struct* sel)
 {
+	if(!sel)sel=&editorSelection;
 	if(keysDown() & KEY_TOUCH)
 	{
-		blockFace_struct* bf=getBlockFaceCoordinates();
-		if(bf)
+		u8 type;
+		void* ptr=getBlockEntityTouch(&type);
+		if(type)
 		{
-			if(editorSelection.active && isFaceInSelection(bf, &editorSelection))
-			{
-				editorSelection.currentFace=bf;
-				editorSelection.currentPosition=vect(bf->x,bf->y,bf->z);
-				editorSelection.selecting=false;
-			}else{
-				editorSelection.firstFace=editorSelection.secondFace=bf;
-				editorSelection.active=true;
-				editorSelection.selecting=true;
-			}
+			//entity
+			entity_struct* e=(entity_struct*)ptr;
+
+			sel->active=true;
+			sel->selecting=false;
+			sel->entity=e;
 		}else{
-			editorSelection.active=false;
+			//blockface
+			blockFace_struct* bf=(blockFace_struct*)ptr;
+
+			if(bf)
+			{
+				if(sel->active && isFaceInSelection(bf, sel))
+				{
+					sel->currentFace=bf;
+					sel->currentPosition=vect(bf->x,bf->y,bf->z);
+					sel->selecting=false;
+				}else{
+					sel->firstFace=sel->secondFace=bf;
+					sel->active=true;
+					sel->selecting=true;
+				}
+				sel->entity=NULL;
+			}else{
+				sel->active=false;
+			}
 		}
 	}else if(keysHeld() & KEY_TOUCH)
 	{
-		if(editorSelection.active)
+		if(sel->active)
 		{
-			if(editorSelection.selecting)
+			if(sel->entity)
 			{
-				blockFace_struct* bf=getBlockFaceCoordinates();
-				if(bf)editorSelection.secondFace=bf;
-			}else{
-				blockFace_struct* bf=editorSelection.currentFace;
-				bool fill=true;
-				vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
-				p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX+BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY+BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ+BLOCKSIZEZ)/2)/BLOCKSIZEZ);
-				
-				switch(bf->direction)
+				blockFace_struct* bf=getBlockFaceTouch(NULL);
+				if(bf)
 				{
-					case 0: p.y=bf->y; p.z=bf->z; fill=p.x>editorSelection.currentPosition.x; break;
-					case 1: p.y=bf->y; p.z=bf->z; fill=p.x<editorSelection.currentPosition.x; break;
-					case 2: p.x=bf->x; p.z=bf->z; fill=p.y>editorSelection.currentPosition.y; break;
-					case 3: p.x=bf->x; p.z=bf->z; fill=p.y<editorSelection.currentPosition.y; break;
-					case 4: p.x=bf->x; p.y=bf->y; fill=p.z>editorSelection.currentPosition.z; break;
-					default:p.x=bf->x; p.y=bf->y; fill=p.z<editorSelection.currentPosition.z; break;
+					sel->entity->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
 				}
-
-				if(p.x!=editorSelection.currentPosition.x || p.y!=editorSelection.currentPosition.y || p.z!=editorSelection.currentPosition.z)
+			}else{
+				if(sel->selecting)
 				{
-					blockFace_struct oldFirstFace=*editorSelection.firstFace;
-					blockFace_struct oldSecondFace=*editorSelection.secondFace;
-					blockFace_struct oldCurrentFace=*editorSelection.currentFace;
+					blockFace_struct* bf=getBlockFaceTouch(NULL);
+					if(bf)sel->secondFace=bf;
+				}else{
+					blockFace_struct* bf=sel->currentFace;
+					bool fill=true;
+					vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
+					p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX+BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY+BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ+BLOCKSIZEZ)/2)/BLOCKSIZEZ);
+					
+					switch(bf->direction)
+					{
+						case 0: p.y=bf->y; p.z=bf->z; fill=p.x>sel->currentPosition.x; break;
+						case 1: p.y=bf->y; p.z=bf->z; fill=p.x<sel->currentPosition.x; break;
+						case 2: p.x=bf->x; p.z=bf->z; fill=p.y>sel->currentPosition.y; break;
+						case 3: p.x=bf->x; p.z=bf->z; fill=p.y<sel->currentPosition.y; break;
+						case 4: p.x=bf->x; p.y=bf->y; fill=p.z>sel->currentPosition.z; break;
+						default:p.x=bf->x; p.y=bf->y; fill=p.z<sel->currentPosition.z; break;
+					}
 
-					vect3D v=vectDifference(p, editorSelection.currentPosition);
-					vect3D o=(bf->direction%2)?(editorSelection.origin):(adjustVectForNormal(bf->direction, editorSelection.origin)); vect3D s=v;
-					fixOriginSize(&o, &s); s=adjustVectForNormal((bf->direction%2)?(bf->direction):(oppositeDirection[bf->direction]), addVect(s,editorSelection.size));
+					if(p.x!=sel->currentPosition.x || p.y!=sel->currentPosition.y || p.z!=sel->currentPosition.z)
+					{
+						blockFace_struct oldFirstFace=*sel->firstFace;
+						blockFace_struct oldSecondFace=*sel->secondFace;
+						blockFace_struct oldCurrentFace=*sel->currentFace;
 
-					if(fill)fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
-					else emptyBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+						vect3D v=vectDifference(p, sel->currentPosition);
+						vect3D o=(bf->direction%2)?(sel->origin):(adjustVectForNormal(bf->direction, sel->origin)); vect3D s=v;
+						fixOriginSize(&o, &s); s=adjustVectForNormal((bf->direction%2)?(bf->direction):(oppositeDirection[bf->direction]), addVect(s,sel->size));
 
-					adjustSelection(&editorSelection, oldFirstFace, oldSecondFace, oldCurrentFace, v);
-					editorSelection.currentPosition=p;
+						if(fill)fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+						else emptyBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+
+						adjustSelection(&editorRoom, sel, oldFirstFace, oldSecondFace, oldCurrentFace, v);
+						sel->currentPosition=p;
+					}
 				}
 			}
 		}else{
@@ -302,7 +260,7 @@ void updateRoomEditor(void)
 	{
 		updateLineOfTouch(currentTouch.px-128, 96-currentTouch.py);
 		updateEditorCamera();
-		roomEditorCursor();
+		roomEditorCursor(NULL);
 		updateSelection(NULL);
 	}else{
 		updateInterfaceButtons(oldTouch.px,oldTouch.py); //TEMP
@@ -311,59 +269,6 @@ void updateRoomEditor(void)
 	roomEditorControls();
 	
 	oldTouch=currentTouch;
-}
-
-void drawSelection(selection_struct* s)
-{
-	if(!s)s=&editorSelection;
-	if(!s->active || !s->firstFace || !s->secondFace)return;
-	
-	blockFace_struct* bf=s->firstFace;
-	
-	if(s->planar)
-	{
-		u32* vtxPtr=packedVertex[bf->direction];
-		vect3D n=faceNormals[bf->direction];
-		
-		unbindMtl();
-		
-		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE | POLY_ID(8));
-		
-		glPushMatrix();
-			editorRoomTransform();
-			glTranslate3f32(-inttof32(1)/2,-inttof32(1)/2,-inttof32(1)/2);
-			glTranslate3f32(inttof32(s->origin.x),inttof32(s->origin.y),inttof32(s->origin.z));
-			glTranslate3f32(n.x/16, n.y/16, n.z/16);
-			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
-			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
-			
-			GFX_COLOR=RGB15(29,15,3);		
-			GFX_BEGIN=GL_QUADS;
-			
-			GFX_VERTEX10=*vtxPtr++;
-			GFX_VERTEX10=*vtxPtr++;
-			GFX_VERTEX10=*vtxPtr++;
-			GFX_VERTEX10=*vtxPtr++;		
-		glPopMatrix(1);
-	}else{
-		u32* vtxPtr=(u32*)packedVertex;
-		
-		unbindMtl();
-		
-		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE);
-		
-		glPushMatrix();		
-			glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
-			glTranslate3f32(-inttof32(1)/2,-inttof32(1)/2,-inttof32(1)/2);
-			glTranslate3f32(inttof32(s->origin.x-ROOMARRAYSIZEX/2),inttof32(s->origin.y-ROOMARRAYSIZEY/2),inttof32(s->origin.z-ROOMARRAYSIZEZ/2));
-			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
-			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
-			
-			GFX_COLOR=RGB15(29,15,3);		
-			GFX_BEGIN=GL_QUADS;
-			int i;for(i=0;i<6*4;i++)GFX_VERTEX10=*vtxPtr++;	
-		glPopMatrix(1);
-	}
 }
 
 void drawRoomEditor(void)
@@ -391,6 +296,3 @@ void freeRoomEditor(void)
 	freeEditorRoom(&editorRoom);
 	freeBlockFacePool();
 }
-
-
-

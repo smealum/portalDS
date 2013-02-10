@@ -53,7 +53,7 @@ vect3D getBlockPosition(u8 x, u8 y, u8 z);
 void freeBlockFace(blockFace_struct* bf);
 void addBlockFace(blockFace_struct** l, blockFace_struct* bf);
 blockFace_struct* findBlockFace(blockFace_struct* l, u8 x, u8 y, u8 z, u8 direction);
-blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v);
+blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v, int32* d);
 vect3D adjustVectForNormal(u8 dir, vect3D v);
 
 void fixOriginSize(vect3D* o, vect3D* s);

@@ -382,47 +382,93 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		t3=t[2];
 		t4=t[3];
 	}
-	if(!rec.size.x)
-	{
-		glBegin(GL_QUAD);
-			GFX_TEX_COORD = t1;
-			glVertex3v16(pos.x, pos.y, pos.z);
+	// if(!rec.size.x)
+	// {
+	// 	glBegin(GL_QUAD);
+	// 		GFX_TEX_COORD = t1;
+	// 		glVertex3v16(pos.x, pos.y, pos.z);
 
-			GFX_TEX_COORD = t2;
-			glVertex3v16(pos.x, pos.y, pos.z+size.z);
+	// 		GFX_TEX_COORD = t2;
+	// 		glVertex3v16(pos.x, pos.y, pos.z+size.z);
 
-			GFX_TEX_COORD = t3;
-			glVertex3v16(pos.x, pos.y+size.y, pos.z+size.z);
+	// 		GFX_TEX_COORD = t3;
+	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z+size.z);
 
-			GFX_TEX_COORD = t4;
-			glVertex3v16(pos.x, pos.y+size.y, pos.z);
-	}else if(rec.size.y){
-		glBegin(GL_QUAD);
-			GFX_TEX_COORD = t1;
-			glVertex3v16(pos.x, pos.y, pos.z);
+	// 		GFX_TEX_COORD = t4;
+	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z);
+	// }else if(rec.size.y){
+	// 	glBegin(GL_QUAD);
+	// 		GFX_TEX_COORD = t1;
+	// 		glVertex3v16(pos.x, pos.y, pos.z);
 
-			GFX_TEX_COORD = t2;
-			glVertex3v16(pos.x, pos.y+size.y, pos.z);
+	// 		GFX_TEX_COORD = t2;
+	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z);
 
-			GFX_TEX_COORD = t3;
-			glVertex3v16(pos.x+size.x, pos.y+size.y, pos.z);
+	// 		GFX_TEX_COORD = t3;
+	// 		glVertex3v16(pos.x+size.x, pos.y+size.y, pos.z);
 
-			GFX_TEX_COORD = t4;
-			glVertex3v16(pos.x+size.x, pos.y, pos.z);
-	}else{
-		glBegin(GL_QUAD);
-			GFX_TEX_COORD = t1;
-			glVertex3v16(pos.x, pos.y, pos.z);
+	// 		GFX_TEX_COORD = t4;
+	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z);
+	// }else{
+	// 	glBegin(GL_QUAD);
+	// 		GFX_TEX_COORD = t1;
+	// 		glVertex3v16(pos.x, pos.y, pos.z);
 
-			GFX_TEX_COORD = t2;
-			glVertex3v16(pos.x, pos.y, pos.z+size.z);
+	// 		GFX_TEX_COORD = t2;
+	// 		glVertex3v16(pos.x, pos.y, pos.z+size.z);
 
-			GFX_TEX_COORD = t3;
-			glVertex3v16(pos.x+size.x, pos.y, pos.z+size.z);
+	// 		GFX_TEX_COORD = t3;
+	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z+size.z);
 
-			GFX_TEX_COORD = t4;
-			glVertex3v16(pos.x+size.x, pos.y, pos.z);
-	}
+	// 		GFX_TEX_COORD = t4;
+	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z);
+	// }
+
+	//TEMP
+	glPushMatrix();
+		glTranslate3f32(pos.x,pos.y,pos.z);
+		if(!rec.size.x)
+		{
+			glBegin(GL_QUAD);
+				GFX_TEX_COORD = t1;
+				glVertex3v16(0, 0, 0);
+
+				GFX_TEX_COORD = t2;
+				glVertex3v16(0, 0, 0+size.z);
+
+				GFX_TEX_COORD = t3;
+				glVertex3v16(0, 0+size.y, 0+size.z);
+
+				GFX_TEX_COORD = t4;
+				glVertex3v16(0, 0+size.y, 0);
+		}else if(rec.size.y){
+			glBegin(GL_QUAD);
+				GFX_TEX_COORD = t1;
+				glVertex3v16(0, 0, 0);
+
+				GFX_TEX_COORD = t2;
+				glVertex3v16(0, 0+size.y, 0);
+
+				GFX_TEX_COORD = t3;
+				glVertex3v16(0+size.x, 0+size.y, 0);
+
+				GFX_TEX_COORD = t4;
+				glVertex3v16(0+size.x, 0, 0);
+		}else{
+			glBegin(GL_QUAD);
+				GFX_TEX_COORD = t1;
+				glVertex3v16(0, 0, 0);
+
+				GFX_TEX_COORD = t2;
+				glVertex3v16(0, 0, 0+size.z);
+
+				GFX_TEX_COORD = t3;
+				glVertex3v16(0+size.x, 0, 0+size.z);
+
+				GFX_TEX_COORD = t4;
+				glVertex3v16(0+size.x, 0, 0);
+		}
+	glPopMatrix(1);
 }
 
 void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cpos, vect3D cnormal, bool cull) //TEMP ?
@@ -517,6 +563,16 @@ void transferRectangles(room_struct* r)
 		lc=lc->next;
 		i++;
 		if(!(i%8))swiWaitForVBlank();
+	}
+}
+
+void translateRectangles(room_struct* r, vect3D v)
+{
+	listCell_struct *lc=r->rectangles.first;
+	while(lc)
+	{
+		lc->data.position=addVect(lc->data.position,v);
+		lc=lc->next;
 	}
 }
 

@@ -71,6 +71,7 @@ void initGame(void)
 	
 	NOGBA("lalala");
 
+	getPlayer()->currentRoom=&gameRoom;
 	// readMap("lalala.map", NULL);
 	newReadMap("test.map", NULL);
 	
@@ -94,17 +95,16 @@ void initGame(void)
 	//PHYSICS
 	initPI9();
 	
-	getPlayer()->currentRoom=&gameRoom;
-	testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
-	testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
-	testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
-	createEnergyDevice(NULL, vect(0,7,9), pX, true); //TEMP
-	createEnergyDevice(NULL, vect(20,0,9), pY, false); //TEMP
-	createPlatform(vect(TILESIZE*2,TILESIZE,TILESIZE*4),vect(TILESIZE*10,TILESIZE,TILESIZE*4), true); //TEMP
-	testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
-	addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET); //TEMP
-	addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET); //TEMP
-	createEmancipationGrid(NULL,vect(0,0,7),TILESIZE*8,false);
+	// testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
+	// testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
+	// testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
+	// createEnergyDevice(NULL, vect(0,7,9), pX, true); //TEMP
+	// createEnergyDevice(NULL, vect(20,0,9), pY, false); //TEMP
+	// createPlatform(vect(TILESIZE*2,TILESIZE,TILESIZE*4),vect(TILESIZE*10,TILESIZE,TILESIZE*4), true); //TEMP
+	// testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
+	// addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET); //TEMP
+	// addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET); //TEMP
+	// createEmancipationGrid(NULL,vect(0,0,7),TILESIZE*8,false);
 	
 	transferRectangles(&gameRoom);
 	makeGrid();
@@ -180,7 +180,8 @@ static inline void render1(void)
 	// else GFX_CLEAR_COLOR=0;
 	u16 color=getCurrentPortalColor(getPlayer()->object->position);
 	// NOGBA("col %d",color);
-	GFX_CLEAR_COLOR=color|(31<<16);
+	// GFX_CLEAR_COLOR=color|(31<<16);
+	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 	
 		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
 		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}

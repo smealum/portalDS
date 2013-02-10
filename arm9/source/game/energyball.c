@@ -115,7 +115,7 @@ void drawEnergyDevice(energyDevice_struct* ed)
 	glPushMatrix();
 		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(30+ed->id)|POLY_TOON_HIGHLIGHT;
 		setupObjectLighting(NULL, ed->position, &params);
-		
+
 		glTranslate3f32(ed->position.x,ed->position.y,ed->position.z);
 		
 		switch(ed->orientation)

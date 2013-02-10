@@ -7,9 +7,11 @@
 #define ROOMARRAYSIZEY (64)
 #define ROOMARRAYSIZEZ (64)
 
-#define BLOCKMULTX (1)
-#define BLOCKMULTY (4)
-#define BLOCKMULTZ (1)
+#define BLOCKMULT (2)
+
+#define BLOCKMULTX (BLOCKMULT*1)
+#define BLOCKMULTY (BLOCKMULT*4)
+#define BLOCKMULTZ (BLOCKMULT*1)
 
 #define BLOCKSIZEX (TILESIZE*2*BLOCKMULTX)
 #define BLOCKSIZEY (HEIGHTUNIT*BLOCKMULTY)
@@ -56,6 +58,7 @@ blockFace_struct* findBlockFace(blockFace_struct* l, u8 x, u8 y, u8 z, u8 direct
 blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v, int32* d);
 vect3D adjustVectForNormal(u8 dir, vect3D v);
 
+vect3D getMinBlockArray(u8* ba);
 void fixOriginSize(vect3D* o, vect3D* s);
 void freeBlockFaceList(blockFace_struct** l);
 void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts);

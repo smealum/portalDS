@@ -71,7 +71,7 @@ void initPlayer(player_struct* p)
 	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
 
 	//TEMP INIT VALUES
-	p->object->position=vect(0,32*HEIGHTUNIT*4,0);
+	p->object->position=vect(0,32*HEIGHTUNIT*4*2,0);
 }
 
 void drawPlayer(player_struct* p)

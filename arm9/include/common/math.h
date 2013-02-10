@@ -117,9 +117,9 @@ static inline bool equals(int32 a, int32 b)
 	return abs(a-b)<=EPSINT32;
 }
 
-static inline void writeVect(vect3D* v, FILE* f)
+static inline void writeVect(vect3D v, FILE* f)
 {
-	fwrite(v,sizeof(vect3D),1,f);
+	fwrite(&v,sizeof(vect3D),1,f);
 }
 
 static inline void readVect(vect3D* v, FILE* f)

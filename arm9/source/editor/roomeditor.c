@@ -280,8 +280,7 @@ void drawRoomEditor(void)
 	projectCamera(&editorCamera);
 	glLoadIdentity();
 	
-	glPushMatrix();
-		
+	glPushMatrix();		
 		glScalef32(editorScale,editorScale,editorScale);
 		transformCamera(&editorCamera);
 		// glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);

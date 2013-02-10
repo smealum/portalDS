@@ -7,7 +7,7 @@ interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){34,35,"stor
 											(interfaceButton_struct){98,35,"platform2_ui.pcx",NULL,9,false},
 											(interfaceButton_struct){130,35,"grid2_ui.pcx",NULL,8,false},
 											(interfaceButton_struct){162,35,"door2_ui.pcx",NULL,10,false},
-											(interfaceButton_struct){194,35,"dispenser2_ui.pcx",NULL,7,false},
+											(interfaceButton_struct){194,35,"light2_ui.pcx",NULL,11,false},
 											(interfaceButton_struct){34,68,"companion2_ui.pcx",NULL,5,false},
 											(interfaceButton_struct){66,68,"button2_ui.pcx",NULL,2,false},
 											(interfaceButton_struct){98,68,"balllauncher2_ui.pcx",NULL,1,false},

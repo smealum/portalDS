@@ -454,6 +454,29 @@ vect3D getBlockPosition(u8 x, u8 y, u8 z)
 	return vect((x-ROOMARRAYSIZEX/2)*BLOCKSIZEX,(y-ROOMARRAYSIZEY/2)*BLOCKSIZEY,(z-ROOMARRAYSIZEZ/2)*BLOCKSIZEZ);
 }
 
+vect3D getMinBlockArray(u8* ba)
+{
+	if(!ba)return vect(0,0,0);
+	int i, j, k;
+	int mx=ROOMARRAYSIZEX; int my=ROOMARRAYSIZEY; int mz=ROOMARRAYSIZEZ;
+	for(i=0;i<mx;i++)
+	{
+		for(j=0;j<my;j++)
+		{
+			for(k=0;k<mz;k++)
+			{
+				if(!ba[i+j*ROOMARRAYSIZEX+k*ROOMARRAYSIZEX*ROOMARRAYSIZEY])
+				{
+					if(i<mx)mx=i;
+					if(j<my)my=j;
+					if(k<mz)mz=k;
+				}
+			}
+		}
+	}
+	return vect(mx,my,mz);
+}
+
 bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d, int32* dist)
 {
 	vect3D n=faceNormals[bf->direction];

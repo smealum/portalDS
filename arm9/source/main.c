@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	if(keysHeld() & KEY_SELECT)changeState(&editorState);
 	else changeState(&gameState);
 
-	changeState(&editorState);
+	// changeState(&editorState);
 	applyState();
 
 	while(1)

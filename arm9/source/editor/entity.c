@@ -1,18 +1,19 @@
 #include "editor/editor_main.h"
 
-#define NUMENTITYTYPES (11)
+#define NUMENTITYTYPES (12)
 
-entityType_struct entityTypes[]={(entityType_struct){"ballcatcher_16.pcx", NULL},
-								(entityType_struct){"balllauncher_16.pcx", NULL},
-								(entityType_struct){"button_16.pcx", NULL},
-								(entityType_struct){"pressurebttn_16.pcx", NULL},
-								(entityType_struct){"turret_16.pcx", NULL},
-								(entityType_struct){"companion_16.pcx", NULL},
-								(entityType_struct){"storagecube_16.pcx", NULL},
-								(entityType_struct){"dispenser_16.pcx", NULL},
-								(entityType_struct){"grid_16.pcx", NULL},
-								(entityType_struct){"platform_16.pcx", NULL},
-								(entityType_struct){"door_16.pcx", NULL}};
+entityType_struct entityTypes[]={(entityType_struct){"ballcatcher_16.pcx", NULL, 0},
+								(entityType_struct){"balllauncher_16.pcx", NULL, 0},
+								(entityType_struct){"button_16.pcx", NULL, 0},
+								(entityType_struct){"pressurebttn_16.pcx", NULL, 0},
+								(entityType_struct){"turret_16.pcx", NULL, 0},
+								(entityType_struct){"companion_16.pcx", NULL, 0},
+								(entityType_struct){"storagecube_16.pcx", NULL, 0},
+								(entityType_struct){"dispenser_16.pcx", NULL, 0},
+								(entityType_struct){"grid_16.pcx", NULL, 0},
+								(entityType_struct){"platform_16.pcx", NULL, 0},
+								(entityType_struct){"door_16.pcx", NULL, 0},
+								(entityType_struct){"light_16.pcx", NULL, 0}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -29,6 +30,7 @@ void initEntityTypes(void)
 	for(i=0;i<NUMENTITYTYPES;i++)
 	{
 		initEntityType(&entityTypes[i]);
+		entityTypes[i].id=i;
 	}
 }
 
@@ -56,6 +58,20 @@ void changeEntityType(entity_struct* e, u8 type)
 {
 	if(!e || type>=NUMENTITYTYPES)return;
 	e->type=&entityTypes[type];
+}
+
+void generateLightsFromEntities(void)
+{
+	initLights();
+	int i;
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		entity_struct* e=&entity[i];
+		if(e->used && e->type==&entityTypes[11])
+		{
+			createLight(vect(e->position.x*BLOCKMULTX,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ), BLOCKSIZEX*16);
+		}
+	}
 }
 
 entity_struct* createEntity(vect3D pos, u8 type, bool placed)

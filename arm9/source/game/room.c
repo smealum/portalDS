@@ -23,6 +23,9 @@ void readRectangle(rectangle_struct* rec, FILE* f)
 	readVect(&rec->lmPos,f);
 	readVect(&rec->normal,f);
 	
+	NOGBA("pos %d %d %d",rec->position.x,rec->position.y,rec->position.z);
+	NOGBA("size %d %d %d",rec->size.x,rec->size.y,rec->size.z);
+	
 	u16 mid=0;
 	fread(&mid,sizeof(u16),1,f);
 	rec->material=getMaterial(mid);
@@ -133,6 +136,50 @@ void readMap(char* filename, room_struct* r)
 	fclose(f);
 }
 
+void readEntity(FILE* f)
+{
+	if(!f)return;
+	u8 type=0;
+	fread(&type, sizeof(u8), 1, f);
+	switch(type)
+	{
+		case 0:	case 1:
+			//energy ball launcher/catcher
+			{
+				vect3D p;
+				readVect(&p,f);
+				createEnergyDevice(NULL, p, pY, type);
+			}
+			break;
+		case 3:
+			//pressure button
+			{
+				vect3D p;
+				readVect(&p,f);
+				createBigButton(NULL, p);
+			}
+			break;
+		case 11:
+			//light
+			{
+				vect3D p;
+				readVect(&p,f);
+				createLight(p, TILESIZE*2*16);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+void readEntities(FILE* f)
+{
+	if(!f)return;
+
+	u16 cnt; fread(&cnt,sizeof(u16),1,f);
+	int i; for(i=0;i<cnt;i++)readEntity(f);
+}
+
 void newReadMap(char* filename, room_struct* r)
 {
 	if(!r)r=&gameRoom;
@@ -160,23 +207,26 @@ void newReadMap(char* filename, room_struct* r)
 	}
 	if(!f)return;
 
-	initRoom(r, 64, 64, vect(-32,-32,0));
+	//room data
+	initRoom(r, 64*2, 64*2, vect(-32*2,-32*2,0));
 	fread(&r->rectangles.num,sizeof(int),1,f);
 	NOGBA("%d rectangles", r->rectangles.num);
 
 	readRectangles(r, f);
 
+	//lightmap stuff
 	readVect(&r->lmSize,f);
-	NOGBA("%dx%d lightmap",r->lmSize.x,r->lmSize.y);
 	r->lightMapBuffer=malloc(sizeof(u8)*r->lmSize.x*r->lmSize.y);
 	fread(r->lightMapBuffer,sizeof(u8),r->lmSize.x*r->lmSize.y,f);
-
 	{
 		int i;
 		u16 palette[8];
 		for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
 		r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
-	} //TEMP
+	}
+
+	//entities
+	readEntities(f);
 	
 	fclose(f);
 }

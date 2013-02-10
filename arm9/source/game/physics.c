@@ -69,7 +69,7 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 {
 	if(!gc || !o || !r)return false;
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-	// o1.y-=128; //make us taller
+	// o1.y-=128; //make ourselves taller
 	int i;
 	bool ret=false;
 	for(i=0;i<gc->numRectangles;i++)

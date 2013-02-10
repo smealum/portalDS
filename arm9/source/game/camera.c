@@ -37,26 +37,13 @@ void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, 
 	*(m++) = 0;
 	*(m++) = -divf32(2 * mulf32(far, near), far - near);
 	*(m++) = 0;
-	
-	// m[0] = divf32(2*near, right - left);
-	// m[4] = 0;
-	// m[8] = 0;
-	// m[12] = 0;
 
-	// m[1] = 0;
-	// m[5] = divf32(2*near, top - bottom);
-	// m[9] = 0;
-	// m[13] = 0;
+	frustum_struct* f=&c->frustum;
 
-	// m[2] = divf32(right + left, right - left);
-	// m[6] = divf32(top + bottom, top - bottom);
-	// m[10] = -divf32(far + near, far - near);
-	// m[14] = inttof32(-1);
-
-	// m[3] = 0;
-	// m[7] = 0;
-	// m[11] = -divf32(2 * mulf32(far, near), far - near);
-	// m[15] = 0;
+	f->fovy=fovy;f->aspect=aspect;
+	f->near=near;f->far=far;
+	f->nTop=top;f->nLeft=left;
+	f->fTop=mulf32(inttof32(1), tanLerp(fovy>>1));f->fLeft=-mulf32(f->fTop, aspect); //not real far top
 }
 
 //this too
@@ -84,6 +71,17 @@ void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom
 	*(m++) = -divf32(top + bottom, top - bottom);
 	*(m++) = -divf32(zFar + zNear, zFar - zNear);
 	*(m++) = inttof32(1);
+}
+
+void getUnprojectedZLine(camera_struct* c, s16 x, s16 y, vect3D* o, vect3D* v)
+{
+	if(!c)c=&playerCamera;
+	if(!v || !o)return;
+	frustum_struct* f=&c->frustum;
+
+	*o=addVect(vect(0,0,f->near),vect((x*f->nLeft)/128,(y*f->nTop)/96, 0));
+	*v=addVect(vect(0,0,inttof32(1)),vect((x*f->fLeft)/128,(y*f->fTop)/96, 0));
+	*v=vectDifference(*v,*o);
 }
 
 void initTransformationMatrix(camera_struct* c)
@@ -358,7 +356,7 @@ void untransformCamera(camera_struct* c)
 
 	int32 m[9];
 	transposeMatrix33(c->transformationMatrix,m);
-	
+
 	multMatrixGfx33(m);
 }
 

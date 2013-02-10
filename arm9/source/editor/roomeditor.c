@@ -25,7 +25,8 @@ void initRoomEdition(void)
 	initEditorRoom(&editorRoom);
 	initSelection(NULL);
 	initCamera(&editorCamera);
-	initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
+	// initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
+	initProjectionMatrix(&editorCamera, 70*90, inttof32(4)/3, inttof32(1)/10, inttof32(1000)); //TEMP?
 	editorCamera.position=vect(0,0,0);
 	editorTranslation=vect(0,0,0);
 	editorScale=inttof32(1);
@@ -55,6 +56,7 @@ void updateEditorCamera(void)
 	camera_struct* c=&editorCamera;
 	
 	c->position=vect(0,0,0);
+	// c->position=vect(0,0,inttof32(1)); //TEMP
 	updateViewMatrix(c);
 	updateFrustum(c);
 	
@@ -89,9 +91,10 @@ void updateLineOfTouch(s16 x, s16 y)
 {
 	vect3D o=vect(inttof32(x),inttof32(y),inttof32(0));
 	vect3D v=vect(0,0,-inttof32(1));
+	getUnprojectedZLine(&editorCamera, x, y, &o, &v);
 	transformRay(&o, &v);
 	lineOfTouchOrigin=o;
-	lineOfTouchVector=v;
+	lineOfTouchVector=vectMultInt(normalize(v),-1);
 	planeOfTouch[0]=evalVectMatrix33(editorCamera.transformationMatrix,vect(inttof32(1),0,0));
 	planeOfTouch[1]=evalVectMatrix33(editorCamera.transformationMatrix,vect(0,inttof32(1),0));
 }
@@ -258,7 +261,7 @@ void updateRoomEditor(void)
 	
 	if(!currentScreen)
 	{
-		updateLineOfTouch(currentTouch.px-128, 96-currentTouch.py);
+		updateLineOfTouch(currentTouch.px-128, currentTouch.py-96);
 		updateEditorCamera();
 		roomEditorCursor(NULL);
 		updateSelection(NULL);
@@ -285,7 +288,6 @@ void drawRoomEditor(void)
 		drawEditorRoom(&editorRoom);
 		drawEntities();
 		drawSelection(NULL);
-		
 	glPopMatrix(1);
 	
 	glFlush(0);

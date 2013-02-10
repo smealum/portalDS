@@ -10,6 +10,9 @@ typedef struct
 typedef struct
 {
 	plane_struct plane[6];
+	int32 nLeft, nTop, near;
+	int32 fLeft, fTop, far;
+	int32 fovy, aspect;
 }frustum_struct;
 
 typedef struct
@@ -47,6 +50,7 @@ void fixMatrix(int32* m);
 void updateFrustum(camera_struct* c);
 
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);
+void getUnprojectedZLine(camera_struct* c, s16 x, s16 y, vect3D* o, vect3D* v);
 
 void changeBase(int32* tm, vect3D x, vect3D y, vect3D z, bool r);
 

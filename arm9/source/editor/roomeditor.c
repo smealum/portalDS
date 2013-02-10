@@ -28,7 +28,7 @@ void initRoomEdition(void)
 	// initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
 	initProjectionMatrix(&editorCamera, 70*90, inttof32(4)/3, inttof32(1)/10, inttof32(1000)); //TEMP?
 	editorCamera.position=vect(0,0,0);
-	editorTranslation=vect(0,0,0);
+	editorTranslation=vect(0,0,inttof32(-1));
 	editorScale=inttof32(1);
 	lineOfTouchOrigin=vect(0,0,0);
 	lineOfTouchVector=vect(0,0,0);
@@ -55,8 +55,6 @@ void updateEditorCamera(void)
 {
 	camera_struct* c=&editorCamera;
 	
-	c->position=vect(0,0,0);
-	// c->position=vect(0,0,inttof32(1)); //TEMP
 	updateViewMatrix(c);
 	updateFrustum(c);
 	
@@ -67,7 +65,8 @@ void transformRay(vect3D* o, vect3D* v)
 {
 	int32* m=editorCamera.transformationMatrix;
 	// int32 m[9]; transposeMatrix33(editorCamera.transformationMatrix,m);
-	*o=evalVectMatrix33(m,vectDifference(divideVect(*o,editorScale),editorTranslation));
+	// *o=evalVectMatrix33(m,vectDifference(divideVect(*o,editorScale),editorTranslation));
+	*o=addVect(evalVectMatrix33(m,divideVect(*o,editorScale)),editorCamera.position);
 	*v=evalVectMatrix33(m,*v);
 }
 
@@ -238,13 +237,15 @@ void roomEditorCursor(selection_struct* sel)
 void roomEditorControls(void)
 {
 	//TEMP CONTROLS
-	if(keysHeld() & KEY_R)editorScale+=inttof32(2);
-	if(keysHeld() & KEY_L)editorScale-=inttof32(2);
+	// if(keysHeld() & KEY_R)editorScale+=inttof32(2);
+	// if(keysHeld() & KEY_L)editorScale-=inttof32(2);
+	if(keysHeld() & KEY_R)moveCameraImmediate(&editorCamera, vect(0,0,inttof32(1)/64));
+	if(keysHeld() & KEY_L)moveCameraImmediate(&editorCamera, vect(0,0,-inttof32(1)/64));
 	
-	if(keysHeld() & KEY_UP)editorTranslation.y-=inttof32(1)/64;
-	else if(keysHeld() & KEY_DOWN)editorTranslation.y+=inttof32(1)/64;
-	if(keysHeld() & KEY_RIGHT)editorTranslation.x-=inttof32(1)/64;
-	else if(keysHeld() & KEY_LEFT)editorTranslation.x+=inttof32(1)/64;
+	if(keysHeld() & KEY_UP)moveCameraImmediate(&editorCamera, vect(0,inttof32(1)/64,0));
+	else if(keysHeld() & KEY_DOWN)moveCameraImmediate(&editorCamera, vect(0,-inttof32(1)/64,0));
+	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&editorCamera, vect(inttof32(1)/64,0,0));
+	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&editorCamera, vect(-inttof32(1)/64,0,0));
 	
 	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, 64, true);
 	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, -64, true);
@@ -282,8 +283,8 @@ void drawRoomEditor(void)
 	glPushMatrix();
 		
 		glScalef32(editorScale,editorScale,editorScale);
-		glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);
 		transformCamera(&editorCamera);
+		// glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);
 
 		drawEditorRoom(&editorRoom);
 		drawEntities();

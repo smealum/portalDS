@@ -39,6 +39,7 @@ void transformCamera(camera_struct* c);
 void untransformCamera(camera_struct* c);
 void moveCamera(camera_struct* c, vect3D v);
 void rotateCamera(camera_struct* c, vect3D a);
+void moveCameraImmediate(camera_struct* c, vect3D v);
 vect3D getCameraPosition(camera_struct* c);
 void setCamera(camera_struct* c, vect3D v);
 void updateCamera(camera_struct* c);

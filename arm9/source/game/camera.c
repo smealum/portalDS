@@ -383,6 +383,17 @@ void moveCamera(camera_struct* c, vect3D v)
 	c->object.speed.z+=mulf32(v.z,v1.z)+mulf32(v.x,c->transformationMatrix[6]);
 }
 
+void moveCameraImmediate(camera_struct* c, vect3D v)
+{
+	if(!c)c=&playerCamera;
+	
+	vect3D v1=normalize(vect(c->transformationMatrix[2],c->transformationMatrix[5],c->transformationMatrix[8]));
+	
+	c->position.x+=mulf32(v.z,v1.x)+mulf32(v.x,c->transformationMatrix[0])+mulf32(v.y,c->transformationMatrix[1]);
+	c->position.y+=mulf32(v.z,v1.y)+mulf32(v.x,c->transformationMatrix[3])+mulf32(v.y,c->transformationMatrix[4]);
+	c->position.z+=mulf32(v.z,v1.z)+mulf32(v.x,c->transformationMatrix[6])+mulf32(v.y,c->transformationMatrix[7]);
+}
+
 void rotateCamera(camera_struct* c, vect3D a)
 {
 	if(!c)c=&playerCamera;

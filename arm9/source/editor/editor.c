@@ -9,9 +9,9 @@ void initEditor(void)
 {
 	lcdMainOnBottom();
 	videoSetMode(MODE_5_3D);
-	videoSetModeSub(MODE_0_2D);
+	videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE);
 	
-	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_LCD,VRAM_D_MAIN_BG_0x06000000);	
+	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_SUB_BG,VRAM_D_TEXTURE);	
 	
 	glInit();
 	

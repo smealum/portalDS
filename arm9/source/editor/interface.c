@@ -1,0 +1,134 @@
+#include "editor/editor_main.h"
+
+#define NUMINTERFACEBUTTONS (11)
+
+interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){34,35,"storagecube2_ui.pcx",NULL,false},
+											(interfaceButton_struct){66,35,"pressurebttn2_ui.pcx",NULL,false},
+											(interfaceButton_struct){98,35,"platform2_ui.pcx",NULL,false},
+											(interfaceButton_struct){130,35,"grid2_ui.pcx",NULL,false},
+											(interfaceButton_struct){162,35,"door2_ui.pcx",NULL,false},
+											(interfaceButton_struct){194,35,"dispenser2_ui.pcx",NULL,false},
+											(interfaceButton_struct){34,68,"companion2_ui.pcx",NULL,false},
+											(interfaceButton_struct){66,68,"button2_ui.pcx",NULL,false},
+											(interfaceButton_struct){98,68,"balllauncher2_ui.pcx",NULL,false},
+											(interfaceButton_struct){130,68,"ballcatcher2_ui.pcx",NULL,false},
+											(interfaceButton_struct){162,68,"turret2_ui.pcx",NULL,false}};
+
+struct gl_texture_t *interfaceBackground;
+int bgSub;
+
+void initInterfaceButton(interfaceButton_struct* ib)
+{
+	if(!ib)return;
+	ib->imageData=(struct gl_texture_t *)ReadPCXFile(ib->imageName,"editor");
+	convertPCX16Bit(ib->imageData);
+	ib->down=false;
+}
+
+void initInterfaceButtons(void)
+{
+	int i;
+	for(i=0;i<NUMINTERFACEBUTTONS;i++)
+	{
+		initInterfaceButton(&interfaceButtons[i]);
+	}
+}
+
+void initInterface(void)
+{
+	interfaceBackground=(struct gl_texture_t *)ReadPCXFile("interface.pcx","editor");
+	convertPCX16Bit(interfaceBackground);
+	bgSub=bgInitSub(3, BgType_Bmp16, BgSize_B16_256x256, 0, 0);
+	if(interfaceBackground->texels16)dmaCopy(interfaceBackground->texels16,bgGetGfxPtr(bgSub),256*192*2);
+
+	initInterfaceButtons();
+}
+
+void drawInterfaceButton(interfaceButton_struct* ib)
+{
+	if(!ib || !ib->imageData || !ib->imageData->texels16)return;
+
+	int j;
+	for(j=0;j<ib->imageData->height;j++)
+	{
+		dmaCopy(&ib->imageData->texels16[j*ib->imageData->width],&bgGetGfxPtr(bgSub)[ib->x+(ib->y+j)*256],ib->imageData->width*2);
+	}
+}
+
+void eraseInterfaceButton(interfaceButton_struct* ib)
+{
+	if(!ib || !ib->imageData || !interfaceBackground)return;
+
+	int j;
+	for(j=0;j<ib->imageData->height;j++)
+	{
+		dmaCopy(&interfaceBackground->texels16[ib->x+(ib->y+j)*256],&bgGetGfxPtr(bgSub)[ib->x+(ib->y+j)*256],ib->imageData->width*2);
+	}
+}
+
+void updateInterfaceButton(interfaceButton_struct* ib, u8 x, u8 y)
+{
+	if(!ib || !ib->imageData)return;
+
+	if(x>=ib->x && y>=ib->y && x<ib->x+ib->imageData->width && y<ib->y+ib->imageData->height)
+	{
+		if(keysHeld() & KEY_TOUCH)
+		{
+			if(!ib->down)
+			{
+				drawInterfaceButton(ib);
+				ib->down=true;
+			}
+		}else if(keysUp() & KEY_TOUCH)
+		{
+			eraseInterfaceButton(ib);
+			ib->down=false;
+		}
+	}else{
+		if(ib->down)
+		{
+			eraseInterfaceButton(ib);
+			ib->down=false;
+		}
+	}
+}
+
+void pauseEditorInterface(void)
+{
+	int i;
+	for(i=0;i<NUMINTERFACEBUTTONS;i++)
+	{
+		updateInterfaceButton(&interfaceButtons[i], 0, 0);
+	}
+}
+
+void updateInterfaceButtons(u8 x, u8 y)
+{
+	int i;
+	for(i=0;i<NUMINTERFACEBUTTONS;i++)
+	{
+		updateInterfaceButton(&interfaceButtons[i], x, y);
+	}
+}
+
+void freeInterfaceButton(interfaceButton_struct* ib)
+{
+	if(!ib || !ib->imageData)return;
+	freePCX(ib->imageData);
+	ib->imageData=NULL;
+}
+
+void freeInterfaceButtons(void)
+{
+	int i;
+	for(i=0;i<NUMINTERFACEBUTTONS;i++)
+	{
+		freeInterfaceButton(&interfaceButtons[i]);
+	}
+}
+
+void freeInterface(void)
+{
+	freePCX(interfaceBackground);
+	freeInterfaceButtons();
+}

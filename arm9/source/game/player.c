@@ -68,11 +68,10 @@ void initPlayer(player_struct* p)
 	generateModelDisplayLists(&playerModel, false, 1);
 	initModelInstance(&p->modelInstance,&gun);
 	initModelInstance(&p->playerModelInstance,&playerModel);
-	// crossHair=createTexture("crshair.pcx","textures");
 	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
-	// bgSub=bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
-	// dmaCopy(bottomScreen->palette, BG_PALETTE_SUB, 256*2);
-	// copyBottomScreen(0);
+
+	//TEMP INIT VALUES
+	p->object->position=vect(0,32*HEIGHTUNIT*4,0);
 }
 
 void drawPlayer(player_struct* p)

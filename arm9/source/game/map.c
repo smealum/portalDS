@@ -60,6 +60,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	sign*=(size.y>=0)?1:-1;
 	sign*=(size.z>=0)?1:-1;
 	rec->normal=vect(rec->normal.x*sign,rec->normal.y*sign,rec->normal.z*sign);
+	rec->material=NULL;
 	// NOGBA("n : %d %d %d",rec->normal.x,rec->normal.y,rec->normal.z);
 	rec->lmSize.x=x;
 	rec->lmSize.y=y;
@@ -148,7 +149,6 @@ u8 computeLighting(vect3D l, int32 intensity, vect3D p, rectangle_struct* rec, r
 	{
 		vect3D u=vectDifference(p,l);
 		u=divideVect(u,rdist);
-		// NOGBA("dv : %d, %d, %d",u.x,u.y,u.z);
 		if(collideLineMap(r, rec, l, u, rdist, NULL, NULL))return 0;
 		int32 v=dotProduct(u,rec->normal);
 		v=max(0,v);
@@ -169,7 +169,7 @@ u8 computeLightings(vect3D p, rectangle_struct* rec, room_struct* r)
 		if(lights[i].used)
 		{
 			light_struct* l=&lights[i];
-			v+=computeLighting(vect(l->position.x*TILESIZE*2,l->position.z*HEIGHTUNIT,l->position.y*TILESIZE*2), l->intensity, p, rec, r);
+			v+=computeLighting(vect(l->position.x*TILESIZE*2,l->position.y*HEIGHTUNIT,l->position.z*TILESIZE*2), l->intensity, p, rec, r);
 		}
 	}
 	return (u8)(31-min(max(v,0),31));
@@ -569,7 +569,7 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 
 void initRoomGrid(room_struct* r)
 {
-	if(!r)return;
+	if(!r || !r->width || !r->height)return;
 	
 	r->rectangleGridSize.x=r->width/CELLSIZE+1;
 	r->rectangleGridSize.y=r->height/CELLSIZE+1;
@@ -603,8 +603,6 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	
 	r->lightMap=NULL;
 	r->lightMapBuffer=NULL;
-	r->pathfindingData=NULL;
-	r->doorWay=NULL;
 		
 	initRoomGrid(r);
 }
@@ -799,10 +797,6 @@ void freeRoom(room_struct* r)
 		r->materials=NULL;
 		if(r->lightMapBuffer)free(r->lightMapBuffer);
 		r->lightMapBuffer=NULL;
-		if(r->pathfindingData)free(r->pathfindingData);
-		r->pathfindingData=NULL;
-		if(r->doorWay)free(r->doorWay);
-		r->doorWay=NULL;
 		if(r->lightMap)r->lightMap->used=false;
 		removeRectangles(r);
 	}

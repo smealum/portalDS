@@ -9,35 +9,6 @@ void drawRoomsGame(u8 mode, u16 color)
 	drawRoom(&gameRoom,((1)<<3)|((gameRoom.lmSlot!=0)<<2)|(1)|(mode), color);
 }
 
-//WRITE AREA
-
-void writeRectangle(rectangle_struct* rec, FILE* f)
-{
-	if(!rec || !f)return;
-	
-	writeVect(&rec->position,f);
-	writeVect(&rec->size,f);
-	writeVect(&rec->lmSize,f);
-	writeVect(&rec->lmPos,f);
-	writeVect(&rec->normal,f);
-	
-	u16 mid=getMaterialID(rec->material);
-	
-	fwrite(&mid,sizeof(u16),1,f);
-	fwrite(&rec->rot,sizeof(bool),1,f);
-}
-
-void writeRectangles(room_struct* r, FILE* f)
-{
-	if(!r || !f)return;
-	listCell_struct *lc=r->rectangles.first;
-	while(lc)
-	{
-		writeRectangle(&lc->data, f);
-		lc=lc->next;
-	}
-}
-
 //READ AREA
 
 extern char* basePath;
@@ -158,6 +129,54 @@ void readMap(char* filename, room_struct* r)
 	fseek(f,sizeof(int),SEEK_CUR);
 
 	readRoom(f, r);
+	
+	fclose(f);
+}
+
+void newReadMap(char* filename, room_struct* r)
+{
+	if(!r)r=&gameRoom;
+	char fn[1024];
+	FILE* f=NULL;
+	if(fsMode==1||fsMode==2)
+	{
+		if(fsMode==2)
+		{
+			sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
+			NOGBA("lala : %s",fn);
+			f=fopen(fn,"rb");
+		}
+		if(!f)
+		{
+			sprintf(fn,"nitro:/fpsm/maps/%s",filename);
+			NOGBA("lala : %s",fn);
+			f=fopen(fn,"rb");
+		}
+	}else if(fsMode==3)
+	{
+		sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
+		NOGBA("lala : %s",fn);
+		f=fopen(fn,"rb");
+	}
+	if(!f)return;
+
+	initRoom(r, 64, 64, vect(-32,-32,0));
+	fread(&r->rectangles.num,sizeof(int),1,f);
+	NOGBA("%d rectangles", r->rectangles.num);
+
+	readRectangles(r, f);
+
+	readVect(&r->lmSize,f);
+	NOGBA("%dx%d lightmap",r->lmSize.x,r->lmSize.y);
+	r->lightMapBuffer=malloc(sizeof(u8)*r->lmSize.x*r->lmSize.y);
+	fread(r->lightMapBuffer,sizeof(u8),r->lmSize.x*r->lmSize.y,f);
+
+	{
+		int i;
+		u16 palette[8];
+		for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
+		r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
+	} //TEMP
 	
 	fclose(f);
 }

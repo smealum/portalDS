@@ -14,8 +14,16 @@ int main(int argc, char **argv)
 	createState(&gameState, initGame, gameFrame, killGame, gameVBL);
 	createState(&editorState, initEditor, editorFrame, killEditor, editorVBL);
 	
-	// changeState(&editorState);
-	changeState(&gameState);
+	//TEMP DEBUG
+	scanKeys();
+	scanKeys();
+	scanKeys();
+	scanKeys();
+
+	if(keysHeld() & KEY_SELECT)changeState(&editorState);
+	else changeState(&gameState);
+
+	changeState(&editorState);
 	applyState();
 
 	while(1)

@@ -53,6 +53,7 @@ void initGame(void)
 	
 	initPlayer(NULL);
 	
+	initLights();
 	initParticles();
 	
 	initLightMaps();
@@ -70,7 +71,8 @@ void initGame(void)
 	
 	NOGBA("lalala");
 
-	readMap("lalala.map", NULL);
+	// readMap("lalala.map", NULL);
+	newReadMap("test.map", NULL);
 	
 	currentBuffer=false;
 	

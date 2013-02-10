@@ -8,11 +8,11 @@
 #define ROOMARRAYSIZEZ (64)
 
 #define BLOCKMULTX (1)
-#define BLOCKMULTY (2)
+#define BLOCKMULTY (4)
 #define BLOCKMULTZ (1)
 
 #define BLOCKSIZEX (TILESIZE*2*BLOCKMULTX)
-#define BLOCKSIZEY (HEIGHTUNIT*2*BLOCKMULTY)
+#define BLOCKSIZEY (HEIGHTUNIT*BLOCKMULTY)
 #define BLOCKSIZEZ (TILESIZE*2*BLOCKMULTZ)
 
 //DIR : 0 X
@@ -34,7 +34,6 @@ typedef struct
 {
 	u8* blockArray;
 	blockFace_struct* blockFaceList;
-	rectangleList_struct rectangleList;
 }editorRoom_struct;
 
 extern vect3D faceNormals[6];
@@ -45,6 +44,7 @@ extern u8 oppositeDirection[6];
 void initEditorRoom(editorRoom_struct* er);
 void freeEditorRoom(editorRoom_struct* er);
 void drawEditorRoom(editorRoom_struct* er);
+void editorRoomTransform(void);
 
 void initBlocks(void);
 void freeBlockFacePool(void);
@@ -55,7 +55,6 @@ void addBlockFace(blockFace_struct** l, blockFace_struct* bf);
 blockFace_struct* findBlockFace(blockFace_struct* l, u8 x, u8 y, u8 z, u8 direction);
 blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v);
 vect3D adjustVectForNormal(u8 dir, vect3D v);
-
 
 void fixOriginSize(vect3D* o, vect3D* s);
 void freeBlockFaceList(blockFace_struct** l);

@@ -181,7 +181,6 @@ void initBlockArray(u8* ba)
 void initEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
-	initRectangleList(&er->rectangleList);
 	er->blockFaceList=NULL;
 	er->blockArray=malloc(sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
@@ -367,7 +366,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			vect2D p, s;
 			getMaxRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
 			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y))),&rl);
 			cnt1-=s.x*s.y;
 		}
 		while(cnt2>0)
@@ -407,7 +406,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			vect2D p, s;
 			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
 			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y))),&rl);
 			cnt2-=s.x*s.y;
 		}
 	}
@@ -431,7 +430,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			vect2D p, s;
 			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
 			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k+1)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0))),&rl);
 			cnt1-=s.x*s.y;
 		}
 		while(cnt2>0)
@@ -550,6 +549,12 @@ void drawBlockFaceList(blockFace_struct* l)
 	}
 }
 
+void editorRoomTransform(void)
+{
+	glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
+	glTranslate3f32(inttof32(-ROOMARRAYSIZEX/2),inttof32(-ROOMARRAYSIZEY/2),inttof32(-ROOMARRAYSIZEZ/2));	
+}
+
 void drawEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
@@ -558,8 +563,7 @@ void drawEditorRoom(editorRoom_struct* er)
 	GFX_COLOR=RGB15(31,31,31);
 	
 	glPushMatrix();
-		glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
-		glTranslate3f32(inttof32(-ROOMARRAYSIZEX/2),inttof32(-ROOMARRAYSIZEY/2),inttof32(-ROOMARRAYSIZEZ/2));		
+		editorRoomTransform();
 		drawBlockFaceList(er->blockFaceList);
 	glPopMatrix(1);
 }

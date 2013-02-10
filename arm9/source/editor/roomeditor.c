@@ -13,6 +13,8 @@ int32 editorScale;
 vect3D lineOfTouchOrigin, lineOfTouchVector;
 touchPosition currentTouch, oldTouch;
 
+bool currentScreen;
+
 
 void initSelection(selection_struct* s)
 {
@@ -25,7 +27,10 @@ void initSelection(selection_struct* s)
 
 void initRoomEdition(void)
 {
+	initLights();
 	initBlocks();
+	initEntities();
+	initInterface();
 	initEditorRoom(&editorRoom);
 	initSelection(&editorSelection);
 	initCamera(&editorCamera);
@@ -35,6 +40,7 @@ void initRoomEdition(void)
 	editorScale=inttof32(1);
 	lineOfTouchOrigin=vect(0,0,0);
 	lineOfTouchVector=vect(0,0,0);
+	currentScreen=false;
 
 	//initial camera setup
 	rotateMatrixY(editorCamera.transformationMatrix, 2048+384, true);
@@ -187,29 +193,21 @@ void adjustSelection(selection_struct* s, blockFace_struct of, blockFace_struct 
 	if(!s->firstFace || !s->secondFace || !s->currentFace)s->active=false;
 }
 
-void updateRoomEditor(void)
+void switchScreens(void)
 {
-	touchRead(&currentTouch);
-	
-	updateLineOfTouch(currentTouch.px-128, 96-currentTouch.py);
-	updateEditorCamera();
-	
-	//TEMP CONTROLS
-	if(keysHeld() & KEY_R)editorScale+=inttof32(2);
-	if(keysHeld() & KEY_L)editorScale-=inttof32(2);
-	
-	if(keysHeld() & KEY_UP)editorTranslation.y-=inttof32(1)/64;
-	else if(keysHeld() & KEY_DOWN)editorTranslation.y+=inttof32(1)/64;
-	if(keysHeld() & KEY_RIGHT)editorTranslation.x-=inttof32(1)/64;
-	else if(keysHeld() & KEY_LEFT)editorTranslation.x+=inttof32(1)/64;
-	
-	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, 64, true);
-	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, -64, true);
-	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
-	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
-	
-	if(keysHeld() & KEY_START){editorRoom.rectangleList=generateOptimizedRectangles(editorRoom.blockArray);NOGBA("%d",editorRoom.rectangleList.num);}
-	
+	if(currentScreen)
+	{
+		pauseEditorInterface();
+	}else{
+		editorSelection.active=false;
+		editorSelection.selecting=false;
+	}
+	currentScreen^=1;
+	lcdSwap();
+}
+
+void roomEditorCursor(void)
+{
 	if(keysDown() & KEY_TOUCH)
 	{
 		blockFace_struct* bf=getBlockFaceCoordinates();
@@ -274,8 +272,44 @@ void updateRoomEditor(void)
 			if(abs(oldTouch.py-currentTouch.py)>2)rotateMatrixX(editorCamera.transformationMatrix, -TOUCHSPEEDY*(oldTouch.py-currentTouch.py), false);
 		}
 	}
+}
+
+void roomEditorControls(void)
+{
+	//TEMP CONTROLS
+	if(keysHeld() & KEY_R)editorScale+=inttof32(2);
+	if(keysHeld() & KEY_L)editorScale-=inttof32(2);
 	
-	updateSelection(NULL);
+	if(keysHeld() & KEY_UP)editorTranslation.y-=inttof32(1)/64;
+	else if(keysHeld() & KEY_DOWN)editorTranslation.y+=inttof32(1)/64;
+	if(keysHeld() & KEY_RIGHT)editorTranslation.x-=inttof32(1)/64;
+	else if(keysHeld() & KEY_LEFT)editorTranslation.x+=inttof32(1)/64;
+	
+	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, 64, true);
+	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, -64, true);
+	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
+	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
+	
+	if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
+	if(keysDown() & KEY_SELECT){switchScreens();}
+}
+
+void updateRoomEditor(void)
+{
+	touchRead(&currentTouch);
+	
+	if(!currentScreen)
+	{
+		updateLineOfTouch(currentTouch.px-128, 96-currentTouch.py);
+		updateEditorCamera();
+		roomEditorCursor();
+		updateSelection(NULL);
+	}else{
+		updateInterfaceButtons(oldTouch.px,oldTouch.py); //TEMP
+	}
+
+	roomEditorControls();
+	
 	oldTouch=currentTouch;
 }
 
@@ -295,10 +329,10 @@ void drawSelection(selection_struct* s)
 		
 		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE | POLY_ID(8));
 		
-		glPushMatrix();		
-			glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
+		glPushMatrix();
+			editorRoomTransform();
 			glTranslate3f32(-inttof32(1)/2,-inttof32(1)/2,-inttof32(1)/2);
-			glTranslate3f32(inttof32(s->origin.x-ROOMARRAYSIZEX/2),inttof32(s->origin.y-ROOMARRAYSIZEY/2),inttof32(s->origin.z-ROOMARRAYSIZEZ/2));
+			glTranslate3f32(inttof32(s->origin.x),inttof32(s->origin.y),inttof32(s->origin.z));
 			glTranslate3f32(n.x/16, n.y/16, n.z/16);
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
@@ -342,11 +376,9 @@ void drawRoomEditor(void)
 		glScalef32(editorScale,editorScale,editorScale);
 		glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);
 		transformCamera(&editorCamera);
+
 		drawEditorRoom(&editorRoom);
-
-		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-		drawRectangleList(&editorRoom.rectangleList);
-
+		drawEntities();
 		drawSelection(NULL);
 		
 	glPopMatrix(1);

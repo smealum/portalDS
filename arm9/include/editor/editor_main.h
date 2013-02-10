@@ -7,5 +7,8 @@
 #include "editor/roomeditor.h"
 #include "editor/material.h"
 #include "editor/rectangle.h"
+#include "editor/entity.h"
+#include "editor/io.h"
+#include "editor/interface.h"
 
 #endif

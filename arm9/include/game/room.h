@@ -36,8 +36,6 @@ typedef struct
 	vect3D lmSize;
 	u16 width, height;
 	u8* lightMapBuffer;
-	u8* pathfindingData;
-	void** doorWay;
 	mtlImg_struct* lightMap;
 	lightMapSlots_struct* lmSlot;
 	gridCell_struct* rectangleGrid;
@@ -49,5 +47,6 @@ void drawRoomEdits(void);
 void wipeMapEdit(void);
 void writeMap(char* filename);
 void readMap(char* filename, room_struct* r);
+void newReadMap(char* filename, room_struct* r);
 
 #endif

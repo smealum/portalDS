@@ -50,6 +50,7 @@ void updateViewMatrix(camera_struct* c);
 void fixMatrix(int32* m);
 void updateFrustum(camera_struct* c);
 
+void initProjectionMatrixBottom(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far);
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);
 void getUnprojectedZLine(camera_struct* c, s16 x, s16 y, vect3D* o, vect3D* v);
 

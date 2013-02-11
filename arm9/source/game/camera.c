@@ -46,6 +46,50 @@ void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, 
 	f->fTop=mulf32(inttof32(1), tanLerp(fovy>>1));f->fLeft=-mulf32(f->fTop, aspect); //not real far top
 }
 
+void initProjectionMatrixBottom(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far)
+{
+	if(!c)c=&playerCamera;
+	int32* m=c->projectionMatrix;
+	
+	int32 right, left, top, bottom;
+
+	top = mulf32(near, tanLerp(fovy>>1));
+	bottom=-top;
+
+	left = mulf32(bottom, aspect);
+	right = mulf32(top, aspect);
+
+	bottom=-top*3;
+	top=-top;
+	
+	*(m++) = divf32(2*near, right - left);
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = 0;
+	*(m++) = divf32(2*near, top - bottom);
+	*(m++) = 0;
+	*(m++) = 0;
+
+	*(m++) = divf32(right + left, right - left);
+	*(m++) = divf32(top + bottom, top - bottom);
+	*(m++) = -divf32(far + near, far - near);
+	*(m++) = inttof32(-1);
+
+	*(m++) = 0;
+	*(m++) = 0;
+	*(m++) = -divf32(2 * mulf32(far, near), far - near);
+	*(m++) = 0;
+
+	frustum_struct* f=&c->frustum;
+
+	f->fovy=fovy;f->aspect=aspect;
+	f->near=near;f->far=far;
+	f->nTop=top;f->nLeft=left;
+	f->fTop=mulf32(inttof32(1), tanLerp(fovy>>1));f->fLeft=-mulf32(f->fTop, aspect); //not real far top
+}
+
 //this too
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar)
 {

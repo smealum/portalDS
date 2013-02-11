@@ -2,6 +2,7 @@
 
 extern state_struct* currentState;
 state_struct gameState;
+state_struct menuState;
 state_struct editorState;
 
 int main(int argc, char **argv)
@@ -12,6 +13,7 @@ int main(int argc, char **argv)
 	initAudio();
 	
 	createState(&gameState, initGame, gameFrame, killGame, gameVBL);
+	createState(&menuState, initMenu, menuFrame, killMenu, menuVBL);
 	createState(&editorState, initEditor, editorFrame, killEditor, editorVBL);
 	
 	//TEMP DEBUG
@@ -24,6 +26,7 @@ int main(int argc, char **argv)
 	else changeState(&gameState);
 
 	// changeState(&editorState);
+	changeState(&menuState);
 	applyState();
 
 	while(1)

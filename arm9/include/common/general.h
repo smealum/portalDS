@@ -35,6 +35,7 @@
 #include "game/displaylist.h"
 
 #include "game/game_ex.h"
+#include "menu/menu_ex.h"
 #include "editor/editor_ex.h"
 
 #include "debug/xmem.h"

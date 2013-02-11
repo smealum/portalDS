@@ -46,19 +46,20 @@ bool writeEntity(entity_struct* e, FILE* f)
 		case 0:	case 1:
 			//energy ball launcher/catcher
 			fwrite(&e->type->id,sizeof(u8),1,f);
-			writeVect(vect(e->position.x*BLOCKMULTX,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ), f);
+			//BLOCKMULTY/2 etc should depend on orientation
+			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
 		case 3:
 			//pressure button
 			fwrite(&e->type->id,sizeof(u8),1,f);
-			writeVect(vect(e->position.x*BLOCKMULTX,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ), f);
+			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
 		case 11:
 			//light
 			fwrite(&e->type->id,sizeof(u8),1,f);
-			writeVect(vect(e->position.x*BLOCKMULTX,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ), f);
+			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY-BLOCKMULTY/2,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
 		default:

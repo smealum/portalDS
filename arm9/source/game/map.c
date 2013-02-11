@@ -177,10 +177,12 @@ u8 computeLightings(vect3D p, rectangle_struct* rec, room_struct* r)
 
 void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
 {
+	if(!buffer || !v)return;
 	int i;
 	// u8 vt=(rand()%31)<<3;
 	if(!rot)
 	{
+		NOGBA("bounds %d %d",p.x+s.x,p.y+s.y);
 		for(i=0;i<s.x;i++)
 		{
 			int j;
@@ -191,6 +193,7 @@ void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
 			}
 		}
 	}else{
+		NOGBA("bounds %d %d",p.x+s.y,p.y+s.x);
 		for(i=0;i<s.x;i++)
 		{
 			int j;
@@ -224,11 +227,12 @@ rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, materia
 
 void generateLightmap(rectangle_struct* rec, room_struct* r, u8* b)
 {
-	if(rec && r->lightMap)// && rec->lightMap)
+	if(rec && r->lightMap && b)// && rec->lightMap)
 	{
 		u16 x=rec->lmSize.x, y=rec->lmSize.y;
 		// u16 x=rec->lightMap->width, y=rec->lightMap->height;
 		u8* data=malloc(x*y);
+		if(!data)return;
 		vect3D p=vect(rec->position.x*TILESIZE*2-TILESIZE,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2-TILESIZE);
 		NOGBA("p : %d, %d, %d",p.x,p.y,p.z);
 		// u16 palette[256];
@@ -281,20 +285,22 @@ void generateLightmaps(room_struct* r)
 	bool rr=packRectanglesSize(&rl, &w, &h);
 	r->lmSize=vect(w,h,0);
 	NOGBA("done : %d %dx%d",(int)rr,w,h);
-	if(!r->lightMap)
-	{
-		#ifdef A5I3
-			u16 palette[8];
-			int i;for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
-			r->lightMap=createReservedTextureBufferA5I3(NULL,palette,w,h,(void*)(0x6800000+0x0020000));
-		#else
-			u16 palette[256];
-			int i;for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
-			r->lightMap=createTextureBuffer(NULL,palette,w,h);
-		#endif
-	}else changeTextureSizeA5I3(r->lightMap,w,h);
+	// if(!r->lightMap)
+	// {
+	// 	#ifdef A5I3
+	// 		u16 palette[8];
+	// 		int i;for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
+	// 		r->lightMap=createReservedTextureBufferA5I3(NULL,palette,w,h,(void*)(0x6800000+0x0020000));
+	// 	#else
+	// 		u16 palette[256];
+	// 		int i;for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
+	// 		r->lightMap=createTextureBuffer(NULL,palette,w,h);
+	// 	#endif
+	// }else changeTextureSizeA5I3(r->lightMap,w,h);
 	if(r->lightMapBuffer)free(r->lightMapBuffer);
 	r->lightMapBuffer=malloc(w*h);
+	if(!rr)return; //TEMP
+	if(!r->lightMapBuffer)return;
 	// fillBuffer(buffer, vect2(0,0), vect2(512,256), 0, false);
 	lc=r->rectangles.first;
 	while(lc)
@@ -304,7 +310,7 @@ void generateLightmaps(room_struct* r)
 	}
 	
 	NOGBA("done generating, loading...");
-	loadToBank(r->lightMap,r->lightMapBuffer);
+	// loadToBank(r->lightMap,r->lightMapBuffer);
 	NOGBA("loaded.");
 	
 	freeRectangle2DList(&rl);

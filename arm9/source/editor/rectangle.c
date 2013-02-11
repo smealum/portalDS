@@ -124,6 +124,7 @@ void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
 
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip)
 {
+	if(!rec)return false;
 	int32 p1=dotProduct(v,rec->normal);
 	if(!equals(p1,0))
 	{
@@ -436,7 +437,7 @@ bool packRectanglesSize(rectangle2DList_struct* l, short* w, short* h)
 	bool rr=true;
 	*w=32;
 	*h=32;
-	while(rr && *w<=512 && *h<=256)
+	while(rr && *w<512 && *h<=256)
 	{
 		if(l->surface<=(*w)*(*h))
 		{

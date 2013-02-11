@@ -171,7 +171,8 @@ void initBlockArray(u8* ba)
 		{
 			for(k=0;k<ROOMARRAYSIZEZ;k++)
 			{
-				if(i<28 || j<30 || k<28 || i>=36 || j>=34 || k>=36 || (k==31 && i==31))setBlock(ba,i,j,k,1);
+				// if(i<28 || j<30 || k<28 || i>=36 || j>=34 || k>=36 || (k==31 && i==31))setBlock(ba,i,j,k,1);
+				if(i<28 || j<1 || k<28 || i>=36 || j>=63 || k>=36)setBlock(ba,i,j,k,1); //TEMP
 				else setBlock(ba,i,j,k,0);
 			}
 		}
@@ -541,6 +542,9 @@ void drawBlockFace(blockFace_struct* bf)
 	
 	if(bf->direction==2)applyMTL(floorTexture);
 	else applyMTL(wallTexture);
+
+	u8 textmult=1; //temp
+	if(bf->direction==2)textmult=2;
 	
 	glPushMatrix();
 	
@@ -552,11 +556,11 @@ void drawBlockFace(blockFace_struct* bf)
 		
 		GFX_TEX_COORD=TEXTURE_PACK(0*16, 0*16);
 		GFX_VERTEX10=*vtxPtr++;
-		GFX_TEX_COORD=TEXTURE_PACK(64*16, 0*16);
+		GFX_TEX_COORD=TEXTURE_PACK(64*textmult*16, 0*16);
 		GFX_VERTEX10=*vtxPtr++;
-		GFX_TEX_COORD=TEXTURE_PACK(64*16, 64*16);
+		GFX_TEX_COORD=TEXTURE_PACK(64*textmult*16, 64*textmult*16);
 		GFX_VERTEX10=*vtxPtr++;
-		GFX_TEX_COORD=TEXTURE_PACK(0*16, 64*16);
+		GFX_TEX_COORD=TEXTURE_PACK(0*16, 64*textmult*16);
 		GFX_VERTEX10=*vtxPtr++;
 	
 	glPopMatrix(1);

@@ -13,6 +13,8 @@ void drawRoomsGame(u8 mode, u16 color)
 
 extern char* basePath;
 
+u32 total=0;
+
 void readRectangle(rectangle_struct* rec, FILE* f)
 {
 	if(!rec || !f)return;
@@ -22,9 +24,9 @@ void readRectangle(rectangle_struct* rec, FILE* f)
 	readVect(&rec->lmSize,f);
 	readVect(&rec->lmPos,f);
 	readVect(&rec->normal,f);
-	
-	NOGBA("pos %d %d %d",rec->position.x,rec->position.y,rec->position.z);
-	NOGBA("size %d %d %d",rec->size.x,rec->size.y,rec->size.z);
+
+	total+=rec->lmSize.x*rec->lmSize.y;
+	NOGBA("total %d",total);
 	
 	u16 mid=0;
 	fread(&mid,sizeof(u16),1,f);
@@ -216,6 +218,7 @@ void newReadMap(char* filename, room_struct* r)
 
 	//lightmap stuff
 	readVect(&r->lmSize,f);
+	NOGBA("%dx%d lightmap",r->lmSize.x,r->lmSize.y);
 	r->lightMapBuffer=malloc(sizeof(u8)*r->lmSize.x*r->lmSize.y);
 	fread(r->lightMapBuffer,sizeof(u8),r->lmSize.x*r->lmSize.y,f);
 	{

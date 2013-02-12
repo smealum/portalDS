@@ -47,6 +47,9 @@ void initMenu(void)
 	glMaterialf(GL_SPECULAR, RGB15(0,0,0));
 	glMaterialf(GL_EMISSION, RGB15(0,0,0));
 
+	glSetToonTableRange(0, 15, RGB15(8,8,8)); //TEMP?
+	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?
+
 	menuCamera.position=vect(156,8000,13000);
 }
 
@@ -73,8 +76,12 @@ void menuFrame(void)
 	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&menuCamera, vect(inttof32(1)/64,0,0));
 	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&menuCamera, vect(-inttof32(1)/64,0,0));
 
-	if(keysHeld() & KEY_A)lightAngle+=128;
-	else if(keysHeld() & KEY_B)lightAngle-=128;
+	// if(keysHeld() & KEY_A)lightAngle+=128;
+	// else if(keysHeld() & KEY_B)lightAngle-=128;
+	if(keysHeld() & KEY_A)rotateMatrixY(menuCamera.transformationMatrix, 64, true);
+	if(keysHeld() & KEY_Y)rotateMatrixY(menuCamera.transformationMatrix, -64, true);
+	if(keysHeld() & KEY_X)rotateMatrixX(menuCamera.transformationMatrix, 64, false);
+	if(keysHeld() & KEY_B)rotateMatrixX(menuCamera.transformationMatrix, -64, false);
 
 	NOGBA("%d",lightAngle);
 	
@@ -82,9 +89,9 @@ void menuFrame(void)
 		glScalef32(inttof32(16),inttof32(16),inttof32(16));
 		transformCamera(&menuCamera);
 
-		renderModelFrameInterp(GLaDOSmodelInstance.currentFrame,GLaDOSmodelInstance.nextFrame,GLaDOSmodelInstance.interpCounter, &GLaDOSmodel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
-		renderModelFrameInterp(0, 0, 0, &domeModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
-		renderModelFrameInterp(0, 0, 0, &lairModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
+		renderModelFrameInterp(GLaDOSmodelInstance.currentFrame,GLaDOSmodelInstance.nextFrame,GLaDOSmodelInstance.interpCounter, &GLaDOSmodel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(2), false, NULL, RGB15(31,31,31));
+		renderModelFrameInterp(0, 0, 0, &domeModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(0), false, NULL, RGB15(31,31,31));
+		renderModelFrameInterp(0, 0, 0, &lairModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(1), false, NULL, RGB15(31,31,31));
 	glPopMatrix(1);
 	
 	glFlush(0);

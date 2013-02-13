@@ -45,9 +45,6 @@ void initRoomEdition(void)
 	//cosmetics
 	glSetOutlineColor(0,RGB15(0,0,0));
 	glSetOutlineColor(1,RGB15(29,15,3));
-
-	//TEMP entity test
-	createEntity(vect(32,32,32), 0, true);
 }
 
 void updateEditorCamera(void)

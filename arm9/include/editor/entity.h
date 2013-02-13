@@ -5,8 +5,9 @@
 
 typedef struct
 {
-	const char* spriteName;
-	mtlImg_struct* spriteTexture;
+	const char* modelName;
+	const char* textureName;
+	md2Model_struct model;
 	u8 id;
 }entityType_struct;
 

@@ -2,18 +2,18 @@
 
 #define NUMENTITYTYPES (12)
 
-entityType_struct entityTypes[]={(entityType_struct){"ballcatcher_16.pcx", NULL, 0},
-								(entityType_struct){"balllauncher_16.pcx", NULL, 0},
-								(entityType_struct){"button_16.pcx", NULL, 0},
-								(entityType_struct){"pressurebttn_16.pcx", NULL, 0},
-								(entityType_struct){"turret_16.pcx", NULL, 0},
-								(entityType_struct){"companion_16.pcx", NULL, 0},
-								(entityType_struct){"storagecube_16.pcx", NULL, 0},
-								(entityType_struct){"dispenser_16.pcx", NULL, 0},
-								(entityType_struct){"grid_16.pcx", NULL, 0},
-								(entityType_struct){"platform_16.pcx", NULL, 0},
-								(entityType_struct){"door_16.pcx", NULL, 0},
-								(entityType_struct){"light_16.pcx", NULL, 0}};
+entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/door_ed.md2", "door.pcx"/*, NULL, 0*/},
+								(entityType_struct){"editor/models/light_ed.md2", "light.pcx"/*, NULL, 0*/}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -21,7 +21,7 @@ void initEntityType(entityType_struct* et)
 {
 	if(!et)return;
 
-	et->spriteTexture=createTexture((char*)et->spriteName, "editor/3D");
+	loadMd2Model((char*)et->modelName,(char*)et->textureName,&et->model);
 }
 
 void initEntityTypes(void)
@@ -134,17 +134,18 @@ void drawEntity(entity_struct* e)
 	glPushMatrix();
 		editorRoomTransform();
 		glTranslate3f32(inttof32(e->position.x),inttof32(e->position.y),inttof32(e->position.z));
-		untransformCamera(&editorCamera);
-		applyMTL(et->spriteTexture);
-		GFX_BEGIN=GL_QUADS;
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(64));
-			GFX_VERTEX10=NORMAL_PACK(-(1<<5),-(1<<5), 0);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
-			GFX_VERTEX10=NORMAL_PACK( (1<<5),-(1<<5), 0);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(0));
-			GFX_VERTEX10=NORMAL_PACK( (1<<5), (1<<5), 0);
-			GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
-			GFX_VERTEX10=NORMAL_PACK(-(1<<5), (1<<5), 0);
+		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE, false, NULL, RGB15(31,31,31));
+		// untransformCamera(&editorCamera);
+		// applyMTL(et->spriteTexture);
+		// GFX_BEGIN=GL_QUADS;
+		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(64));
+		// 	GFX_VERTEX10=NORMAL_PACK(-(1<<5),-(1<<5), 0);
+		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
+		// 	GFX_VERTEX10=NORMAL_PACK( (1<<5),-(1<<5), 0);
+		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(0));
+		// 	GFX_VERTEX10=NORMAL_PACK( (1<<5), (1<<5), 0);
+		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
+		// 	GFX_VERTEX10=NORMAL_PACK(-(1<<5), (1<<5), 0);
 	glPopMatrix(1);
 }
 

@@ -138,12 +138,53 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	fclose(f);
 }
 
+//READING STUFF
+
 void readHeader(mapHeader_struct* h, FILE* f)
 {
 	if(!h || !f)return;
 	fseek(f, 0, SEEK_SET);
 	fread(h, sizeof(mapHeader_struct), 1, f);
 }
+
+// void readEntity(FILE* f)
+// {
+// 	if(!f)return;
+
+// 	vect3D v;
+// 	u8 id;
+// 	fread(&id,sizeof(u8),1,f);
+
+// 	createEntity();
+
+// 	switch(id)
+// 	{
+// 		case 0:	case 1:
+// 			//energy ball launcher/catcher
+// 			readVect(&v, f);
+// 			break;
+// 		case 3:
+// 			//pressure button
+// 			readVect(&v, f);
+// 			break;
+// 		case 11:
+// 			//light
+// 			readVect(&v, f);
+// 			break;
+// 		default:
+// 			break;
+// 	}
+// }
+
+// void readEntities(FILE* f)
+// {
+// 	int i; u16 cnt;
+// 	fread(&cnt,sizeof(u16),1,f);
+// 	for(i=0;i<cnt;i++)
+// 	{
+// 		readEntity(f);
+// 	}
+// }
 
 void loadMapEditor(editorRoom_struct* er, const char* str)
 {
@@ -155,16 +196,15 @@ void loadMapEditor(editorRoom_struct* er, const char* str)
 	mapHeader_struct h;
 	readHeader(&h, f);
 
-	NOGBA("%d %d %d %d",h.dataPosition,h.rectanglesPosition,h.rectanglesPosition-h.dataPosition,h.dataSize);
-
 	fseek(f, h.dataPosition, SEEK_SET);
 		u8* compressed=malloc(sizeof(u8)*h.dataSize);
 		if(!compressed){return;} //TEMP : clean up first !
 		fread(compressed, sizeof(u8), h.dataSize, f);
-		// decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ); //test
-		decompress(compressed, er->blockArray, RLE);
-		NOGBA("size %p", compressed);
+		decompress(compressed, er->blockArray, RLE); // decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		
 		free(compressed);
+
+	// fseek(f, h.entityPosition, SEEK_SET);
+	// 	readEntities(f);
 
 	fclose(f);
 }

@@ -21,6 +21,7 @@
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
+#include "common/compress.h"
 #include "common/iniparser.h"
 #include "common/math.h"
 #include "common/files.h"

@@ -97,7 +97,7 @@ void writeHeader(mapHeader_struct* h, FILE* f)
 {
 	if(!h || !f)return;
 	fseek(f, 0, SEEK_SET);
-	fwrite(h, sizeof(h), 1, f);
+	fwrite(h, sizeof(mapHeader_struct), 1, f);
 }
 
 void writeMapEditor(editorRoom_struct* er, const char* str)
@@ -123,7 +123,6 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 		fwrite(compressed,sizeof(u8),h.dataSize,f);
 		free(compressed);
 
-
 	h.rectanglesPosition=ftell(f);
 		writeRectangleList(&r.rectangles,f);
 
@@ -135,6 +134,37 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 		writeEntities(f);
 
 	writeHeader(&h,f);
+
+	fclose(f);
+}
+
+void readHeader(mapHeader_struct* h, FILE* f)
+{
+	if(!h || !f)return;
+	fseek(f, 0, SEEK_SET);
+	fread(h, sizeof(mapHeader_struct), 1, f);
+}
+
+void loadMapEditor(editorRoom_struct* er, const char* str)
+{
+	if(!er || !str)return;
+
+	FILE* f=fopen(str,"rb");
+	if(!f)return;
+
+	mapHeader_struct h;
+	readHeader(&h, f);
+
+	NOGBA("%d %d %d %d",h.dataPosition,h.rectanglesPosition,h.rectanglesPosition-h.dataPosition,h.dataSize);
+
+	fseek(f, h.dataPosition, SEEK_SET);
+		u8* compressed=malloc(sizeof(u8)*h.dataSize);
+		if(!compressed){return;} //TEMP : clean up first !
+		fread(compressed, sizeof(u8), h.dataSize, f);
+		// decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ); //test
+		decompress(compressed, er->blockArray, RLE);
+		NOGBA("size %p", compressed);
+		free(compressed);
 
 	fclose(f);
 }

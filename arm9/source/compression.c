@@ -106,3 +106,33 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 
 	return dstS;
 }
+
+uint decompressRLE(u8 *dst, u8 *src, uint dstS)
+{
+	if(!dst || !src)return 0;
+
+	uint ii, size=0;
+	u8 *srcL=src+4, *dstD=dst;
+
+	for(ii=0; ii<dstS; ii += size)
+	{
+		// Get header byte
+		u32 header= *srcL++;
+
+		if(header&0x80)		// compressed stint
+		{
+			size= min( (header&~0x80)+3, dstS-ii);
+			memset(&dstD[ii], *srcL, size);
+			srcL++;
+		}
+		else				// noncompressed stint
+		{
+			size= min(header+1, dstS-ii);
+			// memcpy(&dstD[ii], srcL, size);
+			memset(&dstD[ii], 0, size);
+			srcL += size;
+		}
+	}
+
+	return dstS;
+}

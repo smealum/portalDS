@@ -185,7 +185,8 @@ void initEditorRoom(editorRoom_struct* er)
 	er->blockFaceList=NULL;
 	er->blockArray=malloc(sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
-	initBlockArray(er->blockArray);
+	// initBlockArray(er->blockArray);
+	loadMapEditor(er,"testedit.map");
 	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 }
 

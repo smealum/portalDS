@@ -11,5 +11,6 @@ typedef struct
 }mapHeader_struct;
 
 void writeMapEditor(editorRoom_struct* er, const char* str);
+void loadMapEditor(editorRoom_struct* er, const char* str);
 
 #endif

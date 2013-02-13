@@ -2,17 +2,17 @@
 
 #define NUMINTERFACEBUTTONS (11)
 
-interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){34,35,"storagecube2_ui.pcx",NULL,6,false},
-											(interfaceButton_struct){66,35,"pressurebttn2_ui.pcx",NULL,3,false},
-											(interfaceButton_struct){98,35,"platform2_ui.pcx",NULL,9,false},
-											(interfaceButton_struct){130,35,"grid2_ui.pcx",NULL,8,false},
-											(interfaceButton_struct){162,35,"door2_ui.pcx",NULL,10,false},
-											(interfaceButton_struct){194,35,"light2_ui.pcx",NULL,11,false},
-											(interfaceButton_struct){34,68,"companion2_ui.pcx",NULL,5,false},
-											(interfaceButton_struct){66,68,"button2_ui.pcx",NULL,2,false},
-											(interfaceButton_struct){98,68,"balllauncher2_ui.pcx",NULL,1,false},
-											(interfaceButton_struct){130,68,"ballcatcher2_ui.pcx",NULL,0,false},
-											(interfaceButton_struct){162,68,"turret2_ui.pcx",NULL,4,false}};
+interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
+											(interfaceButton_struct){72,38,"pressurebttn2_ui.pcx",NULL,3,false},
+											(interfaceButton_struct){107,38,"platform2_ui.pcx",NULL,9,false},
+											(interfaceButton_struct){142,38,"grid2_ui.pcx",NULL,8,false},
+											(interfaceButton_struct){177,38,"door2_ui.pcx",NULL,10,false},
+											(interfaceButton_struct){212,38,"light2_ui.pcx",NULL,11,false},
+											(interfaceButton_struct){37,81,"companion2_ui.pcx",NULL,5,false},
+											(interfaceButton_struct){72,81,"button2_ui.pcx",NULL,2,false},
+											(interfaceButton_struct){107,81,"balllauncher2_ui.pcx",NULL,1,false},
+											(interfaceButton_struct){142,81,"ballcatcher2_ui.pcx",NULL,0,false},
+											(interfaceButton_struct){177,81,"turret2_ui.pcx",NULL,4,false}};
 
 struct gl_texture_t *interfaceBackground;
 int bgSub;

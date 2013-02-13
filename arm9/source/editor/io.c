@@ -84,9 +84,20 @@ void writeEntities(FILE* f)
 	fseek(f, 0, SEEK_END);
 }
 
+u8* compressBlockArray(u8* ba, u32* size)
+{
+	u8* dst;
+	*size=compressRLE(&dst, ba, sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
+	return dst;
+}
+
 void writeMapEditor(editorRoom_struct* er, const char* str)
 {
 	if(!er)return;
+
+	u32 size=0;
+	u8* compressed=compressBlockArray(er->blockArray, &size);
+	NOGBA("%do vs %dko",size,ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ/1024);
 
 	FILE* f=fopen(str,"wb+");
 	if(!f)return;

@@ -134,18 +134,7 @@ void drawEntity(entity_struct* e)
 	glPushMatrix();
 		editorRoomTransform();
 		glTranslate3f32(inttof32(e->position.x),inttof32(e->position.y),inttof32(e->position.z));
-		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE, false, NULL, RGB15(31,31,31));
-		// untransformCamera(&editorCamera);
-		// applyMTL(et->spriteTexture);
-		// GFX_BEGIN=GL_QUADS;
-		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(64));
-		// 	GFX_VERTEX10=NORMAL_PACK(-(1<<5),-(1<<5), 0);
-		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(64));
-		// 	GFX_VERTEX10=NORMAL_PACK( (1<<5),-(1<<5), 0);
-		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(64), inttot16(0));
-		// 	GFX_VERTEX10=NORMAL_PACK( (1<<5), (1<<5), 0);
-		// 	GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
-		// 	GFX_VERTEX10=NORMAL_PACK(-(1<<5), (1<<5), 0);
+		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));
 	glPopMatrix(1);
 }
 

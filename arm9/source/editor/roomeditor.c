@@ -45,6 +45,16 @@ void initRoomEdition(void)
 	//cosmetics
 	glSetOutlineColor(0,RGB15(0,0,0));
 	glSetOutlineColor(1,RGB15(29,15,3));
+
+	glMaterialf(GL_AMBIENT, RGB15(8,8,8));
+	glMaterialf(GL_DIFFUSE, RGB15(24,24,24));
+	glMaterialf(GL_SPECULAR, RGB15(0,0,0));
+	glMaterialf(GL_EMISSION, RGB15(0,0,0));
+
+	glSetToonTableRange(0, 2, RGB15(8,8,8));
+	glSetToonTableRange(3, 31, RGB15(24,24,24));
+
+	glLight(0, RGB15(31,31,31), cosLerp(4096)>>3, 0, sinLerp(4096)>>3);
 }
 
 void updateEditorCamera(void)

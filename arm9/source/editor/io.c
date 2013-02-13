@@ -1,5 +1,7 @@
 #include "editor/editor_main.h"
 
+mapHeader_struct blankHeader=(mapHeader_struct){0,0,0,0,0};
+
 //WRITING STUFF
 
 void writeTranslatedVect(vect3D v, FILE* f)
@@ -91,16 +93,22 @@ u8* compressBlockArray(u8* ba, u32* size)
 	return dst;
 }
 
+void writeHeader(mapHeader_struct* h, FILE* f)
+{
+	if(!h || !f)return;
+	fseek(f, 0, SEEK_SET);
+	fwrite(h, sizeof(h), 1, f);
+}
+
 void writeMapEditor(editorRoom_struct* er, const char* str)
 {
 	if(!er)return;
 
-	u32 size=0;
-	u8* compressed=compressBlockArray(er->blockArray, &size);
-	NOGBA("%do vs %dko",size,ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ/1024);
-
 	FILE* f=fopen(str,"wb+");
 	if(!f)return;
+
+	mapHeader_struct h=blankHeader;
+	writeHeader(&h,f);
 
 	room_struct r;
 	initRoom(&r, 0, 0, vect(0,0,0));
@@ -109,12 +117,24 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	generateLightsFromEntities();
 	generateLightmaps(&r);
 
-	writeRectangleList(&r.rectangles,f);
+	h.dataPosition=ftell(f);
+		u8* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);
+		if(!compressed){return;} //TEMP : clean up first !
+		fwrite(compressed,sizeof(u8),h.dataSize,f);
+		free(compressed);
 
-	writeVect(r.lmSize,f);
-	fwrite(r.lightMapBuffer,sizeof(u8),r.lmSize.x*r.lmSize.y,f);
 
-	writeEntities(f);
+	h.rectanglesPosition=ftell(f);
+		writeRectangleList(&r.rectangles,f);
+
+	h.lightPosition=ftell(f);
+		writeVect(r.lmSize,f);
+		fwrite(r.lightMapBuffer,sizeof(u8),r.lmSize.x*r.lmSize.y,f);
+
+	h.entityPosition=ftell(f);
+		writeEntities(f);
+
+	writeHeader(&h,f);
 
 	fclose(f);
 }

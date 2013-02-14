@@ -129,8 +129,6 @@ void emptyBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 
 	fixOriginSize(&o, &s);
 
-	NOGBA("%d %d %d",s.x,s.y,s.z);
-
 	int i, j, k;
 	for(i=o.x;i<o.x+s.x;i++)
 	{

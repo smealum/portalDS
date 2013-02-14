@@ -6,7 +6,7 @@ typedef struct
 	blockFace_struct *firstFace, *secondFace, *currentFace;
 	entity_struct* entity;
 	vect3D origin, size, currentPosition;
-	bool active, selecting, planar;
+	bool active, selecting, planar, error;
 }selection_struct;
 
 extern selection_struct editorSelection;

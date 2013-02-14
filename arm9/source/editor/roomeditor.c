@@ -192,7 +192,7 @@ void roomEditorCursor(selection_struct* sel)
 				blockFace_struct* bf=getBlockFaceTouch(NULL);
 				if(bf)
 				{
-					moveEntityToBlockFace(sel->entity, bf);
+					sel->error=!moveEntityToBlockFace(sel->entity, bf);
 				}
 			}else{
 				if(sel->selecting)
@@ -224,9 +224,12 @@ void roomEditorCursor(selection_struct* sel)
 						vect3D v=vectDifference(p, sel->currentPosition);
 						vect3D o=(bf->direction%2)?(sel->origin):(adjustVectForNormal(bf->direction, sel->origin)); vect3D s=v;
 						fixOriginSize(&o, &s); s=adjustVectForNormal((bf->direction%2)?(bf->direction):(oppositeDirection[bf->direction]), addVect(s,sel->size));
+						vect3D oe=adjustVectForNormal(bf->direction, sel->origin); vect3D se=sel->size;
 
+						moveEntitiesRange(oe, se, v);
 						if(fill)fillBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
 						else emptyBlockArrayRange(editorRoom.blockArray, &editorRoom.blockFaceList, o, s);
+						getEntityBlockFacesRange(editorRoom.blockFaceList, addVect(oe,v), se, true);
 
 						adjustSelection(&editorRoom, sel, oldFirstFace, oldSecondFace, oldCurrentFace, v);
 						sel->currentPosition=p;

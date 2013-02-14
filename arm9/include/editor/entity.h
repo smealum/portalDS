@@ -38,6 +38,8 @@ blockFace_struct* getEntityBlockFace(entity_struct* e, blockFace_struct* l);
 void getEntityBlockFaces(blockFace_struct* l);
 void changeEntityType(entity_struct* e, u8 type);
 bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf);
+void moveEntitiesRange(vect3D o, vect3D s, vect3D u);
+void getEntityBlockFacesRange(blockFace_struct* l, vect3D o, vect3D s, bool delete);
 void generateLightsFromEntities(void);
 void drawEntities(void);
 

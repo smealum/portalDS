@@ -99,6 +99,8 @@ void drawSelection(selection_struct* s)
 	if(!s->active || (!s->entity && (!s->firstFace || !s->secondFace)))return;
 	
 	blockFace_struct* bf=s->firstFace;
+
+	GFX_COLOR=(s->error)?RGB15(31,0,0):(RGB15(29,15,3));
 	
 	if(s->planar && !s->entity)
 	{
@@ -116,8 +118,7 @@ void drawSelection(selection_struct* s)
 			glTranslate3f32(n.x/16, n.y/16, n.z/16);
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
-			
-			GFX_COLOR=RGB15(29,15,3);		
+				
 			GFX_BEGIN=GL_QUADS;
 			
 			GFX_VERTEX10=*vtxPtr++;
@@ -139,10 +140,11 @@ void drawSelection(selection_struct* s)
 			glTranslate3f32(inttof32(s->origin.x-ROOMARRAYSIZEX/2),inttof32(s->origin.y-ROOMARRAYSIZEY/2),inttof32(s->origin.z-ROOMARRAYSIZEZ/2));
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
-			
-			GFX_COLOR=RGB15(29,15,3);		
+				
 			GFX_BEGIN=GL_QUADS;
 			int i;for(i=0;i<6*4;i++)GFX_VERTEX10=*vtxPtr++;	
 		glPopMatrix(1);
 	}
+	
+	s->error=false;
 }

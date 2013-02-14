@@ -91,6 +91,13 @@ entity_struct* createEntity(vect3D pos, u8 type, bool placed)
 	return NULL;
 }
 
+void removeEntity(entity_struct* e)
+{
+	if(!e)return;
+
+	e->used=false;
+}
+
 bool collideLineEntity(entity_struct* e, vect3D o, vect3D v, vect3D p1, vect3D p2, int32* d)
 {
 	if(!e)return false;
@@ -130,7 +137,7 @@ bool isEntityPositionValid(entity_struct* e, vect3D p)
 	int i;
 	for(i=0;i<NUMENTITIES;i++)
 	{
-		if(entity[i].used && entity[i].position.x==p.x && entity[i].position.y==p.y && entity[i].position.z==p.z)return false; //TEMP
+		if(&entity[i]!=e && entity[i].used && entity[i].position.x==p.x && entity[i].position.y==p.y && entity[i].position.z==p.z)return false; //TEMP
 	}
 	return true;
 }
@@ -148,7 +155,7 @@ bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)
 {
 	if(!e || !bf)return false;
 
-	if(!isEntityBlockFaceValid(e,bf))return false;
+	if(!isEntityBlockFaceValid(e,bf)){return false;}
 
 	e->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
 	e->direction=bf->direction;
@@ -178,6 +185,36 @@ void getEntityBlockFaces(blockFace_struct* l)
 	for(i=0;i<NUMENTITIES;i++)
 	{
 		if(entity[i].used)entity[i].blockFace=getEntityBlockFace(&entity[i],l);
+	}
+}
+
+void getEntityBlockFacesRange(blockFace_struct* l, vect3D o, vect3D s, bool delete)
+{
+	int i;
+	vect3D v=addVect(o, s);
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		entity_struct* e=&entity[i];
+		if(e->used && e->position.x>=o.x && e->position.x<v.x && e->position.y>=o.y && e->position.y<v.y && e->position.z>=o.z && e->position.z<v.z)
+		{
+			e->blockFace=getEntityBlockFace(e,l);
+			if(delete && !e->blockFace)removeEntity(e);
+		}
+	}
+}
+
+void moveEntitiesRange(vect3D o, vect3D s, vect3D u)
+{
+	int i;
+	vect3D v=addVect(o, s);
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		entity_struct* e=&entity[i];
+		if(e->used && e->position.x>=o.x && e->position.x<v.x && e->position.y>=o.y && e->position.y<v.y && e->position.z>=o.z && e->position.z<v.z)
+		{
+			e->position=addVect(e->position, u);
+			e->blockFace=NULL;
+		}
 	}
 }
 

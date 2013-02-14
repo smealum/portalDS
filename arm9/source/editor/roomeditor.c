@@ -192,8 +192,7 @@ void roomEditorCursor(selection_struct* sel)
 				blockFace_struct* bf=getBlockFaceTouch(NULL);
 				if(bf)
 				{
-					sel->entity->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
-					sel->entity->placed=true;
+					moveEntityToBlockFace(sel->entity, bf);
 				}
 			}else{
 				if(sel->selecting)

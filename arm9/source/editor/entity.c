@@ -40,6 +40,7 @@ void initEntities(void)
 	for(i=0;i<NUMENTITIES;i++)
 	{
 		entity[i].used=false;
+		entity[i].blockFace=NULL;
 	}
 	initEntityTypes();
 }
@@ -51,6 +52,7 @@ void initEntity(entity_struct* e, entityType_struct* et, vect3D pos, bool placed
 	e->position=pos;
 	e->type=et;
 	e->placed=placed;
+	e->blockFace=NULL;
 	e->used=true;
 }
 
@@ -121,6 +123,17 @@ entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int
 	return ret;
 }
 
+bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)
+{
+	if(!e || !bf)return false;
+
+	e->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
+	e->blockFace=bf;
+	e->placed=true;
+
+	return true;
+}
+
 extern camera_struct editorCamera;
 
 void drawEntity(entity_struct* e)
@@ -134,6 +147,14 @@ void drawEntity(entity_struct* e)
 	glPushMatrix();
 		editorRoomTransform();
 		glTranslate3f32(inttof32(e->position.x),inttof32(e->position.y),inttof32(e->position.z));
+
+		if(e->blockFace)
+		{
+			if(e->blockFace->direction<=1)glRotateZi(-8192);
+			else if(e->blockFace->direction>=4)glRotateXi(8192);
+			if(e->blockFace->direction%2)glRotateXi(16384);
+		}
+		glTranslate3f32(0,-inttof32(1)/2,0);
 		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));
 	glPopMatrix(1);
 }

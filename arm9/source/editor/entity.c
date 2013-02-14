@@ -123,13 +123,25 @@ entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int
 	return ret;
 }
 
+bool isEntityPositionValid(entity_struct* e, vect3D p)
+{
+	if(!e)return false;
+
+	int i;
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		if(entity[i].used && entity[i].position.x==p.x && entity[i].position.y==p.y && entity[i].position.z==p.z)return false; //TEMP
+	}
+	return true;
+}
+
 bool isEntityBlockFaceValid(entity_struct* e, blockFace_struct* bf)
 {
 	if(!e || !bf)return false;
 	entityType_struct* et=e->type;
 	if(!et)return false;
 
-	return et->possibleDirections & (1<<(bf->direction));
+	return (et->possibleDirections & (1<<(bf->direction))) && isEntityPositionValid(e, adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z)));
 }
 
 bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)

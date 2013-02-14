@@ -2,18 +2,18 @@
 
 #define NUMENTITYTYPES (12)
 
-entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/door_ed.md2", "door.pcx"/*, NULL, 0*/},
-								(entityType_struct){"editor/models/light_ed.md2", "light.pcx"/*, NULL, 0*/}};
+entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask/*, NULL, 0*/},
+								(entityType_struct){"editor/models/light_ed.md2", "light.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -123,15 +123,50 @@ entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int
 	return ret;
 }
 
+bool isEntityBlockFaceValid(entity_struct* e, blockFace_struct* bf)
+{
+	if(!e || !bf)return false;
+	entityType_struct* et=e->type;
+	if(!et)return false;
+
+	return et->possibleDirections & (1<<(bf->direction));
+}
+
 bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)
 {
 	if(!e || !bf)return false;
 
+	if(!isEntityBlockFaceValid(e,bf))return false;
+
 	e->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
+	e->direction=bf->direction;
 	e->blockFace=bf;
 	e->placed=true;
 
 	return true;
+}
+
+blockFace_struct* getEntityBlockFace(entity_struct* e, blockFace_struct* l)
+{
+	if(!e || !e->used || !l)return NULL;
+
+	vect3D o=adjustVectForNormal(oppositeDirection[e->direction], e->position);
+
+	while(l)
+	{
+		if(l->x==o.x && l->y==o.y && l->z==o.z && l->direction==e->direction)return l;
+		l=l->next;
+	}
+	return NULL;
+}
+
+void getEntityBlockFaces(blockFace_struct* l)
+{
+	int i;
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		if(entity[i].used)entity[i].blockFace=getEntityBlockFace(&entity[i],l);
+	}
 }
 
 extern camera_struct editorCamera;
@@ -150,9 +185,9 @@ void drawEntity(entity_struct* e)
 
 		if(e->blockFace)
 		{
-			if(e->blockFace->direction<=1)glRotateZi(-8192);
-			else if(e->blockFace->direction>=4)glRotateXi(8192);
-			if(e->blockFace->direction%2)glRotateXi(16384);
+			if(e->direction<=1)glRotateZi(-8192);
+			else if(e->direction>=4)glRotateXi(8192);
+			if(e->direction%2)glRotateXi(16384);
 		}
 		glTranslate3f32(0,-inttof32(1)/2,0);
 		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));

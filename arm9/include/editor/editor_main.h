@@ -11,5 +11,6 @@
 #include "editor/rectangle.h"
 #include "editor/io.h"
 #include "editor/interface.h"
+#include "editor/contextbuttons.h"
 
 #endif

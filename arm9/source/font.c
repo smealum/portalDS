@@ -71,6 +71,26 @@ void loadFont(font_struct* f, u8 charsize)
 	setFont(f);
 }
 
+void drawCharRelative(char c)
+{
+	c-=32;
+	
+	int tx=(c*16)%512;
+	int ty=16*(c*16-tx)/512;	
+	
+	glTranslatef32(inttof32(1), 0, 0);	
+	
+	glBegin(GL_QUADS);	
+		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx), inttot16(ty));
+		GFX_VERTEX10 = t1;
+		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx), inttot16(ty+16));
+		GFX_VERTEX10 = t2;
+		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx+16), inttot16(ty+16));
+		GFX_VERTEX10 = t3;
+		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx+16), inttot16(ty));
+		GFX_VERTEX10 = t4;
+}
+
 void drawChar(char c, u16 color, int32 x, int32 y)
 {
 	c-=32;
@@ -113,12 +133,18 @@ void drawString(char* s, u16 color, int32 size, int32 x, int32 y)
 	int n=strlen(s);
 	int i;
 	
+	glColor(color);
+	bindTexture(&currentFont->tex);
+	bindPalette4(&currentFont->tex);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_ID(63));
+
 	glPushMatrix();
 		glTranslatef32(x, y, 0);
+		glScalef32((currentFont->charsizef32),(currentFont->charsizef32),inttof32(1));
 		glScalef32(size, size,inttof32(1));
 		for(i=0;i<n;i++)
 		{
-			drawChar(s[i], color, i*inttof32(8), 0);
+			drawCharRelative(s[i]);
 		}
 	glPopMatrix(1);
 	unbindMtl();

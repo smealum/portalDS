@@ -533,14 +533,19 @@ blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o,
 	return bf;
 }
 
-void drawBlockFace(blockFace_struct* bf)
+void drawBlockFace(blockFace_struct* bf, u8* ba)
 {
 	if(!bf || !bf->draw)return;
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
-	if(bf->direction==2)applyMTL(floorTexture);
-	else applyMTL(wallTexture);
+	u8 v=getBlock(ba,bf->x,bf->y,bf->z);
+
+	if(v&(1<<(bf->direction+1)))applyMTL(unportalableTexture);
+	else{
+		if(bf->direction==2)applyMTL(floorTexture);
+		else applyMTL(wallTexture);
+	}
 
 	u8 textmult=1; //temp
 	if(bf->direction==2)textmult=2;
@@ -565,13 +570,13 @@ void drawBlockFace(blockFace_struct* bf)
 	glPopMatrix(1);
 }
 
-void drawBlockFaceList(blockFace_struct* l)
+void drawBlockFaceList(blockFace_struct* l, u8* ba)
 {
 	if(!l)return;
 		
 	while(l)
 	{
-		drawBlockFace(l);
+		drawBlockFace(l, ba);
 		l=l->next;
 	}
 }
@@ -591,6 +596,6 @@ void drawEditorRoom(editorRoom_struct* er)
 	
 	glPushMatrix();
 		editorRoomTransform();
-		drawBlockFaceList(er->blockFaceList);
+		drawBlockFaceList(er->blockFaceList, er->blockArray);
 	glPopMatrix(1);
 }

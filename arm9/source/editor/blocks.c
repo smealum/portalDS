@@ -101,6 +101,64 @@ void searchAndDestroyBlockFacesRange(blockFace_struct** l, vect3D o, vect3D s)
 	}
 }
 
+void changePortalableBlockDirection(u8* ba, u8 x, u8 y, u8 z, u8 dir, bool portalable)
+{
+	if(!ba)return;
+	u8 v=getBlock(ba, x, y, z);
+	u8 u=1<<(dir+1);
+	
+	v|=u;
+	if(portalable)v^=u;
+
+	setBlock(ba, x, y, z, v);
+}
+
+void changePortalableBlockArrayRange(u8* ba, blockFace_struct* l, vect3D o, vect3D s, bool portalable)
+{
+	if(!ba)return;
+
+	fixOriginSize(&o, &s);
+	vect3D e=addVect(o, s);
+
+	while(l)
+	{
+		if((l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==0 && l->x==o.x-1 && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==1 && l->x==e.x   && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==2 && l->y==o.y-1 && l->x>=o.x && l->x<e.x && l->z>=o.z && l->z<e.z)
+		|| (l->direction==3 && l->y==e.y   && l->x>=o.x && l->x<e.x && l->z>=o.z && l->z<e.z)
+		|| (l->direction==4 && l->z==o.z-1 && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)
+		|| (l->direction==5 && l->z==e.z   && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y))
+		{
+			changePortalableBlockDirection(ba, l->x, l->y, l->z, l->direction, portalable);
+		}
+		l=l->next;
+	}
+}
+
+void changePortalableBlockArrayRangeDirection(u8* ba, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool portalable)
+{
+	if(!ba)return;
+
+	fixOriginSize(&o, &s);
+	vect3D e=addVect(o, s);
+
+	while(l)
+	{
+		if(l->direction==dir && ((l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==0 && l->x==o.x-1 && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==1 && l->x==e.x   && l->y>=o.y && l->y<e.y && l->z>=o.z && l->z<e.z)
+		|| (l->direction==2 && l->y==o.y-1 && l->x>=o.x && l->x<e.x && l->z>=o.z && l->z<e.z)
+		|| (l->direction==3 && l->y==e.y   && l->x>=o.x && l->x<e.x && l->z>=o.z && l->z<e.z)
+		|| (l->direction==4 && l->z==o.z-1 && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)
+		|| (l->direction==5 && l->z==e.z   && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)))
+		{
+			changePortalableBlockDirection(ba, l->x, l->y, l->z, l->direction, portalable);
+		}
+		l=l->next;
+	}
+}
+
 void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 {
 	if(!ba)return;

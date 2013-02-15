@@ -64,6 +64,8 @@ void freeBlockFaceList(blockFace_struct** l);
 void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts);
 void emptyBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
 void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s);
+void changePortalableBlockArrayRange(u8* ba, blockFace_struct* l, vect3D o, vect3D s, bool portalable);
+void changePortalableBlockArrayRangeDirection(u8* ba, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool portalable);
 
 rectangleList_struct generateOptimizedRectangles(u8* ba);
 

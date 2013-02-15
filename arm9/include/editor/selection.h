@@ -10,10 +10,14 @@ typedef struct
 }selection_struct;
 
 extern selection_struct editorSelection;
+extern contextButton_struct entitySelectionButtonArray[];
+extern contextButton_struct planarSelectionButtonArray[];
+extern contextButton_struct nonplanarSelectionButtonArray[];
 
 void initSelection(selection_struct* s);
 void drawSelection(selection_struct* s);
 void updateSelection(selection_struct* s);
+void undoSelection(selection_struct* s);
 
 bool isFaceInSelection(blockFace_struct* bf, selection_struct* s);
 void adjustSelection(editorRoom_struct* er, selection_struct* s, blockFace_struct of, blockFace_struct os, blockFace_struct oc, vect3D v);

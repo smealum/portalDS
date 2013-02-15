@@ -5,12 +5,9 @@
 
 #define CONTEXTSTEPY (SIMPLEBUTTONSIZEY+2)
 
-contextButton_struct testButtonArray[]={(contextButton_struct){"test1", NULL}, (contextButton_struct){"test2", NULL}, (contextButton_struct){"test3", NULL}};
-
 void initContextButtons(void)
 {
 	initSimpleGui();
-	setupContextButtons(testButtonArray, 3);
 }
 
 bool updateContextButtons(touchPosition* tp)

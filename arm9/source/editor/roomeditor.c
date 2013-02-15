@@ -140,9 +140,7 @@ void switchScreens(void)
 	{
 		pauseEditorInterface();
 	}else{
-		editorSelection.entity=NULL;
-		editorSelection.active=false;
-		editorSelection.selecting=false;
+		undoSelection(&editorSelection);
 	}
 	currentScreen^=1;
 	lcdSwap();
@@ -160,6 +158,7 @@ void roomEditorCursor(selection_struct* sel)
 			//entity
 			entity_struct* e=(entity_struct*)ptr;
 
+			undoSelection(sel);
 			sel->active=true;
 			sel->selecting=false;
 			sel->entity=e;
@@ -175,13 +174,14 @@ void roomEditorCursor(selection_struct* sel)
 					sel->currentPosition=vect(bf->x,bf->y,bf->z);
 					sel->selecting=false;
 				}else{
+					undoSelection(sel);
 					sel->firstFace=sel->secondFace=bf;
 					sel->active=true;
 					sel->selecting=true;
 				}
 				sel->entity=NULL;
 			}else{
-				sel->active=false;
+				undoSelection(sel);
 			}
 		}
 	}else if(keysHeld() & KEY_TOUCH)
@@ -241,6 +241,14 @@ void roomEditorCursor(selection_struct* sel)
 			if(abs(oldTouch.px-currentTouch.px)>2)rotateMatrixY(editorCamera.transformationMatrix, -TOUCHSPEEDX*(oldTouch.px-currentTouch.px), true);
 			if(abs(oldTouch.py-currentTouch.py)>2)rotateMatrixX(editorCamera.transformationMatrix, -TOUCHSPEEDY*(oldTouch.py-currentTouch.py), false);
 		}
+	}else if(keysUp() & KEY_TOUCH)
+	{
+		if(sel->active)
+		{
+			if(sel->entity)setupContextButtons(entitySelectionButtonArray, 2);
+			else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
+			else setupContextButtons(nonplanarSelectionButtonArray, 4);
+		}
 	}
 }
 
@@ -282,7 +290,7 @@ void updateRoomEditor(void)
 	}else{
 		updateInterfaceButtons(oldTouch.px,oldTouch.py); //TEMP
 	}
-	
+
 	roomEditorControls();
 
 	oldTouch=currentTouch;

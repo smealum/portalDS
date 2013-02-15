@@ -5,12 +5,12 @@
 #include "game/game_main.h"
 #include "editor/blocks.h"
 #include "editor/entity.h"
+#include "editor/contextbuttons.h"
 #include "editor/selection.h"
 #include "editor/roomeditor.h"
 #include "editor/material.h"
 #include "editor/rectangle.h"
 #include "editor/io.h"
 #include "editor/interface.h"
-#include "editor/contextbuttons.h"
 
 #endif

@@ -2,6 +2,10 @@
 
 selection_struct editorSelection;
 
+contextButton_struct entitySelectionButtonArray[]={(contextButton_struct){"set target", NULL}, (contextButton_struct){"portalable", NULL}};
+contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", NULL}, (contextButton_struct){"portalable", NULL}};
+contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", NULL}, (contextButton_struct){"portalable", NULL}, (contextButton_struct){"fill", NULL}, (contextButton_struct){"delete", NULL}};
+
 void initSelection(selection_struct* s)
 {
 	if(!s)s=&editorSelection;
@@ -24,6 +28,16 @@ void adjustSelection(editorRoom_struct* er, selection_struct* s, blockFace_struc
 	s->currentFace=findBlockFace(er->blockFaceList, oc.x, oc.y, oc.z, oc.direction);
 
 	if(!s->firstFace || !s->secondFace || !s->currentFace)s->active=false;
+}
+
+void undoSelection(selection_struct* s)
+{
+	if(!s)return;
+
+	cleanUpContextButtons();
+	s->entity=NULL;
+	s->active=false;
+	s->selecting=false;
 }
 
 void updateSelection(selection_struct* s)

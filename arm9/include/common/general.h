@@ -31,9 +31,7 @@
 #include "common/textures.h"
 #include "common/md2.h"
 #include "common/font.h"
-#include "common/GUI.h"
 #include "common/simplegui.h"
-#include "common/keyboard.h"
 #include "game/displaylist.h"
 
 #include "game/game_ex.h"

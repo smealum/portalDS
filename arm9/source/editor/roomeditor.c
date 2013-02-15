@@ -15,8 +15,6 @@ touchPosition currentTouch, oldTouch;
 
 bool currentScreen;
 
-const char testString[]="test button";
-
 void initRoomEdition(void)
 {
 	initLights();
@@ -24,7 +22,7 @@ void initRoomEdition(void)
 	initEntities();
 	initInterface();
 	initEditorRoom(&editorRoom);
-	initSimpleGui();
+	initContextButtons();
 	initSelection(NULL);
 	initCamera(&editorCamera);
 	// initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
@@ -58,9 +56,6 @@ void initRoomEdition(void)
 	glSetToonTableRange(3, 31, RGB15(24,24,24));
 
 	glLight(0, RGB15(31,31,31), cosLerp(4096)>>3, 0, sinLerp(4096)>>3);
-
-	//TEMP
-	createSimpleButton(vect(10,10,0),testString);
 }
 
 void updateEditorCamera(void)
@@ -279,14 +274,17 @@ void updateRoomEditor(void)
 	{
 		updateLineOfTouch(currentTouch.px-128, currentTouch.py-96);
 		updateEditorCamera();
-		roomEditorCursor(NULL);
+		if(!updateContextButtons(&currentTouch))
+		{
+			roomEditorCursor(NULL);
+		}
 		updateSelection(NULL);
 	}else{
 		updateInterfaceButtons(oldTouch.px,oldTouch.py); //TEMP
 	}
-
-	roomEditorControls();
 	
+	roomEditorControls();
+
 	oldTouch=currentTouch;
 }
 
@@ -304,7 +302,7 @@ void drawRoomEditor(void)
 		drawSelection(NULL);
 	glPopMatrix(1);
 
-		drawSimpleGui();
+	drawContextButtons();
 	
 	glFlush(0);
 }

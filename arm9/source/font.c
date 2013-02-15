@@ -10,7 +10,7 @@ font_struct* currentFont;
 
 void initText(void)
 {
-	loadFont(&hudFont,16);
+	loadFont(&hudFont,16,8);
 }
 
 void setFont(font_struct* f)
@@ -18,7 +18,7 @@ void setFont(font_struct* f)
 	currentFont=f;
 }
 
-void loadFont(font_struct* f, u8 charsize)
+void loadFont(font_struct* f, u8 charsize, u8 rendersize)
 {
 	int i, j;
 	int param;
@@ -66,6 +66,7 @@ void loadFont(font_struct* f, u8 charsize)
 	addToBank(&f->tex, buffer, f->tex.bank);
 	
 	f->charsize=charsize;
+	f->rendersize=rendersize;
 	f->charsizef32=inttof32(charsize);
 	
 	setFont(f);
@@ -77,10 +78,8 @@ void drawCharRelative(char c)
 	
 	int tx=(c*16)%512;
 	int ty=16*(c*16-tx)/512;	
-	
-	glTranslatef32(inttof32(1), 0, 0);	
-	
-	glBegin(GL_QUADS);	
+		
+	glBegin(GL_QUADS);
 		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx), inttot16(ty));
 		GFX_VERTEX10 = t1;
 		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx), inttot16(ty+16));
@@ -89,6 +88,8 @@ void drawCharRelative(char c)
 		GFX_VERTEX10 = t3;
 		GFX_TEX_COORD = TEXTURE_PACK(inttot16(tx+16), inttot16(ty));
 		GFX_VERTEX10 = t4;
+
+	glTranslatef32(inttof32(1)/2, 0, 0);
 }
 
 void drawChar(char c, u16 color, int32 x, int32 y)
@@ -142,6 +143,7 @@ void drawString(char* s, u16 color, int32 size, int32 x, int32 y)
 		glTranslatef32(x, y, 0);
 		glScalef32((currentFont->charsizef32),(currentFont->charsizef32),inttof32(1));
 		glScalef32(size, size,inttof32(1));
+		glTranslatef32(inttof32(1)/4, inttof32(1)/2, 0);
 		for(i=0;i<n;i++)
 		{
 			drawCharRelative(s[i]);

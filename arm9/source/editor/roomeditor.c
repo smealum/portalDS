@@ -15,6 +15,8 @@ touchPosition currentTouch, oldTouch;
 
 bool currentScreen;
 
+const char testString[]="test button";
+
 void initRoomEdition(void)
 {
 	initLights();
@@ -22,6 +24,7 @@ void initRoomEdition(void)
 	initEntities();
 	initInterface();
 	initEditorRoom(&editorRoom);
+	initSimpleGui();
 	initSelection(NULL);
 	initCamera(&editorCamera);
 	// initProjectionMatrixOrtho(&editorCamera, inttof32(-128), inttof32(127),inttof32(-96), inttof32(95), inttof32(-1000), inttof32(1000));
@@ -55,6 +58,9 @@ void initRoomEdition(void)
 	glSetToonTableRange(3, 31, RGB15(24,24,24));
 
 	glLight(0, RGB15(31,31,31), cosLerp(4096)>>3, 0, sinLerp(4096)>>3);
+
+	//TEMP
+	createSimpleButton(vect(10,10,0),testString);
 }
 
 void updateEditorCamera(void)
@@ -292,12 +298,13 @@ void drawRoomEditor(void)
 	glPushMatrix();		
 		glScalef32(editorScale,editorScale,editorScale);
 		transformCamera(&editorCamera);
-		// glTranslate3f32(editorTranslation.x,editorTranslation.y,editorTranslation.z);
 
 		drawEditorRoom(&editorRoom);
 		drawEntities();
 		drawSelection(NULL);
 	glPopMatrix(1);
+
+		drawSimpleGui();
 	
 	glFlush(0);
 }

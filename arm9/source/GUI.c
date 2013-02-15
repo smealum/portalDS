@@ -1303,7 +1303,7 @@ void initGui()
 	buttonBlock=NULL;
 	Cursor=NULL;
 	DefaultCursor=NULL;
-	loadFont(&APIfont, CHARSIZE);
+	loadFont(&APIfont, CHARSIZE, CHARSIZE/2);
 	cull=true;
 	keyboardLock=false;
 	touchOnly=true;

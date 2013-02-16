@@ -35,7 +35,7 @@ typedef struct entity_struct
 }entity_struct;
 
 extern contextButton_struct ballLauncherButtonArray[];
-extern contextButton_struct ballLauncherButtonArray[];
+extern contextButton_struct ballCatcherButtonArray[];
 extern contextButton_struct button1ButtonArray[];
 extern contextButton_struct button2ButtonArray[];
 extern contextButton_struct turretButtonArray[];

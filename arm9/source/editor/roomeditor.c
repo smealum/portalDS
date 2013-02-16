@@ -56,9 +56,6 @@ void initRoomEdition(void)
 	glSetToonTableRange(3, 31, RGB15(24,24,24));
 
 	glLight(0, RGB15(31,31,31), cosLerp(4096)>>3, 0, sinLerp(4096)>>3);
-
-	//TEMP
-	createEntity(vect(32,32,32), 0, true)->target=createEntity(vect(40,40,40), 1, true);
 }
 
 void updateEditorCamera(void)
@@ -156,40 +153,53 @@ void roomEditorCursor(selection_struct* sel)
 	{
 		u8 type;
 		void* ptr=getBlockEntityTouch(&type);
-		if(type)
+		if(sel->entity && sel->selectingTarget)
 		{
-			//entity
-			entity_struct* e=(entity_struct*)ptr;
-
-			undoSelection(sel);
-			sel->active=true;
-			sel->selecting=false;
-			sel->entity=e;
-		}else{
-			//blockface
-			blockFace_struct* bf=(blockFace_struct*)ptr;
-
-			if(bf)
+			if(type)
 			{
-				if(sel->active && isFaceInSelection(bf, sel))
+				sel->selectingTarget=false;
+				sel->entity->target=(entity_struct*)ptr;
+				cleanUpContextButtons();
+			}
+		}else{
+			if(type)
+			{
+				//entity
+				entity_struct* e=(entity_struct*)ptr;
+
+				undoSelection(sel);
+				sel->active=true;
+				sel->selecting=false;
+				sel->selectingTarget=false;
+				sel->entity=e;
+			}else{
+				//blockface
+				blockFace_struct* bf=(blockFace_struct*)ptr;
+
+				if(bf)
 				{
-					sel->currentFace=bf;
-					sel->currentPosition=vect(bf->x,bf->y,bf->z);
-					sel->selecting=false;
+					if(sel->active && isFaceInSelection(bf, sel))
+					{
+						sel->currentFace=bf;
+						sel->currentPosition=vect(bf->x,bf->y,bf->z);
+						sel->selecting=false;
+						sel->selectingTarget=false;
+					}else{
+						undoSelection(sel);
+						sel->firstFace=sel->secondFace=bf;
+						sel->active=true;
+						sel->selecting=true;
+						sel->selectingTarget=false;
+					}
+					sel->entity=NULL;
 				}else{
 					undoSelection(sel);
-					sel->firstFace=sel->secondFace=bf;
-					sel->active=true;
-					sel->selecting=true;
 				}
-				sel->entity=NULL;
-			}else{
-				undoSelection(sel);
-			}
+			}			
 		}
 	}else if(keysHeld() & KEY_TOUCH)
 	{
-		if(sel->active)
+		if(sel->active && !(sel->entity && sel->selectingTarget))
 		{
 			if(sel->entity)
 			{
@@ -248,8 +258,11 @@ void roomEditorCursor(selection_struct* sel)
 	{
 		if(sel->active)
 		{
-			if(sel->entity && sel->entity->type)setupContextButtons(sel->entity->type->contextButtonsArray, sel->entity->type->numButtons);
-			else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
+			if(sel->entity && sel->entity->type)
+			{
+				if(!sel->selectingTarget)setupContextButtons(sel->entity->type->contextButtonsArray, sel->entity->type->numButtons);
+				else setupContextButtons(targetSelectionButtonArray, 2);
+			}else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
 			else setupContextButtons(nonplanarSelectionButtonArray, 4);
 		}
 	}

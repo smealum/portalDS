@@ -6,11 +6,11 @@ typedef struct
 	blockFace_struct *firstFace, *secondFace, *currentFace;
 	entity_struct* entity;
 	vect3D origin, size, currentPosition;
-	bool active, selecting, planar, error;
+	bool active, selecting, selectingTarget, planar, error;
 }selection_struct;
 
 extern selection_struct editorSelection;
-extern contextButton_struct entitySelectionButtonArray[];
+extern contextButton_struct targetSelectionButtonArray[];
 extern contextButton_struct planarSelectionButtonArray[];
 extern contextButton_struct nonplanarSelectionButtonArray[];
 

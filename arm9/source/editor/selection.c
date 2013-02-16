@@ -9,6 +9,7 @@ void initSelection(selection_struct* s)
 	
 	s->firstFace=s->secondFace=NULL;
 	s->origin=s->size=vect(0,0,0);
+	s->selectingTarget=false;
 	s->active=false;
 }
 
@@ -40,6 +41,7 @@ void undoSelection(selection_struct* s)
 	s->entity=NULL;
 	s->active=false;
 	s->selecting=false;
+	s->selectingTarget=false;
 }
 
 void updateSelection(selection_struct* s)
@@ -254,7 +256,21 @@ void makePortalablePlanarButton(void)
 	changePortalableBlockArrayRangeDirection(editorRoom.blockArray, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
 }
 
-contextButton_struct entitySelectionButtonArray[]={(contextButton_struct){"set target", NULL}, (contextButton_struct){"portalable", NULL}};
+void cancelTargetButton(void)
+{
+	cleanUpContextButtons();
+	editorSelection.selectingTarget=false;
+}
+
+void removeTargetButton(void)
+{
+	selection_struct* s=&editorSelection;
+	if(s->entity)s->entity->target=NULL;
+	cleanUpContextButtons();
+	editorSelection.selectingTarget=false;
+}
+
+contextButton_struct targetSelectionButtonArray[]={(contextButton_struct){"remove target", removeTargetButton}, (contextButton_struct){"cancel", cancelTargetButton}};
 contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}};
 contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalableButton}, (contextButton_struct){"portalable", makePortalableButton}, (contextButton_struct){"fill", fillButtonFunction}, (contextButton_struct){"delete", emptyButtonFunction}};
 

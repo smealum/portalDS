@@ -10,7 +10,7 @@ entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_
 								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask, cubeButtonArray, 1},
 								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask, cubeButtonArray, 1},
 								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, cubeButtonArray, 1},
-								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1},
+								(entityType_struct){"editor/models/grid_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1},
 								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 1},
 								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1},
 								(entityType_struct){"editor/models/light_ed.md2", "light.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1}};
@@ -253,7 +253,7 @@ void drawEntity(entity_struct* e)
 		if(e->blockFace)
 		{
 			if(e->direction<=1)glRotateZi(-8192);
-			else if(e->direction>=4)glRotateXi(8192);
+			else if(e->direction>=4){glRotateXi(8192);glRotateYi(8192);}
 			if(e->direction%2)glRotateXi(16384);
 		}
 		glTranslate3f32(0,-inttof32(1)/2,0);

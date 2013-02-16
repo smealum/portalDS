@@ -401,103 +401,192 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 	int i, j, k;
 	u8 *data1, *data2;
 	s16 cnt1, cnt2;
+	s16 cnt12, cnt22;
 	u16 maxSize=max(ROOMARRAYSIZEX, max(ROOMARRAYSIZEY, ROOMARRAYSIZEZ));
 	data1=malloc(maxSize*maxSize*sizeof(u8));if(!data1)return rl;
 	data2=malloc(maxSize*maxSize*sizeof(u8));if(!data2){free(data1);return rl;}
 
 	cnt1=0; cnt2=0;
+	cnt12=0; cnt22=0;
 	for(i=0;i<ROOMARRAYSIZEX;i++)
 	{
-		for(j=0;j<ROOMARRAYSIZEY;j++)
-		{
-			for(k=0;k<ROOMARRAYSIZEZ;k++)
-			{
-				data1[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i+1,j,k);
-				data2[j+k*ROOMARRAYSIZEY]=getBlock(ba,i,j,k)&&!getBlock(ba,i-1,j,k);
-				if(data1[j+k*ROOMARRAYSIZEY])cnt1++;
-				if(data2[j+k*ROOMARRAYSIZEY])cnt2++;
-			}
-		}
-
-		while(cnt1>0)
-		{
-			vect2D p, s;
-			getMaxRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y))),&rl);
-			cnt1-=s.x*s.y;
-		}
-		while(cnt2>0)
-		{
-			vect2D p, s;
-			getMaxRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y))),&rl);
-			cnt2-=s.x*s.y;
-		}
-	}
-
-	cnt1=0; cnt2=0;
-	for(j=0;j<ROOMARRAYSIZEY;j++)
-	{
-		for(i=0;i<ROOMARRAYSIZEX;i++)
-		{
-			for(k=0;k<ROOMARRAYSIZEZ;k++)
-			{
-				data1[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j+1,k);
-				data2[i+k*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j-1,k);
-				if(data1[i+k*ROOMARRAYSIZEX])cnt1++;
-				if(data2[i+k*ROOMARRAYSIZEX])cnt2++;
-			}
-		}
-
-		while(cnt1>0)
-		{
-			vect2D p, s;
-			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y))),&rl);
-			cnt1-=s.x*s.y;
-		}
-		while(cnt2>0)
-		{
-			vect2D p, s;
-			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y))),&rl);
-			cnt2-=s.x*s.y;
-		}
-	}
-
-	cnt1=0; cnt2=0;
-	for(k=0;k<ROOMARRAYSIZEZ;k++)
-	{
-		for(i=0;i<ROOMARRAYSIZEX;i++)
+		u8 *d1=data1, *d2=data2;
+		for(k=0;k<ROOMARRAYSIZEZ;k++)
 		{
 			for(j=0;j<ROOMARRAYSIZEY;j++)
 			{
-				data1[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k+1);
-				data2[i+j*ROOMARRAYSIZEX]=getBlock(ba,i,j,k)&&!getBlock(ba,i,j,k-1);
-				if(data1[i+j*ROOMARRAYSIZEX])cnt1++;
-				if(data2[i+j*ROOMARRAYSIZEX])cnt2++;
+				const u8 v=getBlock(ba,i,j,k);
+				*d1=v&&!getBlock(ba,i+1,j,k);
+				*d2=v&&!getBlock(ba,i-1,j,k);
+
+				if((v>>1)&1)*d1=2;
+				if((v>>2)&1)*d2=2;
+
+				if(*d1==1)cnt1++;
+				else if(*d1==2)cnt12++;
+				if(*d2==1)cnt2++;
+				else if(*d2==2)cnt22++;
+				d1++;d2++;
 			}
 		}
 
+		//portalable
 		while(cnt1>0)
 		{
 			vect2D p, s;
-			getMaxRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0))),&rl);
+			getMaxRectangle(data1, 1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y)),true),&rl);
 			cnt1-=s.x*s.y;
 		}
 		while(cnt2>0)
 		{
 			vect2D p, s;
-			getMaxRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0))),&rl);
+			getMaxRectangle(data2, 1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y)),true),&rl);
 			cnt2-=s.x*s.y;
+		}
+
+		//unportalable
+		while(cnt12>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y)),false),&rl);
+			cnt12-=s.x*s.y;
+		}
+		while(cnt22>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, 2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y)),false),&rl);
+			cnt22-=s.x*s.y;
+		}
+	}
+
+	cnt1=0; cnt2=0;
+	cnt12=0; cnt22=0;
+	for(j=0;j<ROOMARRAYSIZEY;j++)
+	{
+		u8 *d1=data1, *d2=data2;
+		for(k=0;k<ROOMARRAYSIZEZ;k++)
+		{
+			for(i=0;i<ROOMARRAYSIZEX;i++)
+			{
+				const u8 v=getBlock(ba,i,j,k);
+				*d1=v&&!getBlock(ba,i,j+1,k);
+				*d2=v&&!getBlock(ba,i,j-1,k);
+
+				if((v<<3)&1)*d1=2;
+				if((v<<4)&1)*d2=2;
+
+				if(*d1==1)cnt1++;
+				else if(*d1==2)cnt12++;
+				if(*d2==1)cnt2++;
+				else if(*d2==2)cnt22++;
+				d1++;d2++;
+			}
+		}
+
+		//portalable
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),true),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y)),true),&rl);
+			cnt2-=s.x*s.y;
+		}
+
+		//unportalable
+		while(cnt12>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),false),&rl);
+			cnt12-=s.x*s.y;
+		}
+		while(cnt22>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y)),false),&rl);
+			cnt22-=s.x*s.y;
+		}
+
+	}
+
+	cnt1=0; cnt2=0;
+	cnt12=0; cnt22=0;
+	for(k=0;k<ROOMARRAYSIZEZ;k++)
+	{
+		u8 *d1=data1, *d2=data2;
+		for(j=0;j<ROOMARRAYSIZEY;j++)
+		{
+			for(i=0;i<ROOMARRAYSIZEX;i++)
+			{
+				const u8 v=getBlock(ba,i,j,k);
+				*d1=v&&!getBlock(ba,i,j,k+1);
+				*d2=v&&!getBlock(ba,i,j,k-1);
+
+				if((v>>5)&1)*d1=2;
+				if((v>>6)&1)*d2=2;
+
+				if(*d1==1)cnt1++;
+				else if(*d1==2)cnt12++;
+				if(*d2==1)cnt2++;
+				else if(*d2==2)cnt22++;
+				d1++;d2++;
+			}
+		}
+
+		//portalable
+		while(cnt1>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0)),true),&rl);
+			cnt1-=s.x*s.y;
+		}
+		while(cnt2>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0)),true),&rl);
+			cnt2-=s.x*s.y;
+		}
+
+		//unportalable
+		while(cnt12>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0)),false),&rl);
+			cnt12-=s.x*s.y;
+		}
+		while(cnt22>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data2, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0)),false),&rl);
+			cnt22-=s.x*s.y;
 		}
 	}
 

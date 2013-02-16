@@ -49,12 +49,12 @@ int area(vect2D origin, vect2D corner)
 	return (corner.x-origin.x+1)*(corner.y-origin.y+1);
 }
 
-void fillCache(int* c, u8* d, int w, int h, int x)
+void fillCache(int* c, u8* d, u8 val, int w, int h, int x)
 {
 	int y;
 	for(y=0;y<h;y++)
 	{
-		if(d[x+y*w])c[y]++;
+		if(d[x+y*w]==val)c[y]++;
 		else c[y]=0;
 	}
 }
@@ -67,7 +67,7 @@ int* initCache(int h)
 	return c;
 }
 
-void getMaxRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
+void getMaxRectangle(u8* data, u8 val, int w, int h, vect2D* pos, vect2D* size)
 {
 	int x;
 	vect2D originb=vect2(0,0),cornerb=vect2(-1,-1);
@@ -77,7 +77,7 @@ void getMaxRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
 	for(x=w-1;x>=0;x--)
 	{
 		int y, width=0;
-		fillCache(c,data,w,h,x);
+		fillCache(c,data,val,w,h,x);
 		for(y=0;y<=h;y++)
 		{
 			if(c[y]>width)

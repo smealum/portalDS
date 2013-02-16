@@ -67,10 +67,11 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	rec->hide=false;
 }
 
-rectangle_struct createRectangle(vect3D pos, vect3D size)
+rectangle_struct createRectangle(vect3D pos, vect3D size, bool portalable)
 {
 	rectangle_struct rec;
 	initRectangle(&rec, pos, size);
+	rec.portalable=portalable;
 	return rec;
 }
 

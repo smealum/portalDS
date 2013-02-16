@@ -19,6 +19,8 @@ void writeRectangle(rectangle_struct* rec, FILE* f)
 	writeVect(rec->lmPos,f);
 	writeVect(rec->normal,f);
 	
+	fwrite(&rec->portalable,sizeof(bool),1,f);
+
 	u16 mid=getMaterialID(rec->material);
 	
 	fwrite(&mid,sizeof(u16),1,f);

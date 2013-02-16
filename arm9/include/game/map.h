@@ -42,7 +42,7 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p);
 void resizeRoom(room_struct* r, u16 l, u16 w, vect3D p);
 rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, material_struct* mat, bool portalable);
 void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size);
-rectangle_struct createRectangle(vect3D pos, vect3D size);
+rectangle_struct createRectangle(vect3D pos, vect3D size, bool portalable);
 void removeRectangles(room_struct* r);
 void drawRectangleList(rectangleList_struct* rl);
 void drawRoom(room_struct* r, u8 mode, u16 color);

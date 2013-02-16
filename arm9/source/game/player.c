@@ -271,58 +271,13 @@ void playerControls(player_struct* p)
 		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
 		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
 	}
-		
-	// if(keysHeld()&(KEY_SELECT))moveCamera(NULL, vect(0,-(inttof32(1)>>6),0));
-	// if(keysHeld()&(KEY_START))moveCamera(NULL, vect(0,inttof32(1)>>6,0));
-	if(keysDown()&(KEY_START))p->object->speed.y=(inttof32(1)>>4);
-	// if(keysDown()&(KEY_SELECT)){camera_struct* c=getPlayerCamera();p->object->position=c->position=portal1.camera.position;memcpy(c->transformationMatrix,portal1.camera.transformationMatrix,9*sizeof(int32));}
+	
+	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
+
+	camera_struct* c=getPlayerCamera();
+	if(keysDown()&(KEY_SELECT))changeGravity(vect(4096,0,0),16);
 	
-	//DEBUG
-	// if(keysHeld()&(KEY_R)){height++;}
-	// if(keysHeld()&(KEY_L)){height--;}
-	// NOGBA("height : %d",height);
-	// if(keysHeld()&(KEY_A)){X++;}
-	// if(keysHeld()&(KEY_B)){X--;}
-	// NOGBA("X : %d",X);
-	// if(keysHeld()&(KEY_X)){depth++;}
-	// if(keysHeld()&(KEY_Y)){depth--;}
-	// NOGBA("depth : %d",depth);
-	
-	/*if(keysDown()&(KEY_SELECT))
-	{
-		room_struct* r=getRoomPoint(p->object->position);
-		if(r)
-		{
-			vect3D p2=convertCoord(r, p->object->position);
-			int dist=0;
-			door_struct* d=getClosestDoorRoom(NULL,r,vect2(p2.x,p2.z),&dist);
-			if(d)
-			{
-				NOGBA("DOOOOOOR %d %p",dist,d);
-				if((!d->open||dist>0) && dist<=4)
-				{
-					closeRoomDoors(NULL, r, d);
-					if(toggleDoor(r,d))
-					{
-						// mmEffect(SFX_DOOR);
-						if(d->open)
-						{
-							// room_struct* r2=d->secondaryRoom;
-							// if(r==r2)r2=d->primaryRoom;
-							// unloadLightMaps(r,r2);
-						}else{
-							unloadLightMaps(r,NULL);
-							room_struct* r2=d->secondaryRoom;
-							if(r==r2)r2=d->primaryRoom;
-							loadLightMap(r2);
-						}
-					}
-				}
-				// moveRoomEnemiesTo(r,p2.x,p2.z,RUNTO);
-			}
-		}
-	}*/
 	touchOld=touchCurrent;
 }
 

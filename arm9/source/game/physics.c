@@ -8,6 +8,9 @@
 
 extern platform_struct platform[NUMPLATFORMS];
 
+vect3D gravityVector=(vect3D){0,-16,0};
+vect3D normGravityVector=(vect3D){0,-4096,0};
+
 vect3D boxDefinition[]={vect(0,-PLAYERSIZEY,0),
 						vect(-PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,-PLAYERSIZEX),
 						vect(PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,-PLAYERSIZEX),
@@ -69,7 +72,7 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 {
 	if(!gc || !o || !r)return false;
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-	// o1.y-=128; //make ourselves taller
+	
 	int i;
 	bool ret=false;
 	for(i=0;i<gc->numRectangles;i++)
@@ -139,19 +142,24 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	return ret;
 }
 
+void changeGravity(vect3D v, int32 l)
+{
+	normGravityVector=v;
+	gravityVector=vectMult(v,l);
+}
+
 void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 {
 	if(!o)return;
 	if(!r)return;
 	vect3D pos=o->position;
-	o->speed.y-=16; //gravity
+
+	o->speed=addVect(o->speed, gravityVector);
 
 	if(o->speed.y>800)o->speed.y=800;
 	else if(o->speed.y<-800)o->speed.y=-800;
 	
 	int32 length=magnitude(o->speed);
-	
-	iprintf("length %d  \n",length);
 	
 	bool ret=false;
 	
@@ -177,10 +185,19 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 	
 	o->contact=ret;
 	
-	// o->speed=vect(0,o->position.y-pos.y,0);
 	o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
-	if(o->contact){o->speed.x-=o->speed.x/2;o->speed.z-=o->speed.z/2;} //floor friction
-	else {o->speed.x-=o->speed.x/32;o->speed.z-=o->speed.z/32;} //air friction
+
+	if(o->contact)
+	{
+		 //floor friction
+		vect3D s=vectDifference(o->speed,vectMult(normGravityVector,dotProduct(normGravityVector,o->speed)));
+		o->speed=vectDifference(o->speed,vectDivInt(s,2));
+	}else{
+		//air friction
+		vect3D s=vectDifference(o->speed,vectMult(normGravityVector,dotProduct(normGravityVector,o->speed)));
+		o->speed=vectDifference(o->speed,vectDivInt(s,32));
+	}
+
 	if(abs(o->speed.x)<3)o->speed.x=0;
 	if(abs(o->speed.z)<3)o->speed.z=0;
 }

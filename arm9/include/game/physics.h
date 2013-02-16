@@ -12,6 +12,9 @@ typedef struct
 	bool contact;
 }physicsObject_struct;
 
+extern vect3D gravityVector;
+extern vect3D normGravityVector;
+
 room_struct* getRoomPoint(vect3D p);
 void updatePhysicsObject(physicsObject_struct* o);
 void collideObjectRoom(physicsObject_struct* o, room_struct* r);
@@ -19,5 +22,6 @@ bool objectInRoom(room_struct* r, physicsObject_struct* o, vect3D* v);
 s16 updateSimplePhysicsObjectRoom(room_struct* r, physicsObject_struct* o);
 void updatePhysicsObjectRoom(room_struct* r, physicsObject_struct* o, bool both);
 vect3D convertCoord(room_struct* r, vect3D p);
+void changeGravity(vect3D v, int32 l);
 
 #endif

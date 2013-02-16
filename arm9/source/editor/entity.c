@@ -2,18 +2,18 @@
 
 #define NUMENTITYTYPES (12)
 
-entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask/*, NULL, 0*/},
-								(entityType_struct){"editor/models/light_ed.md2", "light.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask/*, NULL, 0*/}};
+entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1},
+								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1},
+								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask, button2ButtonArray, 1},
+								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask, button1ButtonArray, 1},
+								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask, turretButtonArray, 1},
+								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask, cubeButtonArray, 1},
+								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask, cubeButtonArray, 1},
+								(entityType_struct){"editor/models/dispenser_ed.md2", "dispenser.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, cubeButtonArray, 1},
+								(entityType_struct){"editor/models/grid_ed.md2", "grid.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1},
+								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 1},
+								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1},
+								(entityType_struct){"editor/models/light_ed.md2", "light.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -41,6 +41,7 @@ void initEntities(void)
 	{
 		entity[i].used=false;
 		entity[i].blockFace=NULL;
+		entity[i].target=NULL;
 	}
 	initEntityTypes();
 }
@@ -53,6 +54,7 @@ void initEntity(entity_struct* e, entityType_struct* et, vect3D pos, bool placed
 	e->type=et;
 	e->placed=placed;
 	e->blockFace=NULL;
+	e->target=NULL;
 	e->used=true;
 }
 
@@ -251,3 +253,24 @@ void drawEntities(void)
 		if(entity[i].used)drawEntity(&entity[i]);
 	}
 }
+
+//ENTITY CONTEXT BUTTONS
+
+void deleteEntityButton(void)
+{
+	selection_struct* s=&editorSelection;
+	if(!s->entity)return;
+
+	removeEntity(s->entity);
+	undoSelection(s);
+}
+
+contextButton_struct ballLauncherButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct button1ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct button2ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct turretButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct cubeButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct gridButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct platformButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct doorButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct lightButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};

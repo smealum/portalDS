@@ -18,18 +18,32 @@ typedef struct
 	const char* modelName;
 	const char* textureName;
 	u8 possibleDirections;
+	contextButton_struct* contextButtonsArray;
+	u8 numButtons;
 	md2Model_struct model;
 	u8 id;
 }entityType_struct;
 
-typedef struct
+typedef struct entity_struct
 {
 	u8 direction;
 	vect3D position;
 	entityType_struct* type;
 	blockFace_struct* blockFace;
+	struct entity_struct* target;
 	bool used, placed;
 }entity_struct;
+
+extern contextButton_struct ballLauncherButtonArray[];
+extern contextButton_struct ballLauncherButtonArray[];
+extern contextButton_struct button1ButtonArray[];
+extern contextButton_struct button2ButtonArray[];
+extern contextButton_struct turretButtonArray[];
+extern contextButton_struct cubeButtonArray[];
+extern contextButton_struct gridButtonArray[];
+extern contextButton_struct platformButtonArray[];
+extern contextButton_struct doorButtonArray[];
+extern contextButton_struct lightButtonArray[];
 
 void initEntities(void);
 entity_struct* createEntity(vect3D pos, u8 type, bool placed);

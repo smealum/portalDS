@@ -325,6 +325,31 @@ void rotateMatrixZ(int32* tm, int32 x, bool r)
 	memcpy(tm,m,9*sizeof(int32));
 }
 
+static inline void rotateMatrixAxis(int32* tm, int32 x, vect3D a, bool r)
+{
+	int32 rm[9], m[9];
+
+	int32 cosval=cosLerp(x);
+	int32 sinval=sinLerp(x);
+	int32 onemcosval=inttof32(1)-cosval;
+
+	rm[0]=cosval+mulf32(mulf32(a.x,a.x),onemcosval);
+	rm[1]=mulf32(mulf32(a.x,a.y),onemcosval)-mulf32(a.z,sinval);
+	rm[2]=mulf32(mulf32(a.x,a.z),onemcosval)+mulf32(a.y,sinval);
+
+	rm[3]=mulf32(mulf32(a.x,a.y),onemcosval)+mulf32(a.z,sinval);
+	rm[4]=cosval+mulf32(mulf32(a.y,a.y),onemcosval);
+	rm[5]=mulf32(mulf32(a.y,a.z),onemcosval)-mulf32(a.x,sinval);
+
+	rm[6]=mulf32(mulf32(a.x,a.z),onemcosval)-mulf32(a.y,sinval);
+	rm[7]=mulf32(mulf32(a.y,a.z),onemcosval)+mulf32(a.x,sinval);
+	rm[8]=cosval+mulf32(mulf32(a.z,a.z),onemcosval);
+
+	if(r)multMatrix33(rm,tm,m);
+	else multMatrix33(tm,rm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
 void translateMatrix(int32* tm, int32 x, int32 y, int32 z)
 {
 	int i;
@@ -442,16 +467,13 @@ void rotateCamera(camera_struct* c, vect3D a)
 {
 	if(!c)c=&playerCamera;
 	
+	// rotateMatrixX(c->transformationMatrix,-a.x,false);
+	// rotateMatrixY(c->transformationMatrix,a.y,true);
+	// rotateMatrixZ(c->transformationMatrix,a.z,false);
+
+	// rotateMatrixAxis(c->transformationMatrix,a.x,vect(c->transformationMatrix[0],c->transformationMatrix[1],c->transformationMatrix[2]),false);
 	rotateMatrixX(c->transformationMatrix,-a.x,false);
-	rotateMatrixY(c->transformationMatrix,a.y,true);
-	rotateMatrixZ(c->transformationMatrix,a.z,false);
-	
-	c->angle.x+=a.x;
-	c->angle.y+=a.y;
-	c->angle.z+=a.z;
-	
-	// if(c->angle.x>4096*2)c->angle.x=4096*2;
-	// if(c->angle.x<-4096-2048)c->angle.x=-4096-2048;
+	rotateMatrixAxis(c->transformationMatrix,-a.y,normGravityVector,true);
 }
 
 bool pointInFrustum(frustum_struct* f, vect3D v)
@@ -525,26 +547,24 @@ void updateCamera(camera_struct* c)
 	updateViewMatrix(c);
 	updateFrustum(c);
 	
-	iprintf("alignment : %d  \n",c->transformationMatrix[3]);
-	// if(c->transformationMatrix[4]<-32)
-	// {
-		// rotateMatrixX(c->transformationMatrix, -(1<<10), false);
-	// }else
+	vect3D g=normalize(vectMultInt(gravityVector,16));
+
+	NOGBA("%d %d %d",g.x,g.y,g.z);
+
+	int32 alignment=-dotProduct(vect(c->transformationMatrix[0],c->transformationMatrix[3],c->transformationMatrix[6]),g);
+	iprintf("alignment : %d  \n",alignment);
+
 	{
-		if(c->transformationMatrix[3]>32)
+		if(alignment>32)
 		{
-			if(c->transformationMatrix[3]>512)rotateMatrixZ(c->transformationMatrix, (1<<10), false);
-			else if(c->transformationMatrix[3]>256)rotateMatrixZ(c->transformationMatrix, (1<<9), false);
-			else if(c->transformationMatrix[3]>128)rotateMatrixZ(c->transformationMatrix, (1<<8), false);
-			// else if(c->transformationMatrix[3]>64)rotateMatrixZ(c->transformationMatrix, (1<<7), false);
-			// else if(c->transformationMatrix[3]>12)rotateMatrixZ(c->transformationMatrix, (1<<6), false);
-		}else if(c->transformationMatrix[3]<-32)
+			if(alignment>512)rotateMatrixZ(c->transformationMatrix, (1<<10), false);
+			else if(alignment>256)rotateMatrixZ(c->transformationMatrix, (1<<9), false);
+			else if(alignment>128)rotateMatrixZ(c->transformationMatrix, (1<<8), false);
+		}else if(alignment<-32)
 		{
-			if(c->transformationMatrix[3]<-512)rotateMatrixZ(c->transformationMatrix, -(1<<10), false);
-			else if(c->transformationMatrix[3]<-256)rotateMatrixZ(c->transformationMatrix, -(1<<9), false);
-			else if(c->transformationMatrix[3]<-128)rotateMatrixZ(c->transformationMatrix, -(1<<8), false);
-			// else if(c->transformationMatrix[3]<-64)rotateMatrixZ(c->transformationMatrix, -(1<<7), false);
-			// else if(c->transformationMatrix[3]<-12)rotateMatrixZ(c->transformationMatrix, -(1<<6), false);
+			if(alignment<-512)rotateMatrixZ(c->transformationMatrix, -(1<<10), false);
+			else if(alignment<-256)rotateMatrixZ(c->transformationMatrix, -(1<<9), false);
+			else if(alignment<-128)rotateMatrixZ(c->transformationMatrix, -(1<<8), false);
 		}
 	}
 	

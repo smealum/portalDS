@@ -245,7 +245,7 @@ void roomEditorCursor(selection_struct* sel)
 	{
 		if(sel->active)
 		{
-			if(sel->entity)setupContextButtons(entitySelectionButtonArray, 2);
+			if(sel->entity && sel->entity->type)setupContextButtons(sel->entity->type->contextButtonsArray, sel->entity->type->numButtons);
 			else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
 			else setupContextButtons(nonplanarSelectionButtonArray, 4);
 		}

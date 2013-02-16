@@ -195,6 +195,31 @@ static inline void rotateMatrixZ(int32* tm, int32 x, bool r)
 	memcpy(tm,m,9*sizeof(int32));
 }
 
+static inline void rotateMatrixAxis(int32* tm, int32 x, vect3D a, bool r)
+{
+	int32 rm[9], m[9];
+
+	int32 cosval=cosLerp(x);
+	int32 sinval=sinLerp(x);
+	int32 onemcosval=inttof32(1)-cosval;
+
+	rm[0]=cosval+mulf32(mulf32(a.x,a.x),onemcosval);
+	rm[1]=mulf32(mulf32(a.x,a.y),onemcosval)-mulf32(a.z,sinval);
+	rm[2]=mulf32(mulf32(a.x,a.z),onemcosval)+mulf32(a.y,sinval);
+
+	rm[3]=mulf32(mulf32(a.x,a.y),onemcosval)+mulf32(a.z,sinval);
+	rm[4]=cosval+mulf32(mulf32(a.y,a.y),onemcosval);
+	rm[5]=mulf32(mulf32(a.y,a.z),onemcosval)-mulf32(a.x,sinval);
+
+	rm[6]=mulf32(mulf32(a.x,a.z),onemcosval)-mulf32(a.y,sinval);
+	rm[7]=mulf32(mulf32(a.y,a.z),onemcosval)+mulf32(a.x,sinval);
+	rm[8]=cosval+mulf32(mulf32(a.z,a.z),onemcosval);
+
+	if(r)multMatrix33(rm,tm,m);
+	else multMatrix33(tm,rm,m);
+	memcpy(tm,m,9*sizeof(int32));
+}
+
 static inline void projectVectorPlane(vect3D* v, vect3D n)
 {
 	if(!v)return;

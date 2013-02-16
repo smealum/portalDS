@@ -73,7 +73,7 @@ void initGame(void)
 
 	getPlayer()->currentRoom=&gameRoom;
 	// readMap("lalala.map", NULL);
-	newReadMap("test.map", NULL);
+	newReadMap("../testedit.map", NULL);
 	
 	currentBuffer=false;
 	

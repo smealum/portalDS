@@ -64,15 +64,13 @@ bool boxInRoom(room_struct* r, physicsObject_struct* o)
 	return false;
 }
 
-const int32 transX=inttof32(1);
 const int32 transY=inttof32(5);
-const int32 transZ=inttof32(1);
 
 bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room_struct* r)
 {
 	if(!gc || !o || !r)return false;
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-	
+
 	int i;
 	bool ret=false;
 	for(i=0;i<gc->numRectangles;i++)
@@ -89,11 +87,13 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 		vect3D v=vectDifference(o2,o1);
 		rec->touched=false;
 		// int sqd=sqMagnitude(v);
-		int32 sqd=divf32(mulf32(v.x,v.x),transX)+divf32(mulf32(v.y,v.y),transY)+divf32(mulf32(v.z,v.z),transZ);
+		int32 gval=dotProduct(v,normGravityVector);
+		vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
+		int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
 		if(sqd<o->sqRadius)
 		{
 			// sqd=v.x*v.x+v.y*v.y+v.z*v.z;
-			int32 sqd=divf32((v.x*v.x),transX)+divf32((v.y*v.y),transY)+divf32((v.z*v.z),transZ);
+			int32 sqd=(v2.x*v.x)+(v2.y*v.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
 			u32 d=sqrtf32((sqd));
 			v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
 			o->position=addVect(o->position,v);
@@ -125,10 +125,12 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 			platform_struct* pf=&platform[i];
 			vect3D o2=getClosestPointRectangle(addVect(pf->position,vect(-PLATFORMSIZE,0,-PLATFORMSIZE)),vect(PLATFORMSIZE*2,0,PLATFORMSIZE*2),o->position);
 			vect3D v=vectDifference(o2,o->position);
-			int32 sqd=divf32(mulf32(v.x,v.x),transX)+divf32(mulf32(v.y,v.y),transY)+divf32(mulf32(v.z,v.z),transZ);
+			int32 gval=dotProduct(v,normGravityVector);
+			vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
+			int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
 			if(sqd<o->sqRadius)
 			{
-				int32 sqd=divf32((v.x*v.x),transX)+divf32((v.y*v.y),transY)+divf32((v.z*v.z),transZ);
+				int32 sqd=(v2.x*v2.x)+(v2.y*v2.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
 				u32 d=sqrtf32((sqd));
 				v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
 				o->position=addVect(o->position,v);

@@ -10,7 +10,11 @@ typedef struct
 	u32 lightPosition;
 }mapHeader_struct;
 
-void writeMapEditor(editorRoom_struct* er, const char* str);
-void loadMapEditor(editorRoom_struct* er, const char* str);
+void readHeader(mapHeader_struct* h, FILE* f);
+
+#ifdef BLOCKS_H
+	void writeMapEditor(editorRoom_struct* er, const char* str);
+	void loadMapEditor(editorRoom_struct* er, const char* str);
+#endif
 
 #endif

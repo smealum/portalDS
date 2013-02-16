@@ -445,11 +445,12 @@ void moveCamera(camera_struct* c, vect3D v)
 {
 	if(!c)c=&playerCamera;
 	
-	vect3D v1=normalize(vect(c->transformationMatrix[2],0/*c->transformationMatrix[5]*/,c->transformationMatrix[8]));
+	vect3D v1=vect(c->transformationMatrix[2],c->transformationMatrix[5],c->transformationMatrix[8]);
+	v1=normalize(vectDifference(v1,vectMult(normGravityVector,dotProduct(normGravityVector,v1))));
 	
-	c->object.speed.x+=mulf32(v.z,v1.x)+mulf32(v.x,c->transformationMatrix[0]);
-	c->object.speed.y+=/*mulf32(v.z,v1.y)+*/mulf32(v.x,c->transformationMatrix[3]);
-	c->object.speed.z+=mulf32(v.z,v1.z)+mulf32(v.x,c->transformationMatrix[6]);
+	vect3D u=vect(mulf32(v.z,v1.x)+mulf32(v.x,c->transformationMatrix[0]), mulf32(v.z,v1.y)+mulf32(v.x,c->transformationMatrix[3]), mulf32(v.z,v1.z)+mulf32(v.x,c->transformationMatrix[6]));
+
+	c->object.speed=addVect(c->object.speed,u);
 }
 
 void moveCameraImmediate(camera_struct* c, vect3D v)
@@ -543,7 +544,6 @@ void updateCamera(camera_struct* c)
 {
 	if(!c)c=&playerCamera;
 	c->position=c->object.position;
-	// c->position.y+=128;
 	updateViewMatrix(c);
 	updateFrustum(c);
 	

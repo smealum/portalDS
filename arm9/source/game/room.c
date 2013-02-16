@@ -43,7 +43,7 @@ void readRectangles(room_struct* r, FILE* f)
 	{
 		rectangle_struct rec;
 		readRectangle(&rec, f);
-		addRoomRectangle(r, rec, rec.material, true);
+		addRoomRectangle(r, rec, rec.material, rec.portalable);
 	}
 }
 

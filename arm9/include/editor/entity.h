@@ -13,6 +13,10 @@ enum
 	mZ_mask = 1<<5
 }directionMask_type;
 
+struct entity_struct;
+
+typedef void(*entityFunction)(struct entity_struct*);
+
 typedef struct
 {
 	const char* modelName;
@@ -20,6 +24,8 @@ typedef struct
 	u8 possibleDirections;
 	contextButton_struct* contextButtonsArray;
 	u8 numButtons;
+	entityFunction specialInit, specialMove;
+	bool removeTarget;
 	md2Model_struct model;
 	u8 id;
 }entityType_struct;

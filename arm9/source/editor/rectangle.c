@@ -437,7 +437,7 @@ bool packRectanglesSize(rectangle2DList_struct* l, short* w, short* h)
 	bool rr=true;
 	*w=32;
 	*h=32;
-	while(rr && *w<512 && *h<=256)
+	while(rr && *w<=512 && *h<=256)
 	{
 		if(l->surface<=(*w)*(*h))
 		{

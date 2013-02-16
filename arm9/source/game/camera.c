@@ -538,6 +538,11 @@ void updateFrustum(camera_struct* c)
 		f->plane[i].point.y=-mulf32(f->plane[i].D,f->plane[i].B);
 		f->plane[i].point.z=-mulf32(f->plane[i].D,f->plane[i].C);
 	}
+	//correct and prevents some precision problems
+	f->plane[2].point=c->position;
+	f->plane[3].point=c->position;
+	f->plane[4].point=c->position;
+	f->plane[5].point=c->position;
 }
 
 void updateCamera(camera_struct* c)

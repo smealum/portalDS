@@ -258,8 +258,6 @@ void drawEntity(entity_struct* e)
 	entityType_struct* et=e->type;
 	if(!et)et=&entityTypes[0];
 
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-
 	glPushMatrix();
 		editorRoomTransform();
 		glTranslate3f32(inttof32(e->position.x),inttof32(e->position.y),inttof32(e->position.z));
@@ -271,7 +269,7 @@ void drawEntity(entity_struct* e)
 			if(e->direction%2)glRotateXi(16384);
 		}
 		glTranslate3f32(0,-inttof32(1)/2,0);
-		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));
+		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));
 	glPopMatrix(1);
 }
 

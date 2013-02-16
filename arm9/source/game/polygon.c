@@ -42,18 +42,6 @@ void freePolygon(polygon_struct** p)
 	*p=NULL;
 }
 
-vect3D intersectSegmentPlane(plane_struct* pl, vect3D o, vect3D v, int32 d)
-{
-	if(!pl)return o;
-	vect3D n=vect(pl->A,pl->B,pl->C);
-	int32 p1=dotProduct(v,n);
-
-	vect3D p=pl->point;		
-	int32 p2=dotProduct(vectDifference(p,o),n);
-	int32 k=divf32(p2,p1);
-	return addVect(o,vectMult(v,k));
-}
-
 polygon_struct* createQuad(vect3D v1, vect3D v2, vect3D v3, vect3D v4)
 {
 	polygon_struct *p, *pp;
@@ -109,6 +97,18 @@ polygon_struct* createEllipseOutline(vect3D po, vect3D v1_1, vect3D v2_1, vect3D
 		if(!p)return NULL;
 	}
 	return pp;
+}
+
+vect3D intersectSegmentPlane(plane_struct* pl, vect3D o, vect3D v, int32 d)
+{
+	if(!pl)return o;
+	vect3D n=vect(pl->A,pl->B,pl->C);
+	int32 p1=dotProduct(v,n);
+
+	vect3D p=pl->point;		
+	int32 p2=dotProduct(vectDifference(p,o),n);
+	int32 k=divf32(p2,p1);
+	return addVect(o,vectMult(v,k));
 }
 
 void clipSegmentPlane(plane_struct* pl, polygon_struct** o, polygon_struct* pp1, polygon_struct* pp2)
@@ -233,7 +233,6 @@ void projectPolygon(camera_struct* c, polygon_struct** p, vect3D o, vect3D u1, v
 		// pp->t=vect(dotProduct(vr,u1),dotProduct(vr,u2),0);
 		// pp->t.x=(pp->t.x*inttot16(127))/d1;
 		// pp->t.y=(pp->t.y*inttot16(127))/d2;
-		
 		pp->v=projectPoint(c,pp->v);
 		pp=pp->next;
 	}

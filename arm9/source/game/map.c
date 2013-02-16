@@ -228,7 +228,7 @@ rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, materia
 
 void generateLightmap(rectangle_struct* rec, room_struct* r, u8* b)
 {
-	if(rec && r->lightMap && b)// && rec->lightMap)
+	if(rec && b)// && rec->lightMap)
 	{
 		u16 x=rec->lmSize.x, y=rec->lmSize.y;
 		// u16 x=rec->lightMap->width, y=rec->lightMap->height;

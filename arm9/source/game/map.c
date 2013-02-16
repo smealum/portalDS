@@ -362,119 +362,65 @@ vect3D getOverlayRectangleSize(rectangle_struct rec)
 void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (clean up, switch to v10 ?)
 {
 	if(rec.hide)return;
-	vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
-	vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
-	int32 t1=TEXTURE_PACK(p1.x, p1.y);
-	int32 t2=TEXTURE_PACK(p1.x, p2.y);
-	int32 t3=TEXTURE_PACK(p2.x, p2.y);
-	int32 t4=TEXTURE_PACK(p2.x, p1.y);
-	if(rec.rot)
+
+	vect3D v[4];
+	pos=vectMultInt(pos,32);
+	size=vectMultInt(size,32);
+	if(!rec.size.x)
 	{
-		p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
-		t1=TEXTURE_PACK(p1.x, p1.y);
-		t4=TEXTURE_PACK(p1.x, p2.y);
-		t3=TEXTURE_PACK(p2.x, p2.y);
-		t2=TEXTURE_PACK(p2.x, p1.y);
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x, pos.y+size.y, pos.z+size.z);
+		v[3]=vect(pos.x, pos.y+size.y, pos.z);
+	}else if(rec.size.y){
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y+size.y, pos.z);
+		v[2]=vect(pos.x+size.x, pos.y+size.y, pos.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
+	}else{
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x+size.x, pos.y, pos.z+size.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
 	}
-	int32 t[4];
+
+	int32 t1, t2, t3, t4;
 	if(c)
 	{
-		c=false;
-		glColor3b(255,255,255);
-		
+		int32 t[4];
+		GFX_COLOR=RGB15(31,31,31);		
 		bindMaterial(rec.material,&rec,t,false);
-		t1=t[0];
-		t2=t[1];
-		t3=t[2];
-		t4=t[3];
-	}
-	// if(!rec.size.x)
-	// {
-	// 	glBegin(GL_QUAD);
-	// 		GFX_TEX_COORD = t1;
-	// 		glVertex3v16(pos.x, pos.y, pos.z);
-
-	// 		GFX_TEX_COORD = t2;
-	// 		glVertex3v16(pos.x, pos.y, pos.z+size.z);
-
-	// 		GFX_TEX_COORD = t3;
-	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z+size.z);
-
-	// 		GFX_TEX_COORD = t4;
-	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z);
-	// }else if(rec.size.y){
-	// 	glBegin(GL_QUAD);
-	// 		GFX_TEX_COORD = t1;
-	// 		glVertex3v16(pos.x, pos.y, pos.z);
-
-	// 		GFX_TEX_COORD = t2;
-	// 		glVertex3v16(pos.x, pos.y+size.y, pos.z);
-
-	// 		GFX_TEX_COORD = t3;
-	// 		glVertex3v16(pos.x+size.x, pos.y+size.y, pos.z);
-
-	// 		GFX_TEX_COORD = t4;
-	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z);
-	// }else{
-	// 	glBegin(GL_QUAD);
-	// 		GFX_TEX_COORD = t1;
-	// 		glVertex3v16(pos.x, pos.y, pos.z);
-
-	// 		GFX_TEX_COORD = t2;
-	// 		glVertex3v16(pos.x, pos.y, pos.z+size.z);
-
-	// 		GFX_TEX_COORD = t3;
-	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z+size.z);
-
-	// 		GFX_TEX_COORD = t4;
-	// 		glVertex3v16(pos.x+size.x, pos.y, pos.z);
-	// }
-
-	//TEMP
-	glPushMatrix();
-		glTranslate3f32(pos.x,pos.y,pos.z);
-		if(!rec.size.x)
+		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
+	}else{
+		vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
+		vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
+		if(rec.rot)
 		{
-			glBegin(GL_QUAD);
-				GFX_TEX_COORD = t1;
-				glVertex3v16(0, 0, 0);
-
-				GFX_TEX_COORD = t2;
-				glVertex3v16(0, 0, 0+size.z);
-
-				GFX_TEX_COORD = t3;
-				glVertex3v16(0, 0+size.y, 0+size.z);
-
-				GFX_TEX_COORD = t4;
-				glVertex3v16(0, 0+size.y, 0);
-		}else if(rec.size.y){
-			glBegin(GL_QUAD);
-				GFX_TEX_COORD = t1;
-				glVertex3v16(0, 0, 0);
-
-				GFX_TEX_COORD = t2;
-				glVertex3v16(0, 0+size.y, 0);
-
-				GFX_TEX_COORD = t3;
-				glVertex3v16(0+size.x, 0+size.y, 0);
-
-				GFX_TEX_COORD = t4;
-				glVertex3v16(0+size.x, 0, 0);
+			p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
+			t1=TEXTURE_PACK(p1.x, p1.y);
+			t4=TEXTURE_PACK(p1.x, p2.y);
+			t3=TEXTURE_PACK(p2.x, p2.y);
+			t2=TEXTURE_PACK(p2.x, p1.y);
 		}else{
-			glBegin(GL_QUAD);
-				GFX_TEX_COORD = t1;
-				glVertex3v16(0, 0, 0);
-
-				GFX_TEX_COORD = t2;
-				glVertex3v16(0, 0, 0+size.z);
-
-				GFX_TEX_COORD = t3;
-				glVertex3v16(0+size.x, 0, 0+size.z);
-
-				GFX_TEX_COORD = t4;
-				glVertex3v16(0+size.x, 0, 0);
+			t1=TEXTURE_PACK(p1.x, p1.y);
+			t2=TEXTURE_PACK(p1.x, p2.y);
+			t3=TEXTURE_PACK(p2.x, p2.y);
+			t4=TEXTURE_PACK(p2.x, p1.y);
 		}
-	glPopMatrix(1);
+	}
+
+	glBegin(GL_QUAD);
+		GFX_TEX_COORD = t1;
+		glVertex3v16(v[0].x,v[0].y,v[0].z);
+
+		GFX_TEX_COORD = t2;
+		glVertex3v16(v[1].x,v[1].y,v[1].z);
+
+		GFX_TEX_COORD = t3;
+		glVertex3v16(v[2].x,v[2].y,v[2].z);
+
+		GFX_TEX_COORD = t4;
+		glVertex3v16(v[3].x,v[3].y,v[3].z);
 }
 
 void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cpos, vect3D cnormal, bool cull) //TEMP ?
@@ -482,6 +428,9 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 	if(rec.hide)return;
 	
 	vect3D v[4];
+	vect3D rpos=pos, rsize=size;
+	pos=convertVect(pos);
+	size=convertSize(size);
 	if(!rec.size.x)
 	{
 		v[0]=vect(pos.x, pos.y, pos.z);
@@ -511,32 +460,51 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		if(!pass)return;
 	}
 	
-	vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
-	vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
-	int32 t1=TEXTURE_PACK(p1.x, p1.y);
-	int32 t2=TEXTURE_PACK(p1.x, p2.y);
-	int32 t3=TEXTURE_PACK(p2.x, p2.y);
-	int32 t4=TEXTURE_PACK(p2.x, p1.y);
-	if(rec.rot)
-	{
-		p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
-		t1=TEXTURE_PACK(p1.x, p1.y);
-		t4=TEXTURE_PACK(p1.x, p2.y);
-		t3=TEXTURE_PACK(p2.x, p2.y);
-		t2=TEXTURE_PACK(p2.x, p1.y);
-	}
-	int32 t[4];
+	int32 t1, t2, t3, t4;
 	if(c)
 	{
-		c=false;
+		int32 t[4];
 		glColorDL(RGB15(31,31,31));
-		
 		bindMaterial(rec.material,&rec,t,true);
-		t1=t[0];
-		t2=t[1];
-		t3=t[2];
-		t4=t[3];
+		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
+	}else{
+		vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
+		vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
+		if(rec.rot)
+		{
+			p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
+			t1=TEXTURE_PACK(p1.x, p1.y);
+			t4=TEXTURE_PACK(p1.x, p2.y);
+			t3=TEXTURE_PACK(p2.x, p2.y);
+			t2=TEXTURE_PACK(p2.x, p1.y);
+		}else{
+			t1=TEXTURE_PACK(p1.x, p1.y);
+			t2=TEXTURE_PACK(p1.x, p2.y);
+			t3=TEXTURE_PACK(p2.x, p2.y);
+			t4=TEXTURE_PACK(p2.x, p1.y);
+		}
 	}
+
+	pos=vectMultInt(rpos,32);
+	size=vectMultInt(rsize,32);
+	if(!rec.size.x)
+	{
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x, pos.y+size.y, pos.z+size.z);
+		v[3]=vect(pos.x, pos.y+size.y, pos.z);
+	}else if(rec.size.y){
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y+size.y, pos.z);
+		v[2]=vect(pos.x+size.x, pos.y+size.y, pos.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
+	}else{
+		v[0]=vect(pos.x, pos.y, pos.z);
+		v[1]=vect(pos.x, pos.y, pos.z+size.z);
+		v[2]=vect(pos.x+size.x, pos.y, pos.z+size.z);
+		v[3]=vect(pos.x+size.x, pos.y, pos.z);
+	}
+
 	glBeginDL(GL_QUAD);
 		glTexCoordPACKED(t1);
 		glVertex3v16DL(v[0].x, v[0].y, v[0].z);
@@ -589,11 +557,16 @@ void drawRectangleList(rectangleList_struct* rl)
 	listCell_struct *lc=rl->first;
 	unbindMtl();
 	GFX_COLOR=RGB15(31,31,31);
-	while(lc)
-	{
-		drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),true);
-		lc=lc->next;
-	}
+
+	glPushMatrix();
+		glTranslate3f32(-TILESIZE,0,-TILESIZE);
+		glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
+		while(lc)
+		{
+			drawRect(lc->data,(lc->data.position),(lc->data.size),true);
+			lc=lc->next;
+		}
+	glPopMatrix(1);
 }
 
 void drawRectangles(room_struct* r, u8 mode, u16 color)
@@ -608,11 +581,15 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 		if(mode&2)applyMTL(r->lightMap);
 		else if(r->lmSlot)applyMTL(r->lmSlot->mtl);
 		GFX_COLOR=RGB15(31,31,31);
-		while(lc)
-		{
-			drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false);
-			lc=lc->next;
-		}
+		glPushMatrix();
+			glTranslate3f32(-TILESIZE,0,-TILESIZE);
+			glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
+			while(lc)
+			{
+				drawRect(lc->data,(lc->data.position),(lc->data.size),false);
+				lc=lc->next;
+			}
+		glPopMatrix(1);
 	}
 	if(mode&128 && color)
 	{
@@ -620,11 +597,15 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_FRONT);
 		unbindMtl();
 		GFX_COLOR=color;
-		while(lc)
-		{
-			drawRect(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false);
-			lc=lc->next;
-		}
+		glPushMatrix();
+			glTranslate3f32(-TILESIZE,0,-TILESIZE);
+			glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
+			while(lc)
+			{
+				drawRect(lc->data,(lc->data.position),(lc->data.size),false);
+				lc=lc->next;
+			}
+		glPopMatrix(1);
 	}
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 }
@@ -765,7 +746,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	listCell_struct *lc=r->rectangles.first;
 	while(lc)
 	{
-		drawRectDL(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),true,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
+		drawRectDL(lc->data,(lc->data.position),(lc->data.size),true,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
 		lc=lc->next;
 	}
 	
@@ -774,7 +755,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	applyMTLDL(r->lightMap);
 	while(lc)
 	{
-		drawRectDL(lc->data,convertVect(lc->data.position),convertSize(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
+		drawRectDL(lc->data,(lc->data.position),(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
 		lc=lc->next;
 	}
 	

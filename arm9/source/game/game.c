@@ -135,7 +135,7 @@ u32 prevTiming;
 u32 cpuEndSlice()
 {
 	u32 temp=prevTiming;
-	// prevTiming=cpuGetTiming();
+	prevTiming=cpuGetTiming();
 	return prevTiming-temp;
 }
 
@@ -196,17 +196,10 @@ static inline void render1(void)
 		
 		transformCamera(NULL);
 		
-		// glPushMatrix();
-			// glPushMatrix();
-				// glTranslate3f32(-TILESIZE*5,0,0);
-				// renderModelFrameInterp(0, 0, 0, &testCatcher, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0, false, NULL);
-			// glPopMatrix(1);
-		// glPopMatrix(1);
-		
 		cpuEndSlice();
 			drawRoomsGame(128, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
-		// iprintf("room : %d  \n",cpuEndSlice());
+		iprintf("room : %d  \n",cpuEndSlice());
 		
 		updateParticles();
 		drawParticles();

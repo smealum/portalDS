@@ -547,11 +547,7 @@ void updateCamera(camera_struct* c)
 	updateViewMatrix(c);
 	updateFrustum(c);
 	
-	vect3D g=normalize(vectMultInt(gravityVector,16));
-
-	NOGBA("%d %d %d",g.x,g.y,g.z);
-
-	int32 alignment=-dotProduct(vect(c->transformationMatrix[0],c->transformationMatrix[3],c->transformationMatrix[6]),g);
+	int32 alignment=-dotProduct(vect(c->transformationMatrix[0],c->transformationMatrix[3],c->transformationMatrix[6]),normGravityVector);
 	iprintf("alignment : %d  \n",alignment);
 
 	{

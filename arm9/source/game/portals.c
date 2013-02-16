@@ -322,6 +322,8 @@ void drawPortalRoom(portal_struct* p)
 	
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
+		glTranslate3f32(-TILESIZE,0,-TILESIZE);
+		glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
 		if(currentPortal->targetPortal && currentPortal->targetPortal->displayList)glCallList(currentPortal->targetPortal->displayList);
 	glPopMatrix(1);
 }

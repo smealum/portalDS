@@ -92,6 +92,7 @@ void drawSimpleButton(sguiButton_struct* b)
 		if(b->string)drawString(b->string, RGB15(31,31,31), inttof32(1), inttof32(SIMPLEBUTTONMARGINX), inttof32(SIMPLEBUTTONMARGINY));
 
 		unbindMtl();
+		glTranslate3f32(0,0,-256);
 		glScalef32(inttof32(b->size.x),inttof32(b->size.y),inttof32(1));
 
 		if(b->active)GFX_COLOR=RGB15(31,0,0);

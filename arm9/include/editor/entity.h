@@ -56,5 +56,6 @@ void moveEntitiesRange(vect3D o, vect3D s, vect3D u);
 void getEntityBlockFacesRange(blockFace_struct* l, vect3D o, vect3D s, bool delete);
 void generateLightsFromEntities(void);
 void drawEntities(void);
+void removeEntity(entity_struct* e);
 
 #endif

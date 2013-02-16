@@ -109,14 +109,39 @@ bool isFaceInSelection(blockFace_struct* bf, selection_struct* s)
 	}
 }
 
+void drawPath(vect3D o, vect3D t)
+{
+	vect3D v=vectDifference(t,o);
+
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_ID(8));
+	unbindMtl();
+	glPushMatrix();
+		glTranslate3f32(inttof32(o.x),inttof32(o.y),inttof32(o.z));
+		GFX_COLOR=RGB15(31,0,0);
+		GFX_BEGIN=GL_TRIANGLES;
+			GFX_VERTEX10=0;
+			glTranslate3f32(inttof32(v.x),0,0);
+			GFX_VERTEX10=0;
+			GFX_VERTEX10=0;
+
+			GFX_VERTEX10=0;
+			glTranslate3f32(0,inttof32(v.y),0);
+			GFX_VERTEX10=0;
+			GFX_VERTEX10=0;
+			
+			GFX_VERTEX10=0;
+			glTranslate3f32(0,0,inttof32(v.z));
+			GFX_VERTEX10=0;
+			GFX_VERTEX10=0;
+	glPopMatrix(1);
+}
+
 void drawSelection(selection_struct* s)
 {
 	if(!s)s=&editorSelection;
 	if(!s->active || (!s->entity && (!s->firstFace || !s->secondFace)))return;
 	
 	blockFace_struct* bf=s->firstFace;
-
-	GFX_COLOR=(s->error)?RGB15(31,0,0):(RGB15(29,15,3));
 	
 	if(s->planar && !s->entity)
 	{
@@ -126,6 +151,8 @@ void drawSelection(selection_struct* s)
 		unbindMtl();
 		
 		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE | POLY_ID(8));
+
+		GFX_COLOR=(s->error)?RGB15(31,0,0):(RGB15(29,15,3));
 		
 		glPushMatrix();
 			editorRoomTransform();
@@ -148,12 +175,16 @@ void drawSelection(selection_struct* s)
 		
 		unbindMtl();
 		
-		glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE);
-		
 		glPushMatrix();		
-			glScalef32((BLOCKSIZEX),(BLOCKSIZEY),(BLOCKSIZEZ));
+			editorRoomTransform();
+
+			if(s->entity && s->entity->target)drawPath(s->entity->position, s->entity->target->position);
+
+			glPolyFmt(POLY_ALPHA(15) | POLY_CULL_NONE);
+			GFX_COLOR=(s->error)?RGB15(31,0,0):(RGB15(29,15,3));
+
 			glTranslate3f32(-inttof32(1)/2,-inttof32(1)/2,-inttof32(1)/2);
-			glTranslate3f32(inttof32(s->origin.x-ROOMARRAYSIZEX/2),inttof32(s->origin.y-ROOMARRAYSIZEY/2),inttof32(s->origin.z-ROOMARRAYSIZEZ/2));
+			glTranslate3f32(inttof32(s->origin.x),inttof32(s->origin.y),inttof32(s->origin.z));
 			glScalef32(inttof32(s->size.x),inttof32(s->size.y),inttof32(s->size.z));
 			glTranslate3f32(inttof32(1)/2,inttof32(1)/2,inttof32(1)/2);
 				

@@ -50,8 +50,10 @@ void readRectangles(room_struct* r, FILE* f)
 void readEntity(FILE* f)
 {
 	if(!f)return;
-	u8 type=0;
+	u8 type=0, dir=0; vect3D v;
 	fread(&type, sizeof(u8), 1, f);
+	readVect(&v, f);
+	fread(&dir, sizeof(u8), 1, f);
 	switch(type)
 	{
 		case 0:	case 1:
@@ -59,7 +61,7 @@ void readEntity(FILE* f)
 			{
 				vect3D p;
 				readVect(&p,f);
-				createEnergyDevice(NULL, p, pY, type);
+				createEnergyDevice(NULL, p, dir, type);
 			}
 			break;
 		case 3:

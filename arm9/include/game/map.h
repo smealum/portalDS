@@ -14,7 +14,7 @@
 #define DEFAULTFLOOR 8
 #define DEFAULTCEILING 24
 
-#define LIGHTMAPRESOLUTION 6
+#define LIGHTMAPRESOLUTION 4
 
 #define LIGHTCONST (0)
 #define AMBIENTLIGHT (8) //portal is pretty bright, right ?

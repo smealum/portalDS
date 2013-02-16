@@ -45,24 +45,25 @@ bool writeEntity(entity_struct* e, FILE* f)
 {
 	if(!e || !f || !e->used || !e->type)return false;
 
+	fwrite(&e->type->id,sizeof(u8),1,f);
+	writeVect(e->position, f);
+	fwrite(&e->direction, sizeof(u8), 1, f);
+
 	switch(e->type->id)
 	{
 		case 0:	case 1:
 			//energy ball launcher/catcher
-			fwrite(&e->type->id,sizeof(u8),1,f);
 			//BLOCKMULTY/2 etc should depend on orientation
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
 		case 3:
 			//pressure button
-			fwrite(&e->type->id,sizeof(u8),1,f);
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
 		case 11:
 			//light
-			fwrite(&e->type->id,sizeof(u8),1,f);
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY-BLOCKMULTY/2,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
 			break;
@@ -149,44 +150,47 @@ void readHeader(mapHeader_struct* h, FILE* f)
 	fread(h, sizeof(mapHeader_struct), 1, f);
 }
 
-// void readEntity(FILE* f)
-// {
-// 	if(!f)return;
+void readEntityEditor(FILE* f)
+{
+	if(!f)return;
 
-// 	vect3D v;
-// 	u8 id;
-// 	fread(&id,sizeof(u8),1,f);
+	u8 type; vect3D v;
 
-// 	createEntity();
+	fread(&type,sizeof(u8),1,f);
+	entity_struct* e=createEntity(vect(0,0,0), type, true);
+	readVect(&e->position, f);
+	fread(&e->direction, sizeof(u8), 1, f);
 
-// 	switch(id)
-// 	{
-// 		case 0:	case 1:
-// 			//energy ball launcher/catcher
-// 			readVect(&v, f);
-// 			break;
-// 		case 3:
-// 			//pressure button
-// 			readVect(&v, f);
-// 			break;
-// 		case 11:
-// 			//light
-// 			readVect(&v, f);
-// 			break;
-// 		default:
-// 			break;
-// 	}
-// }
+	switch(type)
+	{
+		case 0:	case 1:
+			//energy ball launcher/catcher
+			readVect(&v, f);
+			break;
+		case 3:
+			//pressure button
+			readVect(&v, f);
+			break;
+		case 11:
+			//light
+			readVect(&v, f);
+			break;
+		default:
+			removeEntity(e);
+			break;
+	}
 
-// void readEntities(FILE* f)
-// {
-// 	int i; u16 cnt;
-// 	fread(&cnt,sizeof(u16),1,f);
-// 	for(i=0;i<cnt;i++)
-// 	{
-// 		readEntity(f);
-// 	}
-// }
+}
+
+void readEntitiesEditor(FILE* f)
+{
+	int i; u16 cnt;
+	fread(&cnt,sizeof(u16),1,f);
+	for(i=0;i<cnt;i++)
+	{
+		readEntityEditor(f);
+	}
+}
 
 void loadMapEditor(editorRoom_struct* er, const char* str)
 {
@@ -205,8 +209,9 @@ void loadMapEditor(editorRoom_struct* er, const char* str)
 		decompress(compressed, er->blockArray, RLE); // decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		
 		free(compressed);
 
-	// fseek(f, h.entityPosition, SEEK_SET);
-	// 	readEntities(f);
+	fseek(f, h.entityPosition, SEEK_SET);
+		readEntitiesEditor(f);
+		getEntityBlockFaces(er->blockFaceList);
 
 	fclose(f);
 }

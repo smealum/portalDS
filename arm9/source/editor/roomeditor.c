@@ -56,6 +56,9 @@ void initRoomEdition(void)
 	glSetToonTableRange(3, 31, RGB15(24,24,24));
 
 	glLight(0, RGB15(31,31,31), cosLerp(4096)>>3, 0, sinLerp(4096)>>3);
+
+	//TEMP
+	createEntity(vect(32,32,32), 0, true)->target=createEntity(vect(40,40,40), 1, true);
 }
 
 void updateEditorCamera(void)

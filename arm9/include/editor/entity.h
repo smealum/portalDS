@@ -31,6 +31,7 @@ typedef struct entity_struct
 	entityType_struct* type;
 	blockFace_struct* blockFace;
 	struct entity_struct* target;
+	u8 writeID;
 	bool used, placed;
 }entity_struct;
 
@@ -46,6 +47,7 @@ extern contextButton_struct doorButtonArray[];
 extern contextButton_struct lightButtonArray[];
 
 void initEntities(void);
+void removeEntities(void);
 entity_struct* createEntity(vect3D pos, u8 type, bool placed);
 entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int32* d);
 blockFace_struct* getEntityBlockFace(entity_struct* e, blockFace_struct* l);

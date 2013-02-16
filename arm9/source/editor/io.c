@@ -51,24 +51,34 @@ bool writeEntity(entity_struct* e, FILE* f)
 
 	switch(e->type->id)
 	{
-		case 0:	case 1:
-			//energy ball launcher/catcher
-			//BLOCKMULTY/2 etc should depend on orientation
+		case 0:
+			//energy ball catcher
+			//BLOCKMULTY/2 etc should depend on orientation ?
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
+			return true;
+		case 1:
+			//energy ball launcher
+			//BLOCKMULTY/2 etc should depend on orientation ?
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
-			break;
 		case 3:
 			//pressure button
-			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
 			return true;
-			break;
 		case 11:
 			//light
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY-BLOCKMULTY/2,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
 			return true;
-			break;
 		default:
-			return false;
+			return true;
 	}
 }
 
@@ -80,6 +90,7 @@ void writeEntities(FILE* f)
 	u16 cnt=0;
 	size_t pos=ftell(f);
 	fwrite(&cnt,sizeof(u16),1,f);
+	int k=0;for(i=0;i<NUMENTITIES;i++)if(entity[i].used && entity[i].type)entity[i].writeID=k++;
 	for(i=0;i<NUMENTITIES;i++)
 	{
 		if(writeEntity(&entity[i], f))cnt++;
@@ -163,13 +174,27 @@ void readEntityEditor(FILE* f)
 
 	switch(type)
 	{
-		case 0:	case 1:
-			//energy ball launcher/catcher
+		case 0:
+			//energy ball catcher
+			{
+				readVect(&v, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			break;
+		case 1:
+			//energy ball launcher
 			readVect(&v, f);
 			break;
 		case 3:
 			//pressure button
-			readVect(&v, f);
+			{
+				readVect(&v, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
 			break;
 		case 11:
 			//light
@@ -185,6 +210,7 @@ void readEntityEditor(FILE* f)
 void readEntitiesEditor(FILE* f)
 {
 	int i; u16 cnt;
+	removeEntities();
 	fread(&cnt,sizeof(u16),1,f);
 	for(i=0;i<cnt;i++)
 	{
@@ -211,7 +237,9 @@ void loadMapEditor(editorRoom_struct* er, const char* str)
 
 	fseek(f, h.entityPosition, SEEK_SET);
 		readEntitiesEditor(f);
-		getEntityBlockFaces(er->blockFaceList);
 
 	fclose(f);
+
+	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
+	getEntityBlockFaces(er->blockFaceList);
 }

@@ -93,11 +93,27 @@ entity_struct* createEntity(vect3D pos, u8 type, bool placed)
 	return NULL;
 }
 
-void removeEntity(entity_struct* e)
+void removeTargetEntities(entity_struct* e)
 {
 	if(!e)return;
+	int i;
+	for(i=0;i<NUMENTITIES;i++)
+	{
+		if(entity[i].used && entity[i].target==e)entity[i].target=NULL;
+	}
+}
 
+void removeEntity(entity_struct* e)
+{
+	if(!e || !e->used)return;
+
+	removeTargetEntities(e);
 	e->used=false;
+}
+
+void removeEntities(void)
+{
+	int i;for(i=0;i<NUMENTITIES;i++)removeEntity(&entity[i]);
 }
 
 bool collideLineEntity(entity_struct* e, vect3D o, vect3D v, vect3D p1, vect3D p2, int32* d)
@@ -186,7 +202,7 @@ void getEntityBlockFaces(blockFace_struct* l)
 	int i;
 	for(i=0;i<NUMENTITIES;i++)
 	{
-		if(entity[i].used)entity[i].blockFace=getEntityBlockFace(&entity[i],l);
+		if(entity[i].used){entity[i].blockFace=getEntityBlockFace(&entity[i],l);}
 	}
 }
 

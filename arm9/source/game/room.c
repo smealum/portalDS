@@ -56,8 +56,17 @@ void readEntity(FILE* f)
 	fread(&dir, sizeof(u8), 1, f);
 	switch(type)
 	{
-		case 0:	case 1:
-			//energy ball launcher/catcher
+		case 0:
+			//energy ball catcher
+			{
+				vect3D p;
+				readVect(&p,f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+				createEnergyDevice(NULL, p, dir, type);
+			}
+			break;
+		case 1:
+			//energy ball launcher
 			{
 				vect3D p;
 				readVect(&p,f);
@@ -69,6 +78,7 @@ void readEntity(FILE* f)
 			{
 				vect3D p;
 				readVect(&p,f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
 				createBigButton(NULL, p);
 			}
 			break;

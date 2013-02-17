@@ -79,7 +79,8 @@ void readEntity(u8 i, FILE* f)
 			{
 				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
-				createEnergyDevice(NULL, p, dir, type);
+				energyDevice_struct* e=createEnergyDevice(NULL, p, dir, type);
+				if(e)entityActivatorArray[i]=&e->activator;
 				entityTargetArray[i]=target;
 			}
 			break;

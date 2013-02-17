@@ -20,6 +20,7 @@ typedef struct
 	deviceOrientation_type orientation;
 	rectangle_struct* surface;
 	vect3D position;
+	activator_struct activator;
 	bool type; //true=launcher
 	bool active;
 	bool used;

@@ -37,6 +37,7 @@ void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, devic
 {
 	if(!ed)return;
 	
+	initActivator(&ed->activator);
 	initModelInstance(&ed->modelInstance, type?(&energyLauncherModel):(&energyCatcherModel));
 	ed->orientation=or;
 	
@@ -167,8 +168,11 @@ void updateEnergyDevice(energyDevice_struct* ed)
 		}
 	}else{
 		//receiver
-		if(ed->active)ed->modelInstance.palette=activeDevicePalette;
-		else ed->modelInstance.palette=NULL;
+		if(ed->active)
+		{
+			ed->modelInstance.palette=activeDevicePalette;
+			useActivator(&ed->activator);
+		}else ed->modelInstance.palette=NULL;
 	}
 	
 	updateAnimation(&ed->modelInstance);

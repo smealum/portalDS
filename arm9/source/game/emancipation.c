@@ -190,7 +190,7 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 	
 	glPushMatrix();
 		glTranslatef32(eg->position.x,eg->position.y,eg->position.z);
-		if(eg->direction)glRotateYi(8192);
+		if(eg->direction)glRotateYi(-8192);
 		if(eg->length<0)glRotateYi(8192*2);
 		renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
 		glPushMatrix();

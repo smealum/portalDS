@@ -127,7 +127,7 @@ void readEntity(u8 i, FILE* f)
 			//emancipation grid
 			{
 				vect3D p; readVect(&p,f);
-				createEmancipationGrid(NULL, p, TILESIZE*2, !(dir<=1)); //TEMP
+				createEmancipationGrid(NULL, p, (dir%2)?(TILESIZE*2):(TILESIZE*2), !(dir<=1)); //TEMP
 			}
 			break;
 		case 9:

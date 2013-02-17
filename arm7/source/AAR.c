@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#define ALLOCATORSIZE (8*1024)
+#define ALLOCATORSIZE (8*1024) //may cause problems !
 
 u8 allocatorPool[ALLOCATORSIZE];
 u16 allocatorCounter;
@@ -22,6 +22,7 @@ void* allocateData(u16 size)
 {
 	if(allocatorCounter+size>ALLOCATORSIZE){return NULL;}
 	allocatorCounter+=size;
+	// fifoSendValue32(FIFO_USER_08,allocatorCounter);
 	return &allocatorPool[allocatorCounter-size];
 }
 

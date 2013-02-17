@@ -199,6 +199,7 @@ void shootPlayerGun(player_struct* p, bool R)
 			particleExplosion(pos,64,R?(RGB15(31,31,0)):(RGB15(0,31,31)));
 			
 			// r->hide^=1;
+
 			int32 angle=0;
 			vect3D v=vectDifference(pos,p->object->position);
 			

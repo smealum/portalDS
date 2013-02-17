@@ -97,13 +97,13 @@ void listenPI7(void)
 					vect3D normal=vect(0,0,0);
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						u32 x=fifoGetValue32(FIFO_USER_08);
-						size.x=x&((1<<16)-1);
-						size.y=(x>>16)&((1<<16)-1);
+						size.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						x=fifoGetValue32(FIFO_USER_08);
-						size.z=x&((1<<16)-1);
-						x=x>>16;
+						size.y=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						size.z=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						int32 x=fifoGetValue32(FIFO_USER_08);
 						if(x&1)normal.x=-inttof32(1);
 						else if(x&2)normal.x=inttof32(1);
 						if(x&4)normal.y=-inttof32(1);
@@ -227,7 +227,6 @@ void listenPI7(void)
 				break;
 			case PI_KILLBOX:
 				{
-					vect3D pos, size;
 					u32 mass;
 					u8 id=signal>>PISIGNALDATA;
 					if(id<NUMOBJECTS)

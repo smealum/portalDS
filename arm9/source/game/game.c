@@ -72,8 +72,6 @@ void initGame(void)
 	NOGBA("lalala");
 
 	getPlayer()->currentRoom=&gameRoom;
-	// readMap("lalala.map", NULL);
-	newReadMap("test.map", NULL);
 	
 	currentBuffer=false;
 	
@@ -94,6 +92,10 @@ void initGame(void)
 	
 	//PHYSICS
 	initPI9();
+
+	// readMap("lalala.map", NULL);
+	newReadMap("../testedit.map", NULL);
+	// newReadMap("test.map", NULL);
 	
 	// testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	// testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
@@ -145,7 +147,7 @@ static inline void render1(void)
 	
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
-		if(keysDown()&KEY_X)createTurret(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4));
+		if(keysDown()&KEY_X)createTurret(NULL, vect(-inttof32(0),26,-inttof32(0)));
 		// if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&companionCubeModel);
 		if(keysDown()&KEY_SELECT)testDispenser->active=true;
 		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
@@ -184,7 +186,7 @@ static inline void render1(void)
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 	
 		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
-		while(fifoCheckValue32(FIFO_USER_08)){u32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);}
+		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);NOGBA("ALERT %d      \n",cnt);}
 	
 	projectCamera(NULL);
 

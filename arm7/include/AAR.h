@@ -3,7 +3,7 @@
 
 #define NUMAARSEGMENTS (4)
 
-#define NODESIZE (2048)
+#define NODESIZE (4096)
 
 typedef struct
 {

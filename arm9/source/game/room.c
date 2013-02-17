@@ -47,6 +47,8 @@ void readRectangles(room_struct* r, FILE* f)
 	}
 }
 
+int totaltest=0;
+
 void readEntity(FILE* f)
 {
 	if(!f)return;
@@ -54,42 +56,86 @@ void readEntity(FILE* f)
 	fread(&type, sizeof(u8), 1, f);
 	readVect(&v, f);
 	fread(&dir, sizeof(u8), 1, f);
+	totaltest++;
 	switch(type)
 	{
 		case 0:
 			//energy ball catcher
 			{
-				vect3D p;
-				readVect(&p,f);
+				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+				NOGBA("BALL CATCHER %d", totaltest);
 				createEnergyDevice(NULL, p, dir, type);
 			}
 			break;
 		case 1:
 			//energy ball launcher
 			{
-				vect3D p;
-				readVect(&p,f);
+				vect3D p; readVect(&p,f);
 				createEnergyDevice(NULL, p, dir, type);
 			}
 			break;
 		case 3:
 			//pressure button
 			{
-				vect3D p;
-				readVect(&p,f);
+				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
 				createBigButton(NULL, p);
 			}
 			break;
+		case 4:
+			//turret
+			{
+				vect3D p; readVect(&p,f);
+				createTurret(NULL, p);
+			}
+			break;
+		case 5: case 6:
+			//cubes
+			{
+				vect3D p; readVect(&p,f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+			}
+			break;
+		case 7:
+			//dispenser
+			{
+				vect3D p; readVect(&p,f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+				createCubeDispenser(NULL, p, true);
+			}
+			break;
+		case 8:
+			//emancipation grid
+			{
+				vect3D p; readVect(&p,f);
+				createEmancipationGrid(NULL, p, TILESIZE*2, !(dir<=1)); //TEMP
+			}
+			break;
+		case 9:
+			//platform
+			{
+				vect3D p1, p2;
+				readVect(&p1,f);
+				readVect(&p2,f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+				createPlatform(NULL, p1, p2, true);
+			}
+			return;
 		case 11:
 			//light
 			{
-				vect3D p;
-				readVect(&p,f);
+				vect3D p; readVect(&p,f);
 				createLight(p, TILESIZE*2*16);
 			}
 			break;
+		case 12:
+			//platform target
+			{
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+			}
+			return;
 		default:
 			break;
 	}

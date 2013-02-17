@@ -23,7 +23,7 @@ typedef enum
 	PI_RESET=4,  	    //ARG : 0
 	PI_ADDBOX=5,  	    //ARG : 5 (id;[sizex|sizey][sizez|mass][posx][posy][posz])
 	PI_APPLYFORCE=6,    //ARG : 5 (id;[posx|posy][posz][vx][vy][vz])
-	PI_ADDAAR=7,  	    //ARG : 5 (id;[sizex|sizey][sizez|normal][posx][posy][posz])
+	PI_ADDAAR=7,  	    //ARG : 5 (id;[sizex][sizey][sizez][normal][posx][posy][posz])
 	PI_MAKEGRID=8,      //ARG : 0
 	PI_SETVELOCITY=9,   //ARG : 3 (id;[vx][vy][vz])
 	PI_UPDATEPLAYER=10, //ARG : 3 ([vx][vy][vz])

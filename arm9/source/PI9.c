@@ -127,7 +127,7 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	return o;
 }
 
-s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|normal][posx][posy][posz])
+s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex][sizey][sizez][normal][posx][posy][posz])
 {
 	AAR_struct* a=newAAR();
 	if(!a)return -1;
@@ -137,10 +137,12 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex|sizey][sizez|
 	u16 n=((normal.x<0))|((normal.x>0)<<1)
 		 |((normal.y<0)<<2)|((normal.y>0)<<3)
 		 |((normal.z<0)<<4)|((normal.z>0)<<5);
-	
+		 
 	fifoSendValue32(FIFO_USER_08,PI_ADDAAR|((a->id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(a->size.x&((1<<16)-1))|((a->size.y&((1<<16)-1))<<16));	
-	fifoSendValue32(FIFO_USER_08,(a->size.z&((1<<16)-1))|((n)<<16));
+	fifoSendValue32(FIFO_USER_08,(a->size.x));	
+	fifoSendValue32(FIFO_USER_08,(a->size.y));	
+	fifoSendValue32(FIFO_USER_08,(a->size.z));	
+	fifoSendValue32(FIFO_USER_08,(n));
 	fifoSendValue32(FIFO_USER_08,(a->position.x));
 	fifoSendValue32(FIFO_USER_08,(a->position.y));
 	fifoSendValue32(FIFO_USER_08,(a->position.z));

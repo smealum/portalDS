@@ -17,6 +17,6 @@ extern platform_struct platform[NUMPLATFORMS];
 void initPlatforms(void);
 void drawPlatforms(void);
 void updatePlatforms(void);
-platform_struct* createPlatform(vect3D orig, vect3D dest, bool BAF);
+platform_struct* createPlatform(room_struct* r, vect3D orig, vect3D dest, bool BAF);
 
 #endif

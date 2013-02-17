@@ -2,7 +2,10 @@
 	"folders":
 	[
 		{
-			"path": "arm7"
+			"path": "arm7/source"
+		},
+		{
+			"path": "arm7/include"
 		},
 		{
 			"path": "arm9/source"

@@ -22,16 +22,19 @@ void initPlatforms(void)
 	generateModelDisplayLists(&platformModel, false, 0);
 }
 
-void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF)
+void initPlatform(platform_struct* pf, room_struct* r, vect3D orig, vect3D dest, u8 id, bool BAF)
 {
-	if(!pf)return;
+	if(!pf || !r)return;
 	
+	orig=vect(orig.x+r->position.x, orig.y, orig.z+r->position.y);
+	dest=vect(dest.x+r->position.x, dest.y, dest.z+r->position.y);
+
 	pf->id=id;
-	pf->origin=orig;
-	pf->destination=dest;
-	
-	pf->position=orig;
-	pf->velocity=vectDivInt(normalize(vectDifference(dest,orig)),256);
+	pf->origin=convertVect(orig);
+	pf->destination=convertVect(dest);
+
+	pf->position=pf->origin;
+	pf->velocity=vectDivInt(normalize(vectDifference(pf->destination,pf->origin)),256);
 	
 	pf->direction=true;
 	pf->touched=false;
@@ -39,19 +42,20 @@ void initPlatform(platform_struct* pf, vect3D orig, vect3D dest, u8 id, bool BAF
 	
 	pf->oldactive=pf->active=false;
 	
-	addPlatform(id,vectMultInt(orig,4),vectMultInt(dest,4),BAF); //TEMP
+	addPlatform(id,vectMultInt(pf->origin,4),vectMultInt(pf->destination,4),BAF); //TEMP
 	
 	pf->used=true;
 }
 
-platform_struct* createPlatform(vect3D orig, vect3D dest, bool BAF)
+platform_struct* createPlatform(room_struct* r, vect3D orig, vect3D dest, bool BAF)
 {
+	if(!r)r=&gameRoom;
 	int i;
 	for(i=0;i<NUMPLATFORMS;i++)
 	{
 		if(!platform[i].used)
 		{
-			initPlatform(&platform[i],orig,dest,i,BAF);
+			initPlatform(&platform[i],r,orig,dest,i,BAF);
 			return &platform[i];
 		}
 	}

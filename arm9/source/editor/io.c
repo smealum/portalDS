@@ -41,6 +41,32 @@ void writeRectangleList(rectangleList_struct* rl, FILE* f)
 	}
 }
 
+vect3D adaptVector(vect3D v, u8 dir)
+{
+	switch(dir)
+	{
+		case 0:
+			v=vect(v.x*BLOCKMULTX,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
+			break;
+		case 1:
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
+			break;
+		case 3:
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY+BLOCKMULTY,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
+			break;
+		case 4:
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ);
+			break;
+		case 5:
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ+BLOCKMULTZ);
+			break;
+		default:
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
+			break;
+	}
+	return v;
+}
+
 bool writeEntity(entity_struct* e, FILE* f)
 {
 	if(!e || !f || !e->used || !e->type)return false;
@@ -53,44 +79,42 @@ bool writeEntity(entity_struct* e, FILE* f)
 	{
 		case 0:
 			//energy ball catcher
-			//BLOCKMULTY/2 etc should depend on orientation ?
 			{
 				s16 target=(e->target)?(e->target->writeID):(-1);
-				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				writeVect(adaptVector(e->position, e->direction), f);
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
 		case 1:
 			//energy ball launcher
-			//BLOCKMULTY/2 etc should depend on orientation ?
-			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+			writeVect(adaptVector(e->position, e->direction), f);
 			return true;
 		case 3:
 			//pressure button
 			{
 				s16 target=(e->target)?(e->target->writeID):(-1);
-				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				writeVect(adaptVector(e->position, e->direction), f);
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
 		case 4:
 			//turret
 			{
-				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				writeVect(adaptVector(e->position, e->direction), f);
 			}
 			return true;
 		case 5: case 6: case 7:
 			//cubes and dispenser
 			{
 				s16 target=(e->target)?(e->target->writeID):(-1);
-				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				writeVect(adaptVector(e->position, e->direction), f);
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
 		case 8:
 			//emancipation grid
 			{
-				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				writeVect(adaptVector(e->position, e->direction), f);
 			}
 			return true;
 		case 9:

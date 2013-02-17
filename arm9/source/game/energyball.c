@@ -130,10 +130,10 @@ void drawEnergyDevice(energyDevice_struct* ed)
 				glRotateZi(8192);
 				break;
 			case pZ:
-				glRotateXi(-8192);
+				glRotateXi(8192);
 				break;
 			case mZ:
-				glRotateXi(8192);
+				glRotateXi(-8192);
 				break;
 			default:
 				break;

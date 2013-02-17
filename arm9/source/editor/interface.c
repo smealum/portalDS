@@ -73,8 +73,8 @@ void activateInterfaceButton(interfaceButton_struct* ib)
 	if(ib->argument>=0 && ib->argument<12)
 	{
 		entity_struct* e=NULL;
-		if(!(editorSelection.entity && !editorSelection.entity->placed))e=createEntity(vect(32,32,32), ib->argument, false);
-		else{e=editorSelection.entity;changeEntityType(e,ib->argument);}
+		if(editorSelection.entity && !editorSelection.entity->placed){removeEntity(editorSelection.entity);editorSelection.entity=NULL;}
+		e=createEntity(vect(32,32,32), ib->argument, false);
 		editorSelection.active=true;
 		editorSelection.entity=e;
 		switchScreens();

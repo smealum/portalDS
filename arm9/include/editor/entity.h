@@ -16,6 +16,8 @@ enum
 struct entity_struct;
 
 typedef void(*entityFunction)(struct entity_struct*);
+typedef void(*entityMoveFunction)(struct entity_struct*, bool);
+typedef bool(*entityMoveCheckFunction)(struct entity_struct*, vect3D);
 
 typedef struct
 {
@@ -24,8 +26,10 @@ typedef struct
 	u8 possibleDirections;
 	contextButton_struct* contextButtonsArray;
 	u8 numButtons;
-	entityFunction specialInit, specialMove;
-	bool removeTarget;
+	entityFunction specialInit;
+	entityMoveFunction specialMove;
+	entityMoveCheckFunction specialMoveCheck;
+	bool removeTarget, rotate;
 	md2Model_struct model;
 	u8 id;
 }entityType_struct;

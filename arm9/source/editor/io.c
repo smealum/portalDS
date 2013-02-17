@@ -73,9 +73,47 @@ bool writeEntity(entity_struct* e, FILE* f)
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
+		case 4:
+			//turret
+			{
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+			}
+			return true;
+		case 5: case 6: case 7:
+			//cubes and dispenser
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
+			return true;
+		case 8:
+			//emancipation grid
+			{
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+			}
+			return true;
+		case 9:
+			//platform
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				vect3D tp=e->position;
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				if(e->target)tp=e->target->position;
+				writeVect(vect(tp.x*BLOCKMULTX+BLOCKMULTX/2,tp.y*BLOCKMULTY,tp.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
+			return true;
 		case 11:
 			//light
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY-BLOCKMULTY/2,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+			return true;
+		case 12:
+			//platform target
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
 			return true;
 		default:
 			return true;
@@ -196,10 +234,54 @@ void readEntityEditor(FILE* f)
 				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
 			}
 			break;
+		case 4:
+			//turret
+			readVect(&v, f);
+			break;
+		case 5: case 6:
+			//cubes
+			{
+				readVect(&v, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			break;
+		case 7:
+			//dispenser
+			{
+				readVect(&v, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			break;
+		case 8:
+			//emancipation grid
+			readVect(&v, f);
+			break;
+		case 9:
+			//platform
+			{
+				readVect(&v, f);
+				readVect(&v, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			return;
 		case 11:
 			//light
 			readVect(&v, f);
 			break;
+		case 12:
+			//platform target
+			{
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			return;
 		default:
 			removeEntity(e);
 			break;

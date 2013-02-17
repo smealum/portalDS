@@ -336,7 +336,7 @@ extern editorRoom_struct editorRoom;
 
 void cubeSpecialInit(entity_struct* e)
 {
-	if(!e)return;
+	if(!e || e->placed)return;
 
 	entity_struct* t=createEntity(e->position, 7, e->placed);
 	if(!t)return;

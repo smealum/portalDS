@@ -1,6 +1,8 @@
 #ifndef EDITORIO_H
 #define EDITORIO_H
 
+#define NUMENTITIES (64)
+
 typedef struct
 {
 	u32 dataSize;

@@ -14,6 +14,9 @@ void drawRoomsGame(u8 mode, u16 color)
 
 extern char* basePath;
 
+s16 entityTargetArray[NUMENTITIES];
+activator_struct* entityActivatorArray[NUMENTITIES];
+
 void readRectangle(rectangle_struct* rec, FILE* f)
 {
 	if(!rec || !f)return;
@@ -47,16 +50,28 @@ void readRectangles(room_struct* r, FILE* f)
 	}
 }
 
-int totaltest=0;
+void addEntityTarget(u8 k, void* target, activatorTarget_type type)
+{
+	if(!target)return;
+	int i;
+	for(i=0;i<k;i++)
+	{
+		if(entityTargetArray[i]==k && entityActivatorArray[i])
+		{
+			addActivatorTarget(entityActivatorArray[i], target, type);
+		}
+	}
+}
 
-void readEntity(FILE* f)
+void readEntity(u8 i, FILE* f)
 {
 	if(!f)return;
 	u8 type=0, dir=0; vect3D v;
 	fread(&type, sizeof(u8), 1, f);
 	readVect(&v, f);
 	fread(&dir, sizeof(u8), 1, f);
-	totaltest++;
+	entityTargetArray[i]=-1;
+	entityActivatorArray[i]=NULL;
 	switch(type)
 	{
 		case 0:
@@ -64,8 +79,8 @@ void readEntity(FILE* f)
 			{
 				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
-				NOGBA("BALL CATCHER %d", totaltest);
 				createEnergyDevice(NULL, p, dir, type);
+				entityTargetArray[i]=target;
 			}
 			break;
 		case 1:
@@ -80,7 +95,9 @@ void readEntity(FILE* f)
 			{
 				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
-				createBigButton(NULL, p);
+				bigButton_struct* e=createBigButton(NULL, p);
+				if(e)entityActivatorArray[i]=&e->activator;
+				entityTargetArray[i]=target;
 			}
 			break;
 		case 4:
@@ -102,7 +119,8 @@ void readEntity(FILE* f)
 			{
 				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
-				createCubeDispenser(NULL, p, true);
+				cubeDispenser_struct* e=createCubeDispenser(NULL, p, true);
+				if(e)addEntityTarget(i, (void*)e, DISPENSER_TARGET);
 			}
 			break;
 		case 8:
@@ -119,7 +137,8 @@ void readEntity(FILE* f)
 				readVect(&p1,f);
 				readVect(&p2,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
-				createPlatform(NULL, p1, p2, true);
+				platform_struct* e=createPlatform(NULL, p1, p2, true);
+				if(e)addEntityTarget(i, (void*)e, PLATFORM_TARGET);
 			}
 			return;
 		case 11:
@@ -146,7 +165,7 @@ void readEntities(FILE* f)
 	if(!f)return;
 
 	u16 cnt; fread(&cnt,sizeof(u16),1,f);
-	int i; for(i=0;i<cnt;i++)readEntity(f);
+	int i; for(i=0;i<cnt;i++)readEntity(i,f);
 }
 
 void newReadMap(char* filename, room_struct* r)

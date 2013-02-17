@@ -1,8 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#define NUMENTITIES (64)
-
 enum
 {
 	pX_mask = 1,

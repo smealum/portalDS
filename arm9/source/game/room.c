@@ -29,9 +29,11 @@ void readRectangle(rectangle_struct* rec, FILE* f)
 
 	fread(&rec->portalable,sizeof(bool),1,f);
 	
-	u16 mid=0;
-	fread(&mid,sizeof(u16),1,f);
-	rec->material=getMaterial(mid);
+	u16 mid=0; fread(&mid,sizeof(u16),1,f);
+
+	//TEMP ?
+	if(rec->portalable)rec->material=getMaterial(1);
+	else rec->material=getMaterial(2);
 	
 	fread(&rec->rot,sizeof(bool),1,f);
 }

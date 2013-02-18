@@ -24,9 +24,10 @@ void initDoor(door_struct* d, room_struct* r, vect3D position, bool orientation)
 
 	rectangle_struct rec;
 	rec.material=NULL;
-	if(!orientation){rec.position=addVect(position,vect(-2,-8,0)); rec.size=vect(4,16,0); rec.normal=vect(0,0,inttof32(1));}
-	else {rec.position=addVect(position,vect(0,-8,-2)); rec.size=vect(0,16,4); rec.normal=vect(inttof32(1),0,0);}
+	if(!orientation){rec.position=addVect(position,vect(-2,0,0)); rec.size=vect(4,12,0); rec.normal=vect(0,0,inttof32(1));}
+	else {rec.position=addVect(position,vect(0,0,-2)); rec.size=vect(0,12,4); rec.normal=vect(inttof32(1),0,0);}
 	d->rectangle=addRoomRectangle(r, rec, NULL, false);
+	if(d->rectangle)d->rectangle->hide=true;
 
 	initModelInstance(&d->modelInstance, &doorModel);
 	d->position=convertVect(vect(position.x+r->position.x, position.y, position.z+r->position.y));
@@ -56,7 +57,6 @@ void updateDoor(door_struct* d)
 
 	if(d->active)
 	{
-		NOGBA("IM A DOOR");
 		if(d->modelInstance.currentAnim==0)
 		{
 			changeAnimation(&d->modelInstance, 2, false);

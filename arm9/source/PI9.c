@@ -121,6 +121,7 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	initModelInstance(&o->modelInstance,model);
 	
 	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
+	o->size=vect(o->size.x,o->size.z,o->size.y); //md2s don't use the same coordinate system
 	o->mass=mass; //reduce precision to improve range
 	resetBox(o,pos);
 	

@@ -60,6 +60,10 @@ vect3D adaptVector(vect3D v, u8 dir)
 		case 5:
 			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ+BLOCKMULTZ);
 			break;
+		case 6:
+			//CENTER
+			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY+BLOCKMULTY/2,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
+			break;
 		default:
 			v=vect(v.x*BLOCKMULTX+BLOCKMULTX/2,v.y*BLOCKMULTY,v.z*BLOCKMULTZ+BLOCKMULTZ/2);
 			break;
@@ -100,7 +104,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 		case 4:
 			//turret
 			{
-				writeVect(adaptVector(e->position, e->direction), f);
+				writeVect(adaptVector(e->position, 6), f);
 			}
 			return true;
 		case 5: case 6: case 7:

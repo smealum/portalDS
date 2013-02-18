@@ -24,21 +24,22 @@ void resetPortals(void)
 	resetPortalsPI();
 }
 
-void movePortal(portal_struct* p, vect3D pos, vect3D normal, int32 angle, bool actualMove)
+void movePortal(portal_struct* p, vect3D pos, vect3D normal, vect3D plane0, bool actualMove)
 {
 	if(!p)return;
 	p->position=pos;
 	p->normal=normal;
+	p->plane[0]=plane0;
 	p->animCNT=0;
 	
-	p->angle=angle;
+	// p->angle=angle;
 	p->oldZ=-1;
 	
 	computePortalPlane(p);
 	
 	if(actualMove)
 	{
-		updatePortalPI(p==&portal2,p->position,p->normal,p->angle);
+		updatePortalPI(p==&portal2,p->position,p->normal,p->plane[0]);
 		if(p->displayList)free(p->displayList);
 		p->displayList=NULL;
 		p->displayList=generateRoomDisplayList(NULL, p->position, p->normal, true);
@@ -68,10 +69,11 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	else {p->color=RGB15(0,31,31);}
 	initCamera(&p->camera);
 	
-	p->angle=0;
 	p->oldZ=-1;
 	p->normal=normal;
 	p->used=false;
+	p->normal=vect(0,0,inttof32(1));
+	p->plane[0]=vect(0,inttof32(1),0);
 	computePortalPlane(p);
 	
 	p->displayList=NULL;

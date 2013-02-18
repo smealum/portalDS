@@ -213,7 +213,7 @@ void updatePlayerPI(player_struct* p) //([vx][vy][vz])
 	fifoSendValue32(FIFO_USER_08,(p->object->position.z));
 }
 
-void updatePortalPI(u8 id, vect3D pos, vect3D normal, int32 angle) //(id;[px][py][pz][n][cos|sin])
+void updatePortalPI(u8 id, vect3D pos, vect3D normal, vect3D plane0) //(id;[px][py][pz][n][p0x][p0y][p0z])
 {	
 	u16 n=((normal.x<0))|((normal.x>0)<<1)
 		 |((normal.y<0)<<2)|((normal.y>0)<<3)
@@ -224,7 +224,9 @@ void updatePortalPI(u8 id, vect3D pos, vect3D normal, int32 angle) //(id;[px][py
 	fifoSendValue32(FIFO_USER_08,(pos.y*4));
 	fifoSendValue32(FIFO_USER_08,(pos.z*4));
 	fifoSendValue32(FIFO_USER_08,(n));
-	fifoSendValue32(FIFO_USER_08,((cosLerp(angle)+inttof32(1))|((sinLerp(angle)+inttof32(1))<<16)));
+	fifoSendValue32(FIFO_USER_08,(plane0.x));
+	fifoSendValue32(FIFO_USER_08,(plane0.y));
+	fifoSendValue32(FIFO_USER_08,(plane0.z));
 }
 
 void listenPI9(void)

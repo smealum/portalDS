@@ -156,6 +156,7 @@ void listenPI7(void)
 				{
 					vect3D pos;
 					vect3D normal=vect(0,0,0);
+					vect3D plane0=vect(0,0,0);
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
 						pos.x=fifoGetValue32(FIFO_USER_08);
@@ -172,14 +173,20 @@ void listenPI7(void)
 						if(x&16)normal.z=-inttof32(1);
 						else if(x&32)normal.z=inttof32(1);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						x=fifoGetValue32(FIFO_USER_08);
+						plane0.x=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						plane0.y=fifoGetValue32(FIFO_USER_08);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						plane0.z=fifoGetValue32(FIFO_USER_08);
 					if(id<2)
 					{
 						portal[id].used=true;
 						portal[id].position=pos;
 						portal[id].normal=normal;
-						portal[id].cos=(x&((1<<16)-1))-inttof32(1);
-						portal[id].sin=((x>>16)&((1<<16)-1))-inttof32(1);
+						portal[id].plane[0]=plane0;
+						fifoSendValue32(FIFO_USER_08, plane0.x);
+						fifoSendValue32(FIFO_USER_08, plane0.y);
+						fifoSendValue32(FIFO_USER_08, plane0.z);
 						computePortalPlane(&portal[id]);
 						wakeOBBs();
 					}

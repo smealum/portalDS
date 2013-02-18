@@ -27,7 +27,7 @@ typedef enum
 	PI_MAKEGRID=8,      //ARG : 0
 	PI_SETVELOCITY=9,   //ARG : 3 (id;[vx][vy][vz])
 	PI_UPDATEPLAYER=10, //ARG : 3 ([vx][vy][vz])
-	PI_UPDATEPORTAL=11, //ARG : 5 (id;[px][py][pz][n][cos|sin])
+	PI_UPDATEPORTAL=11, //ARG : 7 (id;[px][py][pz][n][p0x][p0y][p0z])
 	PI_ADDPLATFORM=12,  //ARG : 3 (id;[posx][posy][posz])
 	PI_UPDATEPLATFORM=13,//ARG : 3 (id;[posx][posy][posz])
 	PI_TOGGLEPLATFORM=14,//ARG : 1 (id;[active])
@@ -42,31 +42,6 @@ typedef enum
 	{
 		if(!p)return;
 		
-		if(p->normal.x)
-		{
-			if(p->normal.x>0)
-			{
-				p->plane[0]=vect(0,p->sin,-p->cos);
-			}else{
-				p->plane[0]=vect(0,p->sin,p->cos);
-			}
-		}else if(p->normal.y)
-		{
-			if(p->normal.y>0)
-			{
-				p->plane[0]=vect(p->cos,0,p->sin);
-			}else{
-				p->plane[0]=vect(p->cos,0,p->sin);
-			}
-		}else{
-			if(p->normal.z>0)
-			{
-				p->plane[0]=vect(p->cos,p->sin,0);
-			}else{
-				p->plane[0]=vect(-p->cos,p->sin,0);
-			}
-		}
-		
 		p->plane[1]=vectProduct(p->normal,p->plane[0]);
 		
 		//TEST
@@ -76,31 +51,6 @@ typedef enum
 	static inline void computePortalPlane(portal_struct* p)
 	{
 		if(!p)return;
-		
-		if(p->normal.x)
-		{
-			if(p->normal.x>0)
-			{
-				p->plane[0]=vect(0,sinLerp(p->angle),-cosLerp(p->angle));
-			}else{
-				p->plane[0]=vect(0,sinLerp(p->angle),cosLerp(p->angle));
-			}
-		}else if(p->normal.y)
-		{
-			if(p->normal.y>0)
-			{
-				p->plane[0]=vect(cosLerp(p->angle),0,sinLerp(p->angle));
-			}else{
-				p->plane[0]=vect(cosLerp(p->angle),0,sinLerp(p->angle));
-			}
-		}else{
-			if(p->normal.z>0)
-			{
-				p->plane[0]=vect(cosLerp(p->angle),sinLerp(p->angle),0);
-			}else{
-				p->plane[0]=vect(-cosLerp(p->angle),sinLerp(p->angle),0);
-			}
-		}
 		
 		p->plane[1]=vectProduct(p->normal,p->plane[0]);
 	}

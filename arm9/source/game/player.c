@@ -169,6 +169,7 @@ void shootPlayerGun(player_struct* p, bool R)
 {
 	if(!p)p=&player;
 	if(!p->currentRoom)return;
+	camera_struct* c=getPlayerCamera();
 	
 	// mmEffect(&gunShot);
 	// mmEffect(SFX_GUNSHOT);
@@ -200,28 +201,27 @@ void shootPlayerGun(player_struct* p, bool R)
 			
 			// r->hide^=1;
 
-			int32 angle=0;
 			vect3D v=vectDifference(pos,p->object->position);
-			
-			if(r->normal.y<0)angle=getAngle(0,0,-v.z,-v.x)<<6;
-			else if(r->normal.y>0)angle=getAngle(0,0,v.z,v.x)<<6;
+
+			vect3D plane0=vect(c->transformationMatrix[0],c->transformationMatrix[3],c->transformationMatrix[6]);
+			plane0=normalize(vectDifference(plane0,vectMult(r->normal,dotProduct(r->normal,plane0))));
 			
 			portal_struct* por=R?(&portal1):(&portal2);
 			
-			vect3D oldp=por->position;vect3D oldn=por->normal;int32 olda=por->angle;
-			movePortal(por, pos, vectMultInt(r->normal,-1), angle, false);
+			vect3D oldp=por->position;vect3D oldn=por->normal;vect3D oldp0=por->plane[0];
+			movePortal(por, pos, vectMultInt(r->normal,-1), plane0, false);
 			
 			isPortalOnWall(p->currentRoom,por,true);
 			
 			if(isPortalOnWall(p->currentRoom,por,false))
 			{
 				pos=por->position;
-				movePortal(por, oldp, oldn, olda, false); //terribly inelegant, please forgive me	
+				movePortal(por, oldp, oldn, oldp0, false); //terribly inelegant, please forgive me	
 				ejectPortalOBBs(por);
 				
-				movePortal(por, pos, vectMultInt(r->normal,-1), angle, true);
+				movePortal(por, pos, vectMultInt(r->normal,-1), plane0, true);
 			}else{
-				movePortal(por, oldp, oldn, olda, false);
+				movePortal(por, oldp, oldn, oldp0, false);
 			}
 		}
 	}

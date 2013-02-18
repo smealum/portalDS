@@ -132,6 +132,13 @@ bool writeEntity(entity_struct* e, FILE* f)
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
+		case 10:
+			//door
+			{
+				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
+				bool orientation=false; fwrite(&orientation,sizeof(bool),1,f);
+			}
+			return true;
 		case 11:
 			//light
 			writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY-BLOCKMULTY/2,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
@@ -296,6 +303,13 @@ void readEntityEditor(FILE* f)
 				s16 target=-1;
 				fread(&target, sizeof(s16), 1, f);
 				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			return;
+		case 10:
+			//door
+			{
+				readVect(&v, f);
+				fseek(f, sizeof(bool), SEEK_CUR);
 			}
 			return;
 		case 11:

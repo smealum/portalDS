@@ -68,6 +68,7 @@ void initGame(void)
 	initPlatforms();
 	initCubes();
 	initEmancipation();
+	initDoors();
 	
 	NOGBA("lalala");
 
@@ -176,6 +177,7 @@ static inline void render1(void)
 		updateCubeDispensers();
 		updateEmancipators();
 		updateEmancipationGrids();
+		updateDoors();
 	// iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
@@ -217,6 +219,7 @@ static inline void render1(void)
 			drawTurretsStuff();
 			drawEmancipators();
 			drawEmancipationGrids();
+			drawDoors();
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
@@ -268,6 +271,7 @@ static inline void render2(void)
 		drawTurretsStuff();
 		drawEmancipators();
 		drawEmancipationGrids();
+		drawDoors();
 
 	glPopMatrix(1);
 	

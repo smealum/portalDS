@@ -142,6 +142,14 @@ void readEntity(u8 i, FILE* f)
 				if(e)addEntityTarget(i, (void*)e, PLATFORM_TARGET);
 			}
 			return;
+		case 10:
+			//door
+			{
+				vect3D p; readVect(&p,f);
+				bool orientation; fread(&orientation, sizeof(bool), 1, f);
+				createDoor(NULL, p, orientation);
+			}
+			break;
 		case 11:
 			//light
 			{

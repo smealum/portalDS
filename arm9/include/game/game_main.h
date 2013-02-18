@@ -18,10 +18,10 @@
 #include "game/turrets.h"
 #include "game/platform.h"
 #include "game/cubes.h"
+#include "game/door.h"
 #include "game/activator.h"
 #include "game/energyball.h"
 #include "game/bigbutton.h"
 #include "game/emancipation.h"
-#include "game/door.h"
 
 #endif

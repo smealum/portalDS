@@ -7,7 +7,9 @@ typedef struct
 {
 	vect3D position;
 	modelInstance_struct modelInstance;
+	rectangle_struct* rectangle;
 	bool orientation;
+	bool active;
 	bool used;
 	u8 id;
 }door_struct;

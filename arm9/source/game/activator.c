@@ -25,6 +25,12 @@ void useSlot(activatorSlot_struct* as)
 				pf->active=true;
 			}
 			break;
+		case DOOR_TARGET:
+			{
+				door_struct* d=(door_struct*)as->target;
+				d->active=true;
+			}
+			break;
 	}
 }
 
@@ -44,6 +50,12 @@ void unuseSlot(activatorSlot_struct* as)
 			{
 				platform_struct* pf=(platform_struct*)as->target;
 				pf->active=false;
+			}
+			break;
+		case DOOR_TARGET:
+			{
+				door_struct* d=(door_struct*)as->target;
+				d->active=false;
 			}
 			break;
 	}

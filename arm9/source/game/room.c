@@ -50,6 +50,8 @@ void readRectangles(room_struct* r, FILE* f)
 	}
 }
 
+//THIS SYSTEM DOES NOT WORK
+//FIX THIS YOU IDIOT
 void addEntityTarget(u8 k, void* target, activatorTarget_type type)
 {
 	if(!target)return;
@@ -59,6 +61,7 @@ void addEntityTarget(u8 k, void* target, activatorTarget_type type)
 		if(entityTargetArray[i]==k && entityActivatorArray[i])
 		{
 			addActivatorTarget(entityActivatorArray[i], target, type);
+			NOGBA("TARGET");
 		}
 	}
 }
@@ -147,7 +150,9 @@ void readEntity(u8 i, FILE* f)
 			{
 				vect3D p; readVect(&p,f);
 				bool orientation; fread(&orientation, sizeof(bool), 1, f);
-				createDoor(NULL, p, orientation);
+				door_struct* e=createDoor(NULL, p, orientation);
+				NOGBA("DOOR");
+				if(e)addEntityTarget(i, (void*)e, DOOR_TARGET);
 			}
 			break;
 		case 11:

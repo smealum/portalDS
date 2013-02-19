@@ -98,7 +98,7 @@ void updateBigButton(bigButton_struct* bb)
 	if(!bb || !bb->used)return;
 	
 	bb->active=false;
-	if(bb->surface->touched)bb->active=bb->surface->touched;
+	if(bb->surface->touched)bb->active=true;
 	if(bb->surface->AARid>0)
 	{
 		if(!bb->active)bb->active=aaRectangles[bb->surface->AARid].touched;

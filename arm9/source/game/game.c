@@ -330,6 +330,7 @@ void gameFrame(void)
 			// iprintf("frm 2 : %d  \n",cpuGetTiming());
 			render2();
 			listenPI9();
+			updateOBBs();
 			// iprintf("frm 2 : %d  \n",cpuEndTiming());
 			iprintf("fake frame : %d   \n",cpuEndTiming());
 			swiWaitForVBlank();

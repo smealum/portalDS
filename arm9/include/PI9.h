@@ -11,6 +11,7 @@ typedef struct
 	int32 transformationMatrix[9];
 	modelInstance_struct modelInstance;
 	vect3D position, size;
+	s16 groundID;
 	int32 mass;
 	bool used;
 	u8 id;
@@ -30,6 +31,7 @@ void initPI9(void);
 void startPI(void);
 void pausePI(void);
 void listenPI9(void);
+void updateOBBs(void);
 void applyForce(u8 id, vect3D pos, vect3D v);
 s16 createAAR(vect3D size, vect3D pos, vect3D normal);
 void addPlatform(u8 id, vect3D orig, vect3D dest, bool BAF);

@@ -248,11 +248,8 @@ void listenPI9(void)
 			while(!fifoCheckValue32(FIFO_USER_07));
 			// if(k<NUMOBJECTS)
 			{
-				if(groundID>=0 && groundID<NUMAARS)
-				{
-					aaRectangles[groundID].touched=true;
-				}
 				OBB_struct* o=&objects[k];
+				o->groundID=groundID;
 				// o->used=true;
 				o->position.x=fifoGetValue32(FIFO_USER_02);
 				o->position.y=fifoGetValue32(FIFO_USER_03);
@@ -458,6 +455,22 @@ void drawOBBs(void)
 			drawOBB(&objects[i]);
 			if(intersectOBBPortal(&portal1,&objects[i]))drawWarpedOBB(&portal1,&objects[i]);
 			if(intersectOBBPortal(&portal2,&objects[i]))drawWarpedOBB(&portal2,&objects[i]);
+		}
+	}
+}
+
+void updateOBBs(void)
+{
+	int i;
+	for(i=0;i<NUMOBJECTS;i++)
+	{
+		if(objects[i].used)
+		{
+			OBB_struct* o=&objects[i];
+			if(o->groundID>=0 && o->groundID<NUMAARS)
+			{
+				aaRectangles[o->groundID].touched=true;
+			}
 		}
 	}
 }

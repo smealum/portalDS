@@ -76,30 +76,33 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 	for(i=0;i<gc->numRectangles;i++)
 	{
 		rectangle_struct* rec=gc->rectangles[i];
-		vect3D o2=getClosestPointRectangleStruct(rec,o1);
-			if(portal1.used&&portal2.used)
-			{
-				o2=addVect(o2,convertVect(vect(r->position.x,0,r->position.y)));
-				collidePortal(r,rec,&portal1,&o2);
-				collidePortal(r,rec,&portal2,&o2);
-				o2=vectDifference(o2,convertVect(vect(r->position.x,0,r->position.y)));
-			}
-		vect3D v=vectDifference(o2,o1);
-		rec->touched=false;
-		// int sqd=sqMagnitude(v);
-		int32 gval=dotProduct(v,normGravityVector);
-		vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
-		int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
-		if(sqd<o->sqRadius)
+		if(rec->collides)
 		{
-			// sqd=v.x*v.x+v.y*v.y+v.z*v.z;
-			int32 sqd=(v2.x*v.x)+(v2.y*v.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
-			u32 d=sqrtf32((sqd));
-			v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
-			o->position=addVect(o->position,v);
-			o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-			rec->touched=true;
-			ret=true;
+			vect3D o2=getClosestPointRectangleStruct(rec,o1);
+				if(portal1.used&&portal2.used)
+				{
+					o2=addVect(o2,convertVect(vect(r->position.x,0,r->position.y)));
+					collidePortal(r,rec,&portal1,&o2);
+					collidePortal(r,rec,&portal2,&o2);
+					o2=vectDifference(o2,convertVect(vect(r->position.x,0,r->position.y)));
+				}
+			vect3D v=vectDifference(o2,o1);
+			rec->touched=false;
+			// int sqd=sqMagnitude(v);
+			int32 gval=dotProduct(v,normGravityVector);
+			vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
+			int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
+			if(sqd<o->sqRadius)
+			{
+				// sqd=v.x*v.x+v.y*v.y+v.z*v.z;
+				int32 sqd=(v2.x*v.x)+(v2.y*v.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
+				u32 d=sqrtf32((sqd));
+				v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
+				o->position=addVect(o->position,v);
+				o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+				rec->touched=true;
+				ret=true;
+			}
 		}
 	}
 	return ret;

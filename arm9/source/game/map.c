@@ -41,6 +41,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	rec->size=size;
 	rec->normal=vect(0,0,0);
 	rec->touched=false;
+	rec->collides=true;
 	if(!size.x)
 	{
 		x=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);

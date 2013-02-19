@@ -61,14 +61,19 @@ void updateDoor(door_struct* d)
 		{
 			changeAnimation(&d->modelInstance, 2, false);
 			changeAnimation(&d->modelInstance, 1, true);
+		}else if(d->modelInstance.currentAnim==2)
+		{
+			if(d->rectangle)d->rectangle->collides=false;
 		}
 	}else if(d->modelInstance.currentAnim==2)
 	{
 		changeAnimation(&d->modelInstance, 0, false);
 		changeAnimation(&d->modelInstance, 3, true);
+		if(d->rectangle)d->rectangle->collides=true;
 	}
 
 	updateAnimation(&d->modelInstance);
+	d->active=false;
 }
 
 void updateDoors(void)

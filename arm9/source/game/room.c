@@ -16,6 +16,8 @@ extern char* basePath;
 
 s16 entityTargetArray[NUMENTITIES];
 activator_struct* entityActivatorArray[NUMENTITIES];
+void* entityEntityArray[NUMENTITIES];
+activatorTarget_type entityTargetTypeArray[NUMENTITIES];
 
 void readRectangle(rectangle_struct* rec, FILE* f)
 {
@@ -52,13 +54,11 @@ void readRectangles(room_struct* r, FILE* f)
 	}
 }
 
-//THIS SYSTEM DOES NOT WORK
-//FIX THIS YOU IDIOT
-void addEntityTarget(u8 k, void* target, activatorTarget_type type)
+void addEntityTarget(u8 k, u8 n, void* target, activatorTarget_type type)
 {
 	if(!target)return;
 	int i;
-	for(i=0;i<k;i++)
+	for(i=0;i<n;i++)
 	{
 		if(entityTargetArray[i]==k && entityActivatorArray[i])
 		{
@@ -77,6 +77,7 @@ void readEntity(u8 i, FILE* f)
 	fread(&dir, sizeof(u8), 1, f);
 	entityTargetArray[i]=-1;
 	entityActivatorArray[i]=NULL;
+	entityEntityArray[i]=NULL;
 	switch(type)
 	{
 		case 0:
@@ -126,7 +127,8 @@ void readEntity(u8 i, FILE* f)
 				vect3D p; readVect(&p,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
 				cubeDispenser_struct* e=createCubeDispenser(NULL, p, true);
-				if(e)addEntityTarget(i, (void*)e, DISPENSER_TARGET);
+				entityEntityArray[i]=(void*)e;
+				entityTargetTypeArray[i]=DISPENSER_TARGET;
 			}
 			break;
 		case 8:
@@ -144,7 +146,8 @@ void readEntity(u8 i, FILE* f)
 				readVect(&p2,f);
 				s16 target=-1; fread(&target, sizeof(s16), 1, f);
 				platform_struct* e=createPlatform(NULL, p1, p2, true);
-				if(e)addEntityTarget(i, (void*)e, PLATFORM_TARGET);
+				entityEntityArray[i]=(void*)e;
+				entityTargetTypeArray[i]=PLATFORM_TARGET;
 			}
 			return;
 		case 10:
@@ -153,8 +156,8 @@ void readEntity(u8 i, FILE* f)
 				vect3D p; readVect(&p,f);
 				bool orientation; fread(&orientation, sizeof(bool), 1, f);
 				door_struct* e=createDoor(NULL, p, orientation);
-				NOGBA("DOOR");
-				if(e)addEntityTarget(i, (void*)e, DOOR_TARGET);
+				entityEntityArray[i]=(void*)e;
+				entityTargetTypeArray[i]=DOOR_TARGET;
 			}
 			break;
 		case 11:
@@ -182,6 +185,7 @@ void readEntities(FILE* f)
 
 	u16 cnt; fread(&cnt,sizeof(u16),1,f);
 	int i; for(i=0;i<cnt;i++)readEntity(i,f);
+	for(i=0;i<cnt;i++)addEntityTarget(i,cnt,entityEntityArray[i],entityTargetTypeArray[i]);
 }
 
 void newReadMap(char* filename, room_struct* r)

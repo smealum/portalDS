@@ -28,6 +28,7 @@ typedef struct
 
 void initAARs(void);
 void drawAARs(void);
+void toggleAAR(u16 id);
 void generateGrid(grid_struct* g);
 void updateAAR(u16 id, vect3D position);
 void AARsOBBContacts(OBB_struct* o, bool sleep);

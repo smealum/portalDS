@@ -37,6 +37,7 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal);
 void addPlatform(u8 id, vect3D orig, vect3D dest, bool BAF);
 void changePlatform(u8 id, vect3D pos);
 void resetPortalsPI(void);
+void toggleAAR(s16 id);
 
 void killBox(OBB_struct* o);
 void resetBox(OBB_struct* o, vect3D pos);

@@ -95,7 +95,7 @@ void listenPI7(void)
 				{
 					vect3D pos, size;
 					vect3D normal=vect(0,0,0);
-					u8 id=signal>>PISIGNALDATA;
+					u16 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
 						size.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
@@ -246,6 +246,12 @@ void listenPI7(void)
 				{
 					portal[0].used=false;
 					portal[1].used=false;
+				}
+				break;
+			case PI_TOGGLEAAR:
+				{
+					u16 id=signal>>PISIGNALDATA;
+					toggleAAR(id);
 				}
 				break;
 			default:

@@ -467,6 +467,7 @@ void changeAnimation(modelInstance_struct* mi, u16 newAnim, bool oneshot)
 void updateAnimation(modelInstance_struct* mi)
 {
 	if(!mi)return;
+	if(!mi->oneshot)mi->oldAnim=mi->currentAnim;
 	mi->interpCounter++;
 	if(mi->interpCounter>=4)
 	{
@@ -474,7 +475,7 @@ void updateAnimation(modelInstance_struct* mi)
 		mi->currentFrame=mi->nextFrame;
 		if(mi->currentFrame>=mi->model->animations[mi->currentAnim].end)
 		{
-			if(mi->oneshot){mi->currentAnim=mi->oldAnim;mi->oneshot=false;}
+			if(mi->oneshot){u8 oa=mi->currentAnim;mi->currentAnim=mi->oldAnim;mi->oldAnim=oa;mi->oneshot=false;}
 			mi->nextFrame=mi->model->animations[mi->currentAnim].start;
 		}else mi->nextFrame++;
 	}

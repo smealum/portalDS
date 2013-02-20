@@ -480,8 +480,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 				*d1=v&&!getBlock(ba,i,j+1,k);
 				*d2=v&&!getBlock(ba,i,j-1,k);
 
-				if((v<<3)&1)*d1=2;
-				if((v<<4)&1)*d2=2;
+				if((v>>3)&1)*d1=2;
+				if((v>>4)&1)*d2=2;
 
 				if(*d1==1)cnt1++;
 				else if(*d1==2)cnt12++;

@@ -167,7 +167,7 @@ void updateViewMatrix(camera_struct* c)
 	m2[1+3*4]=0;
 	m2[2+3*4]=0;
 	m2[3+3*4]=inttof32(1);
-	translateMatrix(m2,-c->position.x,-c->position.y,-c->position.z);
+	translateMatrix(m2,-c->viewPosition.x,-c->viewPosition.y,-c->viewPosition.z);
 	
 	multMatrix44(m2,m1,c->viewMatrix);
 }
@@ -373,8 +373,7 @@ void initCamera(camera_struct* c)
 	if(!c)c=&playerCamera;
 	
 	c->position=vect(0,HEIGHTUNIT*STARTHEIGHT,0);
-	c->angle=vect(0,0,0);
-	c->angle2=vect(0,0,0);
+	c->viewPosition=c->position;
 	c->object.position=c->position;
 	c->object.speed=vect(0,0,0);
 	c->lookAt=false;
@@ -416,7 +415,7 @@ void transformCamera(camera_struct* c)
 	
 	multTransformationMatrix(c);
 
-	glTranslatef32(-c->position.x,-c->position.y,-c->position.z);
+	glTranslatef32(-c->viewPosition.x,-c->viewPosition.y,-c->viewPosition.z);
 }
 
 void untransformCamera(camera_struct* c)
@@ -539,16 +538,17 @@ void updateFrustum(camera_struct* c)
 		f->plane[i].point.z=-mulf32(f->plane[i].D,f->plane[i].C);
 	}
 	//correct and prevents some precision problems
-	f->plane[2].point=c->position;
-	f->plane[3].point=c->position;
-	f->plane[4].point=c->position;
-	f->plane[5].point=c->position;
+	f->plane[2].point=c->viewPosition;
+	f->plane[3].point=c->viewPosition;
+	f->plane[4].point=c->viewPosition;
+	f->plane[5].point=c->viewPosition;
 }
 
 void updateCamera(camera_struct* c)
 {
 	if(!c)c=&playerCamera;
 	c->position=c->object.position;
+	c->viewPosition=vectDifference(c->position,vectDivInt(normGravityVector,32));
 	updateViewMatrix(c);
 	updateFrustum(c);
 	

@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-	vect3D position, angle, angle2;
+	vect3D position, viewPosition;
 	frustum_struct frustum;
 	vect3D space[3];
 	int32 transformationMatrix[3*3];

@@ -190,7 +190,9 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 	
 	o->contact=ret;
 	
+	vect3D os=o->speed;
 	o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
+	o->speed=vect((os.x*o->speed.x>0)?(o->speed.x):(0),(os.y*o->speed.y>0)?(o->speed.y):(0),(os.z*o->speed.z>0)?(o->speed.z):(0));
 
 	if(o->contact)
 	{

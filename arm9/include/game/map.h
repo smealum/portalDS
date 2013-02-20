@@ -1,8 +1,8 @@
 #ifndef __MAP9__
 #define __MAP9__
 
-#define TILESIZE (256)
-#define HEIGHTUNIT (128)
+#define TILESIZE (384)
+#define HEIGHTUNIT (192)
 #define SCALEFACT (inttof32(150))
 
 #define CELLSIZE (4)

@@ -203,16 +203,16 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 		bindPaletteAddr(gridPalettes[(((counter++)/4)%6)]);
 		GFX_COLOR=RGB15(31,31,31);
 		glPolyFmt(POLY_ALPHA(12) | POLY_ID(21) | POLY_CULL_NONE);
-		glScalef32(l,EMANCIPATIONGRIDHEIGHT,inttof32(1));
+		glScalef32(l,EMANCIPATIONGRIDHEIGHT/2,inttof32(1));
 		glBegin(GL_QUADS);
 			GFX_TEX_COORD = TEXTURE_PACK(0*16, 0*16);
 			glVertex3v16(0, inttof32(1), 0);
 			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE, 0*16);
 			glVertex3v16(inttof32(1), inttof32(1), 0);
 			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE*16, 256*16);
-			glVertex3v16(inttof32(1), 0, 0);
+			glVertex3v16(inttof32(1), -inttof32(1), 0);
 			GFX_TEX_COORD = TEXTURE_PACK(0*16, 256*16);
-			glVertex3v16(0, 0, 0);
+			glVertex3v16(0, -inttof32(1), 0);
 	glPopMatrix(1);
 }
 
@@ -232,8 +232,9 @@ void getEmancipationGridAAR(emancipationGrid_struct* eg, vect3D* pos, vect3D* sp
 {
 	if(!eg || !pos || !sp)return;
 	
-	*sp=vect(eg->direction?(0):(eg->length/2),EMANCIPATIONGRIDHEIGHT/2,eg->direction?(eg->length/2):(0));
+	*sp=vect(eg->direction?(0):(eg->length/2),0,eg->direction?(eg->length/2):(0));
 	*pos=addVect(eg->position,*sp);
+	sp->y=EMANCIPATIONGRIDHEIGHT/2;
 	sp->x=abs(sp->x);sp->z=abs(sp->z);
 }
 

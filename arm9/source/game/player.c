@@ -276,8 +276,8 @@ void playerControls(player_struct* p)
 	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 
-	camera_struct* c=getPlayerCamera();
-	if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
+	// camera_struct* c=getPlayerCamera();
+	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
 	
 	touchOld=touchCurrent;
 }

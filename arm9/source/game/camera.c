@@ -544,11 +544,16 @@ void updateFrustum(camera_struct* c)
 	f->plane[5].point=c->viewPosition;
 }
 
+vect3D getViewPosition(vect3D p)
+{
+	return vectDifference(p,vectDivInt(normGravityVector,32));
+}
+
 void updateCamera(camera_struct* c)
 {
 	if(!c)c=&playerCamera;
 	c->position=c->object.position;
-	c->viewPosition=vectDifference(c->position,vectDivInt(normGravityVector,32));
+	c->viewPosition=getViewPosition(c->position);
 	updateViewMatrix(c);
 	updateFrustum(c);
 	

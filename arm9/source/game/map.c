@@ -767,14 +767,15 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	return displayList;
 }
 
-vect3D getVector(vect3D pos, light_struct* l)
+vect3D getVector(vect3D pos, light_struct* l, int32* d)
 {
+	room_struct* r=&gameRoom;
 	vect3D p=l->position;
-	vect3D v=vectDifference(pos,vect(p.x*(TILESIZE*2),p.z*HEIGHTUNIT,p.y*(TILESIZE*2)));
-	v=vectMultInt(v,100);
+	vect3D v=vectDifference(pos,vect((r->position.x+p.x)*(TILESIZE*2),p.y*HEIGHTUNIT,(r->position.y+p.z)*(TILESIZE*2)));
+	v=vectMultInt(v,8);
 	int32 dist=magnitude(v);
+	if(d)*d=dist/8;
 	v=divideVect(v,dist);
-	// dist/=100;
 	return vect(f32tov10(v.x),f32tov10(v.y),f32tov10(v.z));
 }
 
@@ -783,7 +784,6 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	if(!r)r=getPlayer()->currentRoom;
 	if(!r)return;
 	light_struct *l1, *l2, *l3;
-	int32 d1, d2, d3;
 	// vect3D tilepos=reverseConvertVect(vectDifference(pos,convertVect(vect(r->position.x,0,r->position.y))));
 	// getClosestLights(r->entityCollection, tilepos, &l1, &l2, &l3, &d1, &d2, &d3);
 	gridCell_struct* gc=getCurrentCell(r, pos);
@@ -791,9 +791,6 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	l1=gc->lights[0];
 	l2=gc->lights[1];
 	l3=gc->lights[2];
-	d1=gc->lightDistances[0];
-	d2=gc->lightDistances[1];
-	d3=gc->lightDistances[2];
 	// *params=POLY_ALPHA(31) | POLY_CULL_FRONT;
 	
 	glMaterialf(GL_AMBIENT, RGB15(5,5,5));
@@ -804,21 +801,21 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	if(l1)
 	{
 		*params|=POLY_FORMAT_LIGHT0;
-		vect3D v=getVector(pos, l1);
-		d1*=64;
-		int32 v2=31-((31*d1)*(l1->intensity));
+		int32 d;
+		vect3D v=getVector(pos, l1, &d);
+		int32 v2=31-((31*d)/(l1->intensity));
 		glLight(0, RGB15(v2,v2,v2), v.x, v.y, v.z);
 		if(l2)
 		{
 			*params|=POLY_FORMAT_LIGHT1;
-			vect3D v=getVector(pos, l2);
-			int32 v2=31-((31*d2)*(l2->intensity));
+			vect3D v=getVector(pos, l2, &d);
+			int32 v2=31-((31*d)/(l2->intensity));
 			glLight(1, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			if(l3)
 			{
 				*params|=POLY_FORMAT_LIGHT2;
-				vect3D v=getVector(pos, l3);
-				int32 v2=31-((31*d3)*(l3->intensity));
+				vect3D v=getVector(pos, l3, &d);
+				int32 v2=31-((31*d)/(l3->intensity));
 				glLight(2, RGB15(v2,v2,v2), v.x, v.y, v.z);
 			}
 		}

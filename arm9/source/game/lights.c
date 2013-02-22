@@ -48,7 +48,7 @@ void getClosestLights(vect3D tilepos, light_struct** ll1, light_struct** ll2, li
 		{
 			light_struct* l=&lights[i];
 			// NOGBA("%d %d %d", l->position.x, l->position.y, l->position.z);
-			int32 d=(tilepos.x-l->position.x)*(tilepos.x-l->position.x)+((tilepos.y-l->position.y)*(tilepos.y-l->position.y))/16+(tilepos.z-l->position.z)*(tilepos.z-l->position.z);
+			int32 d=(tilepos.x-l->position.x)*(tilepos.x-l->position.x)+/*((tilepos.y-l->position.y)*(tilepos.y-l->position.y))/16+*/(tilepos.z-l->position.z)*(tilepos.z-l->position.z);
 			if(d<d1){d3=d2;d2=d1;d1=d;
 					l3=l2;l2=l1;l1=l;}
 			else if(d<d2){d3=d2;d2=d;

@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-	vect3D position, angle, angle2;
+	vect3D position, viewPosition;
 	frustum_struct frustum;
 	vect3D space[3];
 	int32 transformationMatrix[3*3];
@@ -49,6 +49,7 @@ vect3D getUnitVector(camera_struct* c);
 void updateViewMatrix(camera_struct* c);
 void fixMatrix(int32* m);
 void updateFrustum(camera_struct* c);
+vect3D getViewPosition(vect3D p);
 
 void initProjectionMatrixBottom(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far);
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);

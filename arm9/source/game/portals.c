@@ -185,11 +185,9 @@ void warpPlayer(portal_struct* p, player_struct* pl)
 {
 	camera_struct* c=getPlayerCamera();
 	updatePortalCamera(p,c);
-	NOGBA("cp %d %d %d",p->camera.position.x,p->camera.position.y,p->camera.position.z);
 	pl->object->position=c->position=p->camera.position;
-	NOGBA("cs %d %d %d",pl->object->speed.x,pl->object->speed.y,pl->object->speed.z);
+	c->viewPosition=getViewPosition(c->position);
 	pl->object->speed=warpVector(p,pl->object->speed);
-	NOGBA("cs2 %d %d %d",pl->object->speed.x,pl->object->speed.y,pl->object->speed.z);
 	memcpy(c->transformationMatrix,p->camera.transformationMatrix,9*sizeof(int32));
 	updateViewMatrix(c);
 	updateFrustum(c);
@@ -265,36 +263,11 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 	if(!c)c=getPlayerCamera();
 	
 	portal_struct* p2=p->targetPortal;
-	
-	// p->camera.position=vectDifference(addVect(p->targetPortal->position,c->position),p->position);
-	vect3D diff=warpVector(p, vectDifference(c->position, p->position));
-	
-	p->camera.position=addVect(p2->position,diff);
-	// p->camera.position=p2->position;
-	
-	// p->camera.angle=c->angle;
-	
-	p->camera.angle=c->angle;
-	p->camera.angle2=vect(0,0,0);
-	
-	if(p2->normal.z)
-	{
-		p->camera.angle.z=p->camera.angle.x;
-		p->camera.angle.x=0;
-	}
+		
+	p->camera.position=addVect(p2->position,warpVector(p, vectDifference(c->position, p->position)));
+	p->camera.viewPosition=addVect(p2->position,warpVector(p, vectDifference(c->viewPosition, p->position)));
 	
 	memcpy(p->camera.transformationMatrix,c->transformationMatrix,9*sizeof(int32));
-	
-	// vect3D n1=p->normal;
-	// getInvertedNormal(&n1);
-	// vect3D plane[2], plane1[2];
-	// computePortalPlane(&n1,plane1,0);
-	
-	// vect3D n=vectMultInt(p2->normal,-1);
-	// computePortalPlane(&n,plane,p2->angle-p->angle);
-	
-	// changeBase(p->camera.transformationMatrix, plane1[0], plane1[1], n1, false);
-	// changeBase(p->camera.transformationMatrix, plane[0], plane[1], n, false);
 	
 	computePortalPlane(p);
 	

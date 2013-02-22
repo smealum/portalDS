@@ -9,6 +9,7 @@ typedef struct
 	modelInstance_struct modelInstance;
 	bool companion;
 	bool active, oldActive;
+	rectangle_struct* openingRectangle;
 	OBB_struct* currentCube;
 	bool used;
 	u8 id;

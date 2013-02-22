@@ -61,6 +61,8 @@ void initRoomEdition(void)
 void updateEditorCamera(void)
 {
 	camera_struct* c=&editorCamera;
+
+	c->viewPosition=c->position;
 	
 	updateViewMatrix(c);
 	updateFrustum(c);

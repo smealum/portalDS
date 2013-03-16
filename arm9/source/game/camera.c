@@ -38,6 +38,12 @@ void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, 
 	*(m++) = -divf32(2 * mulf32(far, near), far - near);
 	*(m++) = 0;
 
+	// NOGBA("PROJECTION");
+	// NOGBA("%d %d %d %d",c->projectionMatrix[0],c->projectionMatrix[1],c->projectionMatrix[2],c->projectionMatrix[3]);
+	// NOGBA("%d %d %d %d",c->projectionMatrix[4],c->projectionMatrix[5],c->projectionMatrix[6],c->projectionMatrix[7]);
+	// NOGBA("%d %d %d %d",c->projectionMatrix[8],c->projectionMatrix[9],c->projectionMatrix[10],c->projectionMatrix[11]);
+	// NOGBA("%d %d %d %d",c->projectionMatrix[12],c->projectionMatrix[13],c->projectionMatrix[14],c->projectionMatrix[15]);
+
 	frustum_struct* f=&c->frustum;
 
 	f->fovy=fovy;f->aspect=aspect;
@@ -415,6 +421,8 @@ void transformCamera(camera_struct* c)
 	
 	multTransformationMatrix(c);
 
+
+	NOGBA("%d %d %d and %d %d %d",c->position.x,c->position.y,c->position.z,c->viewPosition.x,c->viewPosition.y,c->viewPosition.z);
 	glTranslatef32(-c->viewPosition.x,-c->viewPosition.y,-c->viewPosition.z);
 }
 
@@ -549,9 +557,15 @@ vect3D getViewPosition(vect3D p)
 	return vectDifference(p,vectDivInt(normGravityVector,32));
 }
 
+vect3D reverseViewPosition(vect3D p)
+{
+	return vectDifference(p,vectDivInt(normGravityVector,-32));
+}
+
 void updateCamera(camera_struct* c)
 {
 	if(!c)c=&playerCamera;
+
 	c->position=c->object.position;
 	c->viewPosition=getViewPosition(c->position);
 	updateViewMatrix(c);

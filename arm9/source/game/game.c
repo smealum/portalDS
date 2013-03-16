@@ -340,8 +340,8 @@ void gameFrame(void)
 			break;
 	}
 	
-	// if(testStepByStep){while(!(keysUp()&KEY_TOUCH))scanKeys();scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
-	// else if(keysDown()&KEY_SELECT)testStepByStep=true;
+	if(testStepByStep){int i=0;while(!(keysUp()&KEY_TOUCH)){scanKeys();listenPI9();swiWaitForVBlank();}NOGBA("WAITED");scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
+	else if(keysDown()&KEY_SELECT)testStepByStep=true;
 	
 	currentBuffer^=1;
 }

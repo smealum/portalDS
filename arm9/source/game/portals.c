@@ -301,8 +301,6 @@ void drawPortalRoom(portal_struct* p)
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r || !p)return;
 	
-	NOGBA("cam : %d %d %d",p->camera.viewPosition.x,p->camera.viewPosition.y,p->camera.viewPosition.z);
-
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
 		glTranslate3f32(-TILESIZE,0,-TILESIZE);

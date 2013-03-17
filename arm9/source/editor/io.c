@@ -15,8 +15,6 @@ void writeRectangle(rectangle_struct* rec, FILE* f)
 
 	writeVect(rec->position,f);
 	writeVect(rec->size,f);
-	writeVect(rec->lmSize,f);
-	writeVect(rec->lmPos,f);
 	writeVect(rec->normal,f);
 	
 	fwrite(&rec->portalable,sizeof(bool),1,f);
@@ -24,7 +22,6 @@ void writeRectangle(rectangle_struct* rec, FILE* f)
 	u16 mid=getMaterialID(rec->material);
 	
 	fwrite(&mid,sizeof(u16),1,f);
-	fwrite(&rec->rot,sizeof(bool),1,f);
 }
 
 void writeRectangleList(rectangleList_struct* rl, FILE* f)
@@ -187,22 +184,41 @@ void writeHeader(mapHeader_struct* h, FILE* f)
 	fwrite(h, sizeof(mapHeader_struct), 1, f);
 }
 
+void writeLightingData(lightingData_struct* ld, FILE* f)
+{
+	if(!ld || !f)return;
+
+	switch(ld->type)
+	{
+		case LIGHTMAP_DATA:
+			writeVect(ld->data.lightMap.lmSize,f);
+			fwrite(ld->data.lightMap.buffer,sizeof(u8),ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y,f);
+			fwrite(ld->data.lightMap.coords, sizeof(lightMapCoordinates_struct), ld->size, f);
+			break;
+		default:
+			fwrite(ld->data.vertexLighting, sizeof(vertexLightingData_struct), ld->size, f);
+			break;
+	}
+}
+
 void writeMapEditor(editorRoom_struct* er, const char* str)
 {
 	if(!er)return;
 
 	FILE* f=fopen(str,"wb+");
-	// if(!f)return;
+	if(!f)return;
 
 	mapHeader_struct h=blankHeader;
 	writeHeader(&h,f);
 
 	room_struct r;
+	lightingData_struct ld;
 	initRoom(&r, 0, 0, vect(0,0,0));
+	initLightData(&ld);
 
 	r.rectangles=generateOptimizedRectangles(er->blockArray);
 	generateLightsFromEntities();
-	generateLightmaps(&r);
+	generateLightmaps(&r, &ld);
 
 	h.dataPosition=ftell(f);
 		u8* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);
@@ -211,17 +227,18 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 		free(compressed);
 
 	h.rectanglesPosition=ftell(f);
-		writeRectangleList(&r.rectangles,f);
+		writeRectangleList(&r.rectangles, f);
 
 	h.lightPosition=ftell(f);
-		writeVect(r.lmSize,f);
-		fwrite(r.lightMapBuffer,sizeof(u8),r.lmSize.x*r.lmSize.y,f);
+		writeLightingData(&ld, f);
 
 	h.entityPosition=ftell(f);
 		writeEntities(f);
 
 	writeHeader(&h,f);
 
+	freeLightData(&ld);
+	freeRoom(&r);
 	fclose(f);
 }
 

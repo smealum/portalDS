@@ -421,8 +421,6 @@ void transformCamera(camera_struct* c)
 	
 	multTransformationMatrix(c);
 
-
-	NOGBA("%d %d %d and %d %d %d",c->position.x,c->position.y,c->position.z,c->viewPosition.x,c->viewPosition.y,c->viewPosition.z);
 	glTranslatef32(-c->viewPosition.x,-c->viewPosition.y,-c->viewPosition.z);
 }
 

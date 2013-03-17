@@ -7,7 +7,7 @@ void drawRoomsGame(u8 mode, u16 color)
 	unbindMtl();
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 
-	drawRoom(&gameRoom,((1)<<3)|((gameRoom.lmSlot!=0)<<2)|(1)|(mode), color);
+	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color);
 }
 
 //READ AREA
@@ -25,19 +25,17 @@ void readRectangle(rectangle_struct* rec, FILE* f)
 	
 	readVect(&rec->position,f);
 	readVect(&rec->size,f);
-	readVect(&rec->lmSize,f);
-	readVect(&rec->lmPos,f);
 	readVect(&rec->normal,f);
 
 	fread(&rec->portalable,sizeof(bool),1,f);
 	
 	u16 mid=0; fread(&mid,sizeof(u16),1,f);
 
+	rec->lightData.lightMap=NULL;
+
 	//TEMP ?
 	if(rec->portalable)rec->material=getMaterial(1);
 	else rec->material=getMaterial(2);
-	
-	fread(&rec->rot,sizeof(bool),1,f);
 }
 
 void readRectangles(room_struct* r, FILE* f)
@@ -188,6 +186,45 @@ void readEntities(FILE* f)
 	for(i=0;i<cnt;i++)addEntityTarget(i,cnt,entityEntityArray[i],entityTargetTypeArray[i]);
 }
 
+void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
+{
+	if(!r || !ld || !f)return;
+
+	switch(ld->type)
+	{
+		case LIGHTMAP_DATA:
+			initLightDataLM(ld, r->rectangles.num);
+
+			readVect(&ld->data.lightMap.lmSize,f);
+
+			ld->data.lightMap.buffer=malloc(sizeof(u8)*ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y);
+			if(!ld->data.lightMap.buffer)return;
+
+			fread(ld->data.lightMap.buffer,sizeof(u8),ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y,f);
+			fread(ld->data.lightMap.coords, sizeof(lightMapCoordinates_struct), ld->size, f);
+
+			{
+				int i;
+				u16 palette[8];
+				for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
+				r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
+			}
+
+			int i=0;
+			listCell_struct* lc=r->rectangles.first;
+			while(lc)
+			{
+				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i++];
+				lc=lc->next;
+			}
+
+			break;
+		default:
+			fread(ld->data.vertexLighting, sizeof(vertexLightingData_struct), ld->size, f);
+			break;
+	}
+}
+
 void newReadMap(char* filename, room_struct* r)
 {
 	if(!r)r=&gameRoom;
@@ -227,16 +264,7 @@ void newReadMap(char* filename, room_struct* r)
 
 	//lightmap stuff
 	fseek(f, h.lightPosition, SEEK_SET);
-		readVect(&r->lmSize,f);
-		NOGBA("%dx%d lightmap",r->lmSize.x,r->lmSize.y);
-		r->lightMapBuffer=malloc(sizeof(u8)*r->lmSize.x*r->lmSize.y);
-		fread(r->lightMapBuffer,sizeof(u8),r->lmSize.x*r->lmSize.y,f);
-		{
-			int i;
-			u16 palette[8];
-			for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
-			r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
-		}
+		readLightingData(r, &r->lightingData, f);
 
 	//entities
 	fseek(f, h.entityPosition, SEEK_SET);

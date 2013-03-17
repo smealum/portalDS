@@ -3,8 +3,8 @@
 
 #include "common/general.h"
 #include "editor/material.h"
-#include "game/lightmaps.h"
 #include "game/lights.h"
+#include "editor/lighting.h"
 #include "game/room.h"
 #include "game/map.h"
 #include "game/physics.h"

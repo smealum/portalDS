@@ -25,7 +25,7 @@ typedef struct
 typedef struct
 {
 	vect2D position, size;
-	rectangle_struct* real;
+	lightMapCoordinates_struct* real;
 	bool rot;
 }rectangle2D_struct;
 

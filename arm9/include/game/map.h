@@ -63,6 +63,8 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params);
 void generateRoomGrid(room_struct* r);
 gridCell_struct* getCurrentCell(room_struct* r, vect3D o);
 
+vect3D getUnitVect(rectangle_struct* rec);
+
 //lightmaps.h
 void loadLightMap(room_struct* r);
 void unloadLightMap(room_struct* r);

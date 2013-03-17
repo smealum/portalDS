@@ -35,36 +35,21 @@ void popRectangle(rectangleList_struct* p)
 
 void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 {
-	int x, y;
 	s8 sign=1;
 	rec->position=pos;
 	rec->size=size;
 	rec->normal=vect(0,0,0);
 	rec->touched=false;
 	rec->collides=true;
-	if(!size.x)
-	{
-		x=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);
-		y=abs(size.z)*LIGHTMAPRESOLUTION;
-		rec->normal.x=inttof32(1);
-	}else if(!size.y)
-	{
-		x=abs(size.x)*LIGHTMAPRESOLUTION;
-		y=abs(size.z)*LIGHTMAPRESOLUTION;
-		rec->normal.y=inttof32(-1);
-	}else{
-		x=abs(size.x)*LIGHTMAPRESOLUTION;
-		y=abs(size.y)*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2);
-		rec->normal.z=inttof32(1);
-	}
+	if(!size.x)rec->normal.x=inttof32(1);
+	else if(!size.y)rec->normal.y=inttof32(-1);
+	else rec->normal.z=inttof32(1);
 	sign*=(size.x>=0)?1:-1;
 	sign*=(size.y>=0)?1:-1;
 	sign*=(size.z>=0)?1:-1;
 	rec->normal=vect(rec->normal.x*sign,rec->normal.y*sign,rec->normal.z*sign);
 	rec->material=NULL;
 	// NOGBA("n : %d %d %d",rec->normal.x,rec->normal.y,rec->normal.z);
-	rec->lmSize.x=x;
-	rec->lmSize.y=y;
 	rec->hide=false;
 }
 
@@ -141,73 +126,6 @@ rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, v
 	return hit;
 }
 
-u8 computeLighting(vect3D l, int32 intensity, vect3D p, rectangle_struct* rec, room_struct* r)
-{
-	int32 dist=sqDistance(l,p);
-	int32 rdist=sqrtf32(dist);
-	dist=mulf32(dist,dist);
-	// int32 dist=distance(l,p);
-	if(dist<intensity)
-	{
-		vect3D u=vectDifference(p,l);
-		u=divideVect(u,rdist);
-		if(collideLineMap(r, rec, l, u, rdist, NULL, NULL))return 0;
-		int32 v=dotProduct(u,rec->normal);
-		v=max(0,v);
-		v*=3;
-		v/=4;
-		v+=inttof32(1)/4;
-		// int32 v=inttof32(1);
-		return mulf32(v,(31-((dist*31)/intensity)));
-	}else return 0;
-}
-
-u8 computeLightings(vect3D p, rectangle_struct* rec, room_struct* r)
-{
-	int v=AMBIENTLIGHT;
-	int i;
-	for(i=0;i<NUMLIGHTS;i++)
-	{
-		if(lights[i].used)
-		{
-			light_struct* l=&lights[i];
-			v+=computeLighting(vect(l->position.x*TILESIZE*2,l->position.y*HEIGHTUNIT,l->position.z*TILESIZE*2), l->intensity, p, rec, r);
-		}
-	}
-	return (u8)(31-min(max(v,0),31));
-}
-
-void fillBuffer(u8* buffer, vect2D p, vect2D s, u8* v, bool rot, int w)
-{
-	if(!buffer || !v)return;
-	int i;
-	// u8 vt=(rand()%31)<<3;
-	if(!rot)
-	{
-		NOGBA("bounds %d %d",p.x+s.x,p.y+s.y);
-		for(i=0;i<s.x;i++)
-		{
-			int j;
-			for(j=0;j<s.y;j++)
-			{
-				buffer[p.x+i+(p.y+j)*w]=v[i+j*s.x];
-				// buffer[p.x+i+(p.y+j)*w]=vt;
-			}
-		}
-	}else{
-		NOGBA("bounds %d %d",p.x+s.y,p.y+s.x);
-		for(i=0;i<s.x;i++)
-		{
-			int j;
-			for(j=0;j<s.y;j++)
-			{
-				buffer[p.x+j+(p.y+i)*w]=v[i+j*s.x];
-				// buffer[p.x+j+(p.y+i)*w]=vt;
-			}
-		}
-	}
-}
-
 rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, material_struct* mat, bool portalable)
 {
 	if((!rec.size.x && (!rec.size.z || !rec.size.y)) || (!rec.size.y && !rec.size.z))return NULL;
@@ -225,98 +143,6 @@ rectangle_struct* addRoomRectangle(room_struct* r, rectangle_struct rec, materia
 	// NOGBA("mat : %d",getMaterialID(rec.material));
 	rec.portalable=portalable;
 	return addRectangle(rec, &r->rectangles);
-}
-
-void generateLightmap(rectangle_struct* rec, room_struct* r, u8* b)
-{
-	if(rec && b)// && rec->lightMap)
-	{
-		u16 x=rec->lmSize.x, y=rec->lmSize.y;
-		// u16 x=rec->lightMap->width, y=rec->lightMap->height;
-		u8* data=malloc(x*y);
-		if(!data)return;
-		vect3D p=vect(rec->position.x*TILESIZE*2-TILESIZE,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2-TILESIZE);
-		NOGBA("p : %d, %d, %d",p.x,p.y,p.z);
-		// u16 palette[256];
-		// u16 palette[8];
-		int i;
-		// for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
-		// for(i=0;i<8;i++){u8 v=0;palette[i]=RGB15(v,v,v);}
-		vect3D u=getUnitVect(rec);
-		for(i=0;i<x;i++)
-		{
-			int j;
-			for(j=0;j<y;j++)
-			{
-				// data[i+j*rec->lightMap->width]=max(max(31-j,31-i),0);
-				#ifdef A5I3
-					if(!rec->size.x)data[i+j*x]=computeLightings(addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r)<<3;
-					else if(rec->size.y)data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r)<<3;
-					else data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r)<<3;
-				#else
-					if(!rec->size.x)data[i+j*x]=computeLightings(addVect(p,vect(0,i*u.y+u.y/2,j*u.z+u.z/2)),rec,r);//<<3;
-					else if(rec->size.y)data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,j*u.y+u.y/2,0)),rec,r);//<<3;
-					else data[i+j*x]=computeLightings(addVect(p,vect(i*u.x+u.x/2,0,j*u.z+u.z/2)),rec,r);//<<3;
-				#endif
-			}
-		}
-		NOGBA("p2");
-		fillBuffer(b, vect2(rec->lmPos.x,rec->lmPos.y), vect2(rec->lmSize.x,rec->lmSize.y), data, rec->rot, r->lmSize.x);
-		NOGBA("p3");
-		// loadPartToBank(r->lightMap,data,x,y,rec->lmPos.x,rec->lmPos.y,rec->rot);
-		// loadPaletteToBank(rec->lightMap,palette,8*2);
-		free(data);
-		NOGBA("p4");
-	}else NOGBA("NOTHING?");
-}
-
-void generateLightmaps(room_struct* r)
-{
-	if(!r)return;
-	listCell_struct *lc=r->rectangles.first;
-	rectangle2DList_struct rl;
-	initRectangle2DList(&rl);
-	while(lc)
-	{
-		insertRectangle2DList(&rl,(rectangle2D_struct){vect2(0,0),vect2(abs(lc->data.size.x?(lc->data.size.x*LIGHTMAPRESOLUTION):(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2))),abs((lc->data.size.y&&lc->data.size.x)?(lc->data.size.y*LIGHTMAPRESOLUTION*HEIGHTUNIT/(TILESIZE*2)):(lc->data.size.z*LIGHTMAPRESOLUTION))),&lc->data,false});
-		lc=lc->next;
-	}
-	short w=32, h=32;
-	// packRectangles(&rl, 512, 256);
-	// packRectangles(&rl, w, h);
-	bool rr=packRectanglesSize(&rl, &w, &h);
-	r->lmSize=vect(w,h,0);
-	NOGBA("done : %d %dx%d",(int)rr,w,h);
-	// if(!r->lightMap)
-	// {
-	// 	#ifdef A5I3
-	// 		u16 palette[8];
-	// 		int i;for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
-	// 		r->lightMap=createReservedTextureBufferA5I3(NULL,palette,w,h,(void*)(0x6800000+0x0020000));
-	// 	#else
-	// 		u16 palette[256];
-	// 		int i;for(i=0;i<256;i++){u8 v=i%32;palette[i]=RGB15(v,v,v);}
-	// 		r->lightMap=createTextureBuffer(NULL,palette,w,h);
-	// 	#endif
-	// }else changeTextureSizeA5I3(r->lightMap,w,h);
-	if(r->lightMapBuffer)free(r->lightMapBuffer);
-	r->lightMapBuffer=malloc(w*h);
-	if(!rr)return; //TEMP
-	if(!r->lightMapBuffer)return;
-	// fillBuffer(buffer, vect2(0,0), vect2(512,256), 0, false);
-	lc=r->rectangles.first;
-	while(lc)
-	{
-		generateLightmap(&lc->data, r, r->lightMapBuffer);
-		lc=lc->next;
-	}
-	
-	NOGBA("done generating, loading...");
-	// loadToBank(r->lightMap,r->lightMapBuffer);
-	NOGBA("loaded.");
-	
-	freeRectangle2DList(&rl);
-	NOGBA("freed.");
 }
 
 void removeRectangles(room_struct* r)
@@ -393,12 +219,14 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		GFX_COLOR=RGB15(31,31,31);		
 		bindMaterial(rec.material,&rec,t,false);
 		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
-	}else{
-		vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
-		vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
-		if(rec.rot)
+	}else if(rec.lightData.lightMap){
+		vect3D lmPos=rec.lightData.lightMap->lmPos;
+		vect3D lmSize=rec.lightData.lightMap->lmSize;
+		vect3D p1=vect(inttot16(lmPos.x),inttot16(lmPos.y),0);
+		vect3D p2=vect(inttot16(lmPos.x+lmSize.x-1),inttot16(lmPos.y+lmSize.y-1),0);
+		if(rec.lightData.lightMap->rot)
 		{
-			p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
+			p2=vect(inttot16(lmPos.x+lmSize.y-1),inttot16(lmPos.y+lmSize.x-1),0);
 			t1=TEXTURE_PACK(p1.x, p1.y);
 			t4=TEXTURE_PACK(p1.x, p2.y);
 			t3=TEXTURE_PACK(p2.x, p2.y);
@@ -409,7 +237,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 			t3=TEXTURE_PACK(p2.x, p2.y);
 			t4=TEXTURE_PACK(p2.x, p1.y);
 		}
-	}
+	}else return;
 
 	glBegin(GL_QUAD);
 		GFX_TEX_COORD = t1;
@@ -469,12 +297,14 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		glColorDL(RGB15(31,31,31));
 		bindMaterial(rec.material,&rec,t,true);
 		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
-	}else{
-		vect3D p1=vect(inttot16(rec.lmPos.x),inttot16(rec.lmPos.y),0);
-		vect3D p2=vect(inttot16(rec.lmPos.x+rec.lmSize.x-1),inttot16(rec.lmPos.y+rec.lmSize.y-1),0);
-		if(rec.rot)
+	}else if(rec.lightData.lightMap){
+		vect3D lmPos=rec.lightData.lightMap->lmPos;
+		vect3D lmSize=rec.lightData.lightMap->lmSize;
+		vect3D p1=vect(inttot16(lmPos.x),inttot16(lmPos.y),0);
+		vect3D p2=vect(inttot16(lmPos.x+lmSize.x-1),inttot16(lmPos.y+lmSize.y-1),0);
+		if(rec.lightData.lightMap->rot)
 		{
-			p2=vect(inttot16(rec.lmPos.x+rec.lmSize.y-1),inttot16(rec.lmPos.y+rec.lmSize.x-1),0);
+			p2=vect(inttot16(lmPos.x+lmSize.y-1),inttot16(lmPos.y+lmSize.x-1),0);
 			t1=TEXTURE_PACK(p1.x, p1.y);
 			t4=TEXTURE_PACK(p1.x, p2.y);
 			t3=TEXTURE_PACK(p2.x, p2.y);
@@ -485,7 +315,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 			t3=TEXTURE_PACK(p2.x, p2.y);
 			t4=TEXTURE_PACK(p2.x, p1.y);
 		}
-	}
+	}else return;
 
 	pos=vectMultInt(rpos,32);
 	size=vectMultInt(rsize,32);
@@ -576,12 +406,12 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	
 	drawRectangleList(&r->rectangles);
-	if(mode&6)
+	if(mode&6 && r->lightingData.type==LIGHTMAP_DATA)
 	{
+		NOGBA("SUPERTYPE");
 		listCell_struct *lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
-		if(mode&2)applyMTL(r->lightMap);
-		else if(r->lmSlot)applyMTL(r->lmSlot->mtl);
+		applyMTL(r->lightMap);
 		GFX_COLOR=RGB15(31,31,31);
 		glPushMatrix();
 			glTranslate3f32(-TILESIZE,0,-TILESIZE);
@@ -636,8 +466,6 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	r->height=h;
 	r->position=p;
 	
-	r->lmSlot=NULL;
-	
 	initRectangleList(&r->rectangles);
 	
 	if(r->height && r->width)
@@ -647,7 +475,8 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	}else {r->materials=NULL;}
 	
 	r->lightMap=NULL;
-	r->lightMapBuffer=NULL;
+
+	initLightData(&r->lightingData);
 		
 	initRoomGrid(r);
 }
@@ -752,15 +581,18 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 		lc=lc->next;
 	}
 	
-	lc=r->rectangles.first;
-	glPolyFmtDL(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
-	applyMTLDL(r->lightMap);
-	while(lc)
+	if(r->lightingData.type==LIGHTMAP_DATA)
 	{
-		drawRectDL(lc->data,(lc->data.position),(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
-		lc=lc->next;
+		lc=r->rectangles.first;
+		glPolyFmtDL(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
+		applyMTLDL(r->lightMap);
+		while(lc)
+		{
+			drawRectDL(lc->data,(lc->data.position),(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
+			lc=lc->next;
+		}
 	}
-	
+
 	u32 size=glEndListDL();
 	u32* displayList=malloc((size+1)*4);
 	if(displayList)memcpy(displayList,ptr,(size+1)*4);
@@ -837,9 +669,8 @@ void freeRoom(room_struct* r)
 			free(r->rectangleGrid);
 		}
 		r->materials=NULL;
-		if(r->lightMapBuffer)free(r->lightMapBuffer);
-		r->lightMapBuffer=NULL;
 		if(r->lightMap)r->lightMap->used=false;
+		freeLightData(&r->lightingData);
 		removeRectangles(r);
 	}
 }

@@ -56,7 +56,6 @@ void initGame(void)
 	initLights();
 	initParticles();
 	
-	initLightMaps();
 	initMaterials();
 	
 	loadMaterialSlices("slices.ini");

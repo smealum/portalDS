@@ -207,14 +207,15 @@ void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
 				int i;
 				u16 palette[8];
 				for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
-				r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
+				// for(i=0;i<ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y;i++){ld->data.lightMap.buffer[i]=(ld->data.lightMap.buffer[i]<<3);}
+				r->lightMap=createReservedTextureBufferA5I3(ld->data.lightMap.buffer,palette,ld->data.lightMap.lmSize.x,ld->data.lightMap.lmSize.y,(void*)(0x6800000+0x0020000));
 			}
 
-			int i=0;
+			int i=r->rectangles.num-1;
 			listCell_struct* lc=r->rectangles.first;
 			while(lc)
 			{
-				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i++];
+				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i--];
 				lc=lc->next;
 			}
 

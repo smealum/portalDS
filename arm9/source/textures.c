@@ -413,10 +413,10 @@ void loadReservedTextureBufferA5I3(u8* buffer, u16* buffer2, u16 x, u16 y, mtlIm
 	else addPaletteToBank(mtl, NULL, 8*2);
 	
 	mtl->addr=addr;
-	// getTextureAddress(mtl);
+	getTextureAddress(mtl);
 	
-	// if(buffer)addToBank(mtl, buffer, mtl->bank);
-	// else reserveInBank(mtl, (u8*)buffer, &bank[mtl->bank], 0);
+	if(buffer)addToBank(mtl, buffer, mtl->bank);
+	else reserveInBank(mtl, (u8*)buffer, &bank[mtl->bank], 0);
 	
 	// adjustDimension(&mtl->height);
 	

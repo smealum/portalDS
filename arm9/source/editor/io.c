@@ -191,8 +191,8 @@ void writeLightingData(lightingData_struct* ld, FILE* f)
 	switch(ld->type)
 	{
 		case LIGHTMAP_DATA:
-			writeVect(ld->data.lightMap.lmSize,f);
-			fwrite(ld->data.lightMap.buffer,sizeof(u8),ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y,f);
+			writeVect(ld->data.lightMap.lmSize, f);
+			fwrite(ld->data.lightMap.buffer, sizeof(u8), ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y, f);
 			fwrite(ld->data.lightMap.coords, sizeof(lightMapCoordinates_struct), ld->size, f);
 			break;
 		default:
@@ -212,13 +212,12 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	writeHeader(&h,f);
 
 	room_struct r;
-	lightingData_struct ld;
+	lightingData_struct* ld=&r.lightingData;
 	initRoom(&r, 0, 0, vect(0,0,0));
-	initLightData(&ld);
 
 	r.rectangles=generateOptimizedRectangles(er->blockArray);
 	generateLightsFromEntities();
-	generateLightmaps(&r, &ld);
+	generateLightmaps(&r, ld);
 
 	h.dataPosition=ftell(f);
 		u8* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);
@@ -230,14 +229,13 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 		writeRectangleList(&r.rectangles, f);
 
 	h.lightPosition=ftell(f);
-		writeLightingData(&ld, f);
+		writeLightingData(ld, f);
 
 	h.entityPosition=ftell(f);
 		writeEntities(f);
 
 	writeHeader(&h,f);
 
-	freeLightData(&ld);
 	freeRoom(&r);
 	fclose(f);
 }

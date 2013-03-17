@@ -1,7 +1,5 @@
 #include "game/game_main.h"
 
-#define A5I3
-
 room_struct gameRoom;
 
 u32* testDL=NULL;
@@ -408,7 +406,6 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	drawRectangleList(&r->rectangles);
 	if(mode&6 && r->lightingData.type==LIGHTMAP_DATA)
 	{
-		NOGBA("SUPERTYPE");
 		listCell_struct *lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
 		applyMTL(r->lightMap);
@@ -472,11 +469,12 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	{
 		r->materials=malloc(r->height*r->width*sizeof(material_struct*));
 		int i;for(i=0;i<r->height*r->width;i++){r->materials[i]=NULL;}
-	}else {r->materials=NULL;}
+	}else r->materials=NULL;
 	
 	r->lightMap=NULL;
 
 	initLightData(&r->lightingData);
+	r->rectangleGrid=NULL;
 		
 	initRoomGrid(r);
 }
@@ -667,6 +665,7 @@ void freeRoom(room_struct* r)
 				if(r->rectangleGrid[i].rectangles)free(r->rectangleGrid[i].rectangles);
 			}
 			free(r->rectangleGrid);
+			r->rectangleGrid=NULL;
 		}
 		r->materials=NULL;
 		if(r->lightMap)r->lightMap->used=false;

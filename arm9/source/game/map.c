@@ -240,6 +240,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 	if(rec.lightData.vertex)
 	{
 		u8* vc=rec.lightData.vertex->values;
+		const u8 num=rec.lightData.vertex->width*rec.lightData.vertex->height;
 		// u8 vb[4];
 		// vb[0]=computeVertexLightings(convertVect(vectDivInt(v[0],32)), rec.normal);
 		// vb[1]=computeVertexLightings(convertVect(vectDivInt(v[1],32)), rec.normal);
@@ -248,25 +249,61 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		// NOGBA("%d %d %d %d",vc[0],vc[1],vc[2],vc[3]);
 		// NOGBA("%d %d %d %d vs",vb[0],vb[1],vb[2],vb[3]);
 
-		glBegin(GL_QUAD);
-			GFX_TEX_COORD = t1;
-			GFX_COLOR=RGB15(*vc,*vc,*vc);
-			glVertex3v16(v[0].x,v[0].y,v[0].z);
-	
-			GFX_TEX_COORD = t2;
-			vc=&rec.lightData.vertex->values[1];
-			GFX_COLOR=RGB15(*vc,*vc,*vc);
-			glVertex3v16(v[1].x,v[1].y,v[1].z);
-	
-			GFX_TEX_COORD = t3;
-			vc=&rec.lightData.vertex->values[3];
-			GFX_COLOR=RGB15(*vc,*vc,*vc);
-			glVertex3v16(v[2].x,v[2].y,v[2].z);
-	
-			GFX_TEX_COORD = t4;
-			vc=&rec.lightData.vertex->values[2];
-			GFX_COLOR=RGB15(*vc,*vc,*vc);
-			glVertex3v16(v[3].x,v[3].y,v[3].z);
+		if(num>4)
+		{
+			vertexLightingData_struct* vld=rec.lightData.vertex;
+			vect3D o=vect(pos.x,pos.y,pos.z);
+			vect3D v1=vect(size.x/(vld->width-1),0,0);
+			vect3D v2=vect(0,0,size.z/(vld->height-1));
+
+			if(!size.x)v1=vect(0,size.y/(vld->width-1),0);
+			if(!size.z)v2=vect(0,size.y/(vld->height-1),0);
+
+			vect3D p=o;
+			int i, j;
+			int k=0;
+			for(j=0;j<rec.lightData.vertex->width-1;j++)
+			{
+				p=o;
+				glBegin(GL_QUAD_STRIP);
+				for(i=0;i<rec.lightData.vertex->height;i++)
+				{
+					// vc=&rec.lightData.vertex->values[(k++)+rec.lightData.vertex->height];
+					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
+					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
+					GFX_COLOR=RGB15(vb,vb,vb);
+					glVertex3v16(p.x+v1.x,p.y+v1.y,p.z+v1.z);
+					// vc=&rec.lightData.vertex->values[k];
+					// vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x,p.y,p.z),32)), rec.normal);
+					vb=rec.lightData.vertex->values[k++];
+					GFX_COLOR=RGB15(vb,vb,vb);
+					glVertex3v16(p.x,p.y,p.z);
+
+					p=addVect(p,v2);
+				}
+				o=addVect(o,v1);
+			}
+		}else{
+			glBegin(GL_QUAD);
+				GFX_TEX_COORD = t1;
+				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				glVertex3v16(v[0].x,v[0].y,v[0].z);
+		
+				GFX_TEX_COORD = t2;
+				vc=&rec.lightData.vertex->values[1];
+				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				glVertex3v16(v[1].x,v[1].y,v[1].z);
+		
+				GFX_TEX_COORD = t3;
+				vc=&rec.lightData.vertex->values[3];
+				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				glVertex3v16(v[2].x,v[2].y,v[2].z);
+		
+				GFX_TEX_COORD = t4;
+				vc=&rec.lightData.vertex->values[2];
+				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				glVertex3v16(v[3].x,v[3].y,v[3].z);
+		}
 	}else{
 		glBegin(GL_QUAD);
 			GFX_TEX_COORD = t1;

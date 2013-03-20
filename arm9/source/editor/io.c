@@ -219,7 +219,7 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	if(!er)return;
 
 	FILE* f=fopen(str,"wb+");
-	if(!f)return;
+	// if(!f)return;
 
 	mapHeader_struct h=blankHeader;
 	writeHeader(&h,f);

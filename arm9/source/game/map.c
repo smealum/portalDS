@@ -210,13 +210,12 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		v[3]=vect(pos.x+size.x, pos.y, pos.z);
 	}
 
-	int32 t1, t2, t3, t4;
+	vect3D vt[4];
+	int32 t[4];
 	if(c)
 	{
-		int32 t[4];
 		GFX_COLOR=RGB15(31,31,31);		
-		bindMaterial(rec.material,&rec,t,false);
-		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
+		bindMaterial(rec.material,&rec,t,vt,false);
 	}else if(rec.lightData.lightMap){
 		vect3D lmPos=rec.lightData.lightMap->lmPos;
 		vect3D lmSize=rec.lightData.lightMap->lmSize;
@@ -225,15 +224,15 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		if(rec.lightData.lightMap->rot)
 		{
 			p2=vect(inttot16(lmPos.x+lmSize.y-1),inttot16(lmPos.y+lmSize.x-1),0);
-			t1=TEXTURE_PACK(p1.x, p1.y);
-			t4=TEXTURE_PACK(p1.x, p2.y);
-			t3=TEXTURE_PACK(p2.x, p2.y);
-			t2=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x, p1.y);
+			t[3]=TEXTURE_PACK(p1.x, p2.y);
+			t[2]=TEXTURE_PACK(p2.x, p2.y);
+			t[1]=TEXTURE_PACK(p2.x, p1.y);
 		}else{
-			t1=TEXTURE_PACK(p1.x, p1.y);
-			t2=TEXTURE_PACK(p1.x, p2.y);
-			t3=TEXTURE_PACK(p2.x, p2.y);
-			t4=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x, p1.y);
+			t[1]=TEXTURE_PACK(p1.x, p2.y);
+			t[2]=TEXTURE_PACK(p2.x, p2.y);
+			t[3]=TEXTURE_PACK(p2.x, p1.y);
 		}
 	}else return;
 
@@ -241,13 +240,6 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 	{
 		u8* vc=rec.lightData.vertex->values;
 		const u8 num=rec.lightData.vertex->width*rec.lightData.vertex->height;
-		// u8 vb[4];
-		// vb[0]=computeVertexLightings(convertVect(vectDivInt(v[0],32)), rec.normal);
-		// vb[1]=computeVertexLightings(convertVect(vectDivInt(v[1],32)), rec.normal);
-		// vb[2]=computeVertexLightings(convertVect(vectDivInt(v[3],32)), rec.normal);
-		// vb[3]=computeVertexLightings(convertVect(vectDivInt(v[2],32)), rec.normal);
-		// NOGBA("%d %d %d %d",vc[0],vc[1],vc[2],vc[3]);
-		// NOGBA("%d %d %d %d vs",vb[0],vb[1],vb[2],vb[3]);
 
 		if(num>4)
 		{
@@ -259,12 +251,18 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 			if(!size.x)v1=vect(0,size.y/(vld->width-1),0);
 			if(!size.z)v2=vect(0,size.y/(vld->height-1),0);
 
+			vect3D to=vt[0];
+			vect3D vt1=vectDivInt(vectDifference(vt[1],vt[0]),vld->width-1);
+			vect3D vt2=vectDivInt(vectDifference(vt[3],vt[0]),vld->height-1);
+
 			vect3D p=o;
+			vect3D tp=to;
 			int i, j;
 			int k=0;
 			for(j=0;j<rec.lightData.vertex->width-1;j++)
 			{
 				p=o;
+				tp=to;
 				glBegin(GL_QUAD_STRIP);
 				for(i=0;i<rec.lightData.vertex->height;i++)
 				{
@@ -272,50 +270,55 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
 					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
 					GFX_COLOR=RGB15(vb,vb,vb);
+					GFX_TEX_COORD=TEXTURE_PACK(tp.x+vt2.x,tp.y+vt2.y);
 					glVertex3v16(p.x+v1.x,p.y+v1.y,p.z+v1.z);
 					// vc=&rec.lightData.vertex->values[k];
 					// vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x,p.y,p.z),32)), rec.normal);
 					vb=rec.lightData.vertex->values[k++];
 					GFX_COLOR=RGB15(vb,vb,vb);
+					GFX_TEX_COORD=TEXTURE_PACK(tp.x,tp.y);
 					glVertex3v16(p.x,p.y,p.z);
 
 					p=addVect(p,v2);
+					tp=addVect(tp,vt1);
 				}
 				o=addVect(o,v1);
+				to=addVect(to,vt2);
 			}
+			// NOGBA("%d %d vs %d %d",tp.x,tp.y,vt[3].x,vt[3].y);
 		}else{
 			glBegin(GL_QUAD);
-				GFX_TEX_COORD = t1;
+				GFX_TEX_COORD = t[0];
 				GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[0].x,v[0].y,v[0].z);
 		
-				GFX_TEX_COORD = t2;
+				GFX_TEX_COORD = t[1];
 				vc=&rec.lightData.vertex->values[1];
 				GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[1].x,v[1].y,v[1].z);
 		
-				GFX_TEX_COORD = t3;
+				GFX_TEX_COORD = t[2];
 				vc=&rec.lightData.vertex->values[3];
 				GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[2].x,v[2].y,v[2].z);
 		
-				GFX_TEX_COORD = t4;
+				GFX_TEX_COORD = t[3];
 				vc=&rec.lightData.vertex->values[2];
 				GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[3].x,v[3].y,v[3].z);
 		}
 	}else{
 		glBegin(GL_QUAD);
-			GFX_TEX_COORD = t1;
+			GFX_TEX_COORD = t[0];
 			glVertex3v16(v[0].x,v[0].y,v[0].z);
 	
-			GFX_TEX_COORD = t2;
+			GFX_TEX_COORD = t[1];
 			glVertex3v16(v[1].x,v[1].y,v[1].z);
 	
-			GFX_TEX_COORD = t3;
+			GFX_TEX_COORD = t[2];
 			glVertex3v16(v[2].x,v[2].y,v[2].z);
 	
-			GFX_TEX_COORD = t4;
+			GFX_TEX_COORD = t[3];
 			glVertex3v16(v[3].x,v[3].y,v[3].z);
 	}
 }
@@ -358,11 +361,12 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 	}
 	
 	int32 t1, t2, t3, t4;
+	vect3D vt[4];
 	if(c)
 	{
 		int32 t[4];
 		glColorDL(RGB15(31,31,31));
-		bindMaterial(rec.material,&rec,t,true);
+		bindMaterial(rec.material,&rec,t,vt,true);
 		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
 	}else if(rec.lightData.lightMap){
 		vect3D lmPos=rec.lightData.lightMap->lmPos;

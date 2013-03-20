@@ -184,6 +184,16 @@ void writeHeader(mapHeader_struct* h, FILE* f)
 	fwrite(h, sizeof(mapHeader_struct), 1, f);
 }
 
+void writeVertexLightingData(vertexLightingData_struct* vld, FILE* f)
+{
+	if(!vld)return;
+
+	fwrite(&vld->width, sizeof(u8), 1, f);
+	fwrite(&vld->height, sizeof(u8), 1, f);
+
+	fwrite(vld->values, sizeof(u8), vld->width*vld->height, f);
+}
+
 void writeLightingData(lightingData_struct* ld, FILE* f)
 {
 	if(!ld || !f)return;
@@ -196,7 +206,10 @@ void writeLightingData(lightingData_struct* ld, FILE* f)
 			fwrite(ld->data.lightMap.coords, sizeof(lightMapCoordinates_struct), ld->size, f);
 			break;
 		default:
-			fwrite(ld->data.vertexLighting, sizeof(vertexLightingData_struct), ld->size, f);
+			{
+				int i;
+				for(i=0;i<ld->size;i++)writeVertexLightingData(&ld->data.vertexLighting[i],f);
+			}
 			break;
 	}
 }
@@ -217,7 +230,8 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 
 	r.rectangles=generateOptimizedRectangles(er->blockArray);
 	generateLightsFromEntities();
-	generateLightmaps(&r, ld);
+	// generateLightmaps(&r, ld);
+	generateVertexLighting(&r, ld);
 
 	h.dataPosition=ftell(f);
 		u8* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);

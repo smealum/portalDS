@@ -186,9 +186,22 @@ void readEntities(FILE* f)
 	for(i=0;i<cnt;i++)addEntityTarget(i,cnt,entityEntityArray[i],entityTargetTypeArray[i]);
 }
 
+void readVertexLightingData(vertexLightingData_struct* vld, FILE* f)
+{
+	if(!vld || !f)return;
+
+	fread(&vld->width, sizeof(u8), 1, f);
+	fread(&vld->height, sizeof(u8), 1, f);
+
+	vld->values=malloc(sizeof(u8)*vld->width*vld->height);
+	fread(vld->values, sizeof(u8), vld->width*vld->height, f);
+}
+
 void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
 {
 	if(!r || !ld || !f)return;
+
+	ld->type=VERTEXLIGHT_DATA; //TEMP
 
 	switch(ld->type)
 	{
@@ -208,20 +221,33 @@ void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
 				u16 palette[8];
 				for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
 				// for(i=0;i<ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y;i++){ld->data.lightMap.buffer[i]=(ld->data.lightMap.buffer[i]<<3);}
-				r->lightMap=createReservedTextureBufferA5I3(ld->data.lightMap.buffer,palette,ld->data.lightMap.lmSize.x,ld->data.lightMap.lmSize.y,(void*)(0x6800000+0x0020000));
+				ld->data.lightMap.texture=createReservedTextureBufferA5I3(ld->data.lightMap.buffer,palette,ld->data.lightMap.lmSize.x,ld->data.lightMap.lmSize.y,(void*)(0x6800000+0x0020000));
 			}
 
 			int i=r->rectangles.num-1;
 			listCell_struct* lc=r->rectangles.first;
 			while(lc)
 			{
-				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i--];
+				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i--]; //stacking reverses the order...
 				lc=lc->next;
 			}
 
 			break;
 		default:
-			fread(ld->data.vertexLighting, sizeof(vertexLightingData_struct), ld->size, f);
+			initLightDataVL(ld, r->rectangles.num);
+			{
+				int i;
+				for(i=0;i<ld->size;i++)readVertexLightingData(&ld->data.vertexLighting[i],f);
+			}
+			{
+				int i=r->rectangles.num-1;
+				listCell_struct* lc=r->rectangles.first;
+				while(lc)
+				{
+					lc->data.lightData.vertex=&ld->data.vertexLighting[i--]; //stacking reverses the order...
+					lc=lc->next;
+				}
+			}
 			break;
 	}
 }
@@ -263,7 +289,7 @@ void newReadMap(char* filename, room_struct* r)
 		fread(&r->rectangles.num,sizeof(int),1,f);
 		readRectangles(r, f);
 
-	//lightmap stuff
+	//lighting stuff
 	fseek(f, h.lightPosition, SEEK_SET);
 		readLightingData(r, &r->lightingData, f);
 

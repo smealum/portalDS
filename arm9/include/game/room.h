@@ -39,7 +39,6 @@ typedef struct
 	vect3D position;
 	vect3D lmSize;
 	u16 width, height;
-	mtlImg_struct* lightMap;
 	gridCell_struct* rectangleGrid;
 	vect3D rectangleGridSize;
 	rectangleList_struct rectangles;
@@ -53,5 +52,7 @@ void readMap(char* filename, room_struct* r);
 void newReadMap(char* filename, room_struct* r);
 
 void generateLightmaps(room_struct* r, lightingData_struct* ld);
+
+void generateVertexLighting(room_struct* r, lightingData_struct* ld);
 
 #endif

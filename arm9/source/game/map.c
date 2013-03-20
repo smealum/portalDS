@@ -237,18 +237,50 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		}
 	}else return;
 
-	glBegin(GL_QUAD);
-		GFX_TEX_COORD = t1;
-		glVertex3v16(v[0].x,v[0].y,v[0].z);
+	if(rec.lightData.vertex)
+	{
+		u8* vc=rec.lightData.vertex->values;
+		// u8 vb[4];
+		// vb[0]=computeVertexLightings(convertVect(vectDivInt(v[0],32)), rec.normal);
+		// vb[1]=computeVertexLightings(convertVect(vectDivInt(v[1],32)), rec.normal);
+		// vb[2]=computeVertexLightings(convertVect(vectDivInt(v[3],32)), rec.normal);
+		// vb[3]=computeVertexLightings(convertVect(vectDivInt(v[2],32)), rec.normal);
+		// NOGBA("%d %d %d %d",vc[0],vc[1],vc[2],vc[3]);
+		// NOGBA("%d %d %d %d vs",vb[0],vb[1],vb[2],vb[3]);
 
-		GFX_TEX_COORD = t2;
-		glVertex3v16(v[1].x,v[1].y,v[1].z);
-
-		GFX_TEX_COORD = t3;
-		glVertex3v16(v[2].x,v[2].y,v[2].z);
-
-		GFX_TEX_COORD = t4;
-		glVertex3v16(v[3].x,v[3].y,v[3].z);
+		glBegin(GL_QUAD);
+			GFX_TEX_COORD = t1;
+			GFX_COLOR=RGB15(*vc,*vc,*vc);
+			glVertex3v16(v[0].x,v[0].y,v[0].z);
+	
+			GFX_TEX_COORD = t2;
+			vc=&rec.lightData.vertex->values[1];
+			GFX_COLOR=RGB15(*vc,*vc,*vc);
+			glVertex3v16(v[1].x,v[1].y,v[1].z);
+	
+			GFX_TEX_COORD = t3;
+			vc=&rec.lightData.vertex->values[3];
+			GFX_COLOR=RGB15(*vc,*vc,*vc);
+			glVertex3v16(v[2].x,v[2].y,v[2].z);
+	
+			GFX_TEX_COORD = t4;
+			vc=&rec.lightData.vertex->values[2];
+			GFX_COLOR=RGB15(*vc,*vc,*vc);
+			glVertex3v16(v[3].x,v[3].y,v[3].z);
+	}else{
+		glBegin(GL_QUAD);
+			GFX_TEX_COORD = t1;
+			glVertex3v16(v[0].x,v[0].y,v[0].z);
+	
+			GFX_TEX_COORD = t2;
+			glVertex3v16(v[1].x,v[1].y,v[1].z);
+	
+			GFX_TEX_COORD = t3;
+			glVertex3v16(v[2].x,v[2].y,v[2].z);
+	
+			GFX_TEX_COORD = t4;
+			glVertex3v16(v[3].x,v[3].y,v[3].z);
+	}
 }
 
 void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cpos, vect3D cnormal, bool cull) //TEMP ?
@@ -408,7 +440,7 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	{
 		listCell_struct *lc=r->rectangles.first;
 		glPolyFmt(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
-		applyMTL(r->lightMap);
+		applyMTL(r->lightingData.data.lightMap.texture);
 		GFX_COLOR=RGB15(31,31,31);
 		glPushMatrix();
 			glTranslate3f32(-TILESIZE,0,-TILESIZE);
@@ -470,8 +502,6 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 		r->materials=malloc(r->height*r->width*sizeof(material_struct*));
 		int i;for(i=0;i<r->height*r->width;i++){r->materials[i]=NULL;}
 	}else r->materials=NULL;
-	
-	r->lightMap=NULL;
 
 	initLightData(&r->lightingData);
 	r->rectangleGrid=NULL;
@@ -583,7 +613,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	{
 		lc=r->rectangles.first;
 		glPolyFmtDL(POLY_ALPHA(31) | (1<<14) | POLY_CULL_BACK);
-		applyMTLDL(r->lightMap);
+		applyMTLDL(r->lightingData.data.lightMap.texture);
 		while(lc)
 		{
 			drawRectDL(lc->data,(lc->data.position),(lc->data.size),false,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
@@ -668,7 +698,6 @@ void freeRoom(room_struct* r)
 			r->rectangleGrid=NULL;
 		}
 		r->materials=NULL;
-		if(r->lightMap)r->lightMap->used=false;
 		freeLightData(&r->lightingData);
 		removeRectangles(r);
 	}

@@ -50,6 +50,7 @@ void updateViewMatrix(camera_struct* c);
 void fixMatrix(int32* m);
 void updateFrustum(camera_struct* c);
 vect3D getViewPosition(vect3D p);
+vect3D reverseViewPosition(vect3D p);
 
 void initProjectionMatrixBottom(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far);
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);

@@ -25,7 +25,7 @@ typedef struct
 typedef struct
 {
 	vect2D position, size;
-	rectangle_struct* real;
+	lightMapCoordinates_struct* real;
 	bool rot;
 }rectangle2D_struct;
 
@@ -54,6 +54,6 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 vect3D getClosestPointRectangleStruct(rectangle_struct* rec, vect3D o);
 vect3D getClosestPointRectangle(vect3D p, vect3D s, vect3D o);
 
-void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, bool DL);
+void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, vect3D* v,bool DL);
 
 #endif

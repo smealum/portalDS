@@ -195,7 +195,7 @@ void shootPlayerGun(player_struct* p, bool R)
 			ip.z+=TILESIZE;
 			
 			vect3D pos=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
-			NOGBA("SHOT WALL ! GOOD GOING %d %d",r->normal.z,r->normal.x);
+			NOGBA("SHOT WALL ! GOOD GOING %d %d %d",r->normal.z,r->normal.x, r->AARid);
 			
 			particleExplosion(pos,64,R?(RGB15(31,31,0)):(RGB15(0,31,31)));
 			
@@ -276,8 +276,8 @@ void playerControls(player_struct* p)
 	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 
-	camera_struct* c=getPlayerCamera();
-	if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
+	// camera_struct* c=getPlayerCamera();
+	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
 	
 	touchOld=touchCurrent;
 }
@@ -296,7 +296,6 @@ void updatePlayer(player_struct* p)
 		p->relativePosition=convertCoord(r, p->object->position);
 		p->relativePositionReal=vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y)));
 	}
-	if(r && !r->lmSlot)loadLightMap(r);
 	
 	// createParticles(p->object->position,vect(0,0,0),120);
 	// particleExplosion(p->object->position,32);

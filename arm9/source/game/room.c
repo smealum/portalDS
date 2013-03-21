@@ -7,7 +7,7 @@ void drawRoomsGame(u8 mode, u16 color)
 	unbindMtl();
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 
-	drawRoom(&gameRoom,((1)<<3)|((gameRoom.lmSlot!=0)<<2)|(1)|(mode), color);
+	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color);
 }
 
 //READ AREA
@@ -25,19 +25,17 @@ void readRectangle(rectangle_struct* rec, FILE* f)
 	
 	readVect(&rec->position,f);
 	readVect(&rec->size,f);
-	readVect(&rec->lmSize,f);
-	readVect(&rec->lmPos,f);
 	readVect(&rec->normal,f);
 
 	fread(&rec->portalable,sizeof(bool),1,f);
 	
 	u16 mid=0; fread(&mid,sizeof(u16),1,f);
 
+	rec->lightData.lightMap=NULL;
+
 	//TEMP ?
 	if(rec->portalable)rec->material=getMaterial(1);
 	else rec->material=getMaterial(2);
-	
-	fread(&rec->rot,sizeof(bool),1,f);
 }
 
 void readRectangles(room_struct* r, FILE* f)
@@ -188,6 +186,72 @@ void readEntities(FILE* f)
 	for(i=0;i<cnt;i++)addEntityTarget(i,cnt,entityEntityArray[i],entityTargetTypeArray[i]);
 }
 
+void readVertexLightingData(vertexLightingData_struct* vld, FILE* f)
+{
+	if(!vld || !f)return;
+
+	fread(&vld->width, sizeof(u8), 1, f);
+	fread(&vld->height, sizeof(u8), 1, f);
+
+	vld->values=malloc(sizeof(u8)*vld->width*vld->height);
+	fread(vld->values, sizeof(u8), vld->width*vld->height, f);
+}
+
+void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
+{
+	if(!r || !ld || !f)return;
+
+	ld->type=VERTEXLIGHT_DATA; //TEMP
+
+	switch(ld->type)
+	{
+		case LIGHTMAP_DATA:
+			initLightDataLM(ld, r->rectangles.num);
+
+			readVect(&ld->data.lightMap.lmSize,f);
+
+			ld->data.lightMap.buffer=malloc(sizeof(u8)*ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y);
+			if(!ld->data.lightMap.buffer)return;
+
+			fread(ld->data.lightMap.buffer,sizeof(u8),ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y,f);
+			fread(ld->data.lightMap.coords, sizeof(lightMapCoordinates_struct), ld->size, f);
+
+			{
+				int i;
+				u16 palette[8];
+				for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
+				// for(i=0;i<ld->data.lightMap.lmSize.x*ld->data.lightMap.lmSize.y;i++){ld->data.lightMap.buffer[i]=(ld->data.lightMap.buffer[i]<<3);}
+				ld->data.lightMap.texture=createReservedTextureBufferA5I3(ld->data.lightMap.buffer,palette,ld->data.lightMap.lmSize.x,ld->data.lightMap.lmSize.y,(void*)(0x6800000+0x0020000));
+			}
+
+			int i=r->rectangles.num-1;
+			listCell_struct* lc=r->rectangles.first;
+			while(lc)
+			{
+				lc->data.lightData.lightMap=&ld->data.lightMap.coords[i--]; //stacking reverses the order...
+				lc=lc->next;
+			}
+
+			break;
+		default:
+			initLightDataVL(ld, r->rectangles.num);
+			{
+				int i;
+				for(i=0;i<ld->size;i++)readVertexLightingData(&ld->data.vertexLighting[i],f);
+			}
+			{
+				int i=r->rectangles.num-1;
+				listCell_struct* lc=r->rectangles.first;
+				while(lc)
+				{
+					lc->data.lightData.vertex=&ld->data.vertexLighting[i--]; //stacking reverses the order...
+					lc=lc->next;
+				}
+			}
+			break;
+	}
+}
+
 void newReadMap(char* filename, room_struct* r)
 {
 	if(!r)r=&gameRoom;
@@ -225,18 +289,9 @@ void newReadMap(char* filename, room_struct* r)
 		fread(&r->rectangles.num,sizeof(int),1,f);
 		readRectangles(r, f);
 
-	//lightmap stuff
+	//lighting stuff
 	fseek(f, h.lightPosition, SEEK_SET);
-		readVect(&r->lmSize,f);
-		NOGBA("%dx%d lightmap",r->lmSize.x,r->lmSize.y);
-		r->lightMapBuffer=malloc(sizeof(u8)*r->lmSize.x*r->lmSize.y);
-		fread(r->lightMapBuffer,sizeof(u8),r->lmSize.x*r->lmSize.y,f);
-		{
-			int i;
-			u16 palette[8];
-			for(i=0;i<8;i++){u8 v=(i*31)/7;palette[i]=RGB15(v,v,v);}
-			r->lightMap=createReservedTextureBufferA5I3(NULL,palette,r->lmSize.x,r->lmSize.y,(void*)(0x6800000+0x0020000));
-		}
+		readLightingData(r, &r->lightingData, f);
 
 	//entities
 	fseek(f, h.entityPosition, SEEK_SET);

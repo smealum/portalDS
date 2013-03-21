@@ -3,10 +3,14 @@
 
 typedef struct
 {
-	vect3D position, size, lmSize, lmPos, normal;
+	vect3D position, size, normal;
 	material_struct* material;
 	s16 AARid;
-	bool rot, portalable, hide, touched, collides;
+	union{
+		vertexLightingData_struct* vertex;
+		lightMapCoordinates_struct* lightMap;
+	}lightData;
+	bool portalable, hide, touched, collides;
 }rectangle_struct;
 
 typedef struct listCell_struct
@@ -35,12 +39,10 @@ typedef struct
 	vect3D position;
 	vect3D lmSize;
 	u16 width, height;
-	u8* lightMapBuffer;
-	mtlImg_struct* lightMap;
-	lightMapSlots_struct* lmSlot;
 	gridCell_struct* rectangleGrid;
 	vect3D rectangleGridSize;
 	rectangleList_struct rectangles;
+	lightingData_struct lightingData;
 }room_struct;
 
 void drawRoomEdits(void);
@@ -48,5 +50,9 @@ void wipeMapEdit(void);
 void writeMap(char* filename);
 void readMap(char* filename, room_struct* r);
 void newReadMap(char* filename, room_struct* r);
+
+void generateLightmaps(room_struct* r, lightingData_struct* ld);
+
+void generateVertexLighting(room_struct* r, lightingData_struct* ld);
 
 #endif

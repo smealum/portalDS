@@ -9,6 +9,7 @@
 #include "editor/selection.h"
 #include "editor/roomeditor.h"
 #include "editor/material.h"
+#include "editor/lighting.h"
 #include "editor/rectangle.h"
 #include "editor/io.h"
 #include "editor/interface.h"

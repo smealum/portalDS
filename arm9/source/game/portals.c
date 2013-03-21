@@ -185,8 +185,14 @@ void warpPlayer(portal_struct* p, player_struct* pl)
 {
 	camera_struct* c=getPlayerCamera();
 	updatePortalCamera(p,c);
-	pl->object->position=c->position=p->camera.position;
+	
+	c->viewPosition=p->camera.viewPosition;
+	pl->object->position=c->position=reverseViewPosition(p->camera.viewPosition);
+
+	int32 z=dotProduct(vectDifference(c->position,p->targetPortal->position),p->targetPortal->normal);
+	if(z<0)pl->object->position=c->position=addVect(c->position,vectMult(p->targetPortal->normal,-2*z));
 	c->viewPosition=getViewPosition(c->position);
+
 	pl->object->speed=warpVector(p,pl->object->speed);
 	memcpy(c->transformationMatrix,p->camera.transformationMatrix,9*sizeof(int32));
 	updateViewMatrix(c);

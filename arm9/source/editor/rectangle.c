@@ -248,6 +248,7 @@ void insertRectangle2DList(rectangle2DList_struct* l, rectangle2D_struct rec)
 	listCell2D_struct* lc=l->first;
 	l->num++;
 	l->surface+=a;
+	if(n->data.real)n->data.real->lmSize=vect(n->data.size.x,n->data.size.y,0);
 	while(lc)
 	{
 		int a2=lc->data.size.x*lc->data.size.y;

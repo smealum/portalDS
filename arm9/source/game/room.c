@@ -257,25 +257,32 @@ void newReadMap(char* filename, room_struct* r)
 	if(!r)r=&gameRoom;
 	char fn[1024];
 	FILE* f=NULL;
-	if(fsMode==1||fsMode==2)
+
+	//DEBUG DEBUG DEBUG
+	f=fopen("fat:/test.map","rb");
+
+	if(!f)
 	{
-		if(fsMode==2)
+		if(fsMode==1||fsMode==2)
+		{
+			if(fsMode==2)
+			{
+				sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
+				NOGBA("lala : %s",fn);
+				f=fopen(fn,"rb");
+			}
+			if(!f)
+			{
+				sprintf(fn,"nitro:/fpsm/maps/%s",filename);
+				NOGBA("lala : %s",fn);
+				f=fopen(fn,"rb");
+			}
+		}else if(fsMode==3)
 		{
 			sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
 			NOGBA("lala : %s",fn);
 			f=fopen(fn,"rb");
 		}
-		if(!f)
-		{
-			sprintf(fn,"nitro:/fpsm/maps/%s",filename);
-			NOGBA("lala : %s",fn);
-			f=fopen(fn,"rb");
-		}
-	}else if(fsMode==3)
-	{
-		sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
-		NOGBA("lala : %s",fn);
-		f=fopen(fn,"rb");
 	}
 	if(!f)return;
 

@@ -32,6 +32,7 @@ void initGame(void)
 	
 	glEnable(GL_TEXTURE_2D);
 	// glEnable(GL_ANTIALIAS);
+	glDisable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
 	glEnable(GL_OUTLINE);
 	

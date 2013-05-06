@@ -4,6 +4,9 @@ room_struct gameRoom;
 
 u32* testDL=NULL;
 
+//DEBUG
+bool debugWireframe=false;
+
 void initRectangleList(rectangleList_struct* p)
 {
 	p->first=NULL;
@@ -271,13 +274,13 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 					// vc=&rec.lightData.vertex->values[(k++)+rec.lightData.vertex->height];
 					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
 					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
-					GFX_COLOR=RGB15(vb,vb,vb);
+					if(!debugWireframe)GFX_COLOR=RGB15(vb,vb,vb);
 					GFX_TEX_COORD=TEXTURE_PACK(tp.x+vt2.x,tp.y+vt2.y);
 					glVertex3v16(p.x+v1.x,p.y+v1.y,p.z+v1.z);
 					// vc=&rec.lightData.vertex->values[k];
 					// vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x,p.y,p.z),32)), rec.normal);
 					vb=rec.lightData.vertex->values[k++];
-					GFX_COLOR=RGB15(vb,vb,vb);
+					if(!debugWireframe)GFX_COLOR=RGB15(vb,vb,vb);
 					GFX_TEX_COORD=TEXTURE_PACK(tp.x,tp.y);
 					glVertex3v16(p.x,p.y,p.z);
 
@@ -291,22 +294,22 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		}else{
 			glBegin(GL_QUAD);
 				GFX_TEX_COORD = t[0];
-				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[0].x,v[0].y,v[0].z);
 		
 				GFX_TEX_COORD = t[1];
 				vc=&rec.lightData.vertex->values[1];
-				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[1].x,v[1].y,v[1].z);
-		
+
 				GFX_TEX_COORD = t[2];
 				vc=&rec.lightData.vertex->values[3];
-				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[2].x,v[2].y,v[2].z);
 		
 				GFX_TEX_COORD = t[3];
 				vc=&rec.lightData.vertex->values[2];
-				GFX_COLOR=RGB15(*vc,*vc,*vc);
+				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[3].x,v[3].y,v[3].z);
 		}
 	}else{
@@ -476,7 +479,10 @@ void drawRectangleList(rectangleList_struct* rl)
 
 void drawRectangles(room_struct* r, u8 mode, u16 color)
 {
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	// glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+	if(keysDown() & KEY_A)debugWireframe^=1;
+	if(debugWireframe)glPolyFmt(POLY_ALPHA(0) | POLY_CULL_BACK); //DEBUG
+	else glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	
 	drawRectangleList(&r->rectangles);
 	if(mode&6 && r->lightingData.type==LIGHTMAP_DATA)

@@ -365,14 +365,12 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		if(!pass)return;
 	}
 	
-	int32 t1, t2, t3, t4;
 	vect3D vt[4];
+	int32 t[4];
 	if(c)
 	{
-		int32 t[4];
 		glColorDL(RGB15(31,31,31));
 		bindMaterial(rec.material,&rec,t,vt,true);
-		t1=t[0];t2=t[1];t3=t[2];t4=t[3];
 	}else if(rec.lightData.lightMap){
 		vect3D lmPos=rec.lightData.lightMap->lmPos;
 		vect3D lmSize=rec.lightData.lightMap->lmSize;
@@ -381,15 +379,15 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		if(rec.lightData.lightMap->rot)
 		{
 			p2=vect(inttot16(lmPos.x+lmSize.y-1),inttot16(lmPos.y+lmSize.x-1),0);
-			t1=TEXTURE_PACK(p1.x, p1.y);
-			t4=TEXTURE_PACK(p1.x, p2.y);
-			t3=TEXTURE_PACK(p2.x, p2.y);
-			t2=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x, p1.y);
+			t[3]=TEXTURE_PACK(p1.x, p2.y);
+			t[2]=TEXTURE_PACK(p2.x, p2.y);
+			t[1]=TEXTURE_PACK(p2.x, p1.y);
 		}else{
-			t1=TEXTURE_PACK(p1.x, p1.y);
-			t2=TEXTURE_PACK(p1.x, p2.y);
-			t3=TEXTURE_PACK(p2.x, p2.y);
-			t4=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x, p1.y);
+			t[1]=TEXTURE_PACK(p1.x, p2.y);
+			t[2]=TEXTURE_PACK(p2.x, p2.y);
+			t[3]=TEXTURE_PACK(p2.x, p1.y);
 		}
 	}else return;
 
@@ -413,18 +411,90 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		v[3]=vect(pos.x+size.x, pos.y, pos.z);
 	}
 
-	glBeginDL(GL_QUAD);
-		glTexCoordPACKED(t1);
-		glVertex3v16DL(v[0].x, v[0].y, v[0].z);
+	if(rec.lightData.vertex)
+	{
+		u8* vc=rec.lightData.vertex->values;
+		const u8 num=rec.lightData.vertex->width*rec.lightData.vertex->height;
 
-		glTexCoordPACKED(t2);
-		glVertex3v16DL(v[1].x, v[1].y, v[1].z);
+		if(num>4)
+		{
+			vertexLightingData_struct* vld=rec.lightData.vertex;
+			vect3D o=vect(pos.x,pos.y,pos.z);
+			vect3D v1=vect(size.x/(vld->width-1),0,0);
+			vect3D v2=vect(0,0,size.z/(vld->height-1));
 
-		glTexCoordPACKED(t3);
-		glVertex3v16DL(v[2].x, v[2].y, v[2].z);
+			if(!size.x)v1=vect(0,size.y/(vld->width-1),0);
+			if(!size.z)v2=vect(0,size.y/(vld->height-1),0);
 
-		glTexCoordPACKED(t4);
-		glVertex3v16DL(v[3].x, v[3].y, v[3].z);
+			vect3D to=vt[0];
+			vect3D vt1=vectDivInt(vectDifference(vt[1],vt[0]),vld->height-1);
+			vect3D vt2=vectDivInt(vectDifference(vt[3],vt[0]),vld->width-1);
+
+			// NOGBA("%d",vld->height);
+
+			vect3D p=o;
+			vect3D tp=to;
+			int i, j;
+			int k=0;
+			for(j=0;j<rec.lightData.vertex->width-1;j++)
+			{
+				p=o;
+				tp=to;
+				glBeginDL(GL_QUAD_STRIP);
+				for(i=0;i<rec.lightData.vertex->height;i++)
+				{
+					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
+					if(!debugWireframe)glColorDL(RGB15(vb,vb,vb));
+					glTexCoordPACKED(TEXTURE_PACK(tp.x+vt2.x,tp.y+vt2.y));
+					glVertex3v16DL(p.x+v1.x,p.y+v1.y,p.z+v1.z);
+
+					vb=rec.lightData.vertex->values[k++];
+					if(!debugWireframe)glColorDL(RGB15(vb,vb,vb));
+					glTexCoordPACKED(TEXTURE_PACK(tp.x,tp.y));
+					glVertex3v16DL(p.x,p.y,p.z);
+
+					p=addVect(p,v2);
+					tp=addVect(tp,vt1);
+				}
+				o=addVect(o,v1);
+				to=addVect(to,vt2);
+			}
+			// NOGBA("%d %d vs %d %d",tp.x,tp.y,vt[3].x,vt[3].y);
+		}else{
+			glBeginDL(GL_QUAD);
+				glTexCoordPACKED(t[0]);
+				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
+				glVertex3v16DL(v[0].x,v[0].y,v[0].z);
+		
+				glTexCoordPACKED(t[1]);
+				vc=&rec.lightData.vertex->values[1];
+				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
+				glVertex3v16DL(v[1].x,v[1].y,v[1].z);
+
+				glTexCoordPACKED(t[2]);
+				vc=&rec.lightData.vertex->values[3];
+				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
+				glVertex3v16DL(v[2].x,v[2].y,v[2].z);
+		
+				glTexCoordPACKED(t[3]);
+				vc=&rec.lightData.vertex->values[2];
+				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
+				glVertex3v16DL(v[3].x,v[3].y,v[3].z);
+		}
+	}else{
+		glBeginDL(GL_QUAD);
+			glTexCoordPACKED(t[0]);
+			glVertex3v16DL(v[0].x, v[0].y, v[0].z);
+
+			glTexCoordPACKED(t[1]);
+			glVertex3v16DL(v[1].x, v[1].y, v[1].z);
+
+			glTexCoordPACKED(t[2]);
+			glVertex3v16DL(v[2].x, v[2].y, v[2].z);
+
+			glTexCoordPACKED(t[3]);
+			glVertex3v16DL(v[3].x, v[3].y, v[3].z);
+	}
 }
 
 s16 transferRectangle(vect3D pos, vect3D size, vect3D normal)

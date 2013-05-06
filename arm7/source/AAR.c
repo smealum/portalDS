@@ -154,6 +154,12 @@ void updateAAR(u16 id, vect3D position)
 	// }
 }
 
+void toggleAAR(u16 id)
+{
+	if(id>=NUMAARS)return;
+	aaRectangles[id].used^=1;
+}
+
 bool pointInPortal(portal_struct* p, vect3D pos) //assuming correct normal
 {
 	if(!p)return false;

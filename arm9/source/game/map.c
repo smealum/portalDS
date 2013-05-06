@@ -252,8 +252,10 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 			if(!size.z)v2=vect(0,size.y/(vld->height-1),0);
 
 			vect3D to=vt[0];
-			vect3D vt1=vectDivInt(vectDifference(vt[1],vt[0]),vld->width-1);
-			vect3D vt2=vectDivInt(vectDifference(vt[3],vt[0]),vld->height-1);
+			vect3D vt1=vectDivInt(vectDifference(vt[1],vt[0]),vld->height-1);
+			vect3D vt2=vectDivInt(vectDifference(vt[3],vt[0]),vld->width-1);
+
+			// NOGBA("%d",vld->height);
 
 			vect3D p=o;
 			vect3D tp=to;

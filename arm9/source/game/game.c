@@ -199,7 +199,8 @@ static inline void render1(void)
 		transformCamera(NULL);
 		
 		cpuEndSlice();
-			drawRoomsGame(128, color);
+			// drawRoomsGame(128, color);
+			drawRoomsGame(0, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
 		iprintf("room : %d  \n",cpuEndSlice());
 		

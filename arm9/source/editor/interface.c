@@ -1,6 +1,6 @@
 #include "editor/editor_main.h"
 
-#define NUMINTERFACEBUTTONS (11)
+#define NUMINTERFACEBUTTONS (12)
 
 interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
 											(interfaceButton_struct){72,38,"pressurebttn2_ui.pcx",NULL,3,false},
@@ -12,7 +12,8 @@ interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"stor
 											(interfaceButton_struct){72,81,"button2_ui.pcx",NULL,2,false},
 											(interfaceButton_struct){107,81,"balllauncher2_ui.pcx",NULL,1,false},
 											(interfaceButton_struct){142,81,"ballcatcher2_ui.pcx",NULL,0,false},
-											(interfaceButton_struct){177,81,"turret2_ui.pcx",NULL,4,false}};
+											(interfaceButton_struct){177,81,"turret2_ui.pcx",NULL,4,false},
+											(interfaceButton_struct){212,81,"door2_ui.pcx",NULL,13,false}};
 
 struct gl_texture_t *interfaceBackground;
 int bgSub;
@@ -70,7 +71,7 @@ void activateInterfaceButton(interfaceButton_struct* ib)
 {
 	if(!ib)return;
 
-	if(ib->argument>=0 && ib->argument<12)
+	if(ib->argument<NUMENTITYTYPES)
 	{
 		entity_struct* e=NULL;
 		if(editorSelection.entity && !editorSelection.entity->placed){removeEntity(editorSelection.entity);editorSelection.entity=NULL;}

@@ -1,7 +1,5 @@
 #include "editor/editor_main.h"
 
-#define NUMENTITYTYPES (13)
-
 void cubeSpecialInit(entity_struct* e);
 void cubeSpecialMove(entity_struct* e, bool m);
 void dispenserSpecialMove(entity_struct* e, bool m);
@@ -20,7 +18,8 @@ entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_
 								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 2, NULL, platformSpecialMove, NULL, true, false},
 								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, false, false},
-								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, platformTargetSpecialMoveCheck, true, false}};
+								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, NULL, false, true}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -271,7 +270,7 @@ void drawEntity(entity_struct* e)
 		if(e->blockFace && et->rotate)
 		{
 			if(e->direction<=1)glRotateZi(-8192);
-			else if(e->direction>=4){glRotateXi(8192);glRotateYi(8192);}
+			else if(e->direction>=4){glRotateXi(8192);glRotateYi(-8192);}
 			if(e->direction%2)glRotateXi(16384);
 		}
 		glTranslate3f32(0,-inttof32(1)/2,0);

@@ -68,4 +68,6 @@ void generateLightsFromEntities(void);
 void drawEntities(void);
 void removeEntity(entity_struct* e);
 
+int32 getGridLength(entity_struct* e);
+
 #endif

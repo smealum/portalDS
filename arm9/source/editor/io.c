@@ -115,6 +115,9 @@ bool writeEntity(entity_struct* e, FILE* f)
 		case 8:
 			//emancipation grid
 			{
+				int32 l=getGridLength(e);
+				// NOGBA("L %d",l);
+				fwrite(&l,sizeof(int32),1,f);
 				writeVect(adaptVector(e->position, e->direction), f);
 			}
 			return true;
@@ -322,6 +325,7 @@ void readEntityEditor(FILE* f)
 			break;
 		case 8:
 			//emancipation grid
+			fseek(f, sizeof(int32), SEEK_CUR);
 			readVect(&v, f);
 			break;
 		case 9:

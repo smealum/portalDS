@@ -398,3 +398,49 @@ bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p)
 		|| (t->position.x==p.x && t->position.z==p.z)
 		|| (t->position.z==p.z && t->position.y==p.y);
 }
+
+int32 getGridLength(entity_struct* e)
+{
+	if(!e)return 0;
+
+	vect3D d;
+
+	switch(e->direction)
+	{
+		case 0:
+			d=vect(1,0,0);
+			break;
+		case 1:
+			d=vect(-1,0,0);
+			break;
+		case 2:
+			d=vect(0,1,0);
+			break;
+		case 3:
+			d=vect(0,-1,0);
+			break;
+		case 4:
+			d=vect(0,0,1);
+			break;
+		default:
+			d=vect(0,0,-1);
+	}
+
+	vect3D p;
+	int32 l=1;
+	for(p=addVect(e->position,d);!getBlock(editorRoom.blockArray,p.x,p.y,p.z);p=addVect(p,d))l++;
+
+	switch(e->direction)
+	{
+		case 0: case 1:
+			l*=BLOCKSIZEX;
+			break;
+		case 2: case 3:
+			l*=BLOCKSIZEY;
+			break;
+		case 4: default:
+			l*=BLOCKSIZEZ;
+	}
+
+	return l;
+}

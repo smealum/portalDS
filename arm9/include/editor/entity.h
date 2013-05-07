@@ -17,7 +17,7 @@ struct entity_struct;
 
 typedef void(*entityFunction)(struct entity_struct*);
 typedef void(*entityMoveFunction)(struct entity_struct*, bool);
-typedef bool(*entityMoveCheckFunction)(struct entity_struct*, vect3D);
+typedef bool(*entityMoveCheckFunction)(struct entity_struct*, vect3D, u8 dir);
 
 typedef struct
 {

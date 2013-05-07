@@ -4,7 +4,8 @@ void cubeSpecialInit(entity_struct* e);
 void cubeSpecialMove(entity_struct* e, bool m);
 void dispenserSpecialMove(entity_struct* e, bool m);
 void platformSpecialMove(entity_struct* e, bool m);
-bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p);
+bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
+bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 
 entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballCatcherButtonArray, 2, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1, NULL, NULL, NULL, false, true},
@@ -19,7 +20,7 @@ entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_
 								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, false, false},
 								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
-								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, NULL, false, true}};
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, wallDoorSpecialMoveCheck, false, true}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -162,11 +163,11 @@ entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int
 	return ret;
 }
 
-bool isEntityPositionValid(entity_struct* e, vect3D p)
+bool isEntityPositionValid(entity_struct* e, vect3D p, u8 dir)
 {
 	if(!e)return false;
 
-	if(e->type && e->type->specialMoveCheck && !e->type->specialMoveCheck(e,p))return false;
+	if(e->type && e->type->specialMoveCheck && !e->type->specialMoveCheck(e,p,dir))return false;
 
 	int i;
 	for(i=0;i<NUMENTITIES;i++)
@@ -182,7 +183,7 @@ bool isEntityBlockFaceValid(entity_struct* e, blockFace_struct* bf)
 	entityType_struct* et=e->type;
 	if(!et)return false;
 
-	return (et->possibleDirections & (1<<(bf->direction))) && isEntityPositionValid(e, adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z)));
+	return (et->possibleDirections & (1<<(bf->direction))) && isEntityPositionValid(e, adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z)), bf->direction);
 }
 
 bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)
@@ -381,14 +382,14 @@ void platformSpecialMove(entity_struct* e, bool m)
 	if(!e || !e->target || e==e->target || m)return;
 	entity_struct* t=e->target;
 
-	if(!platformTargetSpecialMoveCheck(t, t->position))
+	if(!platformTargetSpecialMoveCheck(t, t->position, t->direction))
 	{
 		t->target=NULL;
 		removeEntity(t);
 	}
 }
 
-bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p)
+bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir)
 {
 	if(!e || !e->target || e==e->target)return false;
 	entity_struct* t=e->target;
@@ -396,6 +397,30 @@ bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p)
 	return (t->position.x==p.x && t->position.y==p.y)
 		|| (t->position.x==p.x && t->position.z==p.z)
 		|| (t->position.z==p.z && t->position.y==p.y);
+}
+
+bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir)
+{
+	if(!e)return false;
+
+	int i, j, k;
+	s8 v=-1;
+
+	//ugh
+	if(dir<=1)
+	{
+		if(!(dir%2))v=1;
+		if(!(p.x>-v && p.y>1 && p.z>1 && p.x<ROOMARRAYSIZEX+v && p.y<ROOMARRAYSIZEY-1 && p.z<ROOMARRAYSIZEZ-1))return false;
+
+		for(i=0;i<3;i++)for(j=0;j<3;j++)for(k=0;k<3;k++)if(!getBlock(editorRoom.blockArray,p.x+(i-3)*v,p.y+j-1,p.z+k-1))return false;
+	}else{
+		if(!(dir%2))v=1;
+		if(!(p.x>1 && p.y>1 && p.z>-v && p.x<ROOMARRAYSIZEX-1 && p.y<ROOMARRAYSIZEY-1 && p.z<ROOMARRAYSIZEZ+v))return false;
+
+		for(i=0;i<3;i++)for(j=0;j<3;j++)for(k=0;k<3;k++)if(!getBlock(editorRoom.blockArray,p.x+i-1,p.y+j-1,p.z+(k-3)*v))return false;
+	}
+
+	return true;
 }
 
 int32 getGridLength(entity_struct* e)

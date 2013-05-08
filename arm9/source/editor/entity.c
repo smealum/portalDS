@@ -1,5 +1,7 @@
 #include "editor/editor_main.h"
 
+mtlImg_struct* pointTexture;
+
 void cubeSpecialInit(entity_struct* e);
 void wallDoorSpecialDraw(entity_struct* e);
 void cubeSpecialMove(entity_struct* e, bool m);
@@ -52,6 +54,8 @@ void initEntities(void)
 		entity[i].target=NULL;
 	}
 	initEntityTypes();
+
+	pointTexture=createTexture("points.pcx", "textures");
 }
 
 void initEntity(entity_struct* e, entityType_struct* et, vect3D pos, bool placed)
@@ -429,58 +433,83 @@ void wallDoorSpecialDraw(entity_struct* e)
 {
 	if(!e)return;
 
-	GFX_COLOR=RGB15(31,0,0);
+	bindTexture(pointTexture);
+	GFX_COLOR=RGB15(31,31,31);
 	glScalef32(inttof32(3),inttof32(3),inttof32(3));
-	//à la main avec amour
+	//fait main avec amour
+	//animation ?
 	glBegin(GL_TRIANGLES);
-		// GFX_TEX_COORD=mdl->packedTexcoords[mdl->triangles[i].st[j]];
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
 
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
 
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
 		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
 
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(0), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_TEX_COORD=TEXTURE_PACK(inttot16(32), inttot16(0));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
 		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
 }

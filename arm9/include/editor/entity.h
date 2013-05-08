@@ -16,6 +16,7 @@ enum
 struct entity_struct;
 
 typedef void(*entityFunction)(struct entity_struct*);
+typedef void(*entityDrawFunction)(struct entity_struct*);
 typedef void(*entityMoveFunction)(struct entity_struct*, bool);
 typedef bool(*entityMoveCheckFunction)(struct entity_struct*, vect3D, u8 dir);
 
@@ -27,6 +28,7 @@ typedef struct
 	contextButton_struct* contextButtonsArray;
 	u8 numButtons;
 	entityFunction specialInit;
+	entityDrawFunction specialDraw;
 	entityMoveFunction specialMove;
 	entityMoveCheckFunction specialMoveCheck;
 	bool removeTarget, rotate;

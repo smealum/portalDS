@@ -1,26 +1,27 @@
 #include "editor/editor_main.h"
 
 void cubeSpecialInit(entity_struct* e);
+void wallDoorSpecialDraw(entity_struct* e);
 void cubeSpecialMove(entity_struct* e, bool m);
 void dispenserSpecialMove(entity_struct* e, bool m);
 void platformSpecialMove(entity_struct* e, bool m);
 bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 
-entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballCatcherButtonArray, 2, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask, button2ButtonArray, 2, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask, button1ButtonArray, 2, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask, turretButtonArray, 1, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask, cubeButtonArray, 1, cubeSpecialInit, cubeSpecialMove, NULL, true, true},
-								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask, cubeButtonArray, 1, cubeSpecialInit, cubeSpecialMove, NULL, true, true},
-								(entityType_struct){"editor/models/dispenser_ed.md2", "cubedispenser.pcx", mY_mask, cubeButtonArray, 1, NULL, dispenserSpecialMove, NULL, true, true},
-								(entityType_struct){"editor/models/grid_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 2, NULL, platformSpecialMove, NULL, true, false},
-								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, false, false},
-								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
-								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, wallDoorSpecialMoveCheck, false, true}};
+entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballCatcherButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask, button2ButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask, button1ButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask, turretButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask, cubeButtonArray, 1, cubeSpecialInit, NULL, cubeSpecialMove, NULL, true, true},
+								(entityType_struct){"editor/models/cube_ed.md2", "storagecube.pcx", pY_mask, cubeButtonArray, 1, cubeSpecialInit, NULL, cubeSpecialMove, NULL, true, true},
+								(entityType_struct){"editor/models/dispenser_ed.md2", "cubedispenser.pcx", mY_mask, cubeButtonArray, 1, NULL, NULL, dispenserSpecialMove, NULL, true, true},
+								(entityType_struct){"editor/models/grid_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/platform_ed.md2", "platform.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 2, NULL, NULL, platformSpecialMove, NULL, true, false},
+								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, NULL, false, false},
+								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, NULL, wallDoorSpecialMoveCheck, false, true}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -276,6 +277,7 @@ void drawEntity(entity_struct* e)
 		}
 		glTranslate3f32(0,-inttof32(1)/2,0);
 		renderModelFrameInterp(0, 0, 0, &et->model, POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT, false, NULL, RGB15(31,31,31));
+		if(e->type && e->type->specialDraw)e->type->specialDraw(e);
 	glPopMatrix(1);
 }
 
@@ -421,6 +423,66 @@ bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir)
 	}
 
 	return true;
+}
+
+void wallDoorSpecialDraw(entity_struct* e)
+{
+	if(!e)return;
+
+	GFX_COLOR=RGB15(31,0,0);
+	glScalef32(inttof32(3),inttof32(3),inttof32(3));
+	//à la main avec amour
+	glBegin(GL_TRIANGLES);
+		// GFX_TEX_COORD=mdl->packedTexcoords[mdl->triangles[i].st[j]];
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+
+
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+
+
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),0,(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK((1<<5),-2*(1<<5),(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),0,(1<<5));
+
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),-(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
+		GFX_VERTEX10=NORMAL_PACK(-(1<<5),-2*(1<<5),(1<<5));
 }
 
 int32 getGridLength(entity_struct* e)

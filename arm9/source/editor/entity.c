@@ -4,9 +4,10 @@ mtlImg_struct* pointTexture;
 
 void cubeSpecialInit(entity_struct* e);
 void wallDoorSpecialDraw(entity_struct* e);
-void cubeSpecialMove(entity_struct* e, bool m);
-void dispenserSpecialMove(entity_struct* e, bool m);
-void platformSpecialMove(entity_struct* e, bool m);
+void cubeSpecialMove(entity_struct* e, vect3D op, u8 od, bool m);
+void dispenserSpecialMove(entity_struct* e, vect3D op, u8 od, bool m);
+void platformSpecialMove(entity_struct* e, vect3D op, u8 od, bool m);
+void wallDoorSpecialMove(entity_struct* e, vect3D op, u8 od, bool m);
 bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 
@@ -23,7 +24,8 @@ entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_
 								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, NULL, false, false},
 								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
-								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, NULL, wallDoorSpecialMoveCheck, false, true}};
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, wallDoorSpecialMove, wallDoorSpecialMoveCheck, false, true},
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, wallDoorSpecialMove, wallDoorSpecialMoveCheck, false, true}};
 
 entity_struct entity[NUMENTITIES];
 
@@ -198,12 +200,14 @@ bool moveEntityToBlockFace(entity_struct* e, blockFace_struct* bf)
 	if(!isEntityBlockFaceValid(e,bf)){return false;}
 
 	vect3D op=e->position;
+	u8 od=e->direction;
+
 	e->position=adjustVectForNormal(bf->direction, vect(bf->x,bf->y,bf->z));
 	e->direction=bf->direction;
 	e->blockFace=bf;
 	e->placed=true;
 
-	if(e->type && e->type->specialMove)e->type->specialMove(e, op.x==e->position.x && op.y==e->position.y && op.z==e->position.z);
+	if(e->type && e->type->specialMove)e->type->specialMove(e, op, od, op.x==e->position.x && op.y==e->position.y && op.z==e->position.z && od==e->direction);
 
 	return true;
 }
@@ -350,10 +354,10 @@ void cubeSpecialInit(entity_struct* e)
 	t->target=e;
 	e->target=t;
 
-	if(e->placed)cubeSpecialMove(e, false);
+	if(e->placed)cubeSpecialMove(e, e->position, e->direction, false);
 }
 
-void cubeSpecialMove(entity_struct* e, bool m)
+void cubeSpecialMove(entity_struct* e, vect3D op, u8 od, bool m)
 {
 	if(!e || !e->target || e==e->target)return;
 	entity_struct* t=e->target;
@@ -368,7 +372,7 @@ void cubeSpecialMove(entity_struct* e, bool m)
 	t->blockFace=getEntityBlockFace(t, editorRoom.blockFaceList);
 }
 
-void dispenserSpecialMove(entity_struct* e, bool m)
+void dispenserSpecialMove(entity_struct* e, vect3D op, u8 od, bool m)
 {
 	if(!e || !e->target || e==e->target)return;
 	entity_struct* t=e->target;
@@ -383,7 +387,7 @@ void dispenserSpecialMove(entity_struct* e, bool m)
 	t->blockFace=getEntityBlockFace(t, editorRoom.blockFaceList);
 }
 
-void platformSpecialMove(entity_struct* e, bool m)
+void platformSpecialMove(entity_struct* e, vect3D op, u8 od, bool m)
 {
 	if(!e || !e->target || e==e->target || m)return;
 	entity_struct* t=e->target;
@@ -403,6 +407,22 @@ bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir)
 	return (t->position.x==p.x && t->position.y==p.y)
 		|| (t->position.x==p.x && t->position.z==p.z)
 		|| (t->position.z==p.z && t->position.y==p.y);
+}
+
+void wallDoorSpecialMove(entity_struct* e, vect3D op, u8 od, bool m)
+{
+	if(!e || m)return;
+
+	vect3D p=vectDifference(op,adjustVectForNormal(od, vect(0,0,0)));
+	u8 v=getBlock(editorRoom.blockArray,p.x,p.y,p.z);
+
+	v=v&(~BLOCK_NOWALLS);
+
+	setBlock(editorRoom.blockArray,p.x,p.y,p.z,v);
+
+	p=vectDifference(e->position,adjustVectForNormal(e->direction, vect(0,0,0)));
+
+	setBlock(editorRoom.blockArray,p.x,p.y,p.z,getBlock(editorRoom.blockArray,p.x,p.y,p.z)|BLOCK_NOWALLS);
 }
 
 bool wallDoorSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir)

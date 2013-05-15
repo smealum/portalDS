@@ -393,6 +393,8 @@ void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, b
 
 vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMULTY,v.z*BLOCKMULTZ};}
 
+static inline bool isWall(u8 v1, u8 v2){return (v1 && !v2) && !(v1&BLOCK_NOWALLS) && !(v2&BLOCK_NOWALLS);}
+
 rectangleList_struct generateOptimizedRectangles(u8* ba)
 {
 	rectangleList_struct rl;
@@ -416,8 +418,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			for(j=0;j<ROOMARRAYSIZEY;j++)
 			{
 				const u8 v=getBlock(ba,i,j,k);
-				*d1=v&&!getBlock(ba,i+1,j,k);
-				*d2=v&&!getBlock(ba,i-1,j,k);
+				*d1=isWall(v,getBlock(ba,i+1,j,k));
+				*d2=isWall(v,getBlock(ba,i-1,j,k));
 
 				if((v>>1)&1)*d1=2;
 				if((v>>2)&1)*d2=2;
@@ -477,8 +479,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			for(i=0;i<ROOMARRAYSIZEX;i++)
 			{
 				const u8 v=getBlock(ba,i,j,k);
-				*d1=v&&!getBlock(ba,i,j+1,k);
-				*d2=v&&!getBlock(ba,i,j-1,k);
+				*d1=isWall(v,getBlock(ba,i,j+1,k));
+				*d2=isWall(v,getBlock(ba,i,j-1,k));
 
 				if((v>>3)&1)*d1=2;
 				if((v>>4)&1)*d2=2;
@@ -539,8 +541,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 			for(i=0;i<ROOMARRAYSIZEX;i++)
 			{
 				const u8 v=getBlock(ba,i,j,k);
-				*d1=v&&!getBlock(ba,i,j,k+1);
-				*d2=v&&!getBlock(ba,i,j,k-1);
+				*d1=isWall(v,getBlock(ba,i,j,k+1));
+				*d2=isWall(v,getBlock(ba,i,j,k-1));
 
 				if((v>>5)&1)*d1=2;
 				if((v>>6)&1)*d2=2;

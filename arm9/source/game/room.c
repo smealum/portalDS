@@ -173,6 +173,13 @@ void readEntity(u8 i, FILE* f)
 				fread(&target, sizeof(s16), 1, f);
 			}
 			return;
+		case 13:
+			//wall door (start)
+			{
+				vect3D p; readVect(&p,f);
+				setupWallDoor(NULL, &entryWallDoor, p, 0); //TEMP
+			}
+			return;
 		default:
 			break;
 	}

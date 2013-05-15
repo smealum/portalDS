@@ -62,6 +62,7 @@ void initGame(void)
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
 	
+	initWallDoors();
 	initTurrets();
 	initBigButtons();
 	initEnergyBalls();
@@ -220,6 +221,7 @@ static inline void render1(void)
 			drawEmancipators();
 			drawEmancipationGrids();
 			drawDoors();
+			drawWallDoors();
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
@@ -272,6 +274,7 @@ static inline void render2(void)
 		drawEmancipators();
 		drawEmancipationGrids();
 		drawDoors();
+		drawWallDoors();
 
 	glPopMatrix(1);
 	

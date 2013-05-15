@@ -150,6 +150,12 @@ bool writeEntity(entity_struct* e, FILE* f)
 				fwrite(&target, sizeof(s16), 1, f);
 			}
 			return true;
+		case 13:
+			//wall door (start)
+			{
+				writeVect(adaptVector(e->position, e->direction), f);
+			}
+			return true;
 		default:
 			return true;
 	}
@@ -357,6 +363,10 @@ void readEntityEditor(FILE* f)
 				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
 			}
 			return;
+		case 13:
+			//wall door (start)
+			readVect(&v, f);
+			break;
 		default:
 			removeEntity(e);
 			break;

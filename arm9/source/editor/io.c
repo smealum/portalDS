@@ -154,6 +154,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 			//wall door (start)
 			{
 				writeVect(adaptVector(e->position, e->direction), f);
+				fwrite(&e->direction,sizeof(u8),1,f);
 			}
 			return true;
 		default:
@@ -366,6 +367,7 @@ void readEntityEditor(FILE* f)
 		case 13:
 			//wall door (start)
 			readVect(&v, f);
+			fseek(f, sizeof(u8), SEEK_CUR);
 			break;
 		default:
 			removeEntity(e);

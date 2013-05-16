@@ -178,6 +178,7 @@ static inline void render1(void)
 		updateEmancipators();
 		updateEmancipationGrids();
 		updateDoors();
+		updateWallDoors();
 	// iprintf("updates : %d  \n",cpuEndSlice());
 	
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);

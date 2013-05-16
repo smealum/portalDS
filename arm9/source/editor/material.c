@@ -161,7 +161,7 @@ void bindMaterialSlice(materialSlice_struct* ms, bool DL)
 
 void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32* t, vect3D* v)
 {
-	if(!t || !v)return;
+	if(!v)return;
 	if(!ms)ms=defaultMaterialSlice;
 	if(!ms->img)return;
 	vect3D p1=vect(0,0,0), p2;
@@ -199,10 +199,14 @@ void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32
 		v[3]=vect(p2.x, p2.y, 0);
 		v[2]=vect(p2.x, p1.y, 0);
 	}
-	t[0]=TEXTURE_PACK(v[0].x,v[0].y);
-	t[1]=TEXTURE_PACK(v[1].x,v[1].y);
-	t[2]=TEXTURE_PACK(v[2].x,v[2].y);
-	t[3]=TEXTURE_PACK(v[3].x,v[3].y);	
+
+	if(t)
+	{
+		t[0]=TEXTURE_PACK(v[0].x,v[0].y);
+		t[1]=TEXTURE_PACK(v[1].x,v[1].y);
+		t[2]=TEXTURE_PACK(v[2].x,v[2].y);
+		t[3]=TEXTURE_PACK(v[3].x,v[3].y);
+	}
 }
 
 char** getMaterialList(int* m, int** cl)
@@ -233,13 +237,19 @@ void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, vect3D* v
 {
 	if(!m)m=defaultMaterial;
 	if(!m->used)return;
-	materialSlice_struct* ms=m->side;
-	if(!rec->size.y)
+	if(!rec)
 	{
-		if(rec->normal.y>0)ms=m->top;
-		else ms=m->bottom;
+		materialSlice_struct* ms=m->side;
+		bindMaterialSlice(ms, DL);
+	}else{
+		materialSlice_struct* ms=m->side;
+		if(!rec->size.y)
+		{
+			if(rec->normal.y>0)ms=m->top;
+			else ms=m->bottom;
+		}
+		unbindMtl();
+		bindMaterialSlice(ms, DL);
+		getTextureCoordSlice(ms,rec,t,v);
 	}
-	unbindMtl();
-	bindMaterialSlice(ms, DL);
-	getTextureCoordSlice(ms,rec,t,v);
 }

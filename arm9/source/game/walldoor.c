@@ -66,6 +66,7 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 
 	//elevator
 	initElevator(&wd->elevator, r, addVect(position,vectMultInt(wallDoorV2[wd->orientation],5)), orientation, true);
+	setElevatorArriving(&wd->elevator,4096);
 }
 
 bool pointInWallDoorRoom(wallDoor_struct* wd, vect3D p)
@@ -90,6 +91,7 @@ void updateWallDoor(wallDoor_struct* wd)
 			changeAnimation(&wd->modelInstance, 2, false);
 			changeAnimation(&wd->modelInstance, 1, true);
 		}
+		updateElevator(&wd->elevator);
 	}else{
 		if(wd->modelInstance.currentAnim==2)
 		{
@@ -105,7 +107,6 @@ void updateWallDoor(wallDoor_struct* wd)
 	}
 
 	updateAnimation(&wd->modelInstance);
-	updateElevator(&wd->elevator);
 }
 
 void updateWallDoors(void)

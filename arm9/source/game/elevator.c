@@ -1,6 +1,6 @@
 #include "game/game_main.h"
 
-#define ELEVATOR_SPEED (128)
+#define ELEVATOR_SPEED (64)
 
 md2Model_struct elevatorModel;
 md2Model_struct elevatorFrameModel;
@@ -31,6 +31,8 @@ void setElevatorArriving(elevator_struct* ev, int32 distance)
 
 	ev->state=ELEVATOR_ARRIVING;
 	ev->progress=distance;
+
+	updateElevator(ev);
 }
 
 void updateElevator(elevator_struct* ev)
@@ -50,14 +52,14 @@ void updateElevator(elevator_struct* ev)
 			}else ev->progress-=ELEVATOR_SPEED;
 			break;
 		case ELEVATOR_OPENING:
-			ev->progress-=0;
+			ev->progress=0;
 			if(ev->modelInstance.currentAnim==2)ev->state=ELEVATOR_OPEN;
 			break;
 		case ELEVATOR_OPEN:
-			ev->progress-=0;
+			ev->progress=0;
 			break;
 		case ELEVATOR_CLOSING:
-			ev->progress-=0;
+			ev->progress=0;
 			if(ev->modelInstance.currentAnim==0)ev->state=ELEVATOR_LEAVING;
 			break;
 		case ELEVATOR_LEAVING:
@@ -65,6 +67,10 @@ void updateElevator(elevator_struct* ev)
 			ev->progress+=ELEVATOR_SPEED;
 			break;
 	}
+
+	bool up=(ev->direction&ELEVATOR_UPDOWNBIT)!=0;
+	ev->realPosition=ev->position;
+	ev->realPosition.y+=up?(ev->progress):(-ev->progress);
 
 	updateAnimation(&ev->modelInstance);
 }
@@ -99,6 +105,5 @@ void drawElevator(elevator_struct* ev)
 		bool up=(ev->direction&ELEVATOR_UPDOWNBIT)!=0;
 		glTranslate3f32(0,up?(ev->progress):(-ev->progress),0);
 		renderModelFrameInterp(ev->modelInstance.currentFrame,ev->modelInstance.nextFrame,ev->modelInstance.interpCounter,ev->modelInstance.model,params,false,ev->modelInstance.palette,RGB15(31,31,31));
-		NOGBA("%d",ev->modelInstance.currentFrame);
 	glPopMatrix(1);
 }

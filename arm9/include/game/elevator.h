@@ -2,6 +2,7 @@
 #define ELEVATOR_H
 
 #define ELEVATOR_UPDOWNBIT (4)
+#define ELEVATOR_SIZE (TILESIZE*3)
 
 typedef enum
 {
@@ -14,7 +15,7 @@ typedef enum
 
 typedef struct
 {
-	vect3D position;
+	vect3D position, realPosition;
 	int32 progress;
 	u8 direction;
 	modelInstance_struct modelInstance;

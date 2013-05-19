@@ -179,6 +179,22 @@ void readEntity(u8 i, FILE* f)
 				vect3D p; readVect(&p,f);
 				u8 o; fread(&o,sizeof(u8),1,f);
 				setupWallDoor(NULL, &entryWallDoor, p, o);
+				if(entryWallDoor.used)
+				{
+					getPlayer()->object->position=addVect(entryWallDoor.elevator.realPosition,vect(0,PLAYERRADIUS*5,0));
+					switch(o)
+					{
+						case 0:
+							rotateCamera(NULL, vect(0,-8192,0));
+							break;
+						case 1:
+							rotateCamera(NULL, vect(0,8192,0));
+							break;
+						case 5:
+							rotateCamera(NULL, vect(0,8192*2,0));
+							break;
+					}
+				}
 			}
 			return;
 		default:

@@ -108,9 +108,28 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 	return ret;
 }
 
+bool collideRectangle(physicsObject_struct* o, room_struct* r, vect3D p, vect3D s)
+{
+	if(!o||!r)return false;
+	vect3D o2=getClosestPointRectangle(p,s,o->position);
+	vect3D v=vectDifference(o2,o->position);
+	int32 gval=dotProduct(v,normGravityVector);
+	vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
+	int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
+	if(sqd<o->sqRadius)
+	{
+		int32 sqd=(v2.x*v2.x)+(v2.y*v2.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
+		u32 d=sqrtf32((sqd));
+		v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
+		o->position=addVect(o->position,v);
+		return true;
+	}
+	return false;
+}
+
 bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 {	
-	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+	// vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
 	// o1.y-=128; //make ourselves taller
 	
 	bool ret=false;
@@ -123,25 +142,18 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	int i;
 	for(i=0;i<NUMPLATFORMS;i++)
 	{
-		if(platform[i].used) //add culling
+		if(platform[i].used && collideRectangle(o,r,addVect(platform[i].position,vect(-PLATFORMSIZE,0,-PLATFORMSIZE)),vect(PLATFORMSIZE*2,0,PLATFORMSIZE*2))) //add culling
 		{
-			platform_struct* pf=&platform[i];
-			vect3D o2=getClosestPointRectangle(addVect(pf->position,vect(-PLATFORMSIZE,0,-PLATFORMSIZE)),vect(PLATFORMSIZE*2,0,PLATFORMSIZE*2),o->position);
-			vect3D v=vectDifference(o2,o->position);
-			int32 gval=dotProduct(v,normGravityVector);
-			vect3D v2=vectDifference(v,vectMult(normGravityVector,gval));
-			int32 sqd=mulf32(v2.x,v2.x)+mulf32(v2.y,v2.y)+mulf32(v2.z,v2.z)+divf32(mulf32(gval,gval),transY);
-			if(sqd<o->sqRadius)
-			{
-				int32 sqd=(v2.x*v2.x)+(v2.y*v2.y)+(v2.z*v2.z)+divf32(gval*gval,transY);
-				u32 d=sqrtf32((sqd));
-				v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
-				o->position=addVect(o->position,v);
-				o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
-				pf->touched=true;
-				ret=true;
-			}
+			platform[i].touched=true;
+			ret=true;
 		}
+	}
+
+	//elevators
+	if(entryWallDoor.used)
+	{
+		elevator_struct* ev=&entryWallDoor.elevator;
+		if(collideRectangle(o,r,addVect(ev->realPosition,vect(-ELEVATOR_SIZE/2,0,-ELEVATOR_SIZE/2)),vect(ELEVATOR_SIZE,0,ELEVATOR_SIZE)))ret=true;
 	}
 	
 	return ret;

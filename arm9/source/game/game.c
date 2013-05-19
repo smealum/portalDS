@@ -62,6 +62,7 @@ void initGame(void)
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
 	
+	initElevators();
 	initWallDoors();
 	initTurrets();
 	initBigButtons();

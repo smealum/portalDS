@@ -23,7 +23,7 @@
 #include "game/energyball.h"
 #include "game/bigbutton.h"
 #include "game/emancipation.h"
-#include "game/walldoor.h"
 #include "game/elevator.h"
+#include "game/walldoor.h"
 
 #endif

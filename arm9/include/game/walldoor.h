@@ -9,6 +9,7 @@ typedef struct
 	modelInstance_struct modelInstance;
 	material_struct* frameMaterial;
 	rectangle_struct* rectangle;
+	elevator_struct elevator;
 	bool used;
 }wallDoor_struct;
 

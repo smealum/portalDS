@@ -309,12 +309,12 @@ void generateBlockFace(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z, u8 dir)
 	bool add=false;
 	switch(dir)
 	{
-		case 0: add=!getBlock(ba,x+1,y,z); break;
-		case 1: add=!getBlock(ba,x-1,y,z); break;
-		case 2: add=!getBlock(ba,x,y+1,z); break;
-		case 3: add=!getBlock(ba,x,y-1,z); break;
-		case 4: add=!getBlock(ba,x,y,z+1); break;
-		case 5: add=!getBlock(ba,x,y,z-1); break;
+		case 0: add=!(getBlock(ba,x+1,y,z)&1); break;
+		case 1: add=!(getBlock(ba,x-1,y,z)&1); break;
+		case 2: add=!(getBlock(ba,x,y+1,z)&1); break;
+		case 3: add=!(getBlock(ba,x,y-1,z)&1); break;
+		case 4: add=!(getBlock(ba,x,y,z+1)&1); break;
+		case 5: add=!(getBlock(ba,x,y,z-1)&1); break;
 	}
 	if(add)addBlockFace(l, createBlockFace(x,y,z,dir));
 }
@@ -393,7 +393,7 @@ void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, b
 
 vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMULTY,v.z*BLOCKMULTZ};}
 
-static inline bool isWall(u8 v1, u8 v2){return (v1 && !v2) && !(v1&BLOCK_NOWALLS) && !(v2&BLOCK_NOWALLS);}
+static inline bool isWall(u8 v1, u8 v2){return ((v1&1) && !(v2&1)) && !(v1&BLOCK_NOWALLS) && !(v2&BLOCK_NOWALLS);}
 
 rectangleList_struct generateOptimizedRectangles(u8* ba)
 {
@@ -421,8 +421,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 				*d1=isWall(v,getBlock(ba,i+1,j,k));
 				*d2=isWall(v,getBlock(ba,i-1,j,k));
 
-				if((v>>1)&1)*d1=2;
-				if((v>>2)&1)*d2=2;
+				if(*d1 && (v>>1)&1)*d1=2;
+				if(*d2 && (v>>2)&1)*d2=2;
 
 				if(*d1==1)cnt1++;
 				else if(*d1==2)cnt12++;
@@ -482,8 +482,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 				*d1=isWall(v,getBlock(ba,i,j+1,k));
 				*d2=isWall(v,getBlock(ba,i,j-1,k));
 
-				if((v>>3)&1)*d1=2;
-				if((v>>4)&1)*d2=2;
+				if(*d1 && (v>>3)&1)*d1=2;
+				if(*d2 && (v>>4)&1)*d2=2;
 
 				if(*d1==1)cnt1++;
 				else if(*d1==2)cnt12++;
@@ -544,8 +544,8 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 				*d1=isWall(v,getBlock(ba,i,j,k+1));
 				*d2=isWall(v,getBlock(ba,i,j,k-1));
 
-				if((v>>5)&1)*d1=2;
-				if((v>>6)&1)*d2=2;
+				if(*d1 && (v>>5)&1)*d1=2;
+				if(*d2 && (v>>6)&1)*d2=2;
 
 				if(*d1==1)cnt1++;
 				else if(*d1==2)cnt12++;

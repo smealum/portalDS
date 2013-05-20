@@ -190,7 +190,7 @@ void readEntity(u8 i, FILE* f)
 						case 1:
 							rotateCamera(NULL, vect(0,8192,0));
 							break;
-						case 5:
+						case 4:
 							rotateCamera(NULL, vect(0,8192*2,0));
 							break;
 					}

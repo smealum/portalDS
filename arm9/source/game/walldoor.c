@@ -60,9 +60,9 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 	if(wd->rectangle){wd->rectangle->hide=true;}
 
 	//room walls
-	// rec.position=addVect(position,vectDifference(vect(0,-4,0),vectMultInt(wallDoorV1[orientation],3)));rec.size=addVect(vectMultInt(wallDoorV1[orientation],6),vectMultInt(wallDoorV2[orientation],6));rec.normal=vect(0,inttof32(1),0);
-	// recp=addRoomRectangle(r, rec, NULL, false);
-	// if(recp){recp->hide=true;}
+	rec.position=addVect(position,vectDifference(vect(0,-4,0),vectMultInt(wallDoorV1[orientation],3)));rec.size=addVect(vectMultInt(wallDoorV1[orientation],6),vectMultInt(wallDoorV2[orientation],6));rec.normal=vect(0,inttof32(1),0);
+	recp=addRoomRectangle(r, rec, NULL, false);
+	if(recp){recp->hide=true;}
 
 	//elevator
 	initElevator(&wd->elevator, r, addVect(position,vectMultInt(wallDoorV2[wd->orientation],5)), orientation, true);
@@ -74,8 +74,8 @@ bool pointInWallDoorRoom(wallDoor_struct* wd, vect3D p)
 	if(!wd)return false;
 	int32 v1=dotProduct(vectDifference(p,wd->gridPosition),vectMultInt(wallDoorV1[wd->orientation],inttof32(1)));
 	int32 v2=dotProduct(vectDifference(p,wd->gridPosition),vectMultInt(wallDoorV2[wd->orientation],inttof32(1)));
-	return (v1<=3)&&(wd->gridPosition.y-12<=p.y)&&(v2<=6)
-		&& (v1>=-3)&&(wd->gridPosition.y+12>=p.y)&&(v2>=0);
+	return (v1<=3)&&(wd->gridPosition.y-12-2<=p.y)&&(v2<=6)
+		&& (v1>=-3)&&(wd->gridPosition.y+12+2>=p.y)&&(v2>0);
 }
 
 void updateWallDoor(wallDoor_struct* wd)

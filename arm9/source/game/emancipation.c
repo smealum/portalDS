@@ -209,7 +209,7 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 			glVertex3v16(0, inttof32(1), 0);
 			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE, 0*16);
 			glVertex3v16(inttof32(1), inttof32(1), 0);
-			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE*16, 256*16);
+			GFX_TEX_COORD = TEXTURE_PACK(l*32*16/TILESIZE, 256*16);
 			glVertex3v16(inttof32(1), -inttof32(1), 0);
 			GFX_TEX_COORD = TEXTURE_PACK(0*16, 256*16);
 			glVertex3v16(0, -inttof32(1), 0);

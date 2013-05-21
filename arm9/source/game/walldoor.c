@@ -2,6 +2,8 @@
 
 #define DOORFRAMELENGTH (8)
 
+room_struct elevatorRoom;
+
 wallDoor_struct entryWallDoor;
 md2Model_struct wallDoorModel;
 
@@ -38,6 +40,8 @@ void initWallDoors(void)
 	//TEMP ?
 	loadMd2Model("models/door.md2", "door.pcx", &wallDoorModel);
 	generateModelDisplayLists(&wallDoorModel, false, true);
+
+	newReadMap("elevatorroom.map", &elevatorRoom, 0);
 }
 
 void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orientation)

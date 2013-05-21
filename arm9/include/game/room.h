@@ -49,7 +49,7 @@ void drawRoomEdits(void);
 void wipeMapEdit(void);
 void writeMap(char* filename);
 void readMap(char* filename, room_struct* r);
-void newReadMap(char* filename, room_struct* r);
+void newReadMap(char* filename, room_struct* r, u8 flags);
 
 void generateLightmaps(room_struct* r, lightingData_struct* ld);
 

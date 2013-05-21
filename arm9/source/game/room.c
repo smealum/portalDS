@@ -277,14 +277,14 @@ void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
 	}
 }
 
-void newReadMap(char* filename, room_struct* r)
+void newReadMap(char* filename, room_struct* r, u8 flags)
 {
 	if(!r)r=&gameRoom;
 	char fn[1024];
 	FILE* f=NULL;
 
 	//DEBUG DEBUG DEBUG
-	f=fopen("fat:/test.map","rb");
+	if(flags&(1<<7))f=fopen("fat:/test.map","rb");
 
 	if(!f)
 	{
@@ -322,12 +322,18 @@ void newReadMap(char* filename, room_struct* r)
 		readRectangles(r, f);
 
 	//lighting stuff
-	fseek(f, h.lightPosition, SEEK_SET);
-		readLightingData(r, &r->lightingData, f);
+	if(flags&(1))
+	{
+		fseek(f, h.lightPosition, SEEK_SET);
+			readLightingData(r, &r->lightingData, f);
+	}
 
 	//entities
-	fseek(f, h.entityPosition, SEEK_SET);
-		readEntities(f);
+	if(flags&(1<<1))
+	{
+		fseek(f, h.entityPosition, SEEK_SET);
+			readEntities(f);
+	}
 	
 	fclose(f);
 }

@@ -105,7 +105,8 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 		if(!(orientation%2))invertRectangle(&rec);
 
 		rec.position=addVect(rec.position,v);
-		addRoomRectangle(r1, rec, rec.material, rec.portalable);	
+		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);	
+		if(recp)recp->collides=!rec.portalable;
 		lc=lc->next;
 	}
 }

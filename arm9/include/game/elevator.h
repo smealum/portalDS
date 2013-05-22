@@ -16,6 +16,7 @@ typedef enum
 typedef struct
 {
 	vect3D position, realPosition;
+	rectangle_struct* doorSurface;
 	int32 progress;
 	u8 direction;
 	modelInstance_struct modelInstance;

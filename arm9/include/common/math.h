@@ -42,6 +42,16 @@ static inline vect3D evalVectMatrix33(int32* m, vect3D v) //3x3
 				(mulf32(v.x,m[6])+mulf32(v.y,m[7])+mulf32(v.z,m[8])));
 }
 
+static inline vect3D minVect(vect3D u, vect3D v)
+{
+	return vect(min(u.x,v.x),min(u.y,v.y),min(u.z,v.z));
+}
+
+static inline vect3D maxVect(vect3D u, vect3D v)
+{
+	return vect(max(u.x,v.x),max(u.y,v.y),max(u.z,v.z));
+}
+
 static inline vect3D addVect(vect3D p1, vect3D p2)
 {
 	return vect(p1.x+p2.x,p1.y+p2.y,p1.z+p2.z);

@@ -10,6 +10,106 @@ void drawRoomsGame(u8 mode, u16 color)
 	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color);
 }
 
+void roomOriginSize(room_struct* r, vect3D* o, vect3D* s)
+{
+	if(!r || (!o && !s))return;
+
+	vect3D m=vect(8192,8192,8192); vect3D M=vect(0,0,0);
+
+	listCell_struct *lc=r->rectangles.first;
+
+	while(lc)
+	{
+		m=minVect(lc->data.position,m);
+		m=minVect(addVect(lc->data.position,lc->data.size),m);
+		M=maxVect(lc->data.position,M);
+		M=maxVect(addVect(lc->data.position,lc->data.size),M);
+		NOGBA("%d",lc->data.position.y);
+		lc=lc->next;
+	}
+
+	if(o)*o=m;
+	if(s)*s=vectDifference(M,m);
+}
+
+vect3D orientVector(vect3D v, u8 k)
+{
+	vect3D u;
+
+	switch(k)
+	{
+		case 1:
+			u.x=v.z;
+			u.y=v.y;
+			u.z=-v.x;
+			break;
+		case 2:
+			u.x=-v.z;
+			u.y=v.y;
+			u.z=v.x;
+			break;
+		case 4:
+			u.x=v.x;
+			u.y=v.y;
+			u.z=-v.z;
+			break;
+		default:
+			u=v;
+			break;
+	}
+
+	return u;
+}
+
+void invertRectangle(rectangle_struct* rec)
+{
+	if(!rec)return;
+
+	if(rec->size.x)
+	{
+		rec->position.x+=rec->size.x;
+		rec->size.x=-rec->size.x;
+	}else{
+		rec->position.y+=rec->size.y;
+		rec->size.y=-rec->size.y;
+	}
+}
+
+void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
+{
+	if(!r1 || !r2)return;
+
+	listCell_struct *lc=r2->rectangles.first;
+
+	vect3D o=vect(0,0,0), s=vect(0,0,0);
+	roomOriginSize(r2,&o,&s);
+
+	switch(orientation)
+	{
+		case 4:
+			v.x-=s.x/2;
+			break;
+		default:
+			break;
+	}
+	v.y-=4;
+
+	while(lc)
+	{
+		rectangle_struct rec=lc->data;
+		rec.position=vectDifference(rec.position,o);
+
+		//rotate
+		rec.position=orientVector(rec.position,orientation);
+		rec.size=orientVector(rec.size,orientation);
+		if(!(orientation%2))invertRectangle(&rec);
+
+		rec.position=addVect(rec.position,v);
+		addRoomRectangle(r1, rec, rec.material, rec.portalable);	
+		lc=lc->next;
+	}
+}
+
 //READ AREA
 
 extern char* basePath;

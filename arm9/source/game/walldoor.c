@@ -55,6 +55,8 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 	wd->orientation=orientation;
 	wd->frameMaterial=getMaterial(1);
 
+	NOGBA("ORIENTATION %d",orientation);
+
 	rectangle_struct rec;
 	rectangle_struct* recp;
 	//door wall
@@ -71,6 +73,9 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 	//elevator
 	initElevator(&wd->elevator, r, addVect(position,vectMultInt(wallDoorV2[wd->orientation],5)), orientation, true);
 	setElevatorArriving(&wd->elevator,2048);
+
+	//elevator room
+	insertRoom(r,&elevatorRoom,position,orientation);
 }
 
 bool pointInWallDoorRoom(wallDoor_struct* wd, vect3D p)

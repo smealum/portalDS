@@ -51,6 +51,9 @@ void writeMap(char* filename);
 void readMap(char* filename, room_struct* r);
 void newReadMap(char* filename, room_struct* r, u8 flags);
 
+void roomOriginSize(room_struct* r, vect3D* o, vect3D* s);
+void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation);
+
 void generateLightmaps(room_struct* r, lightingData_struct* ld);
 
 void generateVertexLighting(room_struct* r, lightingData_struct* ld);

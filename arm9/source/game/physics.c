@@ -127,6 +127,19 @@ bool collideRectangle(physicsObject_struct* o, room_struct* r, vect3D p, vect3D 
 	return false;
 }
 
+bool checkObjectElevatorCollision(physicsObject_struct* o, room_struct* r, elevator_struct* ev)
+{
+	if(!o || !r || !ev)return false;
+
+	bool ret=false;
+
+	if(collideRectangle(o,r,addVect(ev->realPosition,vect(-ELEVATOR_SIZE/2,0,-ELEVATOR_SIZE/2)),vect(ELEVATOR_SIZE,0,ELEVATOR_SIZE)))ret=true;
+
+	int32 v=sqMagnitude(vect(o->position.x-ev->position.x,0,o->position.z-ev->position.z));
+
+	return ret;
+}
+
 bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 {	
 	// vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
@@ -150,11 +163,7 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	}
 
 	//elevators
-	if(entryWallDoor.used)
-	{
-		elevator_struct* ev=&entryWallDoor.elevator;
-		if(collideRectangle(o,r,addVect(ev->realPosition,vect(-ELEVATOR_SIZE/2,0,-ELEVATOR_SIZE/2)),vect(ELEVATOR_SIZE,0,ELEVATOR_SIZE)))ret=true;
-	}
+	if(entryWallDoor.used && checkObjectElevatorCollision(o,r,&entryWallDoor.elevator))ret=true;
 	
 	return ret;
 }

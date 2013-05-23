@@ -66,7 +66,7 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 	if(wd->rectangle){wd->rectangle->hide=true;}
 
 	//elevator
-	initElevator(&wd->elevator, r, addVect(position,vectMultInt(wallDoorV2[wd->orientation],5)), orientation, true);
+	initElevator(&wd->elevator, r, addVect(position,vectMultInt(wallDoorV2[wd->orientation],7)), orientation, true);
 	setElevatorArriving(&wd->elevator,2048);
 
 	//elevator room

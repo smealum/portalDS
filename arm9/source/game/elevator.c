@@ -28,22 +28,22 @@ void initElevator(elevator_struct* ev, room_struct* r, vect3D position, u8 direc
 	rectangle_struct rec;
 	rectangle_struct* recp;
 	
-	rec.position=addVect(position,vect(-1,-4,-1));rec.size=vect(0,20,2);rec.normal=vect(inttof32(1),0,0);
-	recp=addRoomRectangle(r, rec, NULL, false);
-	if(recp){recp->hide=true;}
+	// rec.position=addVect(position,vect(-1,-4,-1));rec.size=vect(0,20,2);rec.normal=vect(inttof32(1),0,0);
+	// recp=addRoomRectangle(r, rec, NULL, false);
+	// if(recp){recp->hide=true;}
 	
-	rec.position=addVect(position,vect(-1,-4,-1));rec.size=vect(2,20,0);rec.normal=vect(0,0,inttof32(1));
-	recp=addRoomRectangle(r, rec, NULL, false);
-	if(recp){recp->hide=true;}
+	// rec.position=addVect(position,vect(-1,-4,-1));rec.size=vect(2,20,0);rec.normal=vect(0,0,inttof32(1));
+	// recp=addRoomRectangle(r, rec, NULL, false);
+	// if(recp){recp->hide=true;}
 	
-	rec.position=addVect(position,vect(1,-4,1));rec.size=vect(0,20,-2);rec.normal=vect(inttof32(1),0,0);
-	recp=addRoomRectangle(r, rec, NULL, false);
-	if(recp){recp->hide=true;}
+	// rec.position=addVect(position,vect(1,-4,1));rec.size=vect(0,20,-2);rec.normal=vect(inttof32(1),0,0);
+	// recp=addRoomRectangle(r, rec, NULL, false);
+	// if(recp){recp->hide=true;}
 
-	rec.position=addVect(position,vect(1,-4,1));rec.size=vect(-2,20,0);rec.normal=vect(0,0,inttof32(1));
-	recp=addRoomRectangle(r, rec, NULL, false);
-	if(recp){recp->hide=true;}
-	if(direction==4)ev->doorSurface=recp;
+	// rec.position=addVect(position,vect(1,-4,1));rec.size=vect(-2,20,0);rec.normal=vect(0,0,inttof32(1));
+	// recp=addRoomRectangle(r, rec, NULL, false);
+	// if(recp){recp->hide=true;}
+	// if(direction==4)ev->doorSurface=recp;
 }
 
 void setElevatorArriving(elevator_struct* ev, int32 distance)

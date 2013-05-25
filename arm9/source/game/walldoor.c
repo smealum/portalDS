@@ -41,7 +41,7 @@ void initWallDoors(void)
 	loadMd2Model("models/door.md2", "door.pcx", &wallDoorModel);
 	generateModelDisplayLists(&wallDoorModel, false, true);
 
-	newReadMap("elevatorroom.map", &elevatorRoom, 0);
+	newReadMap("elevatorroom.map", &elevatorRoom, 1);
 }
 
 void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orientation)

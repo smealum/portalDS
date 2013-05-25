@@ -208,6 +208,7 @@ u8 computeVertexLighting(vect3D l, int32 intensity, vect3D p, vect3D n)
 		u=divideVect(u,rdist);
 		int32 v=dotProduct(u,n);
 		v=max(0,v);
+		v=inttof32(1); //TEMP
 		// v*=3;
 		// v/=4;
 		// v+=inttof32(1)/4;
@@ -280,8 +281,9 @@ void generateRectangleVertexLighting(room_struct* r, rectangle_struct* rec, vert
 {
 	if(!r || !rec || !vld)return;
 
-	vld->width=2;
-	vld->height=2;
+	//TEMP ?
+	vld->width=3;
+	vld->height=3;
 
 	vld->values=NULL;
 

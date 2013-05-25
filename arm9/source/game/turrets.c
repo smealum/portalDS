@@ -28,7 +28,7 @@ void initTurret(turret_struct* t, room_struct* r, vect3D position)
 	position=vectMultInt(convertVect(position),4);
 
 	t->OBB=createBox(position,TURRETMASS,&turretModel);
-	if(!t->OBB)return NULL;
+	if(!t->OBB)return;
 	t->used=true;
 	t->OBB->modelInstance.palette=loadPalettePCX("turret.pcx","textures");
 	changeAnimation(&t->OBB->modelInstance,3,false); //TEMP
@@ -54,10 +54,15 @@ void drawLaser(vect3D orig, vect3D target)
 	unbindMtl();
 	glPolyFmt(POLY_ID(63));
 	GFX_COLOR=RGB15(31,0,0);
-	glBegin(GL_TRIANGLES);	
-		glVertex3v16(orig.x, orig.y, orig.z);
-		glVertex3v16(target.x, target.y, target.z);
-		glVertex3v16(target.x, target.y, target.z);
+	glPushMatrix();
+		vect3D v=vectDifference(target,orig);
+		glBegin(GL_TRIANGLES);
+			glTranslatef32(orig.x, orig.y, orig.z);
+			glVertex3v16(0, 0, 0);
+			glTranslatef32(v.x, v.y, v.z);
+			glVertex3v16(0, 0, 0);
+			glVertex3v16(0, 0, 0);
+	glPopMatrix(1);
 }
 
 void drawTurretStuff(turret_struct* t)
@@ -111,6 +116,8 @@ void updateTurret(turret_struct* t)
 	t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
 	t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
 	t->laserThroughPortal=false;
+
+	NOGBA("T %d %d %d",t->laserOrigin.x,t->laserOrigin.y,t->laserOrigin.z);
 	
 	laserProgression(r, &t->laserOrigin, &t->laserDestination, vect(m[2],m[5],m[8]));
 	

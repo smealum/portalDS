@@ -102,7 +102,7 @@ void laserProgression(room_struct* r, vect3D* origin, vect3D* destination, vect3
 	if(gc)*destination=addVect(ip,convertSize(vect(r->position.x,0,r->position.y)));
 }
 
-bool pointInTurretSight(turret_struct* t, vect3D p)
+bool pointInTurretSight(turret_struct* t, vect3D p, int32* angle, int32* d2)
 {
 	if(!t)return false;
 	const int32* m=t->OBB->transformationMatrix;
@@ -110,6 +110,9 @@ bool pointInTurretSight(turret_struct* t, vect3D p)
 	const vect3D u=vectDifference(p,vectDivInt(t->OBB->position,4));
 	const int32 d=magnitude(u);
 	const int32 v=dotProduct(u,vect(m[2],m[5],m[8]));
+	if(angle)*angle=dotProduct(u,vect(m[0],m[3],m[6]));
+
+	if(d2)*d2=d;
 
 	return v>mulf32(cosLerp(TURRET_SIGHTANGLE),d);
 }
@@ -127,7 +130,8 @@ void updateTurret(turret_struct* t)
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r)return;
 
-	bool b=pointInTurretSight(t, getPlayer()->object->position);
+	int32 angle, d;
+	bool b=pointInTurretSight(t, getPlayer()->object->position, &angle, &d);
 
 	switch(t->state)
 	{
@@ -147,7 +151,9 @@ void updateTurret(turret_struct* t)
 			}
 			break;
 		case TURRET_OPEN:
-			changeAnimation(&t->OBB->modelInstance, 2, false);
+			if(angle>mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 4, false);
+			else if(angle<-mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 5, false);
+			else changeAnimation(&t->OBB->modelInstance, 2, false);
 
 			if(!b)t->state=TURRET_CLOSING;
 			break;
@@ -162,12 +168,14 @@ void updateTurret(turret_struct* t)
 			}
 			break;
 	}
-	
+
 	t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
 	t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
+	if(b)t->laserDestination=getPlayer()->object->position;
+	vect3D dir=normalize(vectDifference(t->laserDestination,t->laserOrigin));
 	t->laserThroughPortal=false;
 
-	laserProgression(r, &t->laserOrigin, &t->laserDestination, vect(m[2],m[5],m[8]));
+	laserProgression(r, &t->laserOrigin, &t->laserDestination, dir);
 	
 	int32 x, y, z;
 	vect3D v;
@@ -181,19 +189,21 @@ void updateTurret(turret_struct* t)
 	}
 	if(portal)
 	{
+		t->laserDestination=addVect(t->laserDestination,vectMult(dir,TILESIZE));
+
+
 		t->laserThroughPortal=true;
-		vect3D dir=warpVector(portal,vect(m[2],m[5],m[8]));
+		dir=warpVector(portal,dir);
 		t->laserOrigin2=addVect(portal->targetPortal->position, warpVector(portal, vectDifference(t->laserDestination, portal->position)));
 		t->laserDestination2=addVect(t->laserOrigin2,dir);
 		
 		laserProgression(r, &t->laserOrigin2, &t->laserDestination2, dir);
 		
-		//TEST
-		t->laserDestination=addVect(t->laserDestination,vectMult(vect(m[2],m[5],m[8]),TILESIZE));
+
 		t->laserOrigin2=addVect(t->laserOrigin2,vectMult(dir,-TILESIZE));
 	}
 	
-	updateAnimation(&t->OBB->modelInstance); //TEMP
+	updateAnimation(&t->OBB->modelInstance);
 }
 
 void updateTurrets(void)

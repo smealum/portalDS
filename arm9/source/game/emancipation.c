@@ -29,6 +29,8 @@ void initEmancipation(void)
 	gridPalettes[4]=loadPalettePCX("gridcolor5.pcx","textures");
 	gridPalettes[5]=loadPalettePCX("gridcolor6.pcx","textures");
 
+	if(gridMtl)gridMtl->param|=(1<<18)|(1<<19); //flip
+
 	u16 paletteTest[16];
 	getPaletteFromBank(gridMtl, paletteTest, 16*2);
 	

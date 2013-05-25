@@ -1,5 +1,7 @@
 #include "game/game_main.h"
 
+#define TURRET_SIGHTANGLE (5144)
+
 turret_struct turrets[NUMTURRETS];
 md2Model_struct turretModel;
 
@@ -30,8 +32,8 @@ void initTurret(turret_struct* t, room_struct* r, vect3D position)
 	t->OBB=createBox(position,TURRETMASS,&turretModel);
 	if(!t->OBB)return;
 	t->used=true;
+	t->state=TURRET_CLOSED;
 	t->OBB->modelInstance.palette=loadPalettePCX("turret.pcx","textures");
-	changeAnimation(&t->OBB->modelInstance,3,false); //TEMP
 }
 
 turret_struct* createTurret(room_struct* r, vect3D position)
@@ -100,6 +102,18 @@ void laserProgression(room_struct* r, vect3D* origin, vect3D* destination, vect3
 	if(gc)*destination=addVect(ip,convertSize(vect(r->position.x,0,r->position.y)));
 }
 
+bool pointInTurretSight(turret_struct* t, vect3D p)
+{
+	if(!t)return false;
+	const int32* m=t->OBB->transformationMatrix;
+
+	const vect3D u=vectDifference(p,vectDivInt(t->OBB->position,4));
+	const int32 d=magnitude(u);
+	const int32 v=dotProduct(u,vect(m[2],m[5],m[8]));
+
+	return v>mulf32(cosLerp(TURRET_SIGHTANGLE),d);
+}
+
 void updateTurret(turret_struct* t)
 {
 	if(!t || !t->used)return;
@@ -112,13 +126,47 @@ void updateTurret(turret_struct* t)
 	int32* m=t->OBB->transformationMatrix;
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r)return;
+
+	bool b=pointInTurretSight(t, getPlayer()->object->position);
+
+	switch(t->state)
+	{
+		case TURRET_CLOSED:
+			changeAnimation(&t->OBB->modelInstance, 0, false);
+
+			if(b)t->state=TURRET_OPENING;
+			break;
+		case TURRET_OPENING:
+			if(t->OBB->modelInstance.currentAnim==2)
+			{
+				t->state=TURRET_OPEN;
+			}else if(t->OBB->modelInstance.currentAnim!=1)
+			{
+				changeAnimation(&t->OBB->modelInstance, 2, false);
+				changeAnimation(&t->OBB->modelInstance, 1, true);
+			}
+			break;
+		case TURRET_OPEN:
+			changeAnimation(&t->OBB->modelInstance, 2, false);
+
+			if(!b)t->state=TURRET_CLOSING;
+			break;
+		case TURRET_CLOSING:
+			if(t->OBB->modelInstance.currentAnim==0)
+			{
+				t->state=TURRET_CLOSED;
+			}else if(t->OBB->modelInstance.currentAnim!=3)
+			{
+				changeAnimation(&t->OBB->modelInstance, 0, false);
+				changeAnimation(&t->OBB->modelInstance, 3, true);
+			}
+			break;
+	}
 	
 	t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
 	t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
 	t->laserThroughPortal=false;
 
-	NOGBA("T %d %d %d",t->laserOrigin.x,t->laserOrigin.y,t->laserOrigin.z);
-	
 	laserProgression(r, &t->laserOrigin, &t->laserDestination, vect(m[2],m[5],m[8]));
 	
 	int32 x, y, z;

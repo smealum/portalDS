@@ -7,7 +7,8 @@
 #define BOXNUM 10
 
 #define ELEVATOR_WIDTH (TILESIZE*2)
-#define ELEVATOR_WIDTH_SQ ((ELEVATOR_WIDTH*ELEVATOR_WIDTH)>>12)
+#define ELEVATOR_HEIGHT (TILESIZE*16)
+
 #define ELEVATOR_ANGLE (3084)
 
 extern platform_struct platform[NUMPLATFORMS];
@@ -142,20 +143,25 @@ bool checkObjectElevatorCollision(physicsObject_struct* o, room_struct* r, eleva
 	vect3D u=vect(o->position.x-ev->position.x,0,o->position.z-ev->position.z);
 	int32 v=magnitude(u);
 
-	switch(ev->direction&(~(1<<ELEVATOR_UPDOWNBIT)))
+	if(abs(o->position.y-ev->position.y)>ELEVATOR_HEIGHT)return ret;
+
+	if(ev->state==ELEVATOR_OPEN)
 	{
-		case 1:
-			if(u.x<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
-			break;
-		case 4:
-			if(u.z>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
-			break;
-		case 5:
-			if(u.z<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
-			break;
-		default:
-			if(u.x>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
-			break;
+		switch(ev->direction&(~(1<<ELEVATOR_UPDOWNBIT)))
+		{
+			case 1:
+				if(u.x<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+				break;
+			case 4:
+				if(u.z>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+				break;
+			case 5:
+				if(u.z<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+				break;
+			default:
+				if(u.x>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+				break;
+		}
 	}
 
 	if(v<ELEVATOR_WIDTH)

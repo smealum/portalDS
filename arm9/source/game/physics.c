@@ -6,6 +6,10 @@
 
 #define BOXNUM 10
 
+#define ELEVATOR_WIDTH (TILESIZE*2)
+#define ELEVATOR_WIDTH_SQ ((ELEVATOR_WIDTH*ELEVATOR_WIDTH)>>12)
+#define ELEVATOR_ANGLE (3084)
+
 extern platform_struct platform[NUMPLATFORMS];
 
 vect3D gravityVector=(vect3D){0,-16,0};
@@ -135,7 +139,39 @@ bool checkObjectElevatorCollision(physicsObject_struct* o, room_struct* r, eleva
 
 	if(collideRectangle(o,r,addVect(ev->realPosition,vect(-ELEVATOR_SIZE/2,0,-ELEVATOR_SIZE/2)),vect(ELEVATOR_SIZE,0,ELEVATOR_SIZE)))ret=true;
 
-	int32 v=sqMagnitude(vect(o->position.x-ev->position.x,0,o->position.z-ev->position.z));
+	vect3D u=vect(o->position.x-ev->position.x,0,o->position.z-ev->position.z);
+	int32 v=magnitude(u);
+
+	switch(ev->direction&(~(1<<ELEVATOR_UPDOWNBIT)))
+	{
+		case 1:
+			if(u.x<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+			break;
+		case 4:
+			if(u.z>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+			break;
+		case 5:
+			if(u.z<-mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+			break;
+		default:
+			if(u.x>mulf32(v,cosLerp(ELEVATOR_ANGLE)))return ret;
+			break;
+	}
+
+	if(v<ELEVATOR_WIDTH)
+	{
+		if(v+o->radius>=ELEVATOR_WIDTH)
+		{
+			u=divideVect(vectMult(u,ELEVATOR_WIDTH-o->radius-v),v);
+			o->position=addVect(o->position,u);
+			ret=true;
+		}
+	}else if(v<o->radius+ELEVATOR_WIDTH)
+	{
+		u=divideVect(vectMult(u,o->radius+ELEVATOR_WIDTH-v),v);
+		o->position=addVect(o->position,u);
+		ret=true;
+	}
 
 	return ret;
 }

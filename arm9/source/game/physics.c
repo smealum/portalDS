@@ -6,7 +6,8 @@
 
 #define BOXNUM 10
 
-#define ELEVATOR_WIDTH (TILESIZE*2)
+#define ELEVATOR_RADIUS_IN (TILESIZE*2-64)
+#define ELEVATOR_RADIUS_OUT (TILESIZE*2+128)
 #define ELEVATOR_HEIGHT (TILESIZE*16)
 
 #define ELEVATOR_ANGLE (3084)
@@ -164,17 +165,17 @@ bool checkObjectElevatorCollision(physicsObject_struct* o, room_struct* r, eleva
 		}
 	}
 
-	if(v<ELEVATOR_WIDTH)
+	if(v<ELEVATOR_RADIUS_IN)
 	{
-		if(v+o->radius>=ELEVATOR_WIDTH)
+		if(v+o->radius>=ELEVATOR_RADIUS_IN)
 		{
-			u=divideVect(vectMult(u,ELEVATOR_WIDTH-o->radius-v),v);
+			u=divideVect(vectMult(u,ELEVATOR_RADIUS_IN-o->radius-v),v);
 			o->position=addVect(o->position,u);
 			ret=true;
 		}
-	}else if(v<o->radius+ELEVATOR_WIDTH)
+	}else if(v<o->radius+ELEVATOR_RADIUS_OUT)
 	{
-		u=divideVect(vectMult(u,o->radius+ELEVATOR_WIDTH-v),v);
+		u=divideVect(vectMult(u,o->radius+ELEVATOR_RADIUS_OUT-v),v);
 		o->position=addVect(o->position,u);
 		ret=true;
 	}

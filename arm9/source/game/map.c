@@ -50,6 +50,7 @@ void initRectangle(rectangle_struct* rec, vect3D pos, vect3D size)
 	sign*=(size.z>=0)?1:-1;
 	rec->normal=vect(rec->normal.x*sign,rec->normal.y*sign,rec->normal.z*sign);
 	rec->material=NULL;
+	rec->lightData.lightMap=NULL;
 	// NOGBA("n : %d %d %d",rec->normal.x,rec->normal.y,rec->normal.z);
 	rec->hide=false;
 }
@@ -215,10 +216,12 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 
 	vect3D vt[4];
 	int32 t[4];
+	u16 tw=1, th=1;
 	if(c)
 	{
 		GFX_COLOR=RGB15(31,31,31);		
-		bindMaterial(rec.material,&rec,t,vt,false);
+		materialSlice_struct* ms=bindMaterial(rec.material,&rec,t,vt,false);
+		if(ms && ms->img){tw=ms->img->width;th=ms->img->height;}
 	}else if(rec.lightData.lightMap){
 		vect3D lmPos=rec.lightData.lightMap->lmPos;
 		vect3D lmSize=rec.lightData.lightMap->lmSize;
@@ -265,12 +268,23 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 			int i, j;
 			int k=0;
 			for(j=0;j<rec.lightData.vertex->width-1;j++)
+			// for(j=0;j<1;j++)
 			{
 				p=o;
 				tp=to;
 				glBegin(GL_QUAD_STRIP);
+
+				tp.x=tp.x%inttot16(tw);
+				tp.y=tp.y%inttot16(th);
+				
 				for(i=0;i<rec.lightData.vertex->height;i++)
 				{
+
+					// vect3D vtest1=vect(tp.x+vt2.x,tp.y+vt2.y,0);
+					// vect3D vtest2=vect(tp.x,tp.y,0);
+					// int32 v=max(max(abs(vtest1.x),abs(vtest1.y)),max(abs(vtest2.x),abs(vtest2.y)));
+					// if(v>=32768){NOGBA("lala %d %d",tw,th);continue;}
+
 					// vc=&rec.lightData.vertex->values[(k++)+rec.lightData.vertex->height];
 					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
 					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
@@ -290,6 +304,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 				o=addVect(o,v1);
 				to=addVect(to,vt2);
 			}
+			// if(to.x!=vt[3].x || to.y!=vt[3].y)NOGBA("lala %d %d %d %d",to.x,to.y,vt[3].x,vt[3].y);
 			// NOGBA("%d %d vs %d %d",tp.x,tp.y,vt[3].x,vt[3].y);
 		}else{
 			glBegin(GL_QUAD);

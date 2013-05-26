@@ -233,16 +233,15 @@ void freeMaterialList(char** l)
 	free(l);
 }
 
-void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, vect3D* v, bool DL)
+materialSlice_struct* bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, vect3D* v, bool DL)
 {
 	if(!m)m=defaultMaterial;
-	if(!m->used)return;
-	if(!rec)
-	{
-		materialSlice_struct* ms=m->side;
-		bindMaterialSlice(ms, DL);
-	}else{
-		materialSlice_struct* ms=m->side;
+	if(!m->used)return NULL;
+	
+	materialSlice_struct* ms=m->side;
+
+	if(!rec)bindMaterialSlice(ms, DL);
+	else{
 		if(!rec->size.y)
 		{
 			if(rec->normal.y>0)ms=m->top;
@@ -252,4 +251,5 @@ void bindMaterial(material_struct* m, rectangle_struct* rec, int32* t, vect3D* v
 		bindMaterialSlice(ms, DL);
 		getTextureCoordSlice(ms,rec,t,v);
 	}
+	return ms;
 }

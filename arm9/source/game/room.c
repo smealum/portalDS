@@ -70,8 +70,8 @@ void invertRectangle(rectangle_struct* rec)
 		rec->position.x+=rec->size.x;
 		rec->size.x=-rec->size.x;
 	}else{
-		rec->position.y+=rec->size.y;
-		rec->size.y=-rec->size.y;
+		rec->position.z+=rec->size.z;
+		rec->size.z=-rec->size.z;
 	}
 }
 
@@ -106,7 +106,11 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 
 		rec.position=addVect(rec.position,v);
 		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);	
-		if(recp)recp->collides=!rec.portalable;
+		if(recp)
+		{
+			recp->collides=!lc->data.portalable;
+			recp->lightData.vertex=lc->data.lightData.vertex;
+		}
 		lc=lc->next;
 	}
 }

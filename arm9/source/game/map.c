@@ -550,7 +550,7 @@ void drawRectangleList(rectangleList_struct* rl)
 void drawRectangles(room_struct* r, u8 mode, u16 color)
 {
 	// glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	if(keysDown() & KEY_A)debugWireframe^=1;
+	if(keysDown() & KEY_X)debugWireframe^=1;
 	if(debugWireframe)glPolyFmt(POLY_ALPHA(0) | POLY_CULL_BACK); //DEBUG
 	else glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	

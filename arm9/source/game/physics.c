@@ -17,17 +17,6 @@ extern platform_struct platform[NUMPLATFORMS];
 vect3D gravityVector=(vect3D){0,-16,0};
 vect3D normGravityVector=(vect3D){0,-4096,0};
 
-vect3D boxDefinition[]={vect(0,-PLAYERSIZEY,0),
-						vect(-PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,-PLAYERSIZEX),
-						vect(PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,-PLAYERSIZEX),
-						vect(PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,PLAYERSIZEX),
-						vect(-PLAYERSIZEX,-PLAYERSIZEY+MAXSTEP*HEIGHTUNIT+2,PLAYERSIZEX),
-						vect(0,PLAYERSIZEY2,0),
-						vect(-PLAYERSIZEX,PLAYERSIZEY2,-PLAYERSIZEX),
-						vect(PLAYERSIZEX,PLAYERSIZEY2,-PLAYERSIZEX),
-						vect(PLAYERSIZEX,PLAYERSIZEY2,PLAYERSIZEX),
-						vect(-PLAYERSIZEX,PLAYERSIZEY2,PLAYERSIZEX)};
-
 bool pointInRoom(room_struct* r, vect3D p, vect3D* v)
 {
 	if(!r)return false;
@@ -58,32 +47,43 @@ vect3D convertCoord(room_struct* r, vect3D p)
 	return rp;
 }
 
-bool boxInRoom(room_struct* r, physicsObject_struct* o)
-{
-	int j;
-	for(j=0;j<BOXNUM;j++)
-	{
-		vect3D t;
-		vect3D p=addVect(o->position,boxDefinition[j]);
-		if(pointInRoom(r,p,&t))return true;
-	}
-	return false;
-}
-
 const int32 transY=inttof32(5);
 
+//TODO : refactor/clean up this shit, maybe switch to octrees ?
 bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room_struct* r)
 {
 	if(!gc || !o || !r)return false;
 	vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
 
+	vect3D vmM=vect(o->radius,o->radius,o->radius);
+
+	//dirty dirty dirty
+	if(normGravityVector.x)vmM.x*=5;
+	else if(normGravityVector.y)vmM.y*=5;
+	else vmM.z*=5;
+
+	vect3D M=addVect(o1,vmM);
+	vect3D m=vectDifference(o1,vmM);
+
 	int i;
+	int k=0;
 	bool ret=false;
 	for(i=0;i<gc->numRectangles;i++)
 	{
 		rectangle_struct* rec=gc->rectangles[i];
 		if(rec->collides)
 		{
+			vect3D p=vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2);
+			if(!rec->size.x)
+			{
+				if(p.x<m.x || p.x>M.x)continue;
+			}else if(!rec->size.y)
+			{
+				if(p.y<m.y || p.y>M.y)continue;
+			}else{
+				if(p.z<m.z || p.z>M.z)continue;
+			}
+			k++;
 			vect3D o2=getClosestPointRectangleStruct(rec,o1);
 				if(portal1.used&&portal2.used)
 				{
@@ -106,6 +106,8 @@ bool checkObjectCollisionCell(gridCell_struct* gc, physicsObject_struct* o, room
 				v=divideVect(vectMult(vect(v.x,v.y,v.z),-((o->radius<<6)-d)),d);
 				o->position=addVect(o->position,v);
 				o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
+				M=addVect(o1,vmM);
+				m=vectDifference(o1,vmM);
 				rec->touched=true;
 				ret=true;
 			}

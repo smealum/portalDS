@@ -148,9 +148,10 @@ static inline void render1(void)
 {
 	scanKeys();
 	
+	// cpuEndSlice();
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
-		if(keysDown()&KEY_X)createTurret(NULL, vect(-inttof32(0),26,-inttof32(0)));
+		// if(keysDown()&KEY_X)createTurret(NULL, vect(-inttof32(0),26,-inttof32(0)));
 		// if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&companionCubeModel);
 		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
 		if(keysDown()&KEY_Y){selectID++;selectID%=NUMOBJECTS;if(!objects[selectID].used)selectID=0;}
@@ -206,7 +207,7 @@ static inline void render1(void)
 			// drawRoomsGame(128, color);
 			drawRoomsGame(0, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
-		iprintf("room : %d  \n",cpuEndSlice());
+		// iprintf("room : %d  \n",cpuEndSlice());
 		
 		updateParticles();
 		drawParticles();

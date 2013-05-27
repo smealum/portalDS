@@ -1,5 +1,7 @@
 #include "game/game_main.h"
 
+#define TEXTURE_SCALE (inttot16(1))
+
 room_struct gameRoom;
 
 u32* testDL=NULL;
@@ -221,6 +223,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 	{
 		GFX_COLOR=RGB15(31,31,31);		
 		materialSlice_struct* ms=bindMaterial(rec.material,&rec,t,vt,false);
+		int i;for(i=0;i<4;i++){vt[i].x/=TEXTURE_SCALE;vt[i].y/=TEXTURE_SCALE;t[i]=TEXTURE_PACK(vt[i].x, vt[i].y);}
 		if(ms && ms->img){tw=ms->img->width;th=ms->img->height;}
 	}else if(rec.lightData.lightMap){
 		vect3D lmPos=rec.lightData.lightMap->lmPos;
@@ -230,15 +233,15 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		if(rec.lightData.lightMap->rot)
 		{
 			p2=vect(inttot16(lmPos.x+lmSize.y-1),inttot16(lmPos.y+lmSize.x-1),0);
-			t[0]=TEXTURE_PACK(p1.x, p1.y);
-			t[3]=TEXTURE_PACK(p1.x, p2.y);
-			t[2]=TEXTURE_PACK(p2.x, p2.y);
-			t[1]=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x/TEXTURE_SCALE, p1.y/TEXTURE_SCALE);
+			t[3]=TEXTURE_PACK(p1.x/TEXTURE_SCALE, p2.y/TEXTURE_SCALE);
+			t[2]=TEXTURE_PACK(p2.x/TEXTURE_SCALE, p2.y/TEXTURE_SCALE);
+			t[1]=TEXTURE_PACK(p2.x/TEXTURE_SCALE, p1.y/TEXTURE_SCALE);
 		}else{
-			t[0]=TEXTURE_PACK(p1.x, p1.y);
-			t[1]=TEXTURE_PACK(p1.x, p2.y);
-			t[2]=TEXTURE_PACK(p2.x, p2.y);
-			t[3]=TEXTURE_PACK(p2.x, p1.y);
+			t[0]=TEXTURE_PACK(p1.x/TEXTURE_SCALE, p1.y/TEXTURE_SCALE);
+			t[1]=TEXTURE_PACK(p1.x/TEXTURE_SCALE, p2.y/TEXTURE_SCALE);
+			t[2]=TEXTURE_PACK(p2.x/TEXTURE_SCALE, p2.y/TEXTURE_SCALE);
+			t[3]=TEXTURE_PACK(p2.x/TEXTURE_SCALE, p1.y/TEXTURE_SCALE);
 		}
 	}else return;
 
@@ -274,28 +277,28 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 				tp=to;
 				glBegin(GL_QUAD_STRIP);
 
-				tp.x=tp.x%inttot16(tw);
-				tp.y=tp.y%inttot16(th);
-				
+				tp.x%=inttot16(tw); tp.y%=inttot16(th);
+				tp.x-=24576; tp.y-=24576;
+
 				for(i=0;i<rec.lightData.vertex->height;i++)
 				{
 
-					// vect3D vtest1=vect(tp.x+vt2.x,tp.y+vt2.y,0);
-					// vect3D vtest2=vect(tp.x,tp.y,0);
-					// int32 v=max(max(abs(vtest1.x),abs(vtest1.y)),max(abs(vtest2.x),abs(vtest2.y)));
-					// if(v>=32768){NOGBA("lala %d %d",tw,th);continue;}
+					vect3D vtest1=vect(tp.x+vt2.x,tp.y+vt2.y,0);
+					vect3D vtest2=vect(tp.x,tp.y,0);
+					int32 v=max(max(abs(vtest1.x),abs(vtest1.y)),max(abs(vtest2.x),abs(vtest2.y)));
+					if(v>=32768){iprintf("lala %d %d %d %d \n",tp.x,tp.y,inttot16(tw),inttot16(th));continue;}
 
 					// vc=&rec.lightData.vertex->values[(k++)+rec.lightData.vertex->height];
 					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
 					u8 vb=rec.lightData.vertex->values[k+rec.lightData.vertex->height];
 					if(!debugWireframe)GFX_COLOR=RGB15(vb,vb,vb);
-					GFX_TEX_COORD=TEXTURE_PACK(tp.x+vt2.x,tp.y+vt2.y);
+					GFX_TEX_COORD=TEXTURE_PACK((tp.x+vt2.x),(tp.y+vt2.y));
 					glVertex3v16(p.x+v1.x,p.y+v1.y,p.z+v1.z);
 					// vc=&rec.lightData.vertex->values[k];
 					// vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x,p.y,p.z),32)), rec.normal);
 					vb=rec.lightData.vertex->values[k++];
 					if(!debugWireframe)GFX_COLOR=RGB15(vb,vb,vb);
-					GFX_TEX_COORD=TEXTURE_PACK(tp.x,tp.y);
+					GFX_TEX_COORD=TEXTURE_PACK((tp.x),(tp.y));
 					glVertex3v16(p.x,p.y,p.z);
 
 					p=addVect(p,v2);
@@ -551,6 +554,12 @@ void drawRectangleList(rectangleList_struct* rl)
 	unbindMtl();
 	GFX_COLOR=RGB15(31,31,31);
 
+	glMatrixMode(GL_TEXTURE);
+	glPushMatrix();
+
+	glScalef32(inttof32(TEXTURE_SCALE),inttof32(TEXTURE_SCALE),inttof32(TEXTURE_SCALE));
+
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 		glTranslate3f32(-TILESIZE,0,-TILESIZE);
 		glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
@@ -559,6 +568,11 @@ void drawRectangleList(rectangleList_struct* rl)
 			drawRect(lc->data,(lc->data.position),(lc->data.size),true);
 			lc=lc->next;
 		}
+
+	glMatrixMode(GL_TEXTURE);
+	glPopMatrix(1);
+	
+	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(1);
 }
 

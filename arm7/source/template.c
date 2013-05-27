@@ -81,10 +81,10 @@ int main() {
 
 	SetYtrigger(80);
 
-	// installWifiFIFO();
-	// installSoundFIFO();
-
 	installSystemFIFO();
+
+	// installWifiFIFO();
+	installSoundFIFO();
 
 	irqSet(IRQ_VCOUNT, VcountHandler);
 	irqSet(IRQ_VBLANK, VblankHandler);

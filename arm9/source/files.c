@@ -54,7 +54,7 @@ bool initFilesystem(int argc, char **argv)
 	return true;
 }
 
-void* bufferizeFile(char* filename, char* dir, bool binary)
+void* bufferizeFile(char* filename, char* dir, u32* size, bool binary)
 {
 	char path[255];getcwd(path,255);
 	/*int r=*/chdir(dir);
@@ -76,6 +76,7 @@ void* bufferizeFile(char* filename, char* dir, bool binary)
 	rewind (file);
 	buffer=(u8*)malloc(lsize);
 	lastSize=lsize;
+	if(size)*size=lsize;
 	
 	if(!buffer){fclose(file);chdir(path);return NULL;}
 		

@@ -28,7 +28,7 @@ void loadFont(font_struct* f, u8 charsize, u8 rendersize)
 	u8 *buffer2;
 	u16 palette[4];
 	
-	buffer2=bufferizeFile("HUD.pcx", "font", true);
+	buffer2=bufferizeFile("HUD.pcx", "font", NULL, true);
 	if(!buffer2)return;
 
 	loadPCX((u8*)buffer2, &pcx);

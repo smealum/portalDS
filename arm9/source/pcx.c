@@ -306,7 +306,7 @@ struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 /* Open image file */
 // fp = fopen (filename, "rb");
 // fp = DS_OpenFile(filename, directory, false, true);
-	buffer = bufferizeFile((char*)filename, directory, true);
+	buffer = bufferizeFile((char*)filename, directory, NULL, true);
 	filesize=lastSize;
 	fileptr=0;
 	if (!buffer)

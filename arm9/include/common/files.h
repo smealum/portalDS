@@ -9,7 +9,7 @@ extern u8 fsMode;
 int chdir (const char *path);
 bool fileExists(char* filename, char* dir);
 bool initFilesystem(int argc, char **argv);
-void* bufferizeFile(char* filename, char* dir, bool binary);
+void* bufferizeFile(char* filename, char* dir, u32* size, bool binary);
 
 #endif
 

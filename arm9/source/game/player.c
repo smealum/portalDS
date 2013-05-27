@@ -7,7 +7,7 @@ struct gl_texture_t *bottomScreen;
 
 touchPosition touchCurrent, touchOld;
 
-SFX_struct* testSFX;
+SFX_struct *gunSFX1, *gunSFX2;
 
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
@@ -75,8 +75,9 @@ void initPlayer(player_struct* p)
 	//TEMP INIT VALUES
 	p->object->position=vect(0,32*HEIGHTUNIT*4*2,0);
 
-	//TEST
-	testSFX=createSFX("portalgun1.raw", SoundFormat_16Bit);
+	//SFX
+	gunSFX1=createSFX("portalgun_orange.raw", SoundFormat_16Bit);
+	gunSFX2=createSFX("portalgun_blue.raw", SoundFormat_16Bit);
 }
 
 void drawPlayer(player_struct* p)
@@ -279,7 +280,7 @@ void playerControls(player_struct* p)
 	}
 	
 	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
-	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(testSFX);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
+	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 
 	// camera_struct* c=getPlayerCamera();
 	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);

@@ -8,6 +8,8 @@ struct gl_texture_t *bottomScreen;
 touchPosition touchCurrent, touchOld;
 
 SFX_struct *gunSFX1, *gunSFX2;
+SFX_struct *portalEnterSFX[2];
+SFX_struct *portalExitSFX[2];
 
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
@@ -78,6 +80,12 @@ void initPlayer(player_struct* p)
 	//SFX
 	gunSFX1=createSFX("portalgun_orange.raw", SoundFormat_16Bit);
 	gunSFX2=createSFX("portalgun_blue.raw", SoundFormat_16Bit);
+
+	portalEnterSFX[0]=createSFX("portal_enter1.raw", SoundFormat_16Bit);
+	portalEnterSFX[1]=createSFX("portal_enter2.raw", SoundFormat_16Bit);
+
+	portalExitSFX[0]=createSFX("portal_exit1.raw", SoundFormat_16Bit);
+	portalExitSFX[1]=createSFX("portal_exit2.raw", SoundFormat_16Bit);
 }
 
 void drawPlayer(player_struct* p)
@@ -305,6 +313,9 @@ void updatePlayer(player_struct* p)
 	
 	// createParticles(p->object->position,vect(0,0,0),120);
 	// particleExplosion(p->object->position,32);
+
+	if(p->inPortal && !p->oldInPortal)playSFX(portalEnterSFX[rand()%2]);
+	else if(!p->inPortal && p->oldInPortal)playSFX(portalExitSFX[rand()%2]);
 	
 	editPalette((u16*)p->modelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	editPalette((u16*)p->playerModelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?

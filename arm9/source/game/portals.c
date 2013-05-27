@@ -148,6 +148,7 @@ void getInvertedNormal(vect3D* n){if(!n->z)*n=vectMultInt(*n,-1);}
 
 bool isPointInPortal(portal_struct* p, vect3D o, vect3D *v, int32* x, int32* y, int32* z)
 {
+	if(!x || !y || !z || !v || !p)return false;
 	*v=vectDifference(o,p->position);
 	const vect3D u1=p->plane[0], u2=p->plane[1];
 	*x=dotProduct(*v,u1);
@@ -210,6 +211,9 @@ void checkPortalPlayerWarp(portal_struct* p)
 	if(r)
 	{
 		if(z<0 && p->oldZ>=0){currentPortal=p;warpPlayer(p,pl);}
+		pl->oldInPortal=pl->inPortal;
+		if(abs(z)<PLAYERRADIUS){pl->inPortal=true;}
+		else pl->inPortal=false;
 	}
 	p->oldZ=z;
 }

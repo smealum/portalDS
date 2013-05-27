@@ -150,6 +150,7 @@ static inline void render1(void)
 	scanKeys();
 	
 	// cpuEndSlice();
+	NOGBA("in portal %d",getPlayer()->inPortal);
 	playerControls(NULL);
 		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
 		// if(keysDown()&KEY_X)createTurret(NULL, vect(-inttof32(0),26,-inttof32(0)));

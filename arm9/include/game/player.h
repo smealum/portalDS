@@ -19,6 +19,7 @@ typedef struct
 	modelInstance_struct modelInstance;
 	modelInstance_struct playerModelInstance;
 	bool currentPortal;
+	bool inPortal, oldInPortal;
 	s8 life;
 }player_struct;
 

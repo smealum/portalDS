@@ -6,6 +6,8 @@ md2Model_struct gridModel;
 mtlImg_struct* gridMtl;
 u32* gridPalettes[6];
 
+SFX_struct* emancipationSFX;
+
 void initEmancipation(void)
 {
 	int i;
@@ -42,6 +44,8 @@ void initEmancipation(void)
 			editPalette((u16*)gridPalettes[j],i,paletteTest[(i+j)%5]);
 		}
 	}
+
+	emancipationSFX=createSFX("emancipation.raw",SoundFormat_16Bit);
 }
 
 void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos, int32* m)
@@ -63,6 +67,8 @@ void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos
 	e->velocity=vectDivInt(normalize(e->velocity),256);
 	e->axis=vect((rand()%inttof32(2))-inttof32(1),(rand()%inttof32(2))-inttof32(1),(rand()%inttof32(2))-inttof32(1));
 	e->axis=normalize(e->axis);
+
+	playSFX(emancipationSFX);
 	
 	e->used=true;
 }

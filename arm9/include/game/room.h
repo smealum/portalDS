@@ -43,6 +43,7 @@ typedef struct
 	vect3D rectangleGridSize;
 	rectangleList_struct rectangles;
 	lightingData_struct lightingData;
+	u32* displayList;
 }room_struct;
 
 void drawRoomEdits(void);

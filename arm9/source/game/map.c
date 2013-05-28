@@ -653,6 +653,7 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 
 	initLightData(&r->lightingData);
 	r->rectangleGrid=NULL;
+	r->displayList=NULL;
 		
 	initRoomGrid(r);
 }
@@ -739,7 +740,15 @@ void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 	if(!r)return;
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
-		if(mode&1)drawRectangles(r, mode, color);
+		if(mode&1)
+		{
+			if(r->displayList)
+			{
+				glTranslate3f32(-TILESIZE,0,-TILESIZE);
+				glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
+				glCallList(r->displayList);
+			}else drawRectangles(r, mode, color);
+		}
 	glPopMatrix(1);
 }
 

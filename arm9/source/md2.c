@@ -200,6 +200,31 @@ int loadMd2Model(const char *filename, char *texname, md2Model_struct *mdl)
 	return 1;
 }
 
+void freeMd2FrameData(md2_frame_t* f, bool dl)
+{
+	if(!f)return;
+
+	if(f->verts)free(f->verts);
+	if(f->packedv10)free(f->packedv10);
+
+	f->verts = NULL;
+	f->packedVerts = NULL;
+	f->packedv10 = NULL;
+
+	if(dl)
+	{
+		if(f->displayList[0])free(f->displayList[0]);
+		if(f->displayList[1])free(f->displayList[1]);
+		if(f->displayList[2])free(f->displayList[2]);
+		if(f->displayList[3])free(f->displayList[3]);
+
+		f->displayList[0]=NULL;
+		f->displayList[1]=NULL;
+		f->displayList[2]=NULL;
+		f->displayList[3]=NULL;
+	}
+}
+
 void freeMd2Model(md2Model_struct *mdl)
 {
 	int i;
@@ -228,16 +253,7 @@ void freeMd2Model(md2Model_struct *mdl)
 	{
 		for (i = 0; i < mdl->header.num_frames; ++i)
 		{
-			free(mdl->frames[i].verts);
-			// free (mdl->frames[i].packedVerts);
-			free(mdl->frames[i].packedv10);
-			if(mdl->frames[i].displayList[0])free(mdl->frames[i].displayList[0]);
-			if(mdl->frames[i].displayList[1])free(mdl->frames[i].displayList[1]);
-			if(mdl->frames[i].displayList[2])free(mdl->frames[i].displayList[2]);
-			if(mdl->frames[i].displayList[3])free(mdl->frames[i].displayList[3]);
-			mdl->frames[i].verts = NULL;
-			mdl->frames[i].packedVerts = NULL;
-			mdl->frames[i].packedv10 = NULL;
+			freeMd2FrameData(&mdl->frames[i], true);
 		}
 
 		free (mdl->frames);
@@ -313,7 +329,7 @@ void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 	if(!mdl)return;
 	
 	int i;
-	for(i=0;i<mdl->header.num_tris;i++)
+	for(i=0;i<mdl->header.num_frames;i++)
 	{
 		generateFrameDisplayList(i, mdl, normals);
 	}
@@ -329,6 +345,13 @@ void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 				generateFrameDisplayListInterp(mdl->animations[i].start+j, mdl->animations[i].start+((j+1)%n), 2, mdl, normals);
 				generateFrameDisplayListInterp(mdl->animations[i].start+j, mdl->animations[i].start+((j+1)%n), 3, mdl, normals);
 			}
+		}
+	}
+	if(interp || mdl->header.num_frames==1)
+	{
+		for(i=0;i<mdl->header.num_frames;i++)
+		{
+			freeMd2FrameData(&mdl->frames[i], false);
 		}
 	}
 }
@@ -415,6 +438,8 @@ void renderModelFrameInterp(int n, int n2, int m, const md2Model_struct *mdl, u3
 		glScalef32(inttof32(32),inttof32(32),inttof32(32)); // necessary for v10
 		GFX_COLOR=color;
 		
+		if(!pframe->verts && !pframe->displayList[m])m=0;
+
 		if(pframe->displayList[m])
 		{
 			glCallList(pframe->displayList[m]);

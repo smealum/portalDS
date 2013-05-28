@@ -310,6 +310,8 @@ static inline void postProcess2(void)
 	}
 }
 
+u32 debugVal; //TEMP
+
 void gameFrame(void)
 {
 	int lala;
@@ -318,6 +320,9 @@ void gameFrame(void)
 		case false:
 			iprintf("\x1b[0;0H");
 			iprintf("%d FPS   \n", FPS);
+			iprintf("%d (debug)   \n", debugVal);
+			iprintf("%p (portal)   \n", portal1.displayList);
+			iprintf("%p (portal)   \n", portal2.displayList);
 			cpuEndSlice();
 			postProcess1();
 			// iprintf("postproc : %d  \n",cpuEndSlice());

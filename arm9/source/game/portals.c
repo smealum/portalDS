@@ -24,6 +24,8 @@ void resetPortals(void)
 	resetPortalsPI();
 }
 
+extern u32 debugVal; //TEMP
+
 void movePortal(portal_struct* p, vect3D pos, vect3D normal, vect3D plane0, bool actualMove)
 {
 	if(!p)return;
@@ -42,7 +44,9 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, vect3D plane0, bool
 		updatePortalPI(p==&portal2,p->position,p->normal,p->plane[0]);
 		if(p->displayList)free(p->displayList);
 		p->displayList=NULL;
+		debugVal=0;
 		p->displayList=generateRoomDisplayList(NULL, p->position, p->normal, true);
+		// debugVal=getMemFree()/1024; //TEMP
 		p->used=true;
 	}
 	

@@ -1,7 +1,7 @@
 #ifndef __POLYGON9__
 #define __POLYGON9__
 
-#define POLYPOOLSIZE 1024
+#define POLYPOOLSIZE 512
 
 typedef struct polygon_struct
 {

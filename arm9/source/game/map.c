@@ -752,6 +752,8 @@ void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 	glPopMatrix(1);
 }
 
+extern u32 debugVal; //TEMP
+
 u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull)
 {	
 	if(!r)r=getPlayer()->currentRoom;
@@ -779,6 +781,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	}
 
 	u32 size=glEndListDL();
+	debugVal=((size+1)*4)/1024;
 	u32* displayList=malloc((size+1)*4);
 	if(displayList)memcpy(displayList,ptr,(size+1)*4);
 	return displayList;

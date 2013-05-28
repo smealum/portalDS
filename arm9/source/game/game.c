@@ -321,6 +321,7 @@ void gameFrame(void)
 			iprintf("\x1b[0;0H");
 			iprintf("%d FPS   \n", FPS);
 			iprintf("%d (debug)   \n", debugVal);
+			iprintf("%d (free ram)   \n", getMemFree()/1024);
 			iprintf("%p (portal)   \n", portal1.displayList);
 			iprintf("%p (portal)   \n", portal2.displayList);
 			cpuEndSlice();

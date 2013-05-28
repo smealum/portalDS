@@ -120,9 +120,7 @@ rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, v
 	{
 		if(&lc->data!=rec)
 		{
-			// NOGBA("%p vs %p",rec,&lc->data);
 			int32 k;
-			// if(collideLineRectangle(&lc->data,l,u,d,&k,&v)){if(k<lowestK){*i=v;lowestK=k;}}
 			if(collideLineRectangle(&lc->data,l,u,lowestK,&k,&v)){if(k<lowestK){*i=v;lowestK=k;hit=&lc->data;}}
 		}
 		lc=lc->next;

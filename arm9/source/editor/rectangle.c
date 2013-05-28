@@ -133,7 +133,10 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 		
 		int32 p2=dotProduct(vectDifference(p,o),rec->normal);
 		int32 k=divf32(p2,p1);
-		if(kk)*kk=k;
+		if(kk)
+		{
+			*kk=k;
+		}
 		if(k<0 || k>d){return false;}
 		vect3D i=addVect(o,vectMult(v,k));
 		if(ip)*ip=i;

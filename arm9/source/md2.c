@@ -327,6 +327,8 @@ void generateFrameDisplayListInterp(int n, int n2, int m, const md2Model_struct 
 void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 {
 	if(!mdl)return;
+
+	int d=getMemFree();//TEMP
 	
 	int i;
 	for(i=0;i<mdl->header.num_frames;i++)
@@ -354,6 +356,7 @@ void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 			freeMd2FrameData(&mdl->frames[i], false);
 		}
 	}
+	NOGBA("total DL : %d",(d-getMemFree())/1024); //TEMP
 }
 
 void renderModelFrame(int n, const md2Model_struct *mdl)

@@ -125,17 +125,19 @@ void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip)
 {
 	if(!rec)return false;
-	int32 p1=dotProduct(v,rec->normal);
+	vect3D n=vect(abs(rec->normal.x),abs(rec->normal.y),abs(rec->normal.z));
+	int32 p1=dotProduct(v,n);
 	if(!equals(p1,0))
 	{
 		vect3D p=convertVect(rec->position); //CHECK lightmap generation ?
 		vect3D s=vect(rec->size.x*TILESIZE*2,rec->size.y*HEIGHTUNIT,rec->size.z*TILESIZE*2);
 		
-		int32 p2=dotProduct(vectDifference(p,o),rec->normal);
+		int32 p2=dotProduct(vectDifference(p,o),n);
 		int32 k=divf32(p2,p1);
+		s8 sign=((s.x>0)^(s.y<0)^(s.z>0)^(p1<0))?(-1):(1);
 		if(kk)
 		{
-			*kk=k;
+			*kk=k+sign;
 		}
 		if(k<0 || k>d){return false;}
 		vect3D i=addVect(o,vectMult(v,k));

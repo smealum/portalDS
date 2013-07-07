@@ -165,6 +165,12 @@ void drawWallDoor(wallDoor_struct* wd)
 				}
 		glPopMatrix(1);
 
+		if(wd->modelInstance.currentAnim==0)
+		{
+			glPopMatrix(1);
+			return;
+		}
+		
 		//TEMP TEST
 		glPushMatrix();
 			switch(wd->orientation)

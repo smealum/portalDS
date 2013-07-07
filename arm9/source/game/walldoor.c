@@ -1,6 +1,7 @@
 #include "game/game_main.h"
 
 #define DOORFRAMELENGTH (8)
+#define WALLDOORINTERVAL (32)
 
 room_struct elevatorRoom;
 
@@ -23,6 +24,8 @@ vect3D wallDoorV2[]={{-1,0,0},
 					{0,0,-1},
 					{0,0,1}};
 
+vect3D elevatorRoomSize;
+
 void initWallDoor(wallDoor_struct* wd)
 {
 	if(!wd)return;
@@ -42,6 +45,8 @@ void initWallDoors(void)
 	generateModelDisplayLists(&wallDoorModel, false, true);
 
 	newReadMap("elevatorroom.map", &elevatorRoom, 1);
+	roomResetOrigin(&elevatorRoom);
+	roomOriginSize(&elevatorRoom, NULL, &elevatorRoomSize);
 }
 
 void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orientation)
@@ -128,24 +133,55 @@ void drawWallDoor(wallDoor_struct* wd)
 
 		glTranslate3f32(wd->position.x,wd->position.y,wd->position.z);
 		
-		if(wd->orientation<=1)glRotateYi(8192);
+		glPushMatrix();
+			if(wd->orientation<=1)glRotateYi(8192);
+			
+			renderModelFrameInterp(wd->modelInstance.currentFrame,wd->modelInstance.nextFrame,wd->modelInstance.interpCounter,wd->modelInstance.model,params,false,wd->modelInstance.palette,RGB15(31,31,31));
 		
-		renderModelFrameInterp(wd->modelInstance.currentFrame,wd->modelInstance.nextFrame,wd->modelInstance.interpCounter,wd->modelInstance.model,params,false,wd->modelInstance.palette,RGB15(31,31,31));
-	
-		glPolyFmt(POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(31));
-		GFX_COLOR=RGB15(31,31,31);
-		vect3D v[4];
-		bindMaterial(wd->frameMaterial, wd->rectangle, NULL, v, false);
-		GFX_BEGIN=GL_QUAD_STRIP;
+			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_BACK|POLY_ID(31));
+			GFX_COLOR=RGB15(31,31,31);
+			vect3D v[4];
+			bindMaterial(wd->frameMaterial, wd->rectangle, NULL, v, false);
+			GFX_BEGIN=GL_QUAD_STRIP;
 
-			int i;
-			for(i=0;i<DOORFRAMELENGTH;i++)
+				int i;
+				for(i=0;i<DOORFRAMELENGTH;i++)
+				{
+					int32 tx=v[0].x+((doorFrameData[i].x-doorFrameData[0].x)*(v[2].x-v[0].x))/(TILESIZE*4);
+					int32 ty=v[0].y+((doorFrameData[i].y-doorFrameData[0].y)*(v[2].y-v[0].y))/(HEIGHTUNIT*8);
+					GFX_TEX_COORD=TEXTURE_PACK((tx), (ty));
+					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z);			
+				}
+		
+			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(31));
+			GFX_BEGIN=GL_QUAD_STRIP;
+
+				for(i=0;i<DOORFRAMELENGTH;i++)
+				{
+					int32 tx=v[0].x+((doorFrameData[i].x-doorFrameData[0].x)*(v[2].x-v[0].x))/(TILESIZE*4);
+					int32 ty=v[0].y+((doorFrameData[i].y-doorFrameData[0].y)*(v[2].y-v[0].y))/(HEIGHTUNIT*8);
+					GFX_TEX_COORD=TEXTURE_PACK((tx), (ty));
+					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z-WALLDOORINTERVAL);			
+				}
+		glPopMatrix(1);
+
+		//TEMP TEST
+		glPushMatrix();
+			switch(wd->orientation)
 			{
-				int32 tx=v[0].x+((doorFrameData[i].x-doorFrameData[0].x)*(v[2].x-v[0].x))/(TILESIZE*4);
-				int32 ty=v[0].y+((doorFrameData[i].y-doorFrameData[0].y)*(v[2].y-v[0].y))/(HEIGHTUNIT*8);
-				GFX_TEX_COORD=TEXTURE_PACK((tx), (ty));
-				glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z);			
+				case 4:
+					glRotateYi(8192*2);
+					break;
+				case 0:
+					glRotateYi(8192);
+					break;
+				case 1:
+					glRotateYi(-8192);
+					break;
 			}
+			glTranslate3f32(-elevatorRoomSize.x*TILESIZE+TILESIZE,0,TILESIZE+WALLDOORINTERVAL); //WALLDOORINTERVAL is arbitrary, just to move it away from the wall
+			drawRoom(&elevatorRoom,((1)<<3)|(1<<2)|(1), getCurrentPortalColor(getPlayer()->object->position));
+		glPopMatrix(1);
 
 	glPopMatrix(1);
 

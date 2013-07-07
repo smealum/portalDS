@@ -7,7 +7,7 @@ void drawRoomsGame(u8 mode, u16 color)
 	unbindMtl();
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 
-	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color);
+	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color); //TEMP
 }
 
 void roomOriginSize(room_struct* r, vect3D* o, vect3D* s)
@@ -30,6 +30,24 @@ void roomOriginSize(room_struct* r, vect3D* o, vect3D* s)
 
 	if(o)*o=m;
 	if(s)*s=vectDifference(M,m);
+}
+
+void roomResetOrigin(room_struct* r)
+{
+	if(!r)return;
+
+	vect3D o;
+
+	roomOriginSize(r, &o, NULL);
+	r->position=vect(0,0,0);
+
+	listCell_struct *lc=r->rectangles.first;
+
+	while(lc)
+	{
+		lc->data.position=vectDifference(lc->data.position,o);
+		lc=lc->next;
+	}
 }
 
 vect3D orientVector(vect3D v, u8 k)
@@ -108,6 +126,7 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);	
 		if(recp)
 		{
+			recp->hide=true; //TEMP ?
 			recp->collides=!lc->data.portalable;
 			recp->lightData.vertex=lc->data.lightData.vertex;
 		}

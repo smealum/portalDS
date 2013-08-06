@@ -223,12 +223,12 @@ void roomEditorCursor(selection_struct* sel)
 					
 					switch(bf->direction)
 					{
-						case 0: p.y=bf->y; p.z=bf->z; fill=p.x>sel->currentPosition.x; break;
-						case 1: p.y=bf->y; p.z=bf->z; fill=p.x<sel->currentPosition.x; break;
-						case 2: p.x=bf->x; p.z=bf->z; fill=p.y>sel->currentPosition.y; break;
-						case 3: p.x=bf->x; p.z=bf->z; fill=p.y<sel->currentPosition.y; break;
-						case 4: p.x=bf->x; p.y=bf->y; fill=p.z>sel->currentPosition.z; break;
-						default:p.x=bf->x; p.y=bf->y; fill=p.z<sel->currentPosition.z; break;
+						case 0:  p.y=bf->y; p.z=bf->z; fill=p.x>sel->currentPosition.x; break;
+						case 1:  p.y=bf->y; p.z=bf->z; fill=p.x<sel->currentPosition.x; break;
+						case 2:  p.x=bf->x; p.z=bf->z; fill=p.y>sel->currentPosition.y; break;
+						case 3:  p.x=bf->x; p.z=bf->z; fill=p.y<sel->currentPosition.y; break;
+						case 4:  p.x=bf->x; p.y=bf->y; fill=p.z>sel->currentPosition.z; break;
+						default: p.x=bf->x; p.y=bf->y; fill=p.z<sel->currentPosition.z; break;
 					}
 
 					if(p.x!=sel->currentPosition.x || p.y!=sel->currentPosition.y || p.z!=sel->currentPosition.z)
@@ -264,7 +264,8 @@ void roomEditorCursor(selection_struct* sel)
 			{
 				if(!sel->selectingTarget)setupContextButtons(sel->entity->type->contextButtonsArray, sel->entity->type->numButtons);
 				else setupContextButtons(targetSelectionButtonArray, 2);
-			}else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
+			}else if(sel->planar && sel->firstFace && (sel->firstFace->direction==2 || sel->firstFace->direction==3))setupContextButtons(groundSelectionButtonArray, 4);
+			else if(sel->planar)setupContextButtons(planarSelectionButtonArray, 2);
 			else setupContextButtons(nonplanarSelectionButtonArray, 4);
 		}
 	}

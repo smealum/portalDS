@@ -272,5 +272,6 @@ void removeTargetButton(void)
 
 contextButton_struct targetSelectionButtonArray[]={(contextButton_struct){"remove target", removeTargetButton}, (contextButton_struct){"cancel", cancelTargetButton}};
 contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}};
+contextButton_struct groundSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}, (contextButton_struct){"add sludge", makePortalablePlanarButton}, (contextButton_struct){"remove sludge", makePortalablePlanarButton}};
 contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalableButton}, (contextButton_struct){"portalable", makePortalableButton}, (contextButton_struct){"fill", fillButtonFunction}, (contextButton_struct){"delete", emptyButtonFunction}};
 

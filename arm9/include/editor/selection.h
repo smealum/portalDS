@@ -12,6 +12,7 @@ typedef struct
 extern selection_struct editorSelection;
 extern contextButton_struct targetSelectionButtonArray[];
 extern contextButton_struct planarSelectionButtonArray[];
+extern contextButton_struct groundSelectionButtonArray[];
 extern contextButton_struct nonplanarSelectionButtonArray[];
 
 void initSelection(selection_struct* s);

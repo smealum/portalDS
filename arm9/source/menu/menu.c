@@ -4,6 +4,11 @@ md2Model_struct GLaDOSmodel, domeModel, lairModel;
 modelInstance_struct GLaDOSmodelInstance;
 camera_struct menuCamera;
 
+u32 lightAngle=54912;
+cameraState_struct tempState={(vect3D){0,0,0}, (vect3D){0,0,0}};
+cameraTransition_struct testTransition;
+bool tempbool=false;
+
 void initMenu(void)
 {
 	lcdMainOnTop();
@@ -50,10 +55,10 @@ void initMenu(void)
 	glSetToonTableRange(0, 15, RGB15(8,8,8)); //TEMP?
 	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?
 
-	menuCamera.position=vect(156,8000,13000);
+	applyCameraState(&menuCamera,&cameraStates[0]);
+	tempState=cameraStates[1];
+	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
 }
-
-u32 lightAngle=54912;
 
 void menuFrame(void)
 {
@@ -68,23 +73,36 @@ void menuFrame(void)
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 
 	scanKeys();
-	if(keysHeld() & KEY_R)moveCameraImmediate(&menuCamera, vect(0,0,inttof32(1)/64));
-	if(keysHeld() & KEY_L)moveCameraImmediate(&menuCamera, vect(0,0,-inttof32(1)/64));
-	
-	if(keysHeld() & KEY_UP)moveCameraImmediate(&menuCamera, vect(0,inttof32(1)/64,0));
-	else if(keysHeld() & KEY_DOWN)moveCameraImmediate(&menuCamera, vect(0,-inttof32(1)/64,0));
-	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&menuCamera, vect(inttof32(1)/64,0,0));
-	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&menuCamera, vect(-inttof32(1)/64,0,0));
+
+	if(keysHeld() & KEY_R)tempState.position=addVect(tempState.position,vect(0,0,inttof32(1)/64));
+	if(keysHeld() & KEY_L)tempState.position=addVect(tempState.position,vect(0,0,-inttof32(1)/64));
+	if(keysHeld() & KEY_UP)tempState.position=addVect(tempState.position,vect(0,inttof32(1)/64,0));
+	if(keysHeld() & KEY_DOWN)tempState.position=addVect(tempState.position,vect(0,-inttof32(1)/64,0));
+	if(keysHeld() & KEY_RIGHT)tempState.position=addVect(tempState.position,vect(inttof32(1)/64,0,0));
+	if(keysHeld() & KEY_LEFT)tempState.position=addVect(tempState.position,vect(-inttof32(1)/64,0,0));
 
 	//TEMP (updateCamera stuff)
 		menuCamera.viewPosition=menuCamera.position;
 
 	// if(keysHeld() & KEY_A)lightAngle+=128;
 	// else if(keysHeld() & KEY_B)lightAngle-=128;
-	if(keysHeld() & KEY_A)rotateMatrixY(menuCamera.transformationMatrix, 64, true);
-	if(keysHeld() & KEY_Y)rotateMatrixY(menuCamera.transformationMatrix, -64, true);
-	if(keysHeld() & KEY_X)rotateMatrixX(menuCamera.transformationMatrix, 64, false);
-	if(keysHeld() & KEY_B)rotateMatrixX(menuCamera.transformationMatrix, -64, false);
+	if(keysHeld() & KEY_A)tempState.angle.x+=64;
+	if(keysHeld() & KEY_B)tempState.angle.x-=64;
+	if(keysHeld() & KEY_X)tempState.angle.y+=64;
+	if(keysHeld() & KEY_Y)tempState.angle.y-=64;
+	if(keysHeld() & KEY_START)tempState.angle.z+=64;
+	if(keysHeld() & KEY_SELECT)tempState.angle.z-=64;
+
+	if(keysUp() & KEY_TOUCH)
+	{
+		if(tempbool)testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
+		else testTransition=startCameraTransition(&cameraStates[0],&cameraStates[1],64);
+
+		tempbool^=1;
+	}
+
+	// applyCameraState(&menuCamera,&tempState);
+	updateCameraTransition(&menuCamera,&testTransition);
 
 	NOGBA("%d",lightAngle);
 	

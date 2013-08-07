@@ -25,8 +25,8 @@ int main(int argc, char **argv)
 	if(keysHeld() & KEY_SELECT)changeState(&editorState);
 	else changeState(&gameState);
 
-	changeState(&editorState);
-	// changeState(&menuState);
+	// changeState(&editorState);
+	changeState(&menuState);
 	applyState();
 
 	while(1)

@@ -261,7 +261,7 @@ void makeUnsludgePlanarButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
 }
 
 void makeSludgePlanarButton(void)
@@ -269,7 +269,7 @@ void makeSludgePlanarButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
 }
 
 void cancelTargetButton(void)

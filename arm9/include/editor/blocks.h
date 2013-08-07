@@ -83,6 +83,6 @@ void changeSludgeBlock(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, u16 u, bool nosludge);
 void changeAttributeBlockArrayRange(BLOCK_TYPE* ba, blockAttributeFunction f, blockFace_struct* l, vect3D o, vect3D s, bool unset);
 void changeAttributeBlockArrayRangeDirection(BLOCK_TYPE* ba, blockAttributeFunction f, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool portalable);
 
-rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba);
+rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba, rectangleList_struct* sludgeList);
 
 #endif

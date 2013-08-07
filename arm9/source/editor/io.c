@@ -157,6 +157,13 @@ bool writeEntity(entity_struct* e, FILE* f)
 				fwrite(&e->direction,sizeof(u8),1,f);
 			}
 			return true;
+		case 14:
+			//wall door (exit)
+			{
+				writeVect(adaptVector(e->position, e->direction), f);
+				fwrite(&e->direction,sizeof(u8),1,f);
+			}
+			return true;
 		default:
 			return true;
 	}
@@ -191,7 +198,7 @@ void writeHeader(mapHeader_struct* h, FILE* f)
 {
 	if(!h || !f)return;
 	fseek(f, 0, SEEK_SET);
-	fwrite(h, sizeof(mapHeader_struct), 1, f);
+	fwrite(h, MAPHEADER_SIZE, 1, f);
 }
 
 void writeVertexLightingData(vertexLightingData_struct* vld, FILE* f)
@@ -238,7 +245,7 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	lightingData_struct* ld=&r.lightingData;
 	initRoom(&r, 0, 0, vect(0,0,0));
 
-	r.rectangles=generateOptimizedRectangles(er->blockArray);
+	r.rectangles=generateOptimizedRectangles(er->blockArray, NULL);
 	generateLightsFromEntities();
 	// generateLightmaps(&r, ld);
 	generateVertexLighting(&r, ld);
@@ -270,7 +277,7 @@ void readHeader(mapHeader_struct* h, FILE* f)
 {
 	if(!h || !f)return;
 	fseek(f, 0, SEEK_SET);
-	fread(h, sizeof(mapHeader_struct), 1, f);
+	fread(h, MAPHEADER_SIZE, 1, f);
 }
 
 void readEntityEditor(FILE* f)
@@ -366,6 +373,11 @@ void readEntityEditor(FILE* f)
 			return;
 		case 13:
 			//wall door (start)
+			readVect(&v, f);
+			fseek(f, sizeof(u8), SEEK_CUR);
+			break;
+		case 14:
+			//wall door (end)
 			readVect(&v, f);
 			fseek(f, sizeof(u8), SEEK_CUR);
 			break;

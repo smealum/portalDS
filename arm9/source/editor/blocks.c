@@ -407,7 +407,7 @@ vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMU
 
 static inline bool isWall(u8 v1, u8 v2){return ((v1&1) && !(v2&1)) && !(v1&BLOCK_NOWALLS) && !(v2&BLOCK_NOWALLS);}
 
-rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
+rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba, rectangleList_struct* sludgeList)
 {
 	rectangleList_struct rl;
 	initRectangleList(&rl);
@@ -449,7 +449,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y)),true),&rl);
 			cnt1-=s.x*s.y;
 		}
@@ -457,7 +457,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y)),true),&rl);
 			cnt2-=s.x*s.y;
 		}
@@ -467,7 +467,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(i+1,p.x+s.x,p.y)),vectBlockToRectangle(vect(0,-s.x,s.y)),false),&rl);
 			cnt12-=s.x*s.y;
 		}
@@ -475,7 +475,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEY, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(i,p.x,p.y)),vectBlockToRectangle(vect(0,s.x,s.y)),false),&rl);
 			cnt22-=s.x*s.y;
 		}
@@ -483,6 +483,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 
 	cnt1=0; cnt2=0;
 	cnt12=0; cnt22=0;
+	s16 cnt3=0;
 	for(j=0;j<ROOMARRAYSIZEY;j++)
 	{
 		u8 *d1=data1, *d2=data2;
@@ -501,6 +502,8 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 				else if(*d1==2)cnt12++;
 				if(*d2==1)cnt2++;
 				else if(*d2==2)cnt22++;
+				if(*d1 && v&BLOCK_SLUDGE){*d1|=4;cnt3++;}
+
 				d1++;d2++;
 			}
 		}
@@ -510,7 +513,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 3);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),true),&rl);
 			cnt1-=s.x*s.y;
 		}
@@ -518,7 +521,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y)),true),&rl);
 			cnt2-=s.x*s.y;
 		}
@@ -528,7 +531,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 3);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+1,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),false),&rl);
 			cnt12-=s.x*s.y;
 		}
@@ -536,11 +539,20 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,j,p.y)),vectBlockToRectangle(vect(-s.x,0,s.y)),false),&rl);
 			cnt22-=s.x*s.y;
 		}
 
+		//sludge
+		while(cnt3>0)
+		{
+			vect2D p, s;
+			getMaxRectangle(data1, 4, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 255);
+			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+2,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),true),&rl);
+			cnt3-=s.x*s.y;
+		}
 	}
 
 	cnt1=0; cnt2=0;
@@ -572,7 +584,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0)),true),&rl);
 			cnt1-=s.x*s.y;
 		}
@@ -580,7 +592,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0)),true),&rl);
 			cnt2-=s.x*s.y;
 		}
@@ -590,7 +602,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data1, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x+s.x,p.y,k+1)),vectBlockToRectangle(vect(-s.x,s.y,0)),false),&rl);
 			cnt12-=s.x*s.y;
 		}
@@ -598,7 +610,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 		{
 			vect2D p, s;
 			getMaxRectangle(data2, 2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
-			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s);
+			fillRectangle(data2, ROOMARRAYSIZEX, ROOMARRAYSIZEY, &p, &s, 255);
 			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,p.y,k)),vectBlockToRectangle(vect(s.x,s.y,0)),false),&rl);
 			cnt22-=s.x*s.y;
 		}

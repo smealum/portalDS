@@ -48,7 +48,7 @@ void packRectangles(rectangle2DList_struct* l, short w, short h);
 bool packRectanglesSize(rectangle2DList_struct* l, short* w, short* h);
 void freeRectangle2DList(rectangle2DList_struct* l);
 
-void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size);
+void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size, u8 mask);
 void getMaxRectangle(u8* data, u8 val, int w, int h, vect2D* pos, vect2D* size);
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip);
 vect3D getClosestPointRectangleStruct(rectangle_struct* rec, vect3D o);

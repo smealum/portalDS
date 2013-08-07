@@ -54,7 +54,8 @@ void fillCache(int* c, u8* d, u8 val, int w, int h, int x)
 	int y;
 	for(y=0;y<h;y++)
 	{
-		if(d[x+y*w]==val)c[y]++;
+		// if(d[x+y*w]==val)c[y]++;
+		if(d[x+y*w]&val)c[y]++;
 		else c[y]=0;
 	}
 }
@@ -109,7 +110,7 @@ void getMaxRectangle(u8* data, u8 val, int w, int h, vect2D* pos, vect2D* size)
 	*size=vect2(cornerb.x-originb.x+1,cornerb.y-originb.y+1);
 }
 
-void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
+void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size, u8 mask)
 {
 	int i;
 	for(i=pos->x;i<pos->x+size->x;i++)
@@ -117,7 +118,7 @@ void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size)
 		int j;
 		for(j=pos->y;j<pos->y+size->y;j++)
 		{
-			data[i+j*w]=0;
+			data[i+j*w]&=~mask;
 		}
 	}
 }

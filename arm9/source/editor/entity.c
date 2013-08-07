@@ -414,7 +414,7 @@ void wallDoorSpecialMove(entity_struct* e, vect3D op, u8 od, bool m)
 	if(!e || m)return;
 
 	vect3D p=vectDifference(op,adjustVectForNormal(od, vect(0,0,0)));
-	u8 v=getBlock(editorRoom.blockArray,p.x,p.y,p.z);
+	BLOCK_TYPE v=getBlock(editorRoom.blockArray,p.x,p.y,p.z);
 
 	v=v&(~BLOCK_NOWALLS);
 

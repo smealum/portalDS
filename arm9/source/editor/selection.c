@@ -229,7 +229,7 @@ void makeUnportalableButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changePortalableBlockArrayRange(editorRoom.blockArray, editorRoom.blockFaceList, s->origin, s->size, false);
+	changeAttributeBlockArrayRange(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, false);
 }
 
 void makePortalableButton(void)
@@ -237,7 +237,7 @@ void makePortalableButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changePortalableBlockArrayRange(editorRoom.blockArray, editorRoom.blockFaceList, s->origin, s->size, true);
+	changeAttributeBlockArrayRange(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, true);
 }
 
 void makeUnportalablePlanarButton(void)
@@ -245,7 +245,7 @@ void makeUnportalablePlanarButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changePortalableBlockArrayRangeDirection(editorRoom.blockArray, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
 }
 
 void makePortalablePlanarButton(void)
@@ -253,7 +253,23 @@ void makePortalablePlanarButton(void)
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
 
-	changePortalableBlockArrayRangeDirection(editorRoom.blockArray, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
+}
+
+void makeUnsludgePlanarButton(void)
+{
+	selection_struct* s=&editorSelection;
+	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
+
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
+}
+
+void makeSludgePlanarButton(void)
+{
+	selection_struct* s=&editorSelection;
+	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
+
+	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
 }
 
 void cancelTargetButton(void)
@@ -272,6 +288,6 @@ void removeTargetButton(void)
 
 contextButton_struct targetSelectionButtonArray[]={(contextButton_struct){"remove target", removeTargetButton}, (contextButton_struct){"cancel", cancelTargetButton}};
 contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}};
-contextButton_struct groundSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}, (contextButton_struct){"add sludge", makePortalablePlanarButton}, (contextButton_struct){"remove sludge", makePortalablePlanarButton}};
+contextButton_struct groundSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}, (contextButton_struct){"add sludge", makeSludgePlanarButton}, (contextButton_struct){"remove sludge", makeUnsludgePlanarButton}};
 contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalableButton}, (contextButton_struct){"portalable", makePortalableButton}, (contextButton_struct){"fill", fillButtonFunction}, (contextButton_struct){"delete", emptyButtonFunction}};
 

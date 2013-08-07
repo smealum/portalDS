@@ -56,13 +56,13 @@ void initBlocks(void)
 	unportalableTexture=createTexture("floor7.pcx", "textures");
 }
 
-u8 getBlock(u8* ba, s8 x, s8 y, s8 z)
+BLOCK_TYPE getBlock(BLOCK_TYPE* ba, s8 x, s8 y, s8 z)
 {
 	if(!ba || x<0 || y<0 || z<0 || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return 1; //not empty
 	return ba[x+y*ROOMARRAYSIZEX+z*ROOMARRAYSIZEX*ROOMARRAYSIZEY];
 }
 
-void setBlock(u8* ba, u8 x, u8 y, u8 z, u8 v)
+void setBlock(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, BLOCK_TYPE v)
 {
 	if(!ba || x<0 || y<0 || z<0 || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return;
 	ba[x+y*ROOMARRAYSIZEX+z*ROOMARRAYSIZEX*ROOMARRAYSIZEY]=v;
@@ -101,21 +101,31 @@ void searchAndDestroyBlockFacesRange(blockFace_struct** l, vect3D o, vect3D s)
 	}
 }
 
-void changePortalableBlockDirection(u8* ba, u8 x, u8 y, u8 z, u8 dir, bool portalable)
+void changePortalableBlockDirection(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, u16 u, bool portalable)
 {
 	if(!ba)return;
-	u8 v=getBlock(ba, x, y, z);
-	u8 u=1<<(dir+1);
-	
+	BLOCK_TYPE v=getBlock(ba, x, y, z);
+
 	v|=u;
 	if(portalable)v^=u;
 
 	setBlock(ba, x, y, z, v);
 }
 
-void changePortalableBlockArrayRange(u8* ba, blockFace_struct* l, vect3D o, vect3D s, bool portalable)
+void changeSludgeBlock(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, u16 u, bool nosludge)
 {
 	if(!ba)return;
+	BLOCK_TYPE v=getBlock(ba, x, y, z);
+
+	v|=BLOCK_SLUDGE;
+	if(nosludge)v^=BLOCK_SLUDGE;
+
+	setBlock(ba, x, y, z, v);
+}
+
+void changeAttributeBlockArrayRange(BLOCK_TYPE* ba, blockAttributeFunction f, blockFace_struct* l, vect3D o, vect3D s, bool unset)
+{
+	if(!ba || !f)return;
 
 	fixOriginSize(&o, &s);
 	vect3D e=addVect(o, s);
@@ -130,15 +140,15 @@ void changePortalableBlockArrayRange(u8* ba, blockFace_struct* l, vect3D o, vect
 		|| (l->direction==4 && l->z==o.z-1 && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)
 		|| (l->direction==5 && l->z==e.z   && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y))
 		{
-			changePortalableBlockDirection(ba, l->x, l->y, l->z, l->direction, portalable);
+			f(ba, l->x, l->y, l->z, 1<<(l->direction+1), unset);
 		}
 		l=l->next;
 	}
 }
 
-void changePortalableBlockArrayRangeDirection(u8* ba, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool portalable)
+void changeAttributeBlockArrayRangeDirection(BLOCK_TYPE* ba, blockAttributeFunction f, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool unset)
 {
-	if(!ba)return;
+	if(!ba || !f)return;
 
 	fixOriginSize(&o, &s);
 	vect3D e=addVect(o, s);
@@ -153,13 +163,13 @@ void changePortalableBlockArrayRangeDirection(u8* ba, blockFace_struct* l, vect3
 		|| (l->direction==4 && l->z==o.z-1 && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)
 		|| (l->direction==5 && l->z==e.z   && l->x>=o.x && l->x<e.x && l->y>=o.y && l->y<e.y)))
 		{
-			changePortalableBlockDirection(ba, l->x, l->y, l->z, l->direction, portalable);
+			f(ba, l->x, l->y, l->z, 1<<(l->direction+1), unset);
 		}
 		l=l->next;
 	}
 }
 
-void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
+void fillBlockArrayRange(BLOCK_TYPE* ba, blockFace_struct** l, vect3D o, vect3D s)
 {
 	if(!ba)return;
 
@@ -181,7 +191,7 @@ void fillBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
 	generateBlockFacesRange(ba, l, o, s, false);
 }
 
-void emptyBlockArrayRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s)
+void emptyBlockArrayRange(BLOCK_TYPE* ba, blockFace_struct** l, vect3D o, vect3D s)
 {
 	if(!ba)return;
 
@@ -217,7 +227,7 @@ vect3D adjustVectForNormal(u8 dir, vect3D v)
 	return v;
 }
 
-void initBlockArray(u8* ba)
+void initBlockArray(BLOCK_TYPE* ba)
 {
 	if(!ba)return;
 	int i, j, k;
@@ -239,11 +249,13 @@ void initEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
 	er->blockFaceList=NULL;
-	er->blockArray=malloc(sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
+	er->blockArray=malloc(sizeof(BLOCK_TYPE)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
-	// initBlockArray(er->blockArray);
-	// generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
-	loadMapEditor(er,"testedit.map");
+
+	initBlockArray(er->blockArray);
+	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
+
+	// loadMapEditor(er,"testedit.map");
 }
 
 void freeBlockFace(blockFace_struct* bf)
@@ -302,7 +314,7 @@ void addBlockFace(blockFace_struct** l, blockFace_struct* bf)
 	*l=bf;
 }
 
-void generateBlockFace(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z, u8 dir)
+void generateBlockFace(BLOCK_TYPE* ba, blockFace_struct** l, u8 x, u8 y, u8 z, u8 dir)
 {
 	if(!ba || !l)return;
 	if(!getBlock(ba,x,y,z))return;
@@ -319,11 +331,11 @@ void generateBlockFace(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z, u8 dir)
 	if(add)addBlockFace(l, createBlockFace(x,y,z,dir));
 }
 
-void generateBlockFaces(u8* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
+void generateBlockFaces(BLOCK_TYPE* ba, blockFace_struct** l, u8 x, u8 y, u8 z)
 {
 	if(!ba || !l || x>=ROOMARRAYSIZEX || y>=ROOMARRAYSIZEY || z>=ROOMARRAYSIZEZ)return;
 	
-	u8 v=getBlock(ba,x,y,z);
+	BLOCK_TYPE v=getBlock(ba,x,y,z);
 	if(!v)return;
 	
 	generateBlockFace(ba, l, x, y, z, 0);
@@ -344,7 +356,7 @@ blockFace_struct* findBlockFace(blockFace_struct* l, u8 x, u8 y, u8 z, u8 direct
 	return NULL;
 }
 
-void generateBlockFacesRange(u8* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts)
+void generateBlockFacesRange(BLOCK_TYPE* ba, blockFace_struct** l, vect3D o, vect3D s, bool outskirts)
 {
 	if(!ba)return;
 	
@@ -395,7 +407,7 @@ vect3D vectBlockToRectangle(vect3D v){return (vect3D){v.x*BLOCKMULTX,v.y*BLOCKMU
 
 static inline bool isWall(u8 v1, u8 v2){return ((v1&1) && !(v2&1)) && !(v1&BLOCK_NOWALLS) && !(v2&BLOCK_NOWALLS);}
 
-rectangleList_struct generateOptimizedRectangles(u8* ba)
+rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba)
 {
 	rectangleList_struct rl;
 	initRectangleList(&rl);
@@ -417,7 +429,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 		{
 			for(j=0;j<ROOMARRAYSIZEY;j++)
 			{
-				const u8 v=getBlock(ba,i,j,k);
+				const BLOCK_TYPE v=getBlock(ba,i,j,k);
 				*d1=isWall(v,getBlock(ba,i+1,j,k));
 				*d2=isWall(v,getBlock(ba,i-1,j,k));
 
@@ -478,7 +490,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 		{
 			for(i=0;i<ROOMARRAYSIZEX;i++)
 			{
-				const u8 v=getBlock(ba,i,j,k);
+				const BLOCK_TYPE v=getBlock(ba,i,j,k);
 				*d1=isWall(v,getBlock(ba,i,j+1,k));
 				*d2=isWall(v,getBlock(ba,i,j-1,k));
 
@@ -540,7 +552,7 @@ rectangleList_struct generateOptimizedRectangles(u8* ba)
 		{
 			for(i=0;i<ROOMARRAYSIZEX;i++)
 			{
-				const u8 v=getBlock(ba,i,j,k);
+				const BLOCK_TYPE v=getBlock(ba,i,j,k);
 				*d1=isWall(v,getBlock(ba,i,j,k+1));
 				*d2=isWall(v,getBlock(ba,i,j,k-1));
 
@@ -603,7 +615,7 @@ vect3D getBlockPosition(u8 x, u8 y, u8 z)
 	return vect((x-ROOMARRAYSIZEX/2)*BLOCKSIZEX,(y-ROOMARRAYSIZEY/2)*BLOCKSIZEY,(z-ROOMARRAYSIZEZ/2)*BLOCKSIZEZ);
 }
 
-vect3D getMinBlockArray(u8* ba)
+vect3D getMinBlockArray(BLOCK_TYPE* ba)
 {
 	if(!ba)return vect(0,0,0);
 	int i, j, k;
@@ -682,13 +694,13 @@ blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o,
 	return bf;
 }
 
-void drawBlockFace(blockFace_struct* bf, u8* ba)
+void drawBlockFace(blockFace_struct* bf, BLOCK_TYPE* ba)
 {
 	if(!bf || !bf->draw)return;
 	
 	u32* vtxPtr=packedVertex[bf->direction];
 	
-	u8 v=getBlock(ba,bf->x,bf->y,bf->z);
+	BLOCK_TYPE v=getBlock(ba,bf->x,bf->y,bf->z);
 
 	if(v&(1<<(bf->direction+1)))applyMTL(unportalableTexture);
 	else{
@@ -719,7 +731,7 @@ void drawBlockFace(blockFace_struct* bf, u8* ba)
 	glPopMatrix(1);
 }
 
-void drawBlockFaceList(blockFace_struct* l, u8* ba)
+void drawBlockFaceList(blockFace_struct* l, BLOCK_TYPE* ba)
 {
 	if(!l)return;
 		

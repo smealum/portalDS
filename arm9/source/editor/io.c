@@ -180,10 +180,10 @@ void writeEntities(FILE* f)
 	fseek(f, 0, SEEK_END);
 }
 
-u8* compressBlockArray(u8* ba, u32* size)
+u8* compressBlockArray(BLOCK_TYPE* ba, u32* size)
 {
 	u8* dst;
-	*size=compressRLE(&dst, ba, sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
+	*size=compressRLE(&dst, (u8*)ba, sizeof(BLOCK_TYPE)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	return dst;
 }
 

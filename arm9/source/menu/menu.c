@@ -76,6 +76,9 @@ void menuFrame(void)
 	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&menuCamera, vect(inttof32(1)/64,0,0));
 	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&menuCamera, vect(-inttof32(1)/64,0,0));
 
+	//TEMP (updateCamera stuff)
+		menuCamera.viewPosition=menuCamera.position;
+
 	// if(keysHeld() & KEY_A)lightAngle+=128;
 	// else if(keysHeld() & KEY_B)lightAngle-=128;
 	if(keysHeld() & KEY_A)rotateMatrixY(menuCamera.transformationMatrix, 64, true);

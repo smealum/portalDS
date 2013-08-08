@@ -412,6 +412,7 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba, rectangleList_s
 	rectangleList_struct rl;
 	initRectangleList(&rl);
 	if(!ba)return rl;
+	if(sludgeList)initRectangleList(sludgeList);
 	int i, j, k;
 	u8 *data1, *data2;
 	s16 cnt1, cnt2;
@@ -545,13 +546,16 @@ rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba, rectangleList_s
 		}
 
 		//sludge
-		while(cnt3>0)
+		if(sludgeList)
 		{
-			vect2D p, s;
-			getMaxRectangle(data1, 4, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
-			fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 255);
-			addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+2,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),true),&rl);
-			cnt3-=s.x*s.y;
+			while(cnt3>0)
+			{
+				vect2D p, s;
+				getMaxRectangle(data1, 4, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s);
+				fillRectangle(data1, ROOMARRAYSIZEX, ROOMARRAYSIZEZ, &p, &s, 255);
+				addRectangle(createRectangle(vectBlockToRectangle(vect(p.x,j+2,p.y)),vectBlockToRectangle(vect(s.x,0,s.y)),true),sludgeList);
+				cnt3-=s.x*s.y;
+			}
 		}
 	}
 

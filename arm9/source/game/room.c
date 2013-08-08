@@ -176,6 +176,20 @@ void readRectangles(room_struct* r, FILE* f)
 	}
 }
 
+void readSludgeRectangles(FILE* f)
+{
+	if(!f)return;
+	int i, k;
+
+	fread(&k,sizeof(int),1,f);
+	for(i=0;i<k;i++)
+	{
+		rectangle_struct rec;
+		readRectangle(&rec, f);
+		addSludgeRectangle(&rec);
+	}
+}
+
 void addEntityTarget(u8 k, u8 n, void* target, activatorTarget_type type)
 {
 	if(!target)return;
@@ -458,6 +472,10 @@ void newReadMap(char* filename, room_struct* r, u8 flags)
 		fseek(f, h.entityPosition, SEEK_SET);
 			readEntities(f);
 	}
+
+	//sludge stuff
+	fseek(f, h.sludgePosition, SEEK_SET);
+		readSludgeRectangles(f);
 	
 	fclose(f);
 }

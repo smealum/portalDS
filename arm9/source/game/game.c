@@ -72,7 +72,8 @@ void initGame(void)
 	initCubes();
 	initEmancipation();
 	initDoors();
-	
+	initSludge();
+
 	NOGBA("lalala");
 
 	getPlayer()->currentRoom=&gameRoom;
@@ -227,6 +228,7 @@ static inline void render1(void)
 			drawEmancipationGrids();
 			drawDoors();
 			drawWallDoors();
+			drawSludge(&gameRoom);
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
 		drawPortal(&portal1);
@@ -280,6 +282,7 @@ static inline void render2(void)
 		drawEmancipationGrids();
 		drawDoors();
 		drawWallDoors();
+		drawSludge(&gameRoom);
 
 	glPopMatrix(1);
 	

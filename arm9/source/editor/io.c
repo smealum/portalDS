@@ -245,7 +245,8 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	lightingData_struct* ld=&r.lightingData;
 	initRoom(&r, 0, 0, vect(0,0,0));
 
-	r.rectangles=generateOptimizedRectangles(er->blockArray, NULL);
+	rectangleList_struct sludgeList;
+	r.rectangles=generateOptimizedRectangles(er->blockArray, &sludgeList);
 	generateLightsFromEntities();
 	// generateLightmaps(&r, ld);
 	generateVertexLighting(&r, ld);
@@ -265,7 +266,13 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	h.entityPosition=ftell(f);
 		writeEntities(f);
 
+	h.sludgePosition=ftell(f);
+		writeRectangleList(&sludgeList, f);
+
 	writeHeader(&h,f);
+
+	//empty sludgelist here
+	while(sludgeList.num)popRectangle(&sludgeList);
 
 	freeRoom(&r);
 	fclose(f);

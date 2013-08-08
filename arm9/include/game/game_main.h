@@ -25,6 +25,7 @@
 #include "game/emancipation.h"
 #include "game/elevator.h"
 #include "game/walldoor.h"
+#include "game/sludge.h"
 #include "game/sfx.h"
 
 #endif

@@ -20,7 +20,7 @@ typedef struct
 
 void initSimpleGui(void);
 sguiButton_struct* createSimpleButton(vect3D p, const char* str, buttonTargetFunction f);
-bool updateSimpleGui(u8 x, u8 y);
+bool updateSimpleGui(s16 x, s16 y);
 void drawSimpleGui(void);
 void cleanUpSimpleButtons(void);
 

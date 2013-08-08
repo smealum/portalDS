@@ -13,6 +13,7 @@ typedef struct
 }cameraTransition_struct;
 
 extern cameraState_struct cameraStates[];
+extern cameraTransition_struct testTransition;
 
 void applyCameraState(camera_struct* c, cameraState_struct* cs);
 

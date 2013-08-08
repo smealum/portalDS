@@ -12,7 +12,8 @@ void initContextButtons(void)
 
 bool updateContextButtons(touchPosition* tp)
 {
-	return updateSimpleGui(tp->px,tp->py);
+	if(!(keysHeld() & KEY_TOUCH)) return updateSimpleGui(-1, -1);
+	else return updateSimpleGui(tp->px,tp->py);
 }
 
 void setupContextButtons(contextButton_struct* cb, u8 n)

@@ -44,7 +44,7 @@ sguiButton_struct* createSimpleButton(vect3D p, const char* str, buttonTargetFun
 	return NULL;
 }
 
-bool updateSimpleButton(sguiButton_struct* b, u8 x, u8 y)
+bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 {
 	if(!b || !b->used)return false;
 
@@ -54,18 +54,17 @@ bool updateSimpleButton(sguiButton_struct* b, u8 x, u8 y)
 	{
 		b->active=true;
 		ret=true;
+	}else if(b->active && x==-1 && y==-1){
+		if(b->targetFunction)b->targetFunction();
+		b->active=false;
 	}else{
-		if(b->active)
-		{
-			if(b->targetFunction)b->targetFunction();
-		}
 		b->active=false;
 	}
 
 	return ret;
 }
 
-bool updateSimpleButtons(u8 x, u8 y)
+bool updateSimpleButtons(s16 x, s16 y)
 {
 	int i;
 	bool ret=false;
@@ -76,7 +75,7 @@ bool updateSimpleButtons(u8 x, u8 y)
 	return ret;
 }
 
-bool updateSimpleGui(u8 x, u8 y)
+bool updateSimpleGui(s16 x, s16 y)
 {
 	return updateSimpleButtons(x,y);
 }

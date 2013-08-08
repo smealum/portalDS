@@ -44,6 +44,8 @@ void initMenu(void)
 	initModelInstance(&GLaDOSmodelInstance,&GLaDOSmodel);
 	changeAnimation(&GLaDOSmodelInstance,1,false);
 
+	initMenuButtons();
+
 	//TEMP
 	glLight(0, RGB15(31,31,31), cosLerp(4096), 0, sinLerp(4096));
 
@@ -58,7 +60,11 @@ void initMenu(void)
 	applyCameraState(&menuCamera,&cameraStates[0]);
 	tempState=cameraStates[1];
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
+
+	setupMenuPage(mainMenuPage, mainMenuPageLength);
 }
+
+touchPosition currentTouch;
 
 void menuFrame(void)
 {
@@ -73,6 +79,7 @@ void menuFrame(void)
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 
 	scanKeys();
+	touchRead(&currentTouch);
 
 	if(keysHeld() & KEY_R)tempState.position=addVect(tempState.position,vect(0,0,inttof32(1)/64));
 	if(keysHeld() & KEY_L)tempState.position=addVect(tempState.position,vect(0,0,-inttof32(1)/64));
@@ -93,18 +100,19 @@ void menuFrame(void)
 	if(keysHeld() & KEY_START)tempState.angle.z+=64;
 	if(keysHeld() & KEY_SELECT)tempState.angle.z-=64;
 
-	if(keysUp() & KEY_TOUCH)
-	{
-		if(tempbool)testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
-		else testTransition=startCameraTransition(&cameraStates[0],&cameraStates[1],64);
+	// if(keysUp() & KEY_TOUCH)
+	// {
+	// 	if(tempbool)testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
+	// 	else testTransition=startCameraTransition(&cameraStates[0],&cameraStates[1],64);
 
-		tempbool^=1;
-	}
+	// 	tempbool^=1;
+	// }
+
+	if(!(keysHeld() & KEY_TOUCH)) updateSimpleGui(-1, -1);
+	else updateSimpleGui(currentTouch.px, currentTouch.py);
 
 	// applyCameraState(&menuCamera,&tempState);
 	updateCameraTransition(&menuCamera,&testTransition);
-
-	NOGBA("%d",lightAngle);
 	
 	glPushMatrix();
 		glScalef32(inttof32(16),inttof32(16),inttof32(16));
@@ -114,6 +122,15 @@ void menuFrame(void)
 		renderModelFrameInterp(0, 0, 0, &domeModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(0), false, NULL, RGB15(31,31,31));
 		renderModelFrameInterp(0, 0, 0, &lairModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(1), false, NULL, RGB15(31,31,31));
 	glPopMatrix(1);
+
+	switch(d3dScreen)
+	{
+		case true:
+			drawSimpleGui();
+			break;
+		default:
+			break;
+	}
 	
 	glFlush(0);
 	swiWaitForVBlank();

@@ -16,8 +16,8 @@ void applyCameraState(camera_struct* c, cameraState_struct* cs)
 	rotateMatrixY(c->transformationMatrix, cs->angle.y, false);
 	rotateMatrixZ(c->transformationMatrix, cs->angle.z, false);
 
-	NOGBA("p : %d %d %d",cs->position.x,cs->position.y,cs->position.z);
-	NOGBA("a : %d %d %d",cs->angle.x,cs->angle.y,cs->angle.z);
+	// NOGBA("p : %d %d %d",cs->position.x,cs->position.y,cs->position.z);
+	// NOGBA("a : %d %d %d",cs->angle.x,cs->angle.y,cs->angle.z);
 }
 
 cameraTransition_struct startCameraTransition(cameraState_struct* s, cameraState_struct* f, int length)

@@ -2,6 +2,7 @@
 #define __GENERAL9__
 
 #define GAMEVERSION "0.01"
+#define arrayLength(a) (sizeof((a))/sizeof((a)[0]))
 
 #include <nds.h>
 #include <fat.h>

@@ -732,6 +732,8 @@ void drawBlockFace(blockFace_struct* bf, BLOCK_TYPE* ba)
 		glTranslate3f32(inttof32(bf->x),inttof32(bf->y),inttof32(bf->z));
 	
 		GFX_COLOR=faceColors[bf->direction];
+
+		if(bf->direction==2 && v&BLOCK_SLUDGE)GFX_COLOR=RGB15(2,15,2);
 	
 		GFX_BEGIN=GL_QUADS;
 		

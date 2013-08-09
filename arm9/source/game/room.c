@@ -56,15 +56,15 @@ vect3D orientVector(vect3D v, u8 k)
 
 	switch(k)
 	{
+		case 0:
+			u.x=-v.z;
+			u.y=v.y;
+			u.z=v.x;
+			break;
 		case 1:
 			u.x=v.z;
 			u.y=v.y;
 			u.z=-v.x;
-			break;
-		case 2:
-			u.x=-v.z;
-			u.y=v.y;
-			u.z=v.x;
 			break;
 		case 4:
 			u.x=v.x;
@@ -102,12 +102,16 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 	vect3D o=vect(0,0,0), s=vect(0,0,0);
 	roomOriginSize(r2,&o,&s);
 
-	switch(orientation)
+	switch(orientation) //TODO : do pre-rotation ?
 	{
-		case 4:
-			v.x-=s.x/2;
+		case 0:
+			v.z-=s.x/2; //not a mistake
 			break;
-		default:
+		case 1:
+			v.z+=s.x/2; //not a mistake
+			break;
+		case 4:	case 5:
+			v.x-=s.x/2;
 			break;
 	}
 	v.y-=4;
@@ -120,7 +124,7 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 		//rotate
 		rec.position=orientVector(rec.position,orientation);
 		rec.size=orientVector(rec.size,orientation);
-		if(!(orientation%2))invertRectangle(&rec);
+		if(!(orientation%2) || orientation==1)invertRectangle(&rec);
 
 		rec.position=addVect(rec.position,v);
 		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);	
@@ -333,6 +337,14 @@ void readEntity(u8 i, FILE* f)
 							break;
 					}
 				}
+			}
+			return;
+		case 14:
+			//wall door (exit)
+			{
+				vect3D p; readVect(&p,f);
+				u8 o; fread(&o,sizeof(u8),1,f);
+				setupWallDoor(NULL, &exitWallDoor, p, o);
 			}
 			return;
 		default:

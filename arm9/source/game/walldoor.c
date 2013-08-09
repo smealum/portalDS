@@ -6,6 +6,7 @@
 room_struct elevatorRoom;
 
 wallDoor_struct entryWallDoor;
+wallDoor_struct exitWallDoor;
 md2Model_struct wallDoorModel;
 
 vect3D doorFrameData[]={{-TILESIZE*2,HEIGHTUNIT*8,0},{-TILESIZE*2,HEIGHTUNIT*5,0},{-TILESIZE,HEIGHTUNIT*8,0},{-TILESIZE,HEIGHTUNIT*7,0},{TILESIZE,HEIGHTUNIT*8,0},{TILESIZE,HEIGHTUNIT*7,0},{TILESIZE*2,HEIGHTUNIT*8,0},{TILESIZE*2,HEIGHTUNIT*5,0}};
@@ -39,6 +40,7 @@ void initWallDoor(wallDoor_struct* wd)
 void initWallDoors(void)
 {
 	initWallDoor(&entryWallDoor);
+	initWallDoor(&exitWallDoor);
 
 	//TEMP ?
 	loadMd2Model("models/door.md2", "door.pcx", &wallDoorModel);
@@ -121,6 +123,7 @@ void updateWallDoor(wallDoor_struct* wd)
 void updateWallDoors(void)
 {
 	updateWallDoor(&entryWallDoor);
+	updateWallDoor(&exitWallDoor);
 }
 
 void drawWallDoor(wallDoor_struct* wd)
@@ -178,10 +181,10 @@ void drawWallDoor(wallDoor_struct* wd)
 				case 4:
 					glRotateYi(8192*2);
 					break;
-				case 0:
+				case 1:
 					glRotateYi(8192);
 					break;
-				case 1:
+				case 0:
 					glRotateYi(-8192);
 					break;
 			}
@@ -197,4 +200,5 @@ void drawWallDoor(wallDoor_struct* wd)
 void drawWallDoors(void)
 {
 	drawWallDoor(&entryWallDoor);
+	drawWallDoor(&exitWallDoor);
 }

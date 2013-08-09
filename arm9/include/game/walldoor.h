@@ -14,6 +14,7 @@ typedef struct
 }wallDoor_struct;
 
 extern wallDoor_struct entryWallDoor;
+extern wallDoor_struct exitWallDoor;
 
 void initWallDoors(void);
 void updateWallDoors(void);

@@ -99,8 +99,9 @@ void initGame(void)
 	initPI9();
 
 	// readMap("lalala.map", NULL);
-	// newReadMap("../testedit.map", NULL);
+	// newReadMap("../testedit.map", NULL, 255);
 	newReadMap("test.map", NULL, 255);
+	// newReadMap("default.map", NULL, 255);
 	
 	// testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
 	// testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP

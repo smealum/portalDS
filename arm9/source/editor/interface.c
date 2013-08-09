@@ -1,6 +1,6 @@
 #include "editor/editor_main.h"
 
-#define NUMINTERFACEBUTTONS (12)
+#define NUMINTERFACEBUTTONS (13)
 
 interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
 											(interfaceButton_struct){72,38,"pressurebttn2_ui.pcx",NULL,3,false},
@@ -13,7 +13,8 @@ interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"stor
 											(interfaceButton_struct){107,81,"balllauncher2_ui.pcx",NULL,1,false},
 											(interfaceButton_struct){142,81,"ballcatcher2_ui.pcx",NULL,0,false},
 											(interfaceButton_struct){177,81,"turret2_ui.pcx",NULL,4,false},
-											(interfaceButton_struct){212,81,"door2_ui.pcx",NULL,13,false}};
+											(interfaceButton_struct){212,81,"door2_ui.pcx",NULL,13,false},
+											(interfaceButton_struct){212,81*2-38,"door2_ui.pcx",NULL,14,false}};
 
 struct gl_texture_t *interfaceBackground;
 int bgSub;

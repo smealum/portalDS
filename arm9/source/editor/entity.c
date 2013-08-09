@@ -24,7 +24,7 @@ entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_
 								(entityType_struct){"editor/models/door_ed.md2", "door.pcx", pY_mask, doorButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/light_ed.md2", "lightbulb.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, lightButtonArray, 1, NULL, NULL, NULL, NULL, false, false},
 								(entityType_struct){"editor/models/platform_ed.md2", "platformtarget.pcx", pX_mask | mX_mask | pY_mask | pZ_mask | mZ_mask, platformButtonArray, 0, NULL, NULL, NULL, platformTargetSpecialMoveCheck, true, false},
-								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, wallDoorSpecialMove, wallDoorSpecialMoveCheck, false, true},
+								(entityType_struct){"editor/models/walldoor_ed.md2", "door_plain.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, wallDoorSpecialMove, wallDoorSpecialMoveCheck, false, true},
 								(entityType_struct){"editor/models/walldoor_ed.md2", "door.pcx", pX_mask | mX_mask | pZ_mask | mZ_mask, gridButtonArray, 1, NULL, wallDoorSpecialDraw, wallDoorSpecialMove, wallDoorSpecialMoveCheck, false, true},
 							};
 

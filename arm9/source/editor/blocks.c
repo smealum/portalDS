@@ -255,7 +255,7 @@ void initEditorRoom(editorRoom_struct* er)
 	// initBlockArray(er->blockArray);
 	// generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 
-	loadMapEditor(er,"testedit.map");
+	loadMapEditor(er,"maps/default.map");
 }
 
 void freeBlockFace(blockFace_struct* bf)

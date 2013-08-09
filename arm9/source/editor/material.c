@@ -167,33 +167,51 @@ void getTextureCoordSlice(materialSlice_struct* ms, rectangle_struct* rec, int32
 	vect3D p1=vect(0,0,0), p2;
 	if(!rec->size.x)
 	{
-		if(ms->align)p1=vect(inttot16(ms->img->height*rec->position.z-1),inttot16(((ms->img->height*rec->position.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
-		p2=vect(inttot16(ms->img->height*rec->size.z-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
+		if(ms->align)p1=vect(inttot16(ms->img->width*rec->position.z),inttot16(((ms->img->height*rec->position.y)*HEIGHTUNIT)/(TILESIZE*2)),0);
+		p2=vect(inttot16(ms->img->height*rec->size.z),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)),0);
+
+		p1.x%=inttot16(ms->img->width);
+		p1.y%=inttot16(ms->img->height);
+		if(p2.x>0)p1.x=0xC000; else p1.x=0x4000;
+		if(p2.y>0)p1.y=0xC000; else p1.y=0x4000;
+
 		p2=addVect(p1,p2);
 		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
-		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX-inttot16(1),p2.y/ms->factorY-inttot16(1),0);
 		v[3]=vect(p1.x, p1.y, 0);
 		v[0]=vect(p1.x, p2.y, 0);
 		v[1]=vect(p2.x, p2.y, 0);
 		v[2]=vect(p2.x, p1.y, 0);
 	}else if(!rec->size.y)
 	{
-		if(ms->align)p1=vect(inttot16(ms->img->width*rec->position.x-1),inttot16(ms->img->height*rec->position.z-1),0);
-		p2=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(ms->img->height*rec->size.z-1),0);
+		if(ms->align)p1=vect(inttot16(ms->img->width*rec->position.x),inttot16(ms->img->height*rec->position.z),0);
+		p2=vect(inttot16(ms->img->width*rec->size.x),inttot16(ms->img->height*rec->size.z),0);
+
+		p1.x%=inttot16(ms->img->width);
+		p1.y%=inttot16(ms->img->height);
+		if(p2.x>0)p1.x=0xC000; else p1.x=0x4000;
+		if(p2.y>0)p1.y=0xC000; else p1.y=0x4000;
+
 		p2=addVect(p1,p2);
 		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
-		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX-inttot16(1),p2.y/ms->factorY-inttot16(1),0);
 		v[0]=vect(p1.x, p1.y, 0);
 		v[1]=vect(p1.x, p2.y, 0);
 		v[2]=vect(p2.x, p2.y, 0);
 		v[3]=vect(p2.x, p1.y, 0);
 	}else
 	{
-		if(ms->align)p1=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
-		p2=vect(inttot16(ms->img->width*rec->size.x-1),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)-1),0);
+		if(ms->align)p1=vect(inttot16(ms->img->width*rec->position.x),inttot16(((ms->img->height*rec->position.y)*HEIGHTUNIT)/(TILESIZE*2)),0);
+		p2=vect(inttot16(ms->img->height*rec->size.x),inttot16(((ms->img->height*rec->size.y)*HEIGHTUNIT)/(TILESIZE*2)),0);
+
+		p1.x%=inttot16(ms->img->width);
+		p1.y%=inttot16(ms->img->height);
+		if(p2.x>0)p1.x=0xC000; else p1.x=0x4000;
+		if(p2.y>0)p1.y=0xC000; else p1.y=0x4000;
+
 		p2=addVect(p1,p2);
 		p1=vect(p1.x/ms->factorX,p1.y/ms->factorY,0);
-		p2=vect(p2.x/ms->factorX,p2.y/ms->factorY,0);
+		p2=vect(p2.x/ms->factorX-inttot16(1),p2.y/ms->factorY-inttot16(1),0);
 		v[1]=vect(p1.x, p1.y, 0);
 		v[0]=vect(p1.x, p2.y, 0);
 		v[3]=vect(p2.x, p2.y, 0);

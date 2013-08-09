@@ -24,7 +24,13 @@ void mainMenuPlayButtonFunction(void)
 	setupMenuPage(playMenuPage, playMenuPageLength);
 }
 
-menuButton_struct mainMenuPage[]={(menuButton_struct){"Options", NULL}, (menuButton_struct){"Create", NULL}, (menuButton_struct){"Play", mainMenuPlayButtonFunction}};
+void mainMenuCreateButtonFunction(void)
+{
+	testTransition=startCameraTransition(&cameraStates[0],&cameraStates[2],64);
+	setupMenuPage(createMenuPage, createMenuPageLength);
+}
+
+menuButton_struct mainMenuPage[]={(menuButton_struct){"Options", NULL}, (menuButton_struct){"Create", mainMenuCreateButtonFunction}, (menuButton_struct){"Play", mainMenuPlayButtonFunction}};
 u8 mainMenuPageLength=arrayLength(mainMenuPage);
 
 void playMenuBackButtonFunction(void)
@@ -35,3 +41,12 @@ void playMenuBackButtonFunction(void)
 
 menuButton_struct playMenuPage[]={(menuButton_struct){"Back", playMenuBackButtonFunction}, (menuButton_struct){"Select Level", NULL}, (menuButton_struct){"Campaign", NULL}};
 u8 playMenuPageLength=arrayLength(playMenuPage);
+
+void createMenuBackButtonFunction(void)
+{
+	testTransition=startCameraTransition(&cameraStates[2],&cameraStates[0],64);
+	setupMenuPage(mainMenuPage, mainMenuPageLength);
+}
+
+menuButton_struct createMenuPage[]={(menuButton_struct){"Back", createMenuBackButtonFunction}, (menuButton_struct){"Load Level", NULL}, (menuButton_struct){"New level", NULL}};
+u8 createMenuPageLength=arrayLength(createMenuPage);

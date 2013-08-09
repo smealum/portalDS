@@ -5,5 +5,6 @@
 #include "game/game_main.h"
 #include "menu/cameratransition.h"
 #include "menu/menupage.h"
+#include "menu/menuscene.h"
 
 #endif

@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	else changeState(&gameState);
 
 	// changeState(&editorState);
-	// changeState(&menuState);
+	changeState(&menuState);
 	applyState();
 
 	while(1)

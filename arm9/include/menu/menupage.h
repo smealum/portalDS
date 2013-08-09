@@ -13,6 +13,9 @@ extern u8 mainMenuPageLength;
 extern menuButton_struct playMenuPage[];
 extern u8 playMenuPageLength;
 
+extern menuButton_struct createMenuPage[];
+extern u8 createMenuPageLength;
+
 void initMenuButtons(void);
 void setupMenuPage(menuButton_struct* mp, u8 n);
 

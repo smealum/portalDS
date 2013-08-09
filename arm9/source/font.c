@@ -142,7 +142,7 @@ void drawString(char* s, u16 color, int32 size, int32 x, int32 y)
 	glPushMatrix();
 		glTranslatef32(x, y, 0);
 		glScalef32((currentFont->charsizef32),(currentFont->charsizef32),inttof32(1));
-		glScalef32(size, size,inttof32(1));
+		glScalef32(size, size, inttof32(1));
 		glTranslatef32(inttof32(1)/4, inttof32(1)/2, 0);
 		for(i=0;i<n;i++)
 		{

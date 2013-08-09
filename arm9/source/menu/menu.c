@@ -81,12 +81,12 @@ void menuFrame(void)
 	// if(keysHeld() & KEY_A)lightAngle+=128;
 	// else if(keysHeld() & KEY_B)lightAngle-=128;
 		
-	// if(keysHeld() & KEY_A)tempState.angle.x+=64;
-	// if(keysHeld() & KEY_B)tempState.angle.x-=64;
-	// if(keysHeld() & KEY_X)tempState.angle.y+=64;
-	// if(keysHeld() & KEY_Y)tempState.angle.y-=64;
-	// if(keysHeld() & KEY_START)tempState.angle.z+=64;
-	// if(keysHeld() & KEY_SELECT)tempState.angle.z-=64;
+	if(keysHeld() & KEY_A)tempState.angle.x+=64;
+	if(keysHeld() & KEY_B)tempState.angle.x-=64;
+	if(keysHeld() & KEY_X)tempState.angle.y+=64;
+	if(keysHeld() & KEY_Y)tempState.angle.y-=64;
+	if(keysHeld() & KEY_START)tempState.angle.z+=64;
+	if(keysHeld() & KEY_SELECT)tempState.angle.z-=64;
 
 	// if(keysUp() & KEY_TOUCH)
 	// {

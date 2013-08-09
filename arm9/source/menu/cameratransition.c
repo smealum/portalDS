@@ -3,6 +3,7 @@
 cameraState_struct cameraStates[]={{(vect3D){156,8000,13000}, (vect3D){0,0,0}},
 									{(vect3D){-5184,7424,6272}, (vect3D){-2368,-4928,832}},
 									{(vect3D){-14976,6144,-15424}, (vect3D){1664,-12288,576}},
+									{(vect3D){-4992,4224,-10496}, (vect3D){-704,2048,-448}},
 								};
 
 void applyCameraState(camera_struct* c, cameraState_struct* cs)

@@ -112,6 +112,19 @@ void drawMenuBoxes(void)
 	}
 }
 
+vect3D textPosition={-8256,6784,-14848};
+vect3D textAngle={0,-1664,0};
+
+void drawScreenText(void)
+{
+	glPushMatrix();
+		glTranslate3f32(textPosition.x,textPosition.y,textPosition.z);
+		glRotateXi(8192*2);
+		glRotateYi(textAngle.y);
+		drawString("hello world", RGB15(31,31,31), inttof32(1)/96, 0, 0);
+	glPopMatrix(1);
+}
+
 void drawMenuScene(void)
 {
 	glPushMatrix();
@@ -123,5 +136,7 @@ void drawMenuScene(void)
 		renderModelFrameInterp(0, 0, 0, &lairModel, POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_TOON_HIGHLIGHT | POLY_ID(1), false, NULL, RGB15(31,31,31));
 
 		drawMenuBoxes();
+
+		drawScreenText();
 	glPopMatrix(1);
 }

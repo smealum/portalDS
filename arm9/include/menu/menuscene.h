@@ -3,7 +3,7 @@
 
 #define NUMMENUBOXES (8)
 #define MENUBOXSPEED (32)
-#define MENUBOXFREQUENCY (32)
+#define MENUBOXFREQUENCY (20)
 #define MENUBOXANGLESPEED (1024)
 
 typedef struct

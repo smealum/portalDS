@@ -48,5 +48,20 @@ void createMenuBackButtonFunction(void)
 	setupMenuPage(mainMenuPage, mainMenuPageLength);
 }
 
-menuButton_struct createMenuPage[]={(menuButton_struct){"Back", createMenuBackButtonFunction}, (menuButton_struct){"Load Level", NULL}, (menuButton_struct){"New level", NULL}};
+void createMenuNewLevelButtonFunction(void)
+{
+	testTransition=startCameraTransition(&cameraStates[2],&cameraStates[3],64);
+	setupMenuPage(newLevelMenuPage, newLevelMenuPageLength);
+}
+
+menuButton_struct createMenuPage[]={(menuButton_struct){"Back", createMenuBackButtonFunction}, (menuButton_struct){"Load Level", NULL}, (menuButton_struct){"New level", createMenuNewLevelButtonFunction}};
 u8 createMenuPageLength=arrayLength(createMenuPage);
+
+void newLevelMenuBackButtonFunction(void)
+{
+	testTransition=startCameraTransition(&cameraStates[3],&cameraStates[2],64);
+	setupMenuPage(createMenuPage, createMenuPageLength);
+}
+
+menuButton_struct newLevelMenuPage[]={(menuButton_struct){"Back", newLevelMenuBackButtonFunction}};
+u8 newLevelMenuPageLength=arrayLength(newLevelMenuPage);

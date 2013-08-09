@@ -3,6 +3,8 @@
 // code borrowed from GRIT 
 // http://www.coranac.com/projects/grit/
 
+//made it into 16bit compression code because screw it 8bit sucks
+
 #define ALIGN4(n) ( ((n)+3)&~3 )
 
 //! Compression type tags.
@@ -30,19 +32,19 @@ u32	cprs_create_header(uint size, u8 tag)
 	return *(u32*)data;
 }
 
-uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
+uint compressRLE(u16 **dst, u16 *srcD, uint srcS)
 {
 	if(!srcD || !dst)return 0;
 
 	uint ii, rle, non;
-	u8 curr, prev;
+	u16 curr, prev;
 
 	// Annoyingly enough, rle _can_ end up being larger than
 	// the original. A checker-board will do it for example.
 	// if srcS is the size of the alternating pattern, then
 	// the endresult will be 4 + srcS + (srcS+0x80-1)/0x80.
-	uint dstS= 8+2*(srcS);
-	u8 *dstD = (u8*)malloc(dstS), *dstL= dstD;
+	uint dstS= 8+2*(srcS*2);
+	u16 *dstD = (u16*)malloc(dstS), *dstL= dstD;
 	if(!dstD)return 0;
 
 	prev=srcD[0];
@@ -60,17 +62,17 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 		{
 			non += rle;
 			dstL[0]= non-2;	
-			memcpy(&dstL[1], &srcD[ii-non+1], non-1);
+			memcpy(&dstL[1], &srcD[ii-non+1], (non-1)*2);
 			dstL += non;
 			non= rle= 1;
 		}
 		else if(curr == prev)		// ** start rle / non on hold
 		{
 			rle++;
-			if( rle==3 && non>1 )	// write non-1 u8s
+			if( rle==3 && non>1 )	// write non-1 u16s
 			{
 				dstL[0]= non-2;
-				memcpy(&dstL[1], &srcD[ii-non-1], non-1);
+				memcpy(&dstL[1], &srcD[ii-non-1], (non-1)*2);
 				dstL += non;
 				non= 1;
 			}
@@ -79,6 +81,7 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 			{
 				dstL[0]= 0x80 | (rle-3);
 				dstL[1]= srcD[ii-1];
+				NOGBA("RLE1 : %d %d",rle,dstL[1]);
 				dstL += 2;
 				non= 0;
 				rle= 1;
@@ -91,7 +94,7 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 	
 	dstS=ALIGN4(dstL-dstD)+4;
 
-	dstL=(u8*)malloc(dstS);
+	dstL=(u16*)malloc(dstS*2);
 	if(!dstL)
 	{
 		free(dstD);
@@ -99,7 +102,7 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 	}
 
 	*(u32*)dstL=cprs_create_header(srcS, CPRS_RLE_TAG);
-	memcpy(dstL+4, dstD, dstS-4);
+	memcpy(dstL+4, dstD, dstS*2-4);
 	*dst=dstL;
 
 	free(dstD);
@@ -107,12 +110,12 @@ uint compressRLE(u8 **dst, u8 *srcD, uint srcS)
 	return dstS;
 }
 
-uint decompressRLE(u8 *dst, u8 *src, uint dstS)
+uint decompressRLE(u16 *dst, u16 *src, uint dstS)
 {
 	if(!dst || !src)return 0;
 
 	uint ii, size=0;
-	u8 *srcL=src+4, *dstD=dst;
+	u16 *srcL=src+4, *dstD=dst;
 
 	for(ii=0; ii<dstS; ii += size)
 	{
@@ -122,14 +125,17 @@ uint decompressRLE(u8 *dst, u8 *src, uint dstS)
 		if(header&0x80)		// compressed stint
 		{
 			size= min( (header&~0x80)+3, dstS-ii);
-			memset(&dstD[ii], *srcL, size);
+			// NOGBA("RLE1- : %d %d",size,*srcL);
+			// memset(&dstD[ii], *srcL, size);
+			int j; for(j=0;j<size;j++)dstD[ii+j]=*srcL; //can't used memset for 16bit
 			srcL++;
 		}
 		else				// noncompressed stint
 		{
 			size= min(header+1, dstS-ii);
-			// memcpy(&dstD[ii], srcL, size);
-			memset(&dstD[ii], 0, size);
+			memcpy(&dstD[ii], srcL, size*2);
+			// memset(&dstD[ii], 0, size*2);
+			// NOGBA("RLE2- : %d",size);
 			srcL += size;
 		}
 	}

@@ -252,10 +252,10 @@ void initEditorRoom(editorRoom_struct* er)
 	er->blockArray=malloc(sizeof(BLOCK_TYPE)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	if(!er->blockArray)return;
 
-	initBlockArray(er->blockArray);
-	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
+	// initBlockArray(er->blockArray);
+	// generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 
-	// loadMapEditor(er,"testedit.map");
+	loadMapEditor(er,"testedit.map");
 }
 
 void freeBlockFace(blockFace_struct* bf)

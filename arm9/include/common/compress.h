@@ -1,7 +1,7 @@
 #ifndef COMPRESS_H
 #define COMPRESS_H
 
-uint compressRLE(u8 **dst, u8 *srcD, uint srcS);
-uint decompressRLE(u8 *dst, u8 *src, uint dstS);
+uint compressRLE(u16 **dst, u16 *srcD, uint srcS);
+uint decompressRLE(u16 *dst, u16 *src, uint dstS);
 
 #endif

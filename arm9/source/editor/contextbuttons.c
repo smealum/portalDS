@@ -20,6 +20,7 @@ void setupContextButtons(contextButton_struct* cb, u8 n)
 {
 	if(!cb || !n)return;
 
+	cleanUpContextButtons();
 	int i;
 	for(i=0;i<n;i++)
 	{

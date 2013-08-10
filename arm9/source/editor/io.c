@@ -102,6 +102,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 			//turret
 			{
 				writeVect(adaptVector(e->position, 6), f);
+				fwrite(&e->orientation, sizeof(u8), 1, f);
 			}
 			return true;
 		case 5: case 6: case 7:
@@ -136,7 +137,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 			//door
 			{
 				writeVect(vect(e->position.x*BLOCKMULTX+BLOCKMULTX/2,e->position.y*BLOCKMULTY,e->position.z*BLOCKMULTZ+BLOCKMULTZ/2), f);
-				bool orientation=false; fwrite(&orientation,sizeof(bool),1,f);
+				fwrite(&e->orientation, sizeof(u8), 1, f);
 			}
 			return true;
 		case 11:
@@ -187,9 +188,9 @@ void writeEntities(FILE* f)
 	fseek(f, 0, SEEK_END);
 }
 
-u8 testARRAY[64*64*64];
+// u8 testARRAY[64*64*64];
 
-u8* compressBlockArray(BLOCK_TYPE* ba, u32* size)
+u16* compressBlockArray(BLOCK_TYPE* ba, u32* size)
 {
 	u16* dst;
 
@@ -334,6 +335,7 @@ void readEntityEditor(FILE* f)
 		case 4:
 			//turret
 			readVect(&v, f);
+			fread(&e->orientation, sizeof(u8), 1, f);
 			break;
 		case 5: case 6:
 			//cubes
@@ -372,7 +374,7 @@ void readEntityEditor(FILE* f)
 			//door
 			{
 				readVect(&v, f);
-				fseek(f, sizeof(bool), SEEK_CUR);
+				fread(&e->orientation, sizeof(u8), 1, f);
 			}
 			return;
 		case 11:

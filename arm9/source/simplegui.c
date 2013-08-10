@@ -50,7 +50,7 @@ bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 
 	bool ret=false;
 
-	if(x>=b->position.x && x<b->position.x+b->size.x && y>=b->position.y && y<b->position.y+b->size.y)
+	if(!(x==-1 && y==-1) && x>=b->position.x && x<b->position.x+b->size.x && y>=b->position.y && y<b->position.y+b->size.y)
 	{
 		b->active=true;
 		ret=true;

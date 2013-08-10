@@ -38,7 +38,7 @@ typedef struct
 
 typedef struct entity_struct
 {
-	u8 direction;
+	u8 direction, orientation;
 	vect3D position;
 	entityType_struct* type;
 	blockFace_struct* blockFace;

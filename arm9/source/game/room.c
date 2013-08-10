@@ -251,6 +251,7 @@ void readEntity(u8 i, FILE* f)
 			//turret
 			{
 				vect3D p; readVect(&p,f);
+				fseek(f, sizeof(u8), SEEK_CUR);
 				createTurret(NULL, p);
 			}
 			break;
@@ -295,8 +296,8 @@ void readEntity(u8 i, FILE* f)
 			//door
 			{
 				vect3D p; readVect(&p,f);
-				bool orientation; fread(&orientation, sizeof(bool), 1, f);
-				door_struct* e=createDoor(NULL, p, orientation);
+				u8 orientation; fread(&orientation, sizeof(u8), 1, f);
+				door_struct* e=createDoor(NULL, p, orientation%2);
 				entityEntityArray[i]=(void*)e;
 				entityTargetTypeArray[i]=DOOR_TARGET;
 			}

@@ -33,6 +33,7 @@ void initWallDoor(wallDoor_struct* wd)
 
 	wd->used=false;
 	wd->rectangle=NULL;
+	wd->override=false;
 	
 	initModelInstance(&wd->modelInstance, &wallDoorModel);
 }
@@ -95,7 +96,7 @@ void updateWallDoor(wallDoor_struct* wd)
 
 	bool pin=pointInWallDoorRoom(wd,getPlayer()->relativePosition);
 
-	if(pin)
+	if(pin || wd->override)
 	{
 		if(wd->modelInstance.currentAnim==0)
 		{

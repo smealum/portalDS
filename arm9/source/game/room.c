@@ -338,6 +338,8 @@ void readEntity(u8 i, FILE* f)
 							break;
 					}
 				}
+				entityEntityArray[i]=(void*)&entryWallDoor;
+				entityTargetTypeArray[i]=WALLDOOR_TARGET;
 			}
 			return;
 		case 14:
@@ -346,6 +348,9 @@ void readEntity(u8 i, FILE* f)
 				vect3D p; readVect(&p,f);
 				u8 o; fread(&o,sizeof(u8),1,f);
 				setupWallDoor(NULL, &exitWallDoor, p, o);
+				entityEntityArray[i]=(void*)&exitWallDoor;
+				entityTargetTypeArray[i]=WALLDOOR_TARGET;
+				exitWallDoor.override=true;
 			}
 			return;
 		default:

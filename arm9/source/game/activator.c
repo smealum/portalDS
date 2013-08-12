@@ -31,6 +31,12 @@ void useSlot(activatorSlot_struct* as)
 				d->active=true;
 			}
 			break;
+		case WALLDOOR_TARGET:
+			{
+				wallDoor_struct* wd=(door_struct*)as->target;
+				wd->override=true;
+			}
+			break;
 	}
 }
 
@@ -56,6 +62,12 @@ void unuseSlot(activatorSlot_struct* as)
 			{
 				door_struct* d=(door_struct*)as->target;
 				d->active=false;
+			}
+			break;
+		case WALLDOOR_TARGET:
+			{
+				wallDoor_struct* wd=(door_struct*)as->target;
+				wd->override=false;
 			}
 			break;
 	}

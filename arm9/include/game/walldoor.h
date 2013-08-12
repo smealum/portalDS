@@ -10,6 +10,7 @@ typedef struct
 	material_struct* frameMaterial;
 	rectangle_struct* rectangle;
 	elevator_struct elevator;
+	bool override;
 	bool used;
 }wallDoor_struct;
 

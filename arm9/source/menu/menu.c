@@ -5,6 +5,9 @@ cameraState_struct tempState={(vect3D){0,0,0}, (vect3D){0,0,0}};
 cameraTransition_struct testTransition;
 bool tempbool=false;
 
+mtlImg_struct* logoMain;
+mtlImg_struct* logoRotate;
+
 void initMenu(void)
 {
 	lcdMainOnTop();
@@ -49,9 +52,13 @@ void initMenu(void)
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
 
 	setupMenuPage(mainMenuPage, mainMenuPageLength);
+
+	logoMain=createTexture("logo.pcx", "menu");
+	logoRotate=createTexture("rotate_logo.pcx", "menu");
 }
 
 touchPosition currentTouch;
+u32 logoAngle=0;
 
 void menuFrame(void)
 {
@@ -111,6 +118,48 @@ void menuFrame(void)
 			updateMenuScene();
 			break;
 		default:
+			{
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+
+				glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
+				
+				glMatrixMode(GL_MODELVIEW);
+				glLoadIdentity();
+
+				glPushMatrix();
+					glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+					applyMTL(logoMain);
+					glScalef32(inttof32(256),inttof32(128),inttof32(1));
+					glBegin(GL_QUADS);
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(0));
+						glVertex3v16(inttof32(0), inttof32(0), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(256), inttot16(0));
+						glVertex3v16(inttof32(1), inttof32(0), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(256), inttot16(128));
+						glVertex3v16(inttof32(1), inttof32(1), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(128));
+						glVertex3v16(inttof32(0), inttof32(1), inttof32(0));
+				glPopMatrix(1);
+
+				glPushMatrix();
+					glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+					applyMTL(logoRotate);
+					glTranslate3f32(inttof32(90+32),inttof32(28+32),-inttof32(1)/16);
+					glRotateZi(logoAngle+=32);
+					glTranslate3f32(-inttof32(32),-inttof32(32),0);
+					glScalef32(inttof32(64),inttof32(64),inttof32(1));
+					glBegin(GL_QUADS);
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(0));
+						glVertex3v16(inttof32(0), inttof32(0), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(64), inttot16(0));
+						glVertex3v16(inttof32(1), inttof32(0), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(64), inttot16(64));
+						glVertex3v16(inttof32(1), inttof32(1), inttof32(0));
+						GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(64));
+						glVertex3v16(inttof32(0), inttof32(1), inttof32(0));
+				glPopMatrix(1);
+			}
 			break;
 	}
 	

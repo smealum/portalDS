@@ -103,6 +103,9 @@ mtlImg_struct* createTexture(char* filename, char* directory)
 {
 	int i;
 	if(!fileExists(filename, directory))return NULL;
+	
+	getVramStatus();
+
 	for(i=0;i<MAX_TEX;i++)
 	{
 		if(!texture[i].used)

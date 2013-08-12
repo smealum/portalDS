@@ -185,17 +185,11 @@ void shootPlayerGun(player_struct* p, bool R)
 	if(!p->currentRoom)return;
 	camera_struct* c=getPlayerCamera();
 	
-	// mmEffect(&gunShot);
-	// mmEffect(SFX_GUNSHOT);
-	
 	p->currentPortal=R;
 	
 	int32 k=inttof32(300);
 	vect3D u=getUnitVector(NULL);
 	vect3D l=vectDifference(p->object->position,convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)));
-	// l.x+=u.x/32;
-	// l.y+=u.y/32;
-	// l.z+=u.z/32;
 	vect3D ip=vect(0,0,0);
 	{
 		l.x-=TILESIZE;
@@ -207,6 +201,8 @@ void shootPlayerGun(player_struct* p, bool R)
 			// ip.z+=TILESIZE*2;
 			ip.x+=TILESIZE;
 			ip.z+=TILESIZE;
+
+			// collideRayBoxes(p->object->position, u);
 			
 			vect3D pos=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 			NOGBA("SHOT WALL ! GOOD GOING %d %d %d",r->normal.z,r->normal.x, r->AARid);

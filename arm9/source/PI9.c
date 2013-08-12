@@ -239,6 +239,29 @@ void updatePortalPI(u8 id, vect3D pos, vect3D normal, vect3D plane0) //(id;[px][
 	fifoSendValue32(FIFO_USER_08,(plane0.z));
 }
 
+int32 distanceLinePoint(vect3D o, vect3D u, vect3D p)
+{
+	vect3D v=vectDifference(p, o);
+	v=vectDifference(v,vectMult(u,dotProduct(v,u)));
+	return magnitude(v);
+}
+
+void collideRayBoxes(vect3D o, vect3D u)
+{
+	int i;
+	for(i=0;i<NUMOBJECTS;i++)
+	{
+		OBB_struct* b=&objects[i];
+		if(b->used)
+		{
+			int32 d=distanceLinePoint(o, u, vectDivInt(b->position,4));
+			NOGBA("distance %d",d);
+			NOGBA("%d %d %d",o.x,o.y,o.z);
+			NOGBA("%d %d %d",b->position.x/4,b->position.y/4,b->position.z/4);
+		}
+	}
+}
+
 void listenPI9(void)
 {
 	while(fifoCheckValue32(FIFO_USER_01))

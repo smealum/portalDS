@@ -251,8 +251,8 @@ void readEntity(u8 i, FILE* f)
 			//turret
 			{
 				vect3D p; readVect(&p,f);
-				fseek(f, sizeof(u8), SEEK_CUR);
-				createTurret(NULL, p);
+				u8 d; fread(&d, sizeof(u8), 1, f);
+				createTurret(NULL, p, d);
 			}
 			break;
 		case 5: case 6:

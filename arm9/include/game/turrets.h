@@ -24,7 +24,7 @@ typedef struct
 }turret_struct;
 
 void initTurrets(void);
-turret_struct* createTurret(room_struct* r, vect3D position);
+turret_struct* createTurret(room_struct* r, vect3D position, u8 d);
 void updateTurrets(void);
 void drawTurretsStuff(void);
 

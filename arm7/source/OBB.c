@@ -26,7 +26,7 @@ static inline int32 divv(int32 a, int32 b) // b in 1-4096
 	return divv16(a,b);
 }
 
-void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass)
+void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32 sine)
 {
 	if(!o)return;
 	
@@ -46,7 +46,7 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass)
 	o->moment=vect(0,0,0);
 	o->forces=vect(0,0,0);
 
-	initTransformationMatrix(o->transformationMatrix);
+	initTransformationMatrix(o->transformationMatrix, cosine, sine);
 
 	int32 x2=mulf32(o->size.x,o->size.x);
 	int32 y2=mulf32(o->size.y,o->size.y);
@@ -458,15 +458,19 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 	}
 }
 
-void initTransformationMatrix(int32* m)
+void initTransformationMatrix(int32* m, s32 cosine, s32 sine)
 {
 	if(!m)return;
 	int i;
 	for(i=0;i<9;i++)m[i]=0;
 
-	m[0]=inttof32(1);
 	m[4]=inttof32(1);
-	m[8]=inttof32(1);
+
+	m[0]=cosine;
+	m[6]=sine;
+
+	m[2]=-sine;
+	m[8]=cosine;
 }
 
 void getVertices(vect3D s, vect3D p, vect3D u1, vect3D u2, vect3D u3, vect3D* v)
@@ -938,12 +942,12 @@ void updateOBBs(void)
 	}
 }
 
-OBB_struct* createOBB(u8 id, vect3D size, vect3D position, int32 mass)
+OBB_struct* createOBB(u8 id, vect3D size, vect3D position, int32 mass, s32 cosine, s32 sine)
 {
 	int i=id;
 		// if(!objects[i].used)
 		{
-			initOBB(&objects[i],size,position,mass);
+			initOBB(&objects[i],size,position,mass,cosine,sine);
 			return &objects[i];
 		}
 	return NULL;

@@ -23,21 +23,21 @@ void initTurrets(void)
 	NOGBA("turret2 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 
-void initTurret(turret_struct* t, room_struct* r, vect3D position)
+void initTurret(turret_struct* t, room_struct* r, vect3D position, u8 d)
 {
 	if(!t)return;
 
 	position=vect(position.x+r->position.x, position.y, position.z+r->position.y);
 	position=vectMultInt(convertVect(position),4);
 
-	t->OBB=createBox(position,TURRETMASS,&turretModel);
+	t->OBB=createBox(position,TURRETMASS,&turretModel, -d*8192);
 	if(!t->OBB)return;
 	t->used=true;
 	t->state=TURRET_CLOSED;
 	t->OBB->modelInstance.palette=loadPalettePCX("turret.pcx","textures");
 }
 
-turret_struct* createTurret(room_struct* r, vect3D position)
+turret_struct* createTurret(room_struct* r, vect3D position, u8 d)
 {
 	if(!r)r=&gameRoom;
 	int i;
@@ -45,7 +45,7 @@ turret_struct* createTurret(room_struct* r, vect3D position)
 	{
 		if(!turrets[i].used)
 		{
-			initTurret(&turrets[i],r,position);
+			initTurret(&turrets[i],r,position,d);
 			return &turrets[i];
 		}
 	}

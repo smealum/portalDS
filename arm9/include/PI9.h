@@ -14,6 +14,7 @@ typedef struct
 	void* spawner;
 	s16 groundID;
 	int32 mass;
+	s32 startAngle;
 	bool used;
 	u8 id;
 }OBB_struct;
@@ -42,7 +43,7 @@ void toggleAAR(s16 id);
 
 void killBox(OBB_struct* o);
 void resetBox(OBB_struct* o, vect3D pos);
-OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model);
+OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model, s32 angle);
 void getBoxAABB(OBB_struct* o, vect3D* s);
 bool intersectAABBAAR(vect3D o1, vect3D s1, vect3D o2, vect3D sp);
 bool intersectOBBPortal(portal_struct* p, OBB_struct* o);

@@ -111,7 +111,7 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 	{
 		if(!cd->currentCube)
 		{
-			cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
+			cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel),0);
 			if(cd->currentCube)cd->currentCube->spawner=(void*)cd;
 		}else{
 			createEmancipator(&cd->currentCube->modelInstance,vectDivInt(cd->currentCube->position,4),cd->currentCube->transformationMatrix);

@@ -90,11 +90,13 @@ void sendBoxData(OBB_struct* o)
 	if(!o)return;
 	
 	fifoSendValue32(FIFO_USER_08,PI_ADDBOX|((o->id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));	
+	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));
 	fifoSendValue32(FIFO_USER_08,(o->size.z&((1<<16)-1))|((o->mass&((1<<16)-1))<<16));
 	fifoSendValue32(FIFO_USER_08,(o->position.x));
 	fifoSendValue32(FIFO_USER_08,(o->position.y));
 	fifoSendValue32(FIFO_USER_08,(o->position.z));
+	fifoSendValue32(FIFO_USER_08,(cosLerp(o->startAngle)));
+	fifoSendValue32(FIFO_USER_08,(sinLerp(o->startAngle)));
 }
 
 void resetBox(OBB_struct* o, vect3D pos)
@@ -114,7 +116,7 @@ void resetPortalsPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESETPORTALS);
 }
 
-OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[sizex|sizey][sizez|mass][posx][posy][posz])
+OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model, s32 angle) //(id;[sizex|sizey][sizez|mass][posx][posy][posz][angle])
 {
 	OBB_struct* o=newBox();
 	if(!o)return NULL;
@@ -125,6 +127,7 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	o->size=vect(o->size.x,o->size.z,o->size.y); //md2s don't use the same coordinate system
 	o->mass=mass; //reduce precision to improve range
 	o->spawner=NULL;
+	o->startAngle=angle;
 	resetBox(o,pos);
 	
 	return o;

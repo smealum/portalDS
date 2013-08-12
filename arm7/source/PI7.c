@@ -63,7 +63,10 @@ void listenPI7(void)
 						pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
 						pos.z=fifoGetValue32(FIFO_USER_08);
-					createOBB(id,size,pos,mass);
+					while(!fifoCheckValue32(FIFO_USER_08));
+						s32 cosine=fifoGetValue32(FIFO_USER_08);
+						s32 sine=fifoGetValue32(FIFO_USER_08);
+					createOBB(id,size,pos,mass,cosine,sine);
 				}
 				break;
 			case PI_APPLYFORCE:

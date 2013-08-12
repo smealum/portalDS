@@ -7,7 +7,8 @@ typedef enum
 {
 	DISPENSER_TARGET,
 	PLATFORM_TARGET,
-	DOOR_TARGET
+	DOOR_TARGET,
+	NOT_TARGET
 }activatorTarget_type;
 
 typedef struct

@@ -13,6 +13,8 @@ typedef struct
 {
 	vect3D position, size;
 	char* string;
+	mtlImg_struct* mtl;
+	vect3D mtlOffset, mtlSize;
 	buttonTargetFunction targetFunction;
 	bool used, active;
 }sguiButton_struct;

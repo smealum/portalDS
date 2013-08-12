@@ -92,4 +92,5 @@ void addActivatorTarget(activator_struct* a, void* target, activatorTarget_type 
 	as->type=type;
 	
 	a->numSlots++;
+	unuseActivator(a);
 }

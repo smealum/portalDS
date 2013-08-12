@@ -11,6 +11,7 @@ typedef struct
 	int32 transformationMatrix[9];
 	modelInstance_struct modelInstance;
 	vect3D position, size;
+	void* spawner;
 	s16 groundID;
 	int32 mass;
 	bool used;

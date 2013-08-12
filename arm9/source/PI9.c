@@ -34,6 +34,7 @@ OBB_struct* newBox(void)
 		if(!objects[i].used)
 		{
 			objects[i].used=true;
+			objects[i].spawner=NULL;
 			return &objects[i];
 		}
 	}
@@ -123,6 +124,7 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model) //(id;[siz
 	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
 	o->size=vect(o->size.x,o->size.z,o->size.y); //md2s don't use the same coordinate system
 	o->mass=mass; //reduce precision to improve range
+	o->spawner=NULL;
 	resetBox(o,pos);
 	
 	return o;
@@ -288,7 +290,8 @@ void listenPI9(void)
 				if(o->used && collideBoxEmancipationGrids(o))
 				{
 					createEmancipator(&o->modelInstance,vectDivInt(o->position,4),o->transformationMatrix);
-					killBox(o);
+					if(o->spawner && ((cubeDispenser_struct*)o->spawner)->active)resetCubeDispenserCube(o->spawner);
+					else killBox(o);
 				}
 			}
 		}else if(k<NUMOBJECTS+NUMPLATFORMS)

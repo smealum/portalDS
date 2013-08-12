@@ -18,6 +18,7 @@ typedef struct
 void initCubes(void);
 void drawCubeDispensers(void);
 void updateCubeDispensers(void);
+void resetCubeDispenserCube(cubeDispenser_struct* cd);
 cubeDispenser_struct* createCubeDispenser(room_struct* r, vect3D pos, bool companion);
 
 #endif

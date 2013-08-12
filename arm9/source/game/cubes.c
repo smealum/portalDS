@@ -52,6 +52,9 @@ void initCubeDispenser(room_struct* r, cubeDispenser_struct* cd, vect3D pos, boo
 	changeAnimation(&cd->modelInstance,0,false);
 	
 	cd->used=true;
+
+	cd->active=true;
+	cd->oldActive=false;
 }
 
 cubeDispenser_struct* createCubeDispenser(room_struct* r, vect3D pos, bool companion)
@@ -91,6 +94,14 @@ void drawCubeDispensers(void)
 	}
 }
 
+void resetCubeDispenserCube(cubeDispenser_struct* cd)
+{
+	if(!cd)return;
+
+	resetBox(cd->currentCube, vectMultInt(cd->position,4));
+	changeAnimation(&cd->modelInstance,1,true);
+}
+
 void updateCubeDispenser(cubeDispenser_struct* cd)
 {
 	if(!cd)return;
@@ -98,10 +109,13 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 	if(cd->currentCube && !cd->currentCube->used)cd->currentCube=NULL;
 	if(cd->active && !cd->oldActive)
 	{
-		if(!cd->currentCube)cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
-		else{
+		if(!cd->currentCube)
+		{
+			cd->currentCube=createBox(vectMultInt(cd->position,4),inttof32(1),(cd->companion)?(&companionCubeModel):(&storageCubeModel));
+			if(cd->currentCube)cd->currentCube->spawner=(void*)cd;
+		}else{
 			createEmancipator(&cd->currentCube->modelInstance,vectDivInt(cd->currentCube->position,4),cd->currentCube->transformationMatrix);
-			resetBox(cd->currentCube, vectMultInt(cd->position,4));
+			resetCubeDispenserCube(cd);
 		}
 		changeAnimation(&cd->modelInstance,1,true);
 	}

@@ -81,3 +81,31 @@ void drawSludge(room_struct* r)
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(1);
 }
+
+bool sludgeBoxCollision(rectangle_struct* rec, OBB_struct* o)
+{
+	if(!rec || !o)return false;
+	
+	vect3D p=vectDivInt(o->position,4);
+	vect3D s;
+	getBoxAABB(o,&s);
+	vect3D pos=addVect(convertVect(rec->position),convertVect(vect(gameRoom.position.x,0,gameRoom.position.y)));
+	vect3D sp=convertSize(rec->size);
+
+	NOGBA("p1 %d %d %d", pos.x, pos.y, pos.z);
+	NOGBA("p2 %d %d %d", p.x, p.y, p.z);
+	
+	return intersectAABBAAR(p, s, pos, sp);
+}
+
+bool collideBoxSludge(OBB_struct* o)
+{
+	if(!o)return false;
+	listCell_struct* lc=sludgeRectangleList.first;
+	while(lc)
+	{
+		if(sludgeBoxCollision(&lc->data, o))return true;
+		lc=lc->next;
+	}
+	return false;
+}

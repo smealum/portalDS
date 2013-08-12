@@ -310,7 +310,7 @@ void listenPI9(void)
 				o->transformationMatrix[5]=v.y;
 				o->transformationMatrix[8]=v.z;
 				
-				if(o->used && collideBoxEmancipationGrids(o))
+				if(o->used && (collideBoxEmancipationGrids(o) || collideBoxSludge(o)))
 				{
 					createEmancipator(&o->modelInstance,vectDivInt(o->position,4),o->transformationMatrix);
 					if(o->spawner && ((cubeDispenser_struct*)o->spawner)->active)resetCubeDispenserCube(o->spawner);

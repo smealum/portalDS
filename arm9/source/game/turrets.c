@@ -94,7 +94,7 @@ void drawTurretStuff(turret_struct* t)
 				glTranslatef32(t->laserOrigin.x, t->laserOrigin.y, t->laserOrigin.z);
 				glTranslatef32(u3.x/128, u3.y/128, u3.z/128);
 				glTranslatef32(u1.x/32, u1.y/32, u1.z/32);
-				glScalef32(inttof32(1)/24,inttof32(1)/24,inttof32(1)/24);
+				glScalef32(inttof32(1)/16,inttof32(1)/16,inttof32(1)/16);
 				glRotatef32i(t->shotAngle[0],u3.x,u3.y,u3.z);
 				glBegin(GL_QUADS);
 					GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(0));

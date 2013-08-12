@@ -284,6 +284,7 @@ void updateEnergyBall(energyBall_struct* eb)
 	if(!col)col=collideGridCell(getCurrentCell(p->currentRoom,addVect(eb->position,vectMult(eb->direction,eb->speed))), eb->launcher?eb->launcher->surface:NULL, l, eb->direction, eb->speed, &ip, &normal);
 	if(col)
 	{
+		NOGBA("COL COL COL %d",col->collides);
 		ip=addVect(convertSize(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 		energyDevice_struct* ed=isEnergyCatcherSurface(col);
 		if(ed && !ed->active)

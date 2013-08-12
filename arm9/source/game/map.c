@@ -84,7 +84,7 @@ bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, i
 	vect3D v;
 	while(lc)
 	{
-		if(&lc->data!=rec)
+		if(&lc->data!=rec && lc->data.collides)
 		{
 			// NOGBA("%p vs %p",rec,&lc->data);
 			if(collideLineRectangle(&lc->data,l,u,d,NULL,&v)){if(i)*i=v;if(n)*n=lc->data.normal;return true;}
@@ -101,7 +101,7 @@ rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, ve
 	int j;
 	for(j=0;j<gc->numRectangles;j++)
 	{
-		if(gc->rectangles[j]!=rec)
+		if(gc->rectangles[j]!=rec && gc->rectangles[j]->collides)
 		{
 			if(collideLineRectangle(gc->rectangles[j],l,u,d,NULL,&v)){if(i)*i=v;if(n)*n=gc->rectangles[j]->normal;return gc->rectangles[j];}
 		}

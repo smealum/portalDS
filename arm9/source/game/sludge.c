@@ -66,7 +66,7 @@ void drawSludge(room_struct* r)
 
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
 		glTranslate3f32(-TILESIZE,0,-TILESIZE);
-		glTranslate3f32(0,-256,0); //arbitrary, just so that the sludge is slightly lower than surrounding ground...
+		glTranslate3f32(0,-SLUDGEMARGIN,0); //arbitrary, just so that the sludge is slightly lower than surrounding ground...
 		glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
 
 		while(lc)
@@ -92,9 +92,13 @@ bool sludgeBoxCollision(rectangle_struct* rec, OBB_struct* o)
 	vect3D pos=addVect(convertVect(rec->position),convertVect(vect(gameRoom.position.x,0,gameRoom.position.y)));
 	vect3D sp=convertSize(rec->size);
 
-	NOGBA("p1 %d %d %d", pos.x, pos.y, pos.z);
-	NOGBA("p2 %d %d %d", p.x, p.y, p.z);
-	
+	if(sp.x<0){pos.x+=sp.x;sp.x=-sp.x;}
+	if(sp.z<0){pos.z+=sp.z;sp.z=-sp.z;}
+
+	sp.x/=2; sp.z/=2;
+	pos.x+=sp.x; pos.z+=sp.z;
+	pos.y-=SLUDGEMARGIN;
+
 	return intersectAABBAAR(p, s, pos, sp);
 }
 

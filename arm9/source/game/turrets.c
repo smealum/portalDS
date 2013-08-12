@@ -4,6 +4,7 @@
 
 turret_struct turrets[NUMTURRETS];
 md2Model_struct turretModel;
+mtlImg_struct* turretShotTexture;
 
 const vect3D laserOrigin=(vect3D){16,76,140};
 
@@ -21,6 +22,7 @@ void initTurrets(void)
 	// generateModelDisplayLists(&turretModel, true, 1);
 	generateModelDisplayLists(&turretModel, false, 1);
 	NOGBA("turret2 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	turretShotTexture=createTexture("turret_shot.pcx", "textures");
 }
 
 void initTurret(turret_struct* t, room_struct* r, vect3D position, u8 d)
@@ -35,6 +37,8 @@ void initTurret(turret_struct* t, room_struct* r, vect3D position, u8 d)
 	t->used=true;
 	t->state=TURRET_CLOSED;
 	t->OBB->modelInstance.palette=loadPalettePCX("turret.pcx","textures");
+
+	t->drawShot[0]=t->drawShot[1]=0;
 }
 
 turret_struct* createTurret(room_struct* r, vect3D position, u8 d)
@@ -74,6 +78,55 @@ void drawTurretStuff(turret_struct* t)
 	
 	drawLaser(t->laserOrigin,t->laserDestination);
 	if(t->laserThroughPortal)drawLaser(t->laserOrigin2,t->laserDestination2);
+
+	//TEMP TEST BILLBOARD
+		vect3D u1=vect(t->OBB->transformationMatrix[0],t->OBB->transformationMatrix[3],t->OBB->transformationMatrix[6]);
+		vect3D u2=vect(t->OBB->transformationMatrix[1],t->OBB->transformationMatrix[4],t->OBB->transformationMatrix[7]);
+		vect3D u3=vect(t->OBB->transformationMatrix[2],t->OBB->transformationMatrix[5],t->OBB->transformationMatrix[8]);
+
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_ID(63));
+		GFX_COLOR=RGB15(31,31,31);
+		applyMTL(turretShotTexture);
+
+		if(t->drawShot[0])
+		{
+			glPushMatrix();
+				glTranslatef32(t->laserOrigin.x, t->laserOrigin.y, t->laserOrigin.z);
+				glTranslatef32(u3.x/128, u3.y/128, u3.z/128);
+				glTranslatef32(u1.x/32, u1.y/32, u1.z/32);
+				glScalef32(inttof32(1)/24,inttof32(1)/24,inttof32(1)/24);
+				glRotatef32i(t->shotAngle[0],u3.x,u3.y,u3.z);
+				glBegin(GL_QUADS);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(0));
+					glVertex3v16(-u1.x/2-u2.x, -u1.y/2-u2.y, -u1.z/2-u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(32), inttot16(0));
+					glVertex3v16(+u1.x/2-u2.x, +u1.y/2-u2.y, +u1.z/2-u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(32), inttot16(64));
+					glVertex3v16(+u1.x/2+u2.x, +u1.y/2+u2.y, +u1.z/2+u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(64));
+					glVertex3v16(-u1.x/2+u2.x, -u1.y/2+u2.y, -u1.z/2+u2.z);
+			glPopMatrix(1);
+		}
+
+		if(t->drawShot[1])
+		{
+			glPushMatrix();
+				glTranslatef32(t->laserOrigin.x, t->laserOrigin.y, t->laserOrigin.z);
+				glTranslatef32(u3.x/128, u3.y/128, u3.z/128);
+				glTranslatef32(-u1.x/32, -u1.y/32, -u1.z/32);
+				glScalef32(inttof32(1)/16,inttof32(1)/16,inttof32(1)/16);
+				glRotatef32i(t->shotAngle[1],u3.x,u3.y,u3.z);
+				glBegin(GL_QUADS);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(0));
+					glVertex3v16(-u1.x/2-u2.x, -u1.y/2-u2.y, -u1.z/2-u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(32), inttot16(0));
+					glVertex3v16(+u1.x/2-u2.x, +u1.y/2-u2.y, +u1.z/2-u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(32), inttot16(64));
+					glVertex3v16(+u1.x/2+u2.x, +u1.y/2+u2.y, +u1.z/2+u2.z);
+					GFX_TEX_COORD = TEXTURE_PACK(inttot16(0), inttot16(64));
+					glVertex3v16(-u1.x/2+u2.x, -u1.y/2+u2.y, -u1.z/2+u2.z);
+			glPopMatrix(1);
+		}
 }
 
 void drawTurretsStuff(void)
@@ -138,6 +191,7 @@ void updateTurret(turret_struct* t)
 	{
 		case TURRET_CLOSED:
 			changeAnimation(&t->OBB->modelInstance, 0, false);
+			t->drawShot[0]=t->drawShot[1]=0;
 
 			if(b)t->state=TURRET_OPENING;
 			break;
@@ -150,13 +204,28 @@ void updateTurret(turret_struct* t)
 				changeAnimation(&t->OBB->modelInstance, 2, false);
 				changeAnimation(&t->OBB->modelInstance, 1, true);
 			}
+			t->drawShot[0]=t->drawShot[1]=0;
 			break;
 		case TURRET_OPEN:
-			if(angle>mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 4, false);
-			else if(angle<-mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 5, false);
-			else changeAnimation(&t->OBB->modelInstance, 2, false);
+			{
+				if(angle>mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 4, false);
+				else if(angle<-mulf32(sinLerp(TURRET_SIGHTANGLE/3),d))changeAnimation(&t->OBB->modelInstance, 5, false);
+				else changeAnimation(&t->OBB->modelInstance, 2, false);
 
-			if(!b)t->state=TURRET_CLOSING;
+				int i;
+				for(i=0;i<2;i++)
+				{
+					if(!t->drawShot[i] && !(rand()%3))
+					{
+						t->drawShot[i]=rand()%8;
+						t->shotAngle[i]=rand();
+					}
+
+					if(t->drawShot[i])t->drawShot[i]--;
+				}
+
+				if(!b)t->state=TURRET_CLOSING;
+			}
 			break;
 		case TURRET_CLOSING:
 			if(t->OBB->modelInstance.currentAnim==0)
@@ -167,6 +236,7 @@ void updateTurret(turret_struct* t)
 				changeAnimation(&t->OBB->modelInstance, 0, false);
 				changeAnimation(&t->OBB->modelInstance, 3, true);
 			}
+			t->drawShot[0]=t->drawShot[1]=0;
 			break;
 	}
 

@@ -47,7 +47,8 @@ void initGame(void)
 
 	glViewport(0,0,255,191);
 	
-	initVramBanks(1);
+	// initVramBanks(1);
+	initVramBanks(2);
 	initTextures();
 	initSound();
 	

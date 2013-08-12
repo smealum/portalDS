@@ -19,6 +19,8 @@ typedef struct
 	vect3D laserOrigin2, laserDestination2;
 	turretState_type state;
 	bool laserThroughPortal;
+	u16 shotAngle[2];
+	u8 drawShot[2];
 	u8 counter;
 	bool used;
 }turret_struct;

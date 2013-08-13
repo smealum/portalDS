@@ -58,8 +58,6 @@ void initMenu(void)
 	logoMain=createTexture("logo.pcx", "menu");
 	logoRotate=createTexture("rotate_logo.pcx", "menu");
 	logoAlpha=31;
-
-	setupKeyboard(NULL, 0, 16, 16);
 }
 
 touchPosition currentTouch;

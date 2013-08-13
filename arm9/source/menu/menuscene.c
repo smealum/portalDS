@@ -6,6 +6,7 @@ modelInstance_struct GLaDOSmodelInstance;
 camera_struct menuCamera;
 
 menuBox_struct menuBoxes[NUMMENUBOXES];
+char menuScreenText[MENUSCREENLINES][MENUSCREENCHARS];
 
 void initMenuBoxes(void)
 {
@@ -121,7 +122,8 @@ void drawScreenText(void)
 		glTranslate3f32(textPosition.x,textPosition.y,textPosition.z);
 		glRotateXi(8192*2);
 		glRotateYi(textAngle.y);
-		drawString("hello world", RGB15(31,31,31), inttof32(1)/96, 0, 0);
+		int i;
+		for(i=0;i<MENUSCREENLINES;i++)drawString(menuScreenText[i], RGB15(31,31,31), inttof32(1)/96, 0, 512*i);
 	glPopMatrix(1);
 }
 
@@ -139,4 +141,9 @@ void drawMenuScene(void)
 
 		drawScreenText();
 	glPopMatrix(1);
+}
+
+void resetSceneScreen(void)
+{
+	int i; for(i=0;i<MENUSCREENLINES;i++)menuScreenText[i][0]='\0';
 }

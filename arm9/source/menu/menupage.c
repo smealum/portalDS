@@ -64,6 +64,12 @@ void createMenuNewLevelButtonFunction(sguiButton_struct* b)
 {
 	testTransition=startCameraTransition(&cameraStates[2],&cameraStates[3],64);
 	setupMenuPage(newLevelMenuPage, newLevelMenuPageLength);
+
+	resetSceneScreen();
+	sprintf(menuScreenText[0],"Level name :");
+	sprintf(menuScreenText[1],"  ");
+	
+	setupKeyboard(&menuScreenText[1][2], 10, 16, 16);
 }
 
 menuButton_struct createMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)createMenuBackButtonFunction}, (menuButton_struct){"Load Level", NULL}, (menuButton_struct){"New level", (buttonTargetFunction)createMenuNewLevelButtonFunction}};

@@ -18,6 +18,18 @@ void setupMenuPage(menuButton_struct* mp, u8 n)
 	}
 }
 
+extern u8 logoAlpha;
+
+void startMenuPlayButtonFunction(void)
+{
+	testTransition=startCameraTransition(&cameraStates[4],&cameraStates[0],48);
+	setupMenuPage(mainMenuPage, mainMenuPageLength);
+	logoAlpha=0;
+}
+
+menuButton_struct startMenuPage[]={(menuButton_struct){"START", startMenuPlayButtonFunction}};
+u8 startMenuPageLength=arrayLength(startMenuPage);
+
 void mainMenuPlayButtonFunction(void)
 {
 	testTransition=startCameraTransition(&cameraStates[0],&cameraStates[1],48);

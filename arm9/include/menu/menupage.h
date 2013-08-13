@@ -7,6 +7,9 @@ typedef struct
 	buttonTargetFunction targetFunction;
 }menuButton_struct;
 
+extern menuButton_struct startMenuPage[];
+extern u8 startMenuPageLength;
+
 extern menuButton_struct mainMenuPage[];
 extern u8 mainMenuPageLength;
 

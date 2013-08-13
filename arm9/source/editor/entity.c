@@ -13,7 +13,7 @@ bool platformTargetSpecialMoveCheck(entity_struct* e, vect3D p, u8 dir);
 
 entityType_struct entityTypes[]={(entityType_struct){"editor/models/ballcatcher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballCatcherButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/balllauncher_ed.md2", "balllauncher.pcx", pX_mask | mX_mask | pY_mask | mY_mask | pZ_mask | mZ_mask, ballLauncherButtonArray, 1, NULL, NULL, NULL, NULL, false, true},
-								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask, button2ButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
+								(entityType_struct){"editor/models/button2_ed.md2", "button2.pcx", pY_mask, button2ButtonArray, 3, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/button1_ed.md2", "button1.pcx", pY_mask, button1ButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/turret_ed.md2", "turret.pcx", pY_mask, turretButtonArray, 2, NULL, NULL, NULL, NULL, false, true},
 								(entityType_struct){"editor/models/cube_ed.md2", "companion.pcx", pY_mask, cubeButtonArray, 1, cubeSpecialInit, NULL, cubeSpecialMove, NULL, true, true},
@@ -343,7 +343,7 @@ void setPlatformTargetButton(void)
 contextButton_struct ballLauncherButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
 contextButton_struct ballCatcherButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}};
 contextButton_struct button1ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}};
-contextButton_struct button2ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}};
+contextButton_struct button2ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}, (contextButton_struct){"rotate", rotateEntityButton}};
 contextButton_struct turretButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"rotate", rotateEntityButton}};
 contextButton_struct cubeButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
 contextButton_struct gridButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};

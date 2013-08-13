@@ -90,6 +90,15 @@ bool writeEntity(entity_struct* e, FILE* f)
 			//energy ball launcher
 			writeVect(adaptVector(e->position, e->direction), f);
 			return true;
+		case 2:
+			//timed button
+			{
+				s16 target=(e->target)?(e->target->writeID):(-1);
+				writeVect(adaptVector(e->position, e->direction), f);
+				fwrite(&e->orientation, sizeof(u8), 1, f);
+				fwrite(&target, sizeof(s16), 1, f);
+			}
+			return true;
 		case 3:
 			//pressure button
 			{
@@ -322,6 +331,17 @@ void readEntityEditor(FILE* f)
 		case 1:
 			//energy ball launcher
 			readVect(&v, f);
+			break;
+		case 2:
+			//timed button
+			{
+				readVect(&v, f);
+				fread(&e->orientation, sizeof(u8), 1, f);
+				s16 target=-1;
+				fread(&target, sizeof(s16), 1, f);
+				if(target>=0 && target<NUMENTITIES)e->target=&entity[target];
+			}
+			break;
 			break;
 		case 3:
 			//pressure button

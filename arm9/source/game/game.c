@@ -68,6 +68,7 @@ void initGame(void)
 	initWallDoors();
 	initTurrets();
 	initBigButtons();
+	initTimedButtons();
 	initEnergyBalls();
 	initPlatforms();
 	initCubes();
@@ -178,6 +179,7 @@ static inline void render1(void)
 		updatePortals();
 		updateTurrets();
 		updateBigButtons();
+		updateTimedButtons();
 		updateEnergyDevices();
 		updateEnergyBalls();
 		updatePlatforms();
@@ -221,6 +223,7 @@ static inline void render1(void)
 			drawOBBs();
 		// iprintf("OBBs : %d  \n",cpuEndSlice());
 			drawBigButtons();
+			drawTimedButtons();
 			drawEnergyDevices();
 			drawEnergyBalls();
 			drawPlatforms();
@@ -275,6 +278,7 @@ static inline void render2(void)
 		
 		drawOBBs();
 		drawBigButtons();
+		drawTimedButtons();
 		drawEnergyDevices();
 		drawEnergyBalls();
 		drawPlatforms();

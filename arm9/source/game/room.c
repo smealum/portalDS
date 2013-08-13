@@ -237,6 +237,17 @@ void readEntity(u8 i, FILE* f)
 				createEnergyDevice(NULL, p, dir, type);
 			}
 			break;
+		case 2:
+			//timed button
+			{
+				vect3D p; readVect(&p,f);
+				u8 d; fread(&d, sizeof(u8), 1, f);
+				s16 target=-1; fread(&target, sizeof(s16), 1, f);
+				timedButton_struct* e=createTimedButton(NULL, p, (d+2)*8192);
+				if(e)entityActivatorArray[i]=&e->activator;
+				entityTargetArray[i]=target;
+			}
+			break;
 		case 3:
 			//pressure button
 			{

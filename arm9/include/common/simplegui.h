@@ -25,5 +25,6 @@ sguiButton_struct* createSimpleButton(vect3D p, const char* str, buttonTargetFun
 bool updateSimpleGui(s16 x, s16 y);
 void drawSimpleGui(void);
 void cleanUpSimpleButtons(void);
+void simpleButtonSetImage(sguiButton_struct* b, mtlImg_struct* mtl, vect3D o, vect3D s);
 
 #endif

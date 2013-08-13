@@ -22,6 +22,7 @@
 #include "game/activator.h"
 #include "game/energyball.h"
 #include "game/bigbutton.h"
+#include "game/timedbutton.h"
 #include "game/emancipation.h"
 #include "game/elevator.h"
 #include "game/walldoor.h"

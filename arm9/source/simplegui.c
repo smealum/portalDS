@@ -28,6 +28,9 @@ void initSimpleButton(sguiButton_struct* b, vect3D p, const char* str, buttonTar
 	b->targetFunction=f;
 	b->active=false;
 	b->used=true;
+
+	b->mtl=NULL;
+	b->mtlOffset=b->mtlSize=vect(0,0,0);
 }
 
 sguiButton_struct* createSimpleButton(vect3D p, const char* str, buttonTargetFunction f)
@@ -42,6 +45,15 @@ sguiButton_struct* createSimpleButton(vect3D p, const char* str, buttonTargetFun
 		}
 	}
 	return NULL;
+}
+
+void simpleButtonSetImage(sguiButton_struct* b, mtlImg_struct* mtl, vect3D o, vect3D s)
+{
+	if(!b || !mtl)return;
+
+	b->mtl=mtl;
+	b->mtlOffset=o;
+	b->mtlSize=s;
 }
 
 bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)

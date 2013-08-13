@@ -446,7 +446,7 @@ void loadMapEditor(editorRoom_struct* er, const char* str)
 	//TEMP TEMP TEMP
 	f=fopen("fat:/test.map","rb");
 
-	if(!f)fopen(str,"rb");
+	if(!f)f=fopen(str,"rb");
 	if(!f)return;
 
 	mapHeader_struct h;

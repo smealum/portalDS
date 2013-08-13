@@ -28,7 +28,7 @@ void initTimedButton(timedButton_struct* bb, room_struct* r, vect3D pos, u16 ang
 	
 	pos=vect(pos.x+r->position.x, pos.y, pos.z+r->position.y);
 	bb->position=convertVect(pos);
-	
+
 	initActivator(&bb->activator);
 	bb->active=false;
 	bb->angle=angle;

@@ -1,5 +1,8 @@
 #include "game/game_main.h"
 
+#define TIMEDBUTTON_RADIUS_OUT (128)
+#define TIMEDBUTTON_HEIGHT (TILESIZE*2)
+
 timedButton_struct timedButton[NUMTIMEDBUTTONS];
 md2Model_struct timedButtonModel;
 u32* timedButtonBrightPalette;
@@ -107,3 +110,39 @@ void updateTimedButtons(void)
 		}
 	}
 }
+
+bool checkObjectTimedButtonCollision(physicsObject_struct* o, room_struct* r, timedButton_struct* tb)
+{
+	if(!o || !r || !tb)return false;
+
+	bool ret=false;
+
+	vect3D u=vect(o->position.x-tb->position.x,0,o->position.z-tb->position.z);
+	int32 v=magnitude(u);
+
+	if(abs(o->position.y-tb->position.y)>TIMEDBUTTON_HEIGHT)return ret;
+
+	if(v<o->radius+TIMEDBUTTON_RADIUS_OUT)
+	{
+		u=divideVect(vectMult(u,o->radius+TIMEDBUTTON_RADIUS_OUT-v),v);
+		o->position=addVect(o->position,u);
+		ret=true;
+	}
+
+	return ret;
+}
+
+bool checkObjectTimedButtonsCollision(physicsObject_struct* o, room_struct* r)
+{
+	int i;
+	bool ret=false;
+	for(i=0;i<NUMTIMEDBUTTONS;i++)
+	{
+		if(timedButton[i].used)
+		{
+			if(checkObjectTimedButtonCollision(o,r,&timedButton[i]))ret=true;
+		}
+	}
+	return ret;
+}
+

@@ -200,7 +200,7 @@ void drawSelection(selection_struct* s)
 
 //SELECTION CONTEXT BUTTONS DEFINITION
 
-void fillButtonFunction(void)
+void fillButtonFunction(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace)return;
@@ -212,7 +212,7 @@ void fillButtonFunction(void)
 	adjustSelection(&editorRoom, s, oldFirstFace, oldSecondFace, oldCurrentFace, vect(0,0,0));
 }
 
-void emptyButtonFunction(void)
+void emptyButtonFunction(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace)return;
@@ -224,7 +224,7 @@ void emptyButtonFunction(void)
 	adjustSelection(&editorRoom, s, oldFirstFace, oldSecondFace, oldCurrentFace, vect(0,0,0));
 }
 
-void makeUnportalableButton(void)
+void makeUnportalableButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -232,7 +232,7 @@ void makeUnportalableButton(void)
 	changeAttributeBlockArrayRange(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, false);
 }
 
-void makePortalableButton(void)
+void makePortalableButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -240,7 +240,7 @@ void makePortalableButton(void)
 	changeAttributeBlockArrayRange(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, true);
 }
 
-void makeUnportalablePlanarButton(void)
+void makeUnportalablePlanarButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -248,7 +248,7 @@ void makeUnportalablePlanarButton(void)
 	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
 }
 
-void makePortalablePlanarButton(void)
+void makePortalablePlanarButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -256,7 +256,7 @@ void makePortalablePlanarButton(void)
 	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changePortalableBlockDirection, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
 }
 
-void makeUnsludgePlanarButton(void)
+void makeUnsludgePlanarButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -264,7 +264,7 @@ void makeUnsludgePlanarButton(void)
 	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, true);
 }
 
-void makeSludgePlanarButton(void)
+void makeSludgePlanarButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->active || !s->firstFace || !s->secondFace || s->entity)return;
@@ -272,13 +272,13 @@ void makeSludgePlanarButton(void)
 	changeAttributeBlockArrayRangeDirection(editorRoom.blockArray, changeSludgeBlock, editorRoom.blockFaceList, s->origin, s->size, s->firstFace->direction, false);
 }
 
-void cancelTargetButton(void)
+void cancelTargetButton(sguiButton_struct* b)
 {
 	cleanUpContextButtons();
 	editorSelection.selectingTarget=false;
 }
 
-void removeTargetButton(void)
+void removeTargetButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(s->entity)s->entity->target=NULL;
@@ -286,8 +286,8 @@ void removeTargetButton(void)
 	editorSelection.selectingTarget=false;
 }
 
-contextButton_struct targetSelectionButtonArray[]={(contextButton_struct){"remove target", removeTargetButton}, (contextButton_struct){"cancel", cancelTargetButton}};
-contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}};
-contextButton_struct groundSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalablePlanarButton}, (contextButton_struct){"portalable", makePortalablePlanarButton}, (contextButton_struct){"add sludge", makeSludgePlanarButton}, (contextButton_struct){"remove sludge", makeUnsludgePlanarButton}};
-contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", makeUnportalableButton}, (contextButton_struct){"portalable", makePortalableButton}, (contextButton_struct){"fill", fillButtonFunction}, (contextButton_struct){"delete", emptyButtonFunction}};
+contextButton_struct targetSelectionButtonArray[]={(contextButton_struct){"remove target", (buttonTargetFunction)removeTargetButton}, (contextButton_struct){"cancel", (buttonTargetFunction)cancelTargetButton}};
+contextButton_struct planarSelectionButtonArray[]={(contextButton_struct){"unportalable", (buttonTargetFunction)makeUnportalablePlanarButton}, (contextButton_struct){"portalable", (buttonTargetFunction)makePortalablePlanarButton}};
+contextButton_struct groundSelectionButtonArray[]={(contextButton_struct){"unportalable", (buttonTargetFunction)makeUnportalablePlanarButton}, (contextButton_struct){"portalable", (buttonTargetFunction)makePortalablePlanarButton}, (contextButton_struct){"add sludge", (buttonTargetFunction)makeSludgePlanarButton}, (contextButton_struct){"remove sludge", (buttonTargetFunction)makeUnsludgePlanarButton}};
+contextButton_struct nonplanarSelectionButtonArray[]={(contextButton_struct){"unportalable", (buttonTargetFunction)makeUnportalableButton}, (contextButton_struct){"portalable", (buttonTargetFunction)makePortalableButton}, (contextButton_struct){"fill", (buttonTargetFunction)fillButtonFunction}, (contextButton_struct){"delete", (buttonTargetFunction)emptyButtonFunction}};
 

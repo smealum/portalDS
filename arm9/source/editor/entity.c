@@ -303,7 +303,7 @@ void drawEntities(void)
 
 //ENTITY CONTEXT BUTTONS
 
-void deleteEntityButton(void)
+void deleteEntityButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->entity)return;
@@ -312,7 +312,7 @@ void deleteEntityButton(void)
 	undoSelection(s);
 }
 
-void rotateEntityButton(void)
+void rotateEntityButton(sguiButton_struct* b)
 {
 	selection_struct* s=&editorSelection;
 	if(!s->entity)return;
@@ -321,13 +321,13 @@ void rotateEntityButton(void)
 	s->entity->orientation%=4;
 }
 
-void selectTargetButton(void)
+void selectTargetButton(sguiButton_struct* b)
 {
 	cleanUpContextButtons();
 	editorSelection.selectingTarget=true;
 }
 
-void setPlatformTargetButton(void)
+void setPlatformTargetButton(sguiButton_struct* b)
 {
 	if(!editorSelection.entity)return;
 	entity_struct* e=createEntity(vect(32,32,32), 12, false);
@@ -340,16 +340,16 @@ void setPlatformTargetButton(void)
 	cleanUpContextButtons();
 }
 
-contextButton_struct ballLauncherButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
-contextButton_struct ballCatcherButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}};
-contextButton_struct button1ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}};
-contextButton_struct button2ButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"target", selectTargetButton}, (contextButton_struct){"rotate", rotateEntityButton}};
-contextButton_struct turretButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"rotate", rotateEntityButton}};
-contextButton_struct cubeButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
-contextButton_struct gridButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
-contextButton_struct platformButtonArray[]={(contextButton_struct){"delete", deleteEntityButton},(contextButton_struct){"set path", setPlatformTargetButton}};
-contextButton_struct doorButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}, (contextButton_struct){"rotate", rotateEntityButton}};
-contextButton_struct lightButtonArray[]={(contextButton_struct){"delete", deleteEntityButton}};
+contextButton_struct ballLauncherButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}};
+contextButton_struct ballCatcherButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}, (contextButton_struct){"target", (buttonTargetFunction)selectTargetButton}};
+contextButton_struct button1ButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}, (contextButton_struct){"target", (buttonTargetFunction)selectTargetButton}};
+contextButton_struct button2ButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}, (contextButton_struct){"target", (buttonTargetFunction)selectTargetButton}, (contextButton_struct){"rotate", (buttonTargetFunction)rotateEntityButton}};
+contextButton_struct turretButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}, (contextButton_struct){"rotate", (buttonTargetFunction)rotateEntityButton}};
+contextButton_struct cubeButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}};
+contextButton_struct gridButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}};
+contextButton_struct platformButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton},(contextButton_struct){"set path", (buttonTargetFunction)setPlatformTargetButton}};
+contextButton_struct doorButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}, (contextButton_struct){"rotate", (buttonTargetFunction)rotateEntityButton}};
+contextButton_struct lightButtonArray[]={(contextButton_struct){"delete", (buttonTargetFunction)deleteEntityButton}};
 
 //SPECIAL INITS/UPDATES
 

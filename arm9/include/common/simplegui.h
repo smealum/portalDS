@@ -1,13 +1,15 @@
 #ifndef SIMPLEGUI_H
 #define SIMPLEGUI_H
 
-#define NUMSIMPLEBUTTONS (16)
+#define NUMSIMPLEBUTTONS (64)
 #define SIMPLEBUTTONMARGINX (6)
 #define SIMPLEBUTTONMARGINY (3)
 
 #define SIMPLEBUTTONSIZEY (SIMPLEBUTTONMARGINY*2+8)
 
-typedef void(*buttonTargetFunction)(void);
+struct sguiButton_struct;
+
+typedef void(*buttonTargetFunction)(struct sguiButton_struct*);
 
 typedef struct
 {

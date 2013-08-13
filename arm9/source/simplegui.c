@@ -67,7 +67,7 @@ bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 		b->active=true;
 		ret=true;
 	}else if(b->active && x==-1 && y==-1){
-		if(b->targetFunction)b->targetFunction();
+		if(b->targetFunction)b->targetFunction(b);
 		b->active=false;
 	}else b->active=false;
 

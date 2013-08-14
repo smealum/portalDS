@@ -50,6 +50,7 @@ void initWallDoors(void)
 	newReadMap("elevatorroom.map", &elevatorRoom, 1);
 	roomResetOrigin(&elevatorRoom);
 	roomOriginSize(&elevatorRoom, NULL, &elevatorRoomSize);
+	elevatorRoom.displayList=generateRoomDisplayList(&elevatorRoom, vect(0,0,0), vect(0,0,0), false);
 }
 
 void freeWallDoors(void)

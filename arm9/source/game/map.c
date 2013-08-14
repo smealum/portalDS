@@ -87,7 +87,7 @@ bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, i
 		if(&lc->data!=rec && lc->data.collides)
 		{
 			// NOGBA("%p vs %p",rec,&lc->data);
-			if(collideLineRectangle(&lc->data,l,u,d,NULL,&v)){if(i)*i=v;if(n)*n=lc->data.normal;return true;}
+			if(collideLineRectangle(&lc->data,vectDifference(l,convertSize(vect(r->position.x,0,r->position.y))),u,d,NULL,&v)){if(i)*i=v;if(n)*n=lc->data.normal;return true;}
 		}
 		lc=lc->next;
 	}

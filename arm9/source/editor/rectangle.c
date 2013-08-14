@@ -134,6 +134,7 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 		vect3D s=vect(rec->size.x*TILESIZE*2,rec->size.y*HEIGHTUNIT,rec->size.z*TILESIZE*2);
 		
 		int32 p2=dotProduct(vectDifference(p,o),n);
+
 		int32 k=divf32(p2,p1);
 		s8 sign=((s.x>0)^(s.y<0)^(s.z>0)^(p1<0))?(-1):(1);
 		if(kk)
@@ -143,7 +144,6 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 		if(k<0 || k>d){return false;}
 		vect3D i=addVect(o,vectMult(v,k));
 		if(ip)*ip=i;
-		// NOGBA("ip : %d %d %d",i.x,i.y,i.z);
 		i=vectDifference(i,p);
 		
 		bool r=true;

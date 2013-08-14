@@ -247,7 +247,15 @@ void updateTurret(turret_struct* t)
 
 	t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
 	t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
-	if(b)t->laserDestination=getPlayer()->object->position;
+
+	if(b)
+	{
+		vect3D u=vectDifference(getPlayer()->object->position,t->laserOrigin);
+		int32 d=magnitude(u);
+		u=divideVect(u,d);
+		if(!collideLineMap(&gameRoom, NULL, t->laserOrigin, u, d, NULL, NULL))t->laserDestination=getPlayer()->object->position;
+	}
+
 	vect3D dir=normalize(vectDifference(t->laserDestination,t->laserOrigin));
 	t->laserThroughPortal=false;
 

@@ -32,6 +32,7 @@ player_struct* getPlayer(void);
 void freePlayer(void);
 void drawCrosshair(void);
 void damagePlayer(player_struct* p);
+void shootPlayer(player_struct* p, vect3D v, u8 damage);
 void drawPlayer(player_struct* p);
 
 #endif

@@ -64,7 +64,7 @@ void initPlayer(player_struct* p)
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->walkCnt=0;
-	p->life=4;
+	p->life=100;
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
 	loadMd2Model("models/ratman.md2","ratman.pcx",&playerModel);
@@ -107,14 +107,6 @@ void drawPlayer(player_struct* p)
 		// renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,p->playerModelInstance.interpCounter,p->playerModelInstance.model,params,false,p->playerModelInstance.palette,RGB15(31,31,31));
 		renderModelFrameInterp(p->playerModelInstance.currentFrame,p->playerModelInstance.nextFrame,0,p->playerModelInstance.model,params,false,p->playerModelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);
-}
-
-void damagePlayer(player_struct* p)
-{
-	if(!p)p=&player;
-	NOGBA("DAMAGE");
-	// mmEffect(SFX_PLAYERHIT);
-	p->life--;
 }
 
 void drawCrosshair(void)
@@ -321,6 +313,10 @@ void updatePlayer(player_struct* p)
 	if(collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=0;
 	
 	updateCamera(NULL);
+
+	//regeneration
+	p->life+=1;
+	if(p->life>100)p->life=100;
 	
 	p->tempAngle.x/=2;
 	p->tempAngle.y/=2;
@@ -329,6 +325,14 @@ void updatePlayer(player_struct* p)
 	
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?
+}
+
+void shootPlayer(player_struct* p, vect3D v, u8 damage)
+{
+	if(!p)p=&player;
+
+	p->object->speed=addVect(p->object->speed,vectDivInt(v,64));
+	p->life-=damage;
 }
 
 void freePlayer(void)

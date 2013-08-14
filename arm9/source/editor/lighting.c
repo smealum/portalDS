@@ -32,7 +32,8 @@ void freeLightData(lightingData_struct* ld)
 		case VERTEXLIGHT_DATA:
 			if(ld->data.vertexLighting)
 			{
-				if(ld->data.vertexLighting->values){free(ld->data.vertexLighting->values);ld->data.vertexLighting->values=NULL;}
+				int i;
+				for(i=0;i<ld->size;i++)if(ld->data.vertexLighting[i].values){free(ld->data.vertexLighting[i].values);ld->data.vertexLighting[i].values=NULL;}
 				free(ld->data.vertexLighting);
 				ld->data.vertexLighting=NULL;
 			}

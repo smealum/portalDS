@@ -842,21 +842,20 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 
 void freeRoom(room_struct* r)
 {
-	if(r)
+	if(!r)return;
+
+	if(r->materials){free(r->materials);r->materials=NULL;}
+	if(r->rectangleGrid)
 	{
-		if(r->materials)free(r->materials);
-		if(r->rectangleGrid)
+		int i;
+		for(i=0;i<r->rectangleGridSize.x*r->rectangleGridSize.y;i++)
 		{
-			int i;
-			for(i=0;i<r->rectangleGridSize.x*r->rectangleGridSize.y;i++)
-			{
-				if(r->rectangleGrid[i].rectangles)free(r->rectangleGrid[i].rectangles);
-			}
-			free(r->rectangleGrid);
-			r->rectangleGrid=NULL;
+			if(r->rectangleGrid[i].rectangles)free(r->rectangleGrid[i].rectangles);
 		}
-		r->materials=NULL;
-		freeLightData(&r->lightingData);
-		removeRectangles(r);
+		free(r->rectangleGrid);
+		r->rectangleGrid=NULL;
 	}
+	freeLightData(&r->lightingData);
+	removeRectangles(r);
+	if(r->displayList){free(r->displayList);r->displayList=NULL;}
 }

@@ -23,6 +23,7 @@ extern portal_struct portal1, portal2;
 extern portal_struct* currentPortal;
 
 void initPortals(void);
+void freePortals(void);
 void resetPortals(void);
 void updatePortals(void);
 void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color);

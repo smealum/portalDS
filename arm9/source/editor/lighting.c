@@ -29,7 +29,13 @@ void freeLightData(lightingData_struct* ld)
 			if(ld->data.lightMap.texture)ld->data.lightMap.texture->used=false;
 			ld->size=0;
 			break;
-		default:
+		case VERTEXLIGHT_DATA:
+			if(ld->data.vertexLighting)
+			{
+				if(ld->data.vertexLighting->values){free(ld->data.vertexLighting->values);ld->data.vertexLighting->values=NULL;}
+				free(ld->data.vertexLighting);
+				ld->data.vertexLighting=NULL;
+			}
 			break;
 	}
 }

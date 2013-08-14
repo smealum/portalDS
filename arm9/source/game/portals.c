@@ -18,6 +18,12 @@ void initPortals(void)
 	currentPortal=&portal1;
 }
 
+void freePortals(void)
+{
+	if(portal1.displayList){free(portal1.displayList);portal1.displayList=NULL;}
+	if(portal2.displayList){free(portal2.displayList);portal2.displayList=NULL;}
+}
+
 void resetPortals(void)
 {
 	portal1.used=portal2.used=false;

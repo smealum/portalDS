@@ -13,6 +13,19 @@ void initSound()
 	soundEnable();
 }
 
+void freeSound(void)
+{
+	int i;
+	for(i=0;i<NUMSFX;i++)
+	{
+		if(SFX[i].used)
+		{
+			if(SFX[i].data){free(SFX[i].data);SFX[i].data=NULL;}
+			SFX[i].used=false;
+		}
+	}
+}
+
 void initSFX(SFX_struct* s)
 {
 	if(!s)return;

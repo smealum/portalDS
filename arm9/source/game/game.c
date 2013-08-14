@@ -385,7 +385,11 @@ void killGame(void)
 	freeTimedButtons();
 	freeTurrets();
 	freeWallDoors();
+	freeSludge();
+	freeRoom(&gameRoom);
+	freePortals();
 	freeState(NULL);
+	freeSound();
 	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	while(1);
 }

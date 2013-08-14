@@ -55,6 +55,7 @@ void initWallDoors(void)
 void freeWallDoors(void)
 {
 	freeMd2Model(&wallDoorModel);
+	freeRoom(&elevatorRoom);
 }
 
 void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orientation)

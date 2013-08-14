@@ -13,6 +13,11 @@ void initSludge(void)
 	sludgeMtl->param|=(1<<18)|(1<<19); //flip repeats, see http://nocash.emubase.de/gbatek.htm#ds3dtextureattributes
 }
 
+void freeSludge(void)
+{
+	while(sludgeRectangleList.num)popRectangle(&sludgeRectangleList);
+}
+
 void addSludgeRectangle(rectangle_struct* rec)
 {
 	if(!rec)return;

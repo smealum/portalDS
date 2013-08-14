@@ -30,10 +30,17 @@ void initDoor(door_struct* d, room_struct* r, vect3D position, bool orientation)
 
 	rectangle_struct rec;
 	rec.material=NULL;
+
 	if(!orientation){rec.position=addVect(position,vect(-1,0,0)); rec.size=vect(2,8,0); rec.normal=vect(0,0,inttof32(1));}
 	else {rec.position=addVect(position,vect(0,0,-1)); rec.size=vect(0,8,2); rec.normal=vect(inttof32(1),0,0);}
-	d->rectangle=addRoomRectangle(r, rec, NULL, false);
-	if(d->rectangle)d->rectangle->hide=true;
+
+	d->rectangle[0]=addRoomRectangle(r, rec, NULL, false);
+	if(d->rectangle[0])d->rectangle[0]->hide=true;
+
+	rec.position.y+=rec.size.y;
+	rec.size.y=-rec.size.y;
+	d->rectangle[1]=addRoomRectangle(r, rec, NULL, false);
+	if(d->rectangle[1])d->rectangle[1]->hide=true;
 
 	initModelInstance(&d->modelInstance, &doorModel);
 	d->position=convertVect(vect(position.x+r->position.x, position.y, position.z+r->position.y));
@@ -69,7 +76,8 @@ void updateDoor(door_struct* d)
 			changeAnimation(&d->modelInstance, 1, true);
 		}else if(d->modelInstance.oldAnim==1 && d->modelInstance.currentAnim==2)
 		{
-			if(d->rectangle){d->rectangle->collides=false;toggleAAR(d->rectangle->AARid);}
+			if(d->rectangle[0]){d->rectangle[0]->collides=false;toggleAAR(d->rectangle[0]->AARid);}
+			if(d->rectangle[1]){d->rectangle[1]->collides=false;toggleAAR(d->rectangle[1]->AARid);}
 		}
 	}else
 	{
@@ -77,7 +85,8 @@ void updateDoor(door_struct* d)
 		{
 			changeAnimation(&d->modelInstance, 0, false);
 			changeAnimation(&d->modelInstance, 3, true);
-			if(d->rectangle){d->rectangle->collides=true;toggleAAR(d->rectangle->AARid);}
+			if(d->rectangle[0]){d->rectangle[0]->collides=true;toggleAAR(d->rectangle[0]->AARid);}
+			if(d->rectangle[1]){d->rectangle[1]->collides=true;toggleAAR(d->rectangle[1]->AARid);}
 		}
 	}
 

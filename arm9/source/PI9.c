@@ -166,7 +166,8 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex][sizey][sizez
 
 void toggleAAR(s16 id)
 {
-	if(id<=0)return;
+	NOGBA("TOOGLE TOGGLE %d",id);
+	if(id<0)return;
 
 	fifoSendValue32(FIFO_USER_08,PI_TOGGLEAAR|((id)<<PISIGNALDATA));
 }

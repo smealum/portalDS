@@ -7,7 +7,7 @@ typedef struct
 {
 	vect3D position;
 	modelInstance_struct modelInstance;
-	rectangle_struct* rectangle;
+	rectangle_struct* rectangle[2];
 	bool orientation;
 	bool active;
 	bool used;

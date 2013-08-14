@@ -118,7 +118,7 @@ rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, v
 	rectangle_struct* hit=NULL;
 	while(lc)
 	{
-		if(&lc->data!=rec)
+		if(&lc->data!=rec && lc->data.collides)
 		{
 			int32 k;
 			if(collideLineRectangle(&lc->data,l,u,lowestK,&k,&v)){if(k<lowestK){*i=v;lowestK=k;hit=&lc->data;}}

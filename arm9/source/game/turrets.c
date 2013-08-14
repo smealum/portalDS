@@ -44,6 +44,7 @@ void initTurret(turret_struct* t, room_struct* r, vect3D position, u8 d)
 	t->OBB->modelInstance.palette=loadPalettePCX("turret.pcx","textures");
 
 	t->drawShot[0]=t->drawShot[1]=0;
+	t->dead=false;
 }
 
 turret_struct* createTurret(room_struct* r, vect3D position, u8 d)
@@ -79,7 +80,7 @@ void drawLaser(vect3D orig, vect3D target)
 
 void drawTurretStuff(turret_struct* t)
 {
-	if(!t || !t->used)return;
+	if(!t || !t->used || t->dead)return;
 	
 	drawLaser(t->laserOrigin,t->laserDestination);
 	if(t->laserThroughPortal)drawLaser(t->laserOrigin2,t->laserDestination2);
@@ -183,6 +184,7 @@ void updateTurret(turret_struct* t)
 	if(!t->OBB || !t->OBB->used){t->OBB=NULL;t->used=false;return;}
 	
 	t->counter+=2;t->counter%=63; //TEMP
+	if(t->dead)t->counter=31;
 	editPalette((u16*)t->OBB->modelInstance.palette,0,RGB15(abs(31-t->counter),0,0)); //TEMP
 	
 	int32* m=t->OBB->transformationMatrix;
@@ -205,7 +207,7 @@ void updateTurret(turret_struct* t)
 			changeAnimation(&t->OBB->modelInstance, 0, false);
 			t->drawShot[0]=t->drawShot[1]=0;
 
-			if(b)t->state=TURRET_OPENING;
+			if(b && !t->dead)t->state=TURRET_OPENING;
 			break;
 		case TURRET_OPENING:
 			if(t->OBB->modelInstance.currentAnim==2)
@@ -238,7 +240,7 @@ void updateTurret(turret_struct* t)
 					if(t->drawShot[i])t->drawShot[i]--;
 				}
 
-				if(!b)t->state=TURRET_CLOSING;
+				if(!b || t->dead)t->state=TURRET_CLOSING;
 			}
 			break;
 		case TURRET_CLOSING:
@@ -254,40 +256,45 @@ void updateTurret(turret_struct* t)
 			break;
 	}
 
-	t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
-	t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
-
-	if(b) t->laserDestination=getPlayer()->object->position;
-
-	vect3D dir=normalize(vectDifference(t->laserDestination,t->laserOrigin));
-	t->laserThroughPortal=false;
-
-	laserProgression(r, &t->laserOrigin, &t->laserDestination, dir);
-	
-	int32 x, y, z;
-	vect3D v;
-	portal_struct* portal=NULL;
-	if(isPointInPortal(&portal1, t->laserDestination, &v, &x, &y, &z))portal=&portal1;
-	if(abs(z)>=32)portal=NULL;
-	if(!portal)
+	if(!t->dead)
 	{
-		if(isPointInPortal(&portal2, t->laserDestination, &v, &x, &y, &z))portal=&portal2;
+		t->laserOrigin=addVect(vectDivInt(t->OBB->position,4),evalVectMatrix33(m,laserOrigin));
+		t->laserDestination=addVect(t->laserOrigin,vect(m[2],m[5],m[8]));
+
+		if(b)t->laserDestination=getPlayer()->object->position;
+
+		vect3D dir=normalize(vectDifference(t->laserDestination,t->laserOrigin));
+		t->laserThroughPortal=false;
+
+		laserProgression(r, &t->laserOrigin, &t->laserDestination, dir);
+		
+		int32 x, y, z;
+		vect3D v;
+		portal_struct* portal=NULL;
+		if(isPointInPortal(&portal1, t->laserDestination, &v, &x, &y, &z))portal=&portal1;
 		if(abs(z)>=32)portal=NULL;
-	}
-	if(portal)
-	{
-		t->laserDestination=addVect(t->laserDestination,vectMult(dir,TILESIZE));
+		if(!portal)
+		{
+			if(isPointInPortal(&portal2, t->laserDestination, &v, &x, &y, &z))portal=&portal2;
+			if(abs(z)>=32)portal=NULL;
+		}
+		if(portal)
+		{
+			t->laserDestination=addVect(t->laserDestination,vectMult(dir,TILESIZE));
 
 
-		t->laserThroughPortal=true;
-		dir=warpVector(portal,dir);
-		t->laserOrigin2=addVect(portal->targetPortal->position, warpVector(portal, vectDifference(t->laserDestination, portal->position)));
-		t->laserDestination2=addVect(t->laserOrigin2,dir);
-		
-		laserProgression(r, &t->laserOrigin2, &t->laserDestination2, dir);
-		
+			t->laserThroughPortal=true;
+			dir=warpVector(portal,dir);
+			t->laserOrigin2=addVect(portal->targetPortal->position, warpVector(portal, vectDifference(t->laserDestination, portal->position)));
+			t->laserDestination2=addVect(t->laserOrigin2,dir);
+			
+			laserProgression(r, &t->laserOrigin2, &t->laserDestination2, dir);
+			
 
-		t->laserOrigin2=addVect(t->laserOrigin2,vectMult(dir,-TILESIZE));
+			t->laserOrigin2=addVect(t->laserOrigin2,vectMult(dir,-TILESIZE));
+		}
+
+		if(m[4]<sinLerp(8192/2))t->dead=true;
 	}
 	
 	updateAnimation(&t->OBB->modelInstance);

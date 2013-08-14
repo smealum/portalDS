@@ -22,6 +22,7 @@ typedef struct
 	u16 shotAngle[2];
 	u8 drawShot[2];
 	u8 counter;
+	bool dead;
 	bool used;
 }turret_struct;
 

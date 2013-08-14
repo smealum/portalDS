@@ -208,7 +208,7 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	}
 
 	//elevators
-	if(entryWallDoor.used && checkObjectElevatorCollision(o,r,&entryWallDoor.elevator) || (exitWallDoor.used && checkObjectElevatorCollision(o,r,&exitWallDoor.elevator)))ret=true;
+	if((entryWallDoor.used && checkObjectElevatorCollision(o,r,&entryWallDoor.elevator)) || (exitWallDoor.used && checkObjectElevatorCollision(o,r,&exitWallDoor.elevator)))ret=true;
 	
 	//timed buttons
 	if(checkObjectTimedButtonsCollision(o,r))ret=true;

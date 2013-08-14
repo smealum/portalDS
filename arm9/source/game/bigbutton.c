@@ -78,7 +78,7 @@ void drawBigButton(bigButton_struct* bb)
 	if(!bb || !bb->used)return;
 	
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(10+bb->id)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(10+bb->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, bb->position, &params);
 		
 		glTranslate3f32(bb->position.x,bb->position.y,bb->position.z);

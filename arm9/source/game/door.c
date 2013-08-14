@@ -99,7 +99,7 @@ void drawDoor(door_struct* d)
 	if(!d || !d->used)return;
 
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(30+d->id)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(30+d->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, d->position, &params);
 
 		glTranslate3f32(d->position.x,d->position.y,d->position.z);

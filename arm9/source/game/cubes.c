@@ -85,7 +85,7 @@ void drawCubeDispenser(cubeDispenser_struct* cd)
 	if(!cd)return;
 	
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(20+cd->id)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(20+cd->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, cd->position, &params);
 		glTranslate3f32(cd->position.x,cd->position.y,cd->position.z);
 		renderModelFrameInterp(cd->modelInstance.currentFrame,cd->modelInstance.nextFrame,cd->modelInstance.interpCounter,cd->modelInstance.model,params,false,cd->modelInstance.palette,RGB15(31,31,31));

@@ -416,7 +416,7 @@ void drawOBB(OBB_struct* o)
 
 	glPushMatrix();
 	
-	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(40+o->id)|POLY_TOON_HIGHLIGHT;
+	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(40+o->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 	setupObjectLighting(NULL, vectDivInt(o->position,4), &params);
 	
 	glTranslatef32(o->position.x/4,o->position.y/4,o->position.z/4);

@@ -138,7 +138,7 @@ void drawWallDoor(wallDoor_struct* wd)
 	if(!wd || !wd->used)return;
 
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(30)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(30)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, wd->position, &params);
 
 		glTranslate3f32(wd->position.x,wd->position.y,wd->position.z);
@@ -148,7 +148,7 @@ void drawWallDoor(wallDoor_struct* wd)
 			
 			renderModelFrameInterp(wd->modelInstance.currentFrame,wd->modelInstance.nextFrame,wd->modelInstance.interpCounter,wd->modelInstance.model,params,false,wd->modelInstance.palette,RGB15(31,31,31));
 		
-			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_BACK|POLY_ID(31));
+			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_BACK|POLY_ID(31)|POLY_FOG);
 			GFX_COLOR=RGB15(31,31,31);
 			vect3D v[4];
 			bindMaterial(wd->frameMaterial, wd->rectangle, NULL, v, false);
@@ -163,7 +163,7 @@ void drawWallDoor(wallDoor_struct* wd)
 					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z);			
 				}
 		
-			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(31));
+			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(31)|POLY_FOG);
 			GFX_BEGIN=GL_QUAD_STRIP;
 
 				for(i=0;i<DOORFRAMELENGTH;i++)

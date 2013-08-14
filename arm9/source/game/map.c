@@ -742,6 +742,7 @@ void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 		{
 			if(r->displayList)
 			{
+				// glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 				glTranslate3f32(-TILESIZE,0,-TILESIZE);
 				glScalef32((TILESIZE*2)<<7,(HEIGHTUNIT)<<7,(TILESIZE*2)<<7);
 				glCallList(r->displayList);
@@ -758,7 +759,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 	if(!r)return NULL;
 	u32* ptr=glBeginListDL();
 	
-	glPolyFmtDL(POLY_ALPHA(31) | POLY_CULL_BACK);
+	glPolyFmtDL(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FOG);
 	listCell_struct *lc=r->rectangles.first;
 	while(lc)
 	{

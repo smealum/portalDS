@@ -53,6 +53,15 @@ void collidePlayer(player_struct* p, room_struct* r)
 	collideObjectRoom(p->object,r);
 }
 
+void setFog(u8 intensity)
+{
+	glEnable(GL_FOG);
+	glFogShift(2);
+	glFogColor(31,0,0,31);
+	int i; for(i=0;i<32;i++)glFogDensity(i,intensity);
+	glFogOffset(0x6500);
+}
+
 void initPlayer(player_struct* p)
 {
 	if(!p)p=&player;
@@ -64,7 +73,7 @@ void initPlayer(player_struct* p)
 	touchRead(&touchCurrent);
 	touchOld=touchCurrent;
 	p->walkCnt=0;
-	p->life=100;
+	p->life=127;
 	p->tempAngle=vect(0,0,0);
 	loadMd2Model("models/portalgun.md2","portalgun.pcx",&gun);
 	loadMd2Model("models/ratman.md2","ratman.pcx",&playerModel);
@@ -86,6 +95,9 @@ void initPlayer(player_struct* p)
 
 	portalExitSFX[0]=createSFX("portal_exit1.raw", SoundFormat_16Bit);
 	portalExitSFX[1]=createSFX("portal_exit2.raw", SoundFormat_16Bit);
+
+	//TEST TEMP
+	setFog(0);
 }
 
 void drawPlayer(player_struct* p)
@@ -93,7 +105,7 @@ void drawPlayer(player_struct* p)
 	if(!p)p=&player;
 	
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(2)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(2)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, p->object->position, &params);
 		
 		camera_struct* c=getPlayerCamera();
@@ -153,7 +165,7 @@ void renderGun(player_struct* p)
 {
 	if(!p)p=&player;
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(1) | POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(1) | POLY_TOON_HIGHLIGHT | POLY_FOG;
 		setupObjectLighting(NULL, p->object->position, &params);
 		
 		glTranslate3f32((sinLerp(p->walkCnt>>1)>>11),(sinLerp(p->walkCnt)>>11),0);
@@ -316,7 +328,9 @@ void updatePlayer(player_struct* p)
 
 	//regeneration
 	p->life+=1;
-	if(p->life>100)p->life=100;
+	if(p->life>127)p->life=127;
+
+	setFog((127-p->life)/2);
 	
 	p->tempAngle.x/=2;
 	p->tempAngle.y/=2;

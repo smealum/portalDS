@@ -121,7 +121,7 @@ void drawEnergyDevice(energyDevice_struct* ed)
 	if(!ed)return;
 	
 	glPushMatrix();
-		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(30+ed->id)|POLY_TOON_HIGHLIGHT;
+		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(30+ed->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, ed->position, &params);
 
 		glTranslate3f32(ed->position.x,ed->position.y,ed->position.z);
@@ -235,10 +235,10 @@ void drawEnergyBall(energyBall_struct* eb)
 		glTranslate3f32(eb->position.x,eb->position.y,eb->position.z);
 		glPushMatrix();
 			glRotateZi(angle*1024);glRotateXi(angle*512);glRotateYi(angle*256);
-			renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(alpha)|POLY_ID(8)|POLY_CULL_NONE,false,eb->modelInstance.palette,RGB15(31,31,31));
+			renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(alpha)|POLY_ID(8)|POLY_CULL_NONE|POLY_FOG,false,eb->modelInstance.palette,RGB15(31,31,31));
 		glPopMatrix(1);
 		glRotateXi(angle*1024);glRotateYi(angle*512);glRotateZi(angle*256);
-		renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(alpha)|POLY_ID(16)|POLY_CULL_NONE,false,eb->modelInstance.palette,RGB15(31,31,31));
+		renderModelFrameInterp(eb->modelInstance.currentFrame,eb->modelInstance.nextFrame,0,eb->modelInstance.model,POLY_ALPHA(alpha)|POLY_ID(16)|POLY_CULL_NONE|POLY_FOG,false,eb->modelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);
 }
 

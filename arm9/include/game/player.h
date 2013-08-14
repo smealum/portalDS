@@ -20,7 +20,7 @@ typedef struct
 	modelInstance_struct playerModelInstance;
 	bool currentPortal;
 	bool inPortal, oldInPortal;
-	s8 life;
+	s16 life;
 }player_struct;
 
 room_struct* getCurrentRoom(void);

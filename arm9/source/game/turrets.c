@@ -232,7 +232,7 @@ void updateTurret(turret_struct* t)
 						t->drawShot[i]=rand()%8;
 						t->shotAngle[i]=rand();
 
-						shootPlayer(NULL, normalize(vectDifference(t->laserDestination,t->laserOrigin)), 4);
+						shootPlayer(NULL, normalize(vectDifference(t->laserDestination,t->laserOrigin)), 6);
 					}
 
 					if(t->drawShot[i])t->drawShot[i]--;

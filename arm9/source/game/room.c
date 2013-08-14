@@ -5,7 +5,7 @@ void drawRoomsGame(u8 mode, u16 color)
 {
 	int i;
 	unbindMtl();
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 
 	drawRoom(&gameRoom,((1)<<3)|(1<<2)|(1)|(mode), color); //TEMP
 }

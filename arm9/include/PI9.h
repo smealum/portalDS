@@ -32,6 +32,7 @@ extern AAR_struct aaRectangles[NUMAARS];
 void initPI9(void);
 void startPI(void);
 void pausePI(void);
+void resetAllPI(void);
 void listenPI9(void);
 void updateOBBs(void);
 void applyForce(u8 id, vect3D pos, vect3D v);

@@ -330,11 +330,15 @@ void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 
 	int d=getMemFree();//TEMP
 	
+NOGBA("HM");
+
+	NOGBA(" : %d",getMemFree()/1024);
 	int i;
 	for(i=0;i<mdl->header.num_frames;i++)
 	{
 		generateFrameDisplayList(i, mdl, normals);
 	}
+	NOGBA(" : %d",getMemFree()/1024);
 	if(interp)
 	{
 		for(i=0;i<mdl->numAnim;i++)
@@ -349,6 +353,7 @@ void generateModelDisplayLists(md2Model_struct *mdl, bool interp, u8 normals)
 			}
 		}
 	}
+	NOGBA("HM");
 	if(interp || mdl->header.num_frames==1)
 	{
 		for(i=0;i<mdl->header.num_frames;i++)

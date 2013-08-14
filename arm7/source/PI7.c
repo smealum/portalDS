@@ -44,6 +44,9 @@ void listenPI7(void)
 				initOBBs();
 				PI7running=true;
 				break;
+			case PI_RESETALL:
+				initPI7();
+				break;
 			case PI_ADDBOX:
 				{
 					vect3D pos, size;

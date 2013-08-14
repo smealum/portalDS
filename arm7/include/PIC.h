@@ -21,6 +21,7 @@ typedef enum
 	PI_PAUSE=2,  	    //ARG : 0
 	PI_STOP=3,   	    //ARG : 0
 	PI_RESET=4,  	    //ARG : 0
+	PI_RESETALL=18,	    //ARG : 0
 	PI_ADDBOX=5,  	    //ARG : 5 (id;[sizex|sizey][sizez|mass][posx][posy][posz])
 	PI_APPLYFORCE=6,    //ARG : 5 (id;[posx|posy][posz][vx][vy][vz])
 	PI_ADDAAR=7,  	    //ARG : 5 (id;[sizex][sizey][sizez][normal][posx][posy][posz])
@@ -34,6 +35,7 @@ typedef enum
 	PI_KILLBOX=15,       //ARG : 0 (id)
 	PI_RESETPORTALS=16,  //ARG : 0
 	PI_TOGGLEAAR=17,  	 //ARG : 0 (id)
+	// 18 taken you fool
 }message_type;
 
 #ifdef ARM7

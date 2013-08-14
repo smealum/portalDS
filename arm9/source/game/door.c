@@ -13,6 +13,7 @@ void initDoors(void)
 	}
 
 	loadMd2Model("models/door.md2", "door.pcx", &doorModel);
+	NOGBA("HM");
 	generateModelDisplayLists(&doorModel, false, true);
 }
 

@@ -77,6 +77,14 @@ void resetPI(void)
 	fifoSendValue32(FIFO_USER_08,PI_RESET);
 }
 
+void resetAllPI(void)
+{
+	int i;
+	for(i=0;i<NUMOBJECTS;i++)objects[i].used=false;
+	fifoSendValue32(FIFO_USER_08,PI_RESETALL);
+	initPI9();
+}
+
 void killBox(OBB_struct* o)
 {
 	if(!o)return;

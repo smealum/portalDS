@@ -390,8 +390,10 @@ void killGame(void)
 	freePortals();
 	freeState(NULL);
 	freeSound();
+
+	resetAllPI();
+
 	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
-	while(1);
 }
 
 void gameVBL(void)

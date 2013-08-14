@@ -48,6 +48,11 @@ void initEmancipation(void)
 	emancipationSFX=createSFX("emancipation.raw",SoundFormat_16Bit);
 }
 
+void freeEmancipation(void)
+{
+	freeMd2Model(&gridModel);
+}
+
 void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos, int32* m)
 {
 	if(!e)return;

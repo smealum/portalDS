@@ -25,6 +25,11 @@ void initTurrets(void)
 	turretShotTexture=createTexture("turret_shot.pcx", "textures");
 }
 
+void freeTurrets(void)
+{
+	freeMd2Model(&turretModel);
+}
+
 void initTurret(turret_struct* t, room_struct* r, vect3D position, u8 d)
 {
 	if(!t)return;

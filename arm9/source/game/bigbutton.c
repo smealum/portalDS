@@ -18,6 +18,11 @@ void initBigButtons(void)
 	bigButtonBrightPalette=loadPalettePCX("button1b.pcx","textures");
 }
 
+void freeBigButtons(void)
+{
+	freeMd2Model(&bigButtonModel);
+}
+
 void initBigButton(bigButton_struct* bb, room_struct* r, vect3D pos)
 {
 	if(!bb || !r)return;

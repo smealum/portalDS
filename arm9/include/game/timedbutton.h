@@ -16,6 +16,7 @@ typedef struct
 }timedButton_struct;
 
 void initTimedButtons(void);
+void freeTimedButtons(void);
 timedButton_struct* createTimedButton(room_struct* r, vect3D position, u16 angle);
 bool checkObjectTimedButtonsCollision(physicsObject_struct* o, room_struct* r);
 void drawTimedButtons(void);

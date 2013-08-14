@@ -39,6 +39,7 @@ typedef struct
 }energyBall_struct;
 
 void initEnergyBalls(void);
+void freeEnergyBalls(void);
 energyDevice_struct* createEnergyDevice(room_struct* r, vect3D pos, deviceOrientation_type or, bool type);
 void drawEnergyDevices(void);
 void updateEnergyDevices(void);

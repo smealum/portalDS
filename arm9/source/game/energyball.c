@@ -33,6 +33,13 @@ void initEnergyBalls(void)
 	generateModelDisplayLists(&energyBallModel, true, 0);
 }
 
+void freeEnergyBalls(void)
+{
+	freeMd2Model(&energyCatcherModel);
+	freeMd2Model(&energyLauncherModel);
+	freeMd2Model(&energyBallModel);
+}
+
 void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, deviceOrientation_type or, bool type)
 {
 	if(!ed)return;
@@ -284,7 +291,7 @@ void updateEnergyBall(energyBall_struct* eb)
 	if(!col)col=collideGridCell(getCurrentCell(p->currentRoom,addVect(eb->position,vectMult(eb->direction,eb->speed))), eb->launcher?eb->launcher->surface:NULL, l, eb->direction, eb->speed, &ip, &normal);
 	if(col)
 	{
-		NOGBA("COL COL COL %d",col->collides);
+		// NOGBA("COL COL COL %d",col->collides);
 		ip=addVect(convertSize(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 		energyDevice_struct* ed=isEnergyCatcherSurface(col);
 		if(ed && !ed->active)

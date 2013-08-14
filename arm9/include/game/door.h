@@ -16,6 +16,7 @@ typedef struct
 
 
 void initDoors(void);
+void freeDoors(void);
 door_struct* createDoor(room_struct* r, vect3D position, bool orientation);
 void updateDoors(void);
 void drawDoors(void);

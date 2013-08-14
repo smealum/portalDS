@@ -16,6 +16,7 @@ typedef struct
 }bigButton_struct;
 
 void initBigButtons(void);
+void freeBigButtons(void);
 bigButton_struct* createBigButton(room_struct* r, vect3D position);
 void drawBigButtons(void);
 void updateBigButtons(void);

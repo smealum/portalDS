@@ -18,6 +18,7 @@ extern wallDoor_struct entryWallDoor;
 extern wallDoor_struct exitWallDoor;
 
 void initWallDoors(void);
+void freeWallDoors(void);
 void updateWallDoors(void);
 void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orientation);
 void drawWallDoors(void);

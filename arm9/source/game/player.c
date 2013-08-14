@@ -72,7 +72,7 @@ void initPlayer(player_struct* p)
 	generateModelDisplayLists(&playerModel, false, 1);
 	initModelInstance(&p->modelInstance,&gun);
 	initModelInstance(&p->playerModelInstance,&playerModel);
-	bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
+	// bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
 
 	//TEMP INIT VALUES
 	p->object->position=vect(0,32*HEIGHTUNIT*4*2,0);
@@ -288,6 +288,7 @@ void playerControls(player_struct* p)
 
 	// camera_struct* c=getPlayerCamera();
 	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
+	if(keysDown()&(KEY_SELECT))p->life=0;
 	
 	touchOld=touchCurrent;
 }
@@ -332,5 +333,6 @@ void updatePlayer(player_struct* p)
 void freePlayer(void)
 {
 	freeMd2Model(&gun);
-	freePCX(bottomScreen);
+	freeMd2Model(&playerModel);
+	// freePCX(bottomScreen);
 }

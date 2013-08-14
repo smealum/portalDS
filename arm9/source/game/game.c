@@ -338,7 +338,7 @@ void gameFrame(void)
 			// iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
 
-			if(keysDown()&KEY_SELECT)testStepByStep^=1; //TEMP
+			// if(keysDown()&KEY_SELECT)testStepByStep^=1; //TEMP
 			iprintf("full : %d (%d)  \n",cpuEndTiming(),testStepByStep);
 			swiWaitForVBlank();
 			cpuStartTiming(0);
@@ -364,8 +364,8 @@ void gameFrame(void)
 			break;
 	}
 	
-	if(testStepByStep){int i=0;while(!(keysUp()&KEY_TOUCH)){scanKeys();listenPI9();swiWaitForVBlank();}NOGBA("WAITED");scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
-	else if(keysDown()&KEY_SELECT)testStepByStep=true;
+	// if(testStepByStep){int i=0;while(!(keysUp()&KEY_TOUCH)){scanKeys();listenPI9();swiWaitForVBlank();}NOGBA("WAITED");scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
+	// else if(keysDown()&KEY_SELECT)testStepByStep=true;
 	
 	currentBuffer^=1;
 }
@@ -375,8 +375,19 @@ void killGame(void)
 	fadeOut();
 	NOGBA("KILLING IT");
 	freePlayer();
+	freeEnergyBalls();
+	freeBigButtons();
+	freeCubes();
+	freeDoors();
+	freeElevators();
+	freeEmancipation();
+	freePlatforms();
+	freeTimedButtons();
+	freeTurrets();
+	freeWallDoors();
 	freeState(NULL);
-	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	while(1);
 }
 
 void gameVBL(void)

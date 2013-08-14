@@ -26,6 +26,7 @@ typedef struct
 }emancipationGrid_struct;
 
 void initEmancipation(void);
+void freeEmancipation(void);
 
 void createEmancipator(modelInstance_struct* mi, vect3D pos, int32* m);
 void updateEmancipators(void);

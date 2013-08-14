@@ -21,6 +21,11 @@ void initTimedButtons(void)
 	timedButtonBrightPalette=loadPalettePCX("button1b.pcx","textures");
 }
 
+void freeTimedButtons(void)
+{
+	freeMd2Model(&timedButtonModel);
+}
+
 void initTimedButton(timedButton_struct* bb, room_struct* r, vect3D pos, u16 angle)
 {
 	if(!bb || !r)return;

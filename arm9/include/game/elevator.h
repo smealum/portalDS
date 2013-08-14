@@ -25,6 +25,7 @@ typedef struct
 }elevator_struct;
 
 void initElevators(void);
+void freeElevators(void);
 void initElevator(elevator_struct* ev, room_struct* r, vect3D position, u8 direction, bool up);
 void setElevatorArriving(elevator_struct* ev, int32 distance);
 void updateElevator(elevator_struct* ev);

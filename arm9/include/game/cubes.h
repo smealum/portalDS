@@ -16,6 +16,7 @@ typedef struct
 }cubeDispenser_struct;
 
 void initCubes(void);
+void freeCubes(void);
 void drawCubeDispensers(void);
 void updateCubeDispensers(void);
 void resetCubeDispenserCube(cubeDispenser_struct* cd);

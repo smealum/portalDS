@@ -13,8 +13,15 @@ void initCubes(void)
 	}
 	
 	loadMd2Model("models/cube.md2","storagecube.pcx",&storageCubeModel);generateModelDisplayLists(&storageCubeModel, false, 1);
-	loadMd2Model("models/cube.md2","companion.pcx",&companionCubeModel);generateModelDisplayLists(&storageCubeModel, false, 1);
+	loadMd2Model("models/cube.md2","companion.pcx",&companionCubeModel);generateModelDisplayLists(&companionCubeModel, false, 1);
 	loadMd2Model("models/cubedispenser.md2","cubedispenser.pcx",&cubeDispenserModel);generateModelDisplayLists(&cubeDispenserModel, false, 1);
+}
+
+void freeCubes(void)
+{
+	freeMd2Model(&storageCubeModel);
+	freeMd2Model(&companionCubeModel);
+	freeMd2Model(&cubeDispenserModel);
 }
 
 void initCubeDispenser(room_struct* r, cubeDispenser_struct* cd, vect3D pos, bool companion)

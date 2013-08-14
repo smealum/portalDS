@@ -16,6 +16,11 @@ void initDoors(void)
 	generateModelDisplayLists(&doorModel, false, true);
 }
 
+void freeDoors(void)
+{
+	freeMd2Model(&doorModel);
+}
+
 void initDoor(door_struct* d, room_struct* r, vect3D position, bool orientation)
 {
 	if(!d || !r)return;

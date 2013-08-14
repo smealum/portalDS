@@ -22,6 +22,11 @@ void initPlatforms(void)
 	generateModelDisplayLists(&platformModel, false, 0);
 }
 
+void freePlatforms(void)
+{
+	freeMd2Model(&platformModel);
+}
+
 void initPlatform(platform_struct* pf, room_struct* r, vect3D orig, vect3D dest, u8 id, bool BAF)
 {
 	if(!pf || !r)return;

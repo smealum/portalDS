@@ -14,6 +14,12 @@ void initElevators(void)
 	generateModelDisplayLists(&elevatorFrameModel, false, true);
 }
 
+void freeElevators(void)
+{
+	freeMd2Model(&elevatorModel);
+	freeMd2Model(&elevatorFrameModel);
+}
+
 void initElevator(elevator_struct* ev, room_struct* r, vect3D position, u8 direction, bool up)
 {
 	if(!ev)return;

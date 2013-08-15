@@ -2,6 +2,8 @@
 
 door_struct door[NUMDOORS];
 md2Model_struct doorModel;
+SFX_struct* doorOpenSFX;
+SFX_struct* doorCloseSFX;
 
 void initDoors(void)
 {
@@ -13,8 +15,10 @@ void initDoors(void)
 	}
 
 	loadMd2Model("models/door.md2", "door.pcx", &doorModel);
-	NOGBA("HM");
 	generateModelDisplayLists(&doorModel, false, true);
+
+	doorOpenSFX=createSFX("door_open.raw", SoundFormat_16Bit);
+	doorCloseSFX=createSFX("door_close.raw", SoundFormat_16Bit);
 }
 
 void freeDoors(void)
@@ -74,6 +78,7 @@ void updateDoor(door_struct* d)
 		{
 			changeAnimation(&d->modelInstance, 2, false);
 			changeAnimation(&d->modelInstance, 1, true);
+			playSFX(doorOpenSFX);
 		}else if(d->modelInstance.oldAnim==1 && d->modelInstance.currentAnim==2)
 		{
 			if(d->rectangle[0]){d->rectangle[0]->collides=false;toggleAAR(d->rectangle[0]->AARid);}
@@ -85,6 +90,7 @@ void updateDoor(door_struct* d)
 		{
 			changeAnimation(&d->modelInstance, 0, false);
 			changeAnimation(&d->modelInstance, 3, true);
+			playSFX(doorCloseSFX);
 			if(d->rectangle[0]){d->rectangle[0]->collides=true;toggleAAR(d->rectangle[0]->AARid);}
 			if(d->rectangle[1]){d->rectangle[1]->collides=true;toggleAAR(d->rectangle[1]->AARid);}
 		}

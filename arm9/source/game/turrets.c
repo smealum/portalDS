@@ -6,6 +6,10 @@ turret_struct turrets[NUMTURRETS];
 md2Model_struct turretModel;
 mtlImg_struct* turretShotTexture;
 
+SFX_struct* turretFireSFX;
+SFX_struct* turretDeploySFX;
+SFX_struct* turretRetractSFX;
+
 const vect3D laserOrigin=(vect3D){16,76,140};
 
 void initTurrets(void)
@@ -23,6 +27,9 @@ void initTurrets(void)
 	generateModelDisplayLists(&turretModel, false, 1);
 	NOGBA("turret2 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	turretShotTexture=createTexture("turret_shot.pcx", "textures");
+	turretFireSFX=createSFX("turret_fire.raw", SoundFormat_16Bit);
+	turretDeploySFX=createSFX("turret_deploy.raw", SoundFormat_16Bit);
+	turretRetractSFX=createSFX("turret_retract.raw", SoundFormat_16Bit);
 }
 
 void freeTurrets(void)
@@ -207,7 +214,7 @@ void updateTurret(turret_struct* t)
 			changeAnimation(&t->OBB->modelInstance, 0, false);
 			t->drawShot[0]=t->drawShot[1]=0;
 
-			if(b && !t->dead)t->state=TURRET_OPENING;
+			if(b && !t->dead){t->state=TURRET_OPENING; playSFX(turretDeploySFX);}
 			break;
 		case TURRET_OPENING:
 			if(t->OBB->modelInstance.currentAnim==2)
@@ -235,12 +242,13 @@ void updateTurret(turret_struct* t)
 						t->shotAngle[i]=rand();
 
 						shootPlayer(NULL, normalize(vectDifference(t->laserDestination,t->laserOrigin)), 6);
+						playSFX(turretFireSFX);
 					}
 
 					if(t->drawShot[i])t->drawShot[i]--;
 				}
 
-				if(!b || t->dead)t->state=TURRET_CLOSING;
+				if(!b || t->dead){t->state=TURRET_CLOSING; playSFX(turretRetractSFX);}
 			}
 			break;
 		case TURRET_CLOSING:

@@ -50,7 +50,7 @@ void freeRoom(room_struct* r);
 void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c);
 bool collideLineMap(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n);
 rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, vect3D* n);
-rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i);
+rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, int32* lk);
 
 void translateRectangles(room_struct* r, vect3D v);
 

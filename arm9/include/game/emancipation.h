@@ -38,5 +38,6 @@ void drawEmancipationGrids(void);
 
 void getEmancipationGridAAR(emancipationGrid_struct* eg, vect3D* pos, vect3D* sp);
 bool collideBoxEmancipationGrids(OBB_struct* o);
+bool collideLineEmancipationGrids(vect3D l, vect3D v, int32 d);
 
 #endif

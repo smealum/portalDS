@@ -109,7 +109,7 @@ rectangle_struct* collideGridCell(gridCell_struct* gc, rectangle_struct* rec, ve
 	return NULL;
 }
 
-rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i)
+rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, vect3D l, vect3D u, int32 d, vect3D* i, int32* lk)
 {
 	if(!r)return NULL;
 	listCell_struct *lc=r->rectangles.first;
@@ -121,7 +121,7 @@ rectangle_struct* collideLineMapClosest(room_struct* r, rectangle_struct* rec, v
 		if(&lc->data!=rec && lc->data.collides)
 		{
 			int32 k;
-			if(collideLineRectangle(&lc->data,l,u,lowestK,&k,&v)){if(k<lowestK){*i=v;lowestK=k;hit=&lc->data;}}
+			if(collideLineRectangle(&lc->data,l,u,lowestK,&k,&v)){if(k<lowestK){*i=v;if(lk)*lk=k;lowestK=k;hit=&lc->data;}}
 		}
 		lc=lc->next;
 	}

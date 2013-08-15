@@ -275,3 +275,37 @@ bool collideBoxEmancipationGrids(OBB_struct* o)
 	}
 	return false;
 }
+
+bool emancipationGridLineCollision(emancipationGrid_struct* eg, vect3D l, vect3D v, int32 d)
+{
+	if(!eg)return false;
+	
+	vect3D pos, sp;
+	getEmancipationGridAAR(eg,&pos,&sp);
+	pos=vectDifference(pos,convertVect(vect(gameRoom.position.x,0,gameRoom.position.y)));
+
+	pos=vectDifference(pos,sp);
+	sp=vect(sp.x*2,sp.y*2,sp.z*2);
+
+	vect3D n;
+	if(!sp.x)n=vect(inttof32(1),0,0);
+	else if(!sp.y)n=vect(0,inttof32(1),0);
+	else n=vect(0,0,inttof32(1));
+
+	NOGBA("%d %d %d vs %d %d %d",pos.x,pos.y,pos.z,l.x,l.y,l.z);
+	
+	return collideLineConvertedRectangle(n, pos, sp, l, v, d, NULL, NULL);
+}
+
+bool collideLineEmancipationGrids(vect3D l, vect3D v, int32 d)
+{
+	int i;
+	for(i=0;i<NUMEMANCIPATIONGRIDS;i++)
+	{
+		if(emancipationGrids[i].used)
+		{
+			if(emancipationGridLineCollision(&emancipationGrids[i], l, v, d))return true;
+		}
+	}
+	return false;
+}

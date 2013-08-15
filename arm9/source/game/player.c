@@ -198,8 +198,9 @@ void shootPlayerGun(player_struct* p, bool R)
 	{
 		l.x-=TILESIZE;
 		l.z-=TILESIZE;
-		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip);
-		if(r&&r->portalable)
+		int32 lk=0;
+		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip, &lk);
+		if(r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))
 		{
 			// ip.x+=TILESIZE*2;
 			// ip.z+=TILESIZE*2;

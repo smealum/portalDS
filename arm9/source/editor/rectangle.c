@@ -123,6 +123,47 @@ void fillRectangle(u8* data, int w, int h, vect2D* pos, vect2D* size, u8 mask)
 	}
 }
 
+bool collideLineConvertedRectangle(vect3D n, vect3D p, vect3D s, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip)
+{
+	int32 p1=dotProduct(v,n);
+	if(!equals(p1,0))
+	{
+		int32 p2=dotProduct(vectDifference(p,o),n);
+
+		int32 k=divf32(p2,p1);
+		s8 sign=((s.x>0)^(s.y<0)^(s.z>0)^(p1<0))?(-1):(1);
+		if(kk)
+		{
+			*kk=k+sign;
+		}
+		if(k<0 || k>d){return false;}
+		vect3D i=addVect(o,vectMult(v,k));
+		if(ip)*ip=i;
+		i=vectDifference(i,p);
+		NOGBA("I %d %d %d",i.x,i.y,i.z);
+		NOGBA("S %d %d %d",s.x,s.y,s.z);
+		
+		bool r=true;
+		if(s.x)
+		{
+			if(s.x>0)r=r&&i.x<s.x&&i.x>=0;
+			else r=r&&i.x>s.x&&i.x<=0;
+		}
+		if(s.y)
+		{
+			if(s.y>0)r=r&&i.y<s.y&&i.y>=0;
+			else r=r&&i.y>s.y&&i.y<=0;
+		}
+		if(s.z)
+		{
+			if(s.z>0)r=r&&i.z<s.z&&i.z>=0;
+			else r=r&&i.z>s.z&&i.z<=0;
+		}
+		return r;
+	}
+	return false;
+}
+
 bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, int32* kk, vect3D* ip)
 {
 	if(!rec)return false;

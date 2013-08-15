@@ -17,6 +17,8 @@ SFX_struct *portalExitSFX[2];
 
 s16 gravityGunTarget;
 
+int subBG;
+
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
 	vect3D pr=addVect(convertVect(vect(r->position.x,0,r->position.y)),vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2));
@@ -93,6 +95,12 @@ void initPlayer(player_struct* p)
 
 	bottomScreenIMG=bufferizeFile("bottom_screen.img.bin", "bottom", NULL, true);
 	bottomScreenPAL=bufferizeFile("bottom_screen.pal.bin", "bottom", NULL, true);
+
+	#ifndef DEBUG_GAME
+		subBG=bgInitSub(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
+		dmaCopy(bottomScreenIMG, bgGetGfxPtr(subBG), 256*192);
+		dmaCopy(bottomScreenPAL, BG_PALETTE_SUB, 256*2);
+	#endif
 
 	//TEMP INIT VALUES
 	p->object->position=vect(0,32*HEIGHTUNIT*4*2,0);

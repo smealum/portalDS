@@ -22,7 +22,7 @@ void initGame(void)
 	NOGBA("mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	NOGBA("initializing...");
 	videoSetMode(MODE_5_3D | DISPLAY_BG3_ACTIVE);
-	videoSetModeSub(MODE_0_2D);
+	videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE);
 	
 	glInit();
 	
@@ -89,8 +89,10 @@ void initGame(void)
 	bgSetPriority(mainBG, 0);
 	REG_BG0CNT=BG_PRIORITY(3);
 	
-	consoleInit(&bottomScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 16, 0, false, true);
-	consoleSelect(&bottomScreen);
+	#ifdef DEBUG_GAME
+		consoleInit(&bottomScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 16, 0, false, true);
+		consoleSelect(&bottomScreen);
+	#endif
 	
 	// glSetToonTableRange(0, 14, RGB15(16,16,16));
 	// glSetToonTableRange(15, 31, RGB15(26,26,26));
@@ -179,8 +181,10 @@ static inline void render1(void)
 	// GFX_CLEAR_COLOR=color|(31<<16);
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 	
+	#ifdef DEBUG_GAME
 		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
 		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);NOGBA("ALERT %d      \n",cnt);}
+	#endif
 	
 	projectCamera(NULL);
 
@@ -309,19 +313,23 @@ void gameFrame(void)
 	switch(currentBuffer)
 	{
 		case false:
-			iprintf("\x1b[0;0H");
-			iprintf("%d FPS   \n", FPS);
-			iprintf("%d (debug)   \n", debugVal);
-			iprintf("%d (free ram)   \n", getMemFree()/1024);
-			iprintf("%p (portal)   \n", portal1.displayList);
-			iprintf("%p (portal)   \n", portal2.displayList);
+			#ifdef DEBUG_GAME
+				iprintf("\x1b[0;0H");
+				iprintf("%d FPS   \n", FPS);
+				iprintf("%d (debug)   \n", debugVal);
+				iprintf("%d (free ram)   \n", getMemFree()/1024);
+				iprintf("%p (portal)   \n", portal1.displayList);
+				iprintf("%p (portal)   \n", portal2.displayList);
+			#endif
 			cpuEndSlice();
 			postProcess1();
 			// iprintf("postproc : %d  \n",cpuEndSlice());
 			render1();
 
 			// if(keysDown()&KEY_SELECT)testStepByStep^=1; //TEMP
-			iprintf("full : %d (%d)  \n",cpuEndTiming(),testStepByStep);
+			#ifdef DEBUG_GAME
+				iprintf("full : %d (%d)  \n",cpuEndTiming(),testStepByStep);
+			#endif
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;
@@ -337,7 +345,9 @@ void gameFrame(void)
 			listenPI9();
 			updateOBBs();
 			// iprintf("frm 2 : %d  \n",cpuEndTiming());
-			iprintf("fake frame : %d   \n",cpuEndTiming());
+			#ifdef DEBUG_GAME
+				iprintf("fake frame : %d   \n",cpuEndTiming());
+			#endif
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;

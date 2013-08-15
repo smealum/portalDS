@@ -1,6 +1,8 @@
 #ifndef __GAMEMAIN9__
 #define __GAMEMAIN9__
 
+// #define DEBUG_GAME
+
 #include "common/general.h"
 #include "editor/material.h"
 #include "game/lights.h"

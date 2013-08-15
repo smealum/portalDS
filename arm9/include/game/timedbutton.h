@@ -10,13 +10,15 @@ typedef struct
 	modelInstance_struct modelInstance;
 	vect3D position;
 	u16 angle;
-	u8 active;
+	u16 active;
 	bool used;
 	u8 id;
 }timedButton_struct;
 
 void initTimedButtons(void);
 void freeTimedButtons(void);
+void activateTimedButton(timedButton_struct* tb);
+timedButton_struct* collideRayTimedButtons(vect3D o, vect3D v, int32 l);
 timedButton_struct* createTimedButton(room_struct* r, vect3D position, u16 angle);
 bool checkObjectTimedButtonsCollision(physicsObject_struct* o, room_struct* r);
 void drawTimedButtons(void);

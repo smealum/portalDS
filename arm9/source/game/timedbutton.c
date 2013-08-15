@@ -1,5 +1,6 @@
 #include "game/game_main.h"
 
+#define BUTTONTIMER (7*30)
 #define TIMEDBUTTON_RADIUS_OUT (128)
 #define TIMEDBUTTON_HEIGHT (TILESIZE*2)
 
@@ -18,7 +19,7 @@ void initTimedButtons(void)
 	}
 	
 	loadMd2Model("models/button2.md2","button2.pcx",&timedButtonModel);generateModelDisplayLists(&timedButtonModel, false, 1);
-	timedButtonBrightPalette=loadPalettePCX("button1b.pcx","textures");
+	timedButtonBrightPalette=loadPalettePCX("button2b.pcx","textures");
 }
 
 void freeTimedButtons(void)
@@ -90,18 +91,24 @@ void updateTimedButton(timedButton_struct* bb)
 {
 	if(!bb || !bb->used)return;
 	
-	bb->active=false;
-
 	if(bb->active)
 	{
 		changeAnimation(&bb->modelInstance,1,false);
 		useActivator(&bb->activator);
+		bb->active--;
 	}else{
 		changeAnimation(&bb->modelInstance,0,false);
 		unuseActivator(&bb->activator);
 	}
 	
 	updateAnimation(&bb->modelInstance);
+}
+
+void activateTimedButton(timedButton_struct* tb)
+{
+	if(!tb || !tb->used)return;
+
+	tb->active=BUTTONTIMER;
 }
 
 void updateTimedButtons(void)
@@ -114,6 +121,23 @@ void updateTimedButtons(void)
 			updateTimedButton(&timedButton[i]);
 		}
 	}
+}
+
+timedButton_struct* collideRayTimedButtons(vect3D o, vect3D v, int32 l)
+{
+	int i;
+	for(i=0;i<NUMTIMEDBUTTONS;i++)
+	{
+		if(timedButton[i].used)
+		{
+			timedButton_struct* tb=&timedButton[i];
+			vect3D p=timedButton[i].position;
+			p.y+=512;
+			int32 d=distanceLinePoint(o,v,p);
+			if(d<=96)return tb;
+		}
+	}
+	return NULL;
 }
 
 bool checkObjectTimedButtonCollision(physicsObject_struct* o, room_struct* r, timedButton_struct* tb)

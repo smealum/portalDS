@@ -206,7 +206,11 @@ void shootPlayerGun(player_struct* p, bool R)
 		int32 lk=0;
 		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip, &lk);
 		OBB_struct* o=collideRayBoxes(p->object->position, u, min(k,2048));
-		if(o)
+		timedButton_struct* tb=collideRayTimedButtons(p->object->position, u, min(k,1024));
+		if(tb)
+		{
+			activateTimedButton(tb);
+		}else if(o)
 		{
 			gravityGunTarget=o->id;
 		}else if(r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))

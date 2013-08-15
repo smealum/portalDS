@@ -47,6 +47,7 @@ void editorFrame(void)
 void killEditor(void)
 {
 	freeRoomEditor();
+	freeState(NULL);
 }
 
 

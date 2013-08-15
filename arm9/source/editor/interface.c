@@ -1,6 +1,6 @@
 #include "editor/editor_main.h"
 
-#define NUMINTERFACEBUTTONS (13)
+#define NUMINTERFACEBUTTONS (15)
 
 interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
 											(interfaceButton_struct){72,38,"pressurebttn2_ui.pcx",NULL,3,false},
@@ -14,7 +14,9 @@ interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"stor
 											(interfaceButton_struct){142,81,"ballcatcher2_ui.pcx",NULL,0,false},
 											(interfaceButton_struct){177,81,"turret2_ui.pcx",NULL,4,false},
 											(interfaceButton_struct){212,81,"door2_ui.pcx",NULL,13,false},
-											(interfaceButton_struct){212,81*2-38,"door2_ui.pcx",NULL,14,false}};
+											(interfaceButton_struct){212,81*2-38,"door2_ui.pcx",NULL,14,false},
+											(interfaceButton_struct){23,150,"save_button.pcx",NULL,100,false},
+											(interfaceButton_struct){178,150,"quit_button.pcx",NULL,101,false}};
 
 struct gl_texture_t *interfaceBackground;
 int bgSub;
@@ -72,14 +74,27 @@ void activateInterfaceButton(interfaceButton_struct* ib)
 {
 	if(!ib)return;
 
-	if(ib->argument<NUMENTITYTYPES)
+	switch(ib->argument)
 	{
-		entity_struct* e=NULL;
-		if(editorSelection.entity && !editorSelection.entity->placed){removeEntity(editorSelection.entity);editorSelection.entity=NULL;}
-		e=createEntity(vect(32,32,32), ib->argument, false);
-		editorSelection.active=true;
-		editorSelection.entity=e;
-		switchScreens();
+		case 100:
+			//SAVE
+			writeMapEditor(&editorRoom, "fat:/test.map");
+			break;
+		case 101:
+			//QUIT
+			changeState(&menuState);
+			break;
+		default:
+			if(ib->argument<NUMENTITYTYPES)
+			{
+				entity_struct* e=NULL;
+				if(editorSelection.entity && !editorSelection.entity->placed){removeEntity(editorSelection.entity);editorSelection.entity=NULL;}
+				e=createEntity(vect(32,32,32), ib->argument, false);
+				editorSelection.active=true;
+				editorSelection.entity=e;
+				switchScreens();
+			}
+			break;
 	}
 }
 

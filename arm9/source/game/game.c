@@ -18,6 +18,7 @@ u16 vblCNT, frmCNT, FPS;
 
 void initGame(void)
 {
+	lcdMainOnTop();
 	int oldv=getMemFree();
 	NOGBA("mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	NOGBA("initializing...");

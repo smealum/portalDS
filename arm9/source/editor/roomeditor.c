@@ -289,10 +289,10 @@ void roomEditorControls(void)
 	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
 	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
 	
-	if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
+	// if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
 	if(keysDown() & KEY_SELECT){switchScreens();}
 
-	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&editorState);
+	// if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&editorState);
 }
 
 void updateRoomEditor(void)

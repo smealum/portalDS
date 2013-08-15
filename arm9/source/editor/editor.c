@@ -28,6 +28,7 @@ void initEditor(void)
 	initTextures();
 	
 	initRoomEdition();
+	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 
 int cnd=0;

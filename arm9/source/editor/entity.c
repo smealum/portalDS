@@ -61,6 +61,15 @@ void initEntities(void)
 	pointTexture=createTexture("points.pcx", "textures");
 }
 
+void freeEntities(void)
+{
+	int i;
+	for(i=0;i<NUMENTITYTYPES;i++)
+	{
+		freeMd2Model(&entityTypes[i].model);
+	}
+}
+
 void initEntity(entity_struct* e, entityType_struct* et, vect3D pos, bool placed)
 {
 	if(!e)return;

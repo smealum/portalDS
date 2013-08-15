@@ -59,6 +59,7 @@ extern contextButton_struct doorButtonArray[];
 extern contextButton_struct lightButtonArray[];
 
 void initEntities(void);
+void freeEntities(void);
 void removeEntities(void);
 entity_struct* createEntity(vect3D pos, u8 type, bool placed);
 entity_struct* collideLineEntities(vect3D o, vect3D v, vect3D p1, vect3D p2, int32* d);

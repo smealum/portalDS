@@ -291,6 +291,8 @@ void roomEditorControls(void)
 	
 	if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
 	if(keysDown() & KEY_SELECT){switchScreens();}
+
+	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&editorState);
 }
 
 void updateRoomEditor(void)
@@ -338,4 +340,6 @@ void freeRoomEditor(void)
 {
 	freeEditorRoom(&editorRoom);
 	freeBlockFacePool();
+	freeEntities();
+	freeInterface();
 }

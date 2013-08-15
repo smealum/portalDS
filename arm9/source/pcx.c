@@ -162,16 +162,16 @@ ReadPCX8bits (u8 *buffer, const struct pcx_header_t *hdr,
 	fpos_t curpos;
 	int y, bytes;
 
-/* The palette is contained in the last 769 bytes of the file */
-// fgetpos (fp, &curpos);
+	/* The palette is contained in the last 769 bytes of the file */
+	// fgetpos (fp, &curpos);
 	curpos=fileptr;
-// fseek (fp, -769, SEEK_END);
+	// fseek (fp, -769, SEEK_END);
 	fileptr=filesize-769;
-// magic = fgetc (fp);
+	// magic = fgetc (fp);
 	magic=buffer[fileptr++];
 
 
-/* First byte must be equal to 0x0c (12) */
+	/* First byte must be equal to 0x0c (12) */
 	if (magic != 0x0c)
 	{
 		NOGBA("error: colormap's first byte must be 0x0c! "
@@ -182,32 +182,32 @@ ReadPCX8bits (u8 *buffer, const struct pcx_header_t *hdr,
 		return;
 	}
 
-/* Read palette */
-// fread (palette, sizeof (u8), 768, fp);
+	/* Read palette */
+	// fread (palette, sizeof (u8), 768, fp);
 	memcpy(palette,&buffer[fileptr],768);
 
-/* Convert palette */
+	/* Convert palette */
 	for(i=0;i<256;i++)
 	{
 		texinfo->palette[i]=RGB15(palette[i*3+0]>>3,palette[i*3+1]>>3,palette[i*3+2]>>3);
 	}
 
-// fsetpos (fp, &curpos);
+	// fsetpos (fp, &curpos);
 	fileptr=curpos;
 
-/* Read pixel data */
+	/* Read pixel data */
 	for (y = 0; y < texinfo->height; ++y)
 	{
-// ptr = &texinfo->texels[(texinfo->height - (y + 1)) * texinfo->width * 3];
+	// ptr = &texinfo->texels[(texinfo->height - (y + 1)) * texinfo->width * 3];
 		ptr = &texinfo->texels[(y) * texinfo->width];
 		bytes = hdr->bytesPerScanLine;
 
-/* Decode line number y */
+	/* Decode line number y */
 		while (bytes--)
 		{
 			if (rle_count == 0)
 			{
-// if( (rle_value = fgetc (fp)) < 0xc0)
+	// if( (rle_value = fgetc (fp)) < 0xc0)
 				if( (rle_value = buffer[fileptr++]) < 0xc0)
 				{
 					rle_count = 1;
@@ -215,24 +215,24 @@ ReadPCX8bits (u8 *buffer, const struct pcx_header_t *hdr,
 				else
 				{
 					rle_count = rle_value - 0xc0;
-// rle_value = fgetc (fp);
+	// rle_value = fgetc (fp);
 					rle_value = buffer[fileptr++];
 				}
 			}
 
 			rle_count--;
 
-// ptr[0] = palette[rle_value * 3 + 0];
-// ptr[1] = palette[rle_value * 3 + 1];
-// ptr[2] = palette[rle_value * 3 + 2];
+	// ptr[0] = palette[rle_value * 3 + 0];
+	// ptr[1] = palette[rle_value * 3 + 1];
+	// ptr[2] = palette[rle_value * 3 + 2];
 			*ptr = rle_value;
-// ptr += 3;
+	// ptr += 3;
 			ptr++;
 		}
 	}
 }
 
-/*static void
+	/*static void
 ReadPCX24bits (FILE *fp, const struct pcx_header_t *hdr,
 struct gl_texture_t *texinfo)
 {
@@ -329,8 +329,7 @@ struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 	}
 
 /* Initialize texture parameters */
-	texinfo = (struct gl_texture_t *)
-	malloc (sizeof (struct gl_texture_t));
+	texinfo = (struct gl_texture_t *)malloc (sizeof (struct gl_texture_t));
 	texinfo->width = header.xmax - header.xmin + 1;
 	texinfo->height = header.ymax - header.ymin + 1;
 // texinfo->format = GL_RGB;
@@ -338,6 +337,8 @@ struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 
 	bitcount = header.bitsPerPixel * header.numColorPlanes;
 	texinfo->format = bitcount;
+	texinfo->texels=NULL;
+	texinfo->palette=NULL;
 	texinfo->texels16=NULL;
 
 /* Read image data */
@@ -359,6 +360,7 @@ struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 		/* 8 bits color index */
 		texinfo->texels = (u8 *) malloc (sizeof (u8) * texinfo->width * texinfo->height);
 		texinfo->palette = (u16 *) malloc (sizeof (u16) * 256);
+		NOGBA("TEXELS %p",texinfo->texels);
 		ReadPCX8bits (buffer, &header, texinfo);
 		break;
 
@@ -387,5 +389,5 @@ void freePCX(struct gl_texture_t * pcx)
 	if(pcx->texels16)free(pcx->texels16);
 	if(pcx->palette)free(pcx->palette);
 	pcx->texels=pcx->texels16=pcx->palette=NULL;
-	if(pcx)free(pcx);
+	free(pcx);
 }

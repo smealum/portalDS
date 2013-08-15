@@ -55,7 +55,7 @@ void drawSludge(room_struct* r)
 	if(!r)return;
 	listCell_struct* lc=sludgeRectangleList.first;
 
-	glPolyFmt(POLY_ALPHA(15) | POLY_CULL_BACK);
+	glPolyFmt(POLY_ALPHA(15) | POLY_CULL_BACK | POLY_FOG);
 	glColor(RGB15(31,31,31));
 	applyMTL(sludgeMtl);
 

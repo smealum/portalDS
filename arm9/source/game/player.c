@@ -4,6 +4,10 @@ player_struct player;
 md2Model_struct gun, playerModel;
 mtlImg_struct* crossHair;
 struct gl_texture_t *bottomScreen;
+struct gl_texture_t *bottomButton;
+
+u8* bottomScreenIMG;
+u16* bottomScreenPAL;
 
 touchPosition touchCurrent, touchOld;
 
@@ -83,7 +87,12 @@ void initPlayer(player_struct* p)
 	generateModelDisplayLists(&playerModel, false, 1);
 	initModelInstance(&p->modelInstance,&gun);
 	initModelInstance(&p->playerModelInstance,&playerModel);
-	// bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom.pcx","bottom");
+
+	// bottomScreen=(struct gl_texture_t *)ReadPCXFile("bottom_screen.pcx","bottom");
+	bottomButton=(struct gl_texture_t *)ReadPCXFile("bottom_button.pcx","bottom");
+
+	bottomScreenIMG=bufferizeFile("bottom_screen.img.bin", "bottom", NULL, true);
+	bottomScreenPAL=bufferizeFile("bottom_screen.pal.bin", "bottom", NULL, true);
 
 	//TEMP INIT VALUES
 	p->object->position=vect(0,32*HEIGHTUNIT*4*2,0);
@@ -348,7 +357,7 @@ void updatePlayer(player_struct* p)
 	editPalette((u16*)p->playerModelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	
 	collidePlayer(p,p->currentRoom);
-	if(collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=0;
+	if(collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=-5;
 	
 	updateCamera(NULL);
 
@@ -379,5 +388,7 @@ void freePlayer(void)
 {
 	freeMd2Model(&gun);
 	freeMd2Model(&playerModel);
-	// freePCX(bottomScreen);
+	free(bottomScreenIMG); free(bottomScreenPAL);
+	bottomScreenIMG=bottomScreenPAL=NULL;
+	if(bottomButton){freePCX(bottomButton);bottomButton=NULL;}
 }

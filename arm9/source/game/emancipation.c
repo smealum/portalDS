@@ -205,17 +205,17 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 		glTranslatef32(eg->position.x,eg->position.y,eg->position.z);
 		if(eg->direction)glRotateYi(-8192);
 		if(eg->length<0)glRotateYi(8192*2);
-		renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
+		renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0 | POLY_FOG, false, NULL, RGB15(31,31,31));
 		glPushMatrix();
 			glTranslatef32(l,0,0);
 			glRotateYi(8192*2);
-			renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0, false, NULL, RGB15(31,31,31));
+			renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0 | POLY_FOG, false, NULL, RGB15(31,31,31));
 		glPopMatrix(1);
 		
 		applyMTL(gridMtl);
 		bindPaletteAddr(gridPalettes[(((counter++)/4)%6)]);
 		GFX_COLOR=RGB15(31,31,31);
-		glPolyFmt(POLY_ALPHA(12) | POLY_ID(21) | POLY_CULL_NONE);
+		glPolyFmt(POLY_ALPHA(12) | POLY_ID(21) | POLY_CULL_NONE | POLY_FOG);
 		glScalef32(l,EMANCIPATIONGRIDHEIGHT/2,inttof32(1));
 		glBegin(GL_QUADS);
 			GFX_TEX_COORD = TEXTURE_PACK(0*16, 0*16);

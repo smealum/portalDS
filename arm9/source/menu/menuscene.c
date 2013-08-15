@@ -32,6 +32,14 @@ void initMenuScene(void)
 	changeAnimation(&GLaDOSmodelInstance,1,false);
 }
 
+void freeMenuScene(void)
+{
+	freeMd2Model(&GLaDOSmodel);
+	freeMd2Model(&domeModel);
+	freeMd2Model(&lairModel);
+	freeMd2Model(&cubeModel);
+}
+
 vect3D boxOrigin={-9984,11392,-14016};
 vect3D boxDestination={-9984,-576,-14016};
 

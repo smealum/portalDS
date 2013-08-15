@@ -21,6 +21,7 @@ extern camera_struct menuCamera;
 extern char menuScreenText[MENUSCREENLINES][MENUSCREENCHARS];
 
 void initMenuScene(void);
+void freeMenuScene(void);
 void updateMenuScene(void);
 void drawMenuScene(void);
 

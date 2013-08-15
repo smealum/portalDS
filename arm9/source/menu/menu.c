@@ -58,6 +58,8 @@ void initMenu(void)
 	logoMain=createTexture("logo.pcx", "menu");
 	logoRotate=createTexture("rotate_logo.pcx", "menu");
 	logoAlpha=31;
+	
+	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 }
 
 touchPosition currentTouch;
@@ -121,6 +123,8 @@ void menuFrame(void)
 	scanKeys();
 	touchRead(&currentTouch);
 
+	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&menuState);
+
 	if(keysHeld() & KEY_R)tempState.position=addVect(tempState.position,vect(0,0,inttof32(1)/64));
 	if(keysHeld() & KEY_L)tempState.position=addVect(tempState.position,vect(0,0,-inttof32(1)/64));
 	if(keysHeld() & KEY_UP)tempState.position=addVect(tempState.position,vect(0,inttof32(1)/64,0));
@@ -176,7 +180,8 @@ void menuFrame(void)
 
 void killMenu(void)
 {
-
+	freeMenuScene();
+	freeState(NULL);
 }
 
 void menuVBL(void)

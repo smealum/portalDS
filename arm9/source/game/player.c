@@ -293,7 +293,7 @@ void playerControls(player_struct* p)
 
 	// camera_struct* c=getPlayerCamera();
 	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
-	if(keysDown()&(KEY_SELECT))p->life=0;
+	if(keysDown()&(KEY_SELECT))p->life=-5;
 	
 	touchOld=touchCurrent;
 }

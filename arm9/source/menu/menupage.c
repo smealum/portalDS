@@ -45,13 +45,18 @@ void mainMenuCreateButtonFunction(sguiButton_struct* b)
 menuButton_struct mainMenuPage[]={(menuButton_struct){"Options", NULL}, (menuButton_struct){"Create", (buttonTargetFunction)mainMenuCreateButtonFunction}, (menuButton_struct){"Play", (buttonTargetFunction)mainMenuPlayButtonFunction}};
 u8 mainMenuPageLength=arrayLength(mainMenuPage);
 
+void playMenuCampaignButtonFunction(sguiButton_struct* b)
+{
+	changeState(&gameState);
+}
+
 void playMenuBackButtonFunction(sguiButton_struct* b)
 {
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],48);
 	setupMenuPage(mainMenuPage, mainMenuPageLength);
 }
 
-menuButton_struct playMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)playMenuBackButtonFunction}, (menuButton_struct){"Select Level", NULL}, (menuButton_struct){"Campaign", NULL}};
+menuButton_struct playMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)playMenuBackButtonFunction}, (menuButton_struct){"Select Level", NULL}, (menuButton_struct){"Campaign", playMenuCampaignButtonFunction}};
 u8 playMenuPageLength=arrayLength(playMenuPage);
 
 void createMenuBackButtonFunction(sguiButton_struct* b)

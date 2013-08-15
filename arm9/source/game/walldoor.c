@@ -93,8 +93,8 @@ bool pointInWallDoorRoom(wallDoor_struct* wd, vect3D p)
 	if(!wd)return false;
 	int32 v1=dotProduct(vectDifference(p,wd->gridPosition),vectMultInt(wallDoorV1[wd->orientation],inttof32(1)));
 	int32 v2=dotProduct(vectDifference(p,wd->gridPosition),vectMultInt(wallDoorV2[wd->orientation],inttof32(1)));
-	return (v1<=4)&&(wd->gridPosition.y-12-2<=p.y)&&(v2<=8)
-		&& (v1>=-4)&&(wd->gridPosition.y+12+2>=p.y)&&(v2>0);
+	return (v1<=5)&&(wd->gridPosition.y-2<=p.y)&&(v2<=8)
+		&& (v1>=-5)&&(wd->gridPosition.y+22>=p.y)&&(v2>0);
 }
 
 void updateWallDoor(wallDoor_struct* wd)

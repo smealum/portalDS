@@ -348,6 +348,9 @@ void readEntity(u8 i, FILE* f)
 							rotateCamera(NULL, vect(0,8192*2,0));
 							break;
 					}
+					moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED*10));
+					getPlayer()->object->position=addVect(getPlayer()->object->position,getPlayer()->object->speed);
+					getPlayer()->object->speed=vect(0,0,0);
 				}
 				entityEntityArray[i]=(void*)&entryWallDoor;
 				entityTargetTypeArray[i]=WALLDOOR_TARGET;

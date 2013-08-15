@@ -11,6 +11,8 @@ SFX_struct *gunSFX1, *gunSFX2;
 SFX_struct *portalEnterSFX[2];
 SFX_struct *portalExitSFX[2];
 
+s16 gravityGunTarget;
+
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
 	vect3D pr=addVect(convertVect(vect(r->position.x,0,r->position.y)),vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2));
@@ -95,6 +97,9 @@ void initPlayer(player_struct* p)
 
 	portalExitSFX[0]=createSFX("portal_exit1.raw", SoundFormat_16Bit);
 	portalExitSFX[1]=createSFX("portal_exit2.raw", SoundFormat_16Bit);
+
+	//GRAVITY GUN
+	gravityGunTarget=-1;
 
 	//TEST TEMP
 	setFog(0);
@@ -200,14 +205,16 @@ void shootPlayerGun(player_struct* p, bool R)
 		l.z-=TILESIZE;
 		int32 lk=0;
 		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip, &lk);
-		if(r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))
+		OBB_struct* o=collideRayBoxes(p->object->position, u, min(k,2048));
+		if(o)
+		{
+			gravityGunTarget=o->id;
+		}else if(r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))
 		{
 			// ip.x+=TILESIZE*2;
 			// ip.z+=TILESIZE*2;
 			ip.x+=TILESIZE;
 			ip.z+=TILESIZE;
-
-			// collideRayBoxes(p->object->position, u);
 			
 			vect3D pos=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
 			NOGBA("SHOT WALL ! GOOD GOING %d %d %d",r->normal.z,r->normal.x, r->AARid);
@@ -241,6 +248,8 @@ void shootPlayerGun(player_struct* p, bool R)
 		}
 	}
 }
+
+extern OBB_struct objects[NUMOBJECTS];
 
 void playerControls(player_struct* p)
 {
@@ -289,7 +298,19 @@ void playerControls(player_struct* p)
 	}
 	
 	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
+
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
+	else if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))
+	{
+		camera_struct* c=getPlayerCamera();
+		setVelocity(gravityGunTarget, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),4)),4),objects[gravityGunTarget].position)),4));
+		changeAnimation(&getPlayer()->modelInstance,2,false);
+	}else if(gravityGunTarget>=0)
+	{
+		gravityGunTarget=-1;
+		changeAnimation(&getPlayer()->modelInstance,0,false);
+		changeAnimation(&getPlayer()->modelInstance,1,true);
+	}
 
 	// camera_struct* c=getPlayerCamera();
 	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);

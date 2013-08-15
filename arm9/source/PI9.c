@@ -257,20 +257,19 @@ int32 distanceLinePoint(vect3D o, vect3D u, vect3D p)
 	return magnitude(v);
 }
 
-void collideRayBoxes(vect3D o, vect3D u)
+OBB_struct* collideRayBoxes(vect3D o, vect3D u, int32 l)
 {
 	int i;
 	for(i=0;i<NUMOBJECTS;i++)
 	{
 		OBB_struct* b=&objects[i];
-		if(b->used)
+		if(b->used && distance(o,vectDivInt(b->position,4))<=l)
 		{
 			int32 d=distanceLinePoint(o, u, vectDivInt(b->position,4));
-			NOGBA("distance %d",d);
-			NOGBA("%d %d %d",o.x,o.y,o.z);
-			NOGBA("%d %d %d",b->position.x/4,b->position.y/4,b->position.z/4);
+			if(d<192)return b;
 		}
 	}
+	return NULL;
 }
 
 void listenPI9(void)

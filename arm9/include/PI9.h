@@ -50,6 +50,8 @@ bool intersectAABBAAR(vect3D o1, vect3D s1, vect3D o2, vect3D sp);
 bool intersectOBBPortal(portal_struct* p, OBB_struct* o);
 void ejectPortalOBBs(portal_struct* p);
 
+OBB_struct* collideRayBoxes(vect3D o, vect3D u, int32 l);
+
 void drawOBBs(void);
 void drawAARs(void);
 

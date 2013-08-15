@@ -138,9 +138,6 @@ bool orangeSeen, blueSeen;
 extern u16** stackEnd;
 u16* ppStack[192*16];
 
-extern u8 selectID;
-extern OBB_struct objects[NUMOBJECTS];
-
 u32 prevTiming;
 
 u32 cpuEndSlice()
@@ -156,21 +153,6 @@ static inline void render1(void)
 	
 	// cpuEndSlice();
 	playerControls(NULL);
-		// if(keysDown()&KEY_X)createBox(vect(TILESIZE,TILESIZE,TILESIZE),vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),inttof32(1));
-		// if(keysDown()&KEY_X)createTurret(NULL, vect(-inttof32(0),26,-inttof32(0)));
-		// if(keysDown()&KEY_SELECT)createBox(vectMultInt(vect(-inttof32(0),HEIGHTUNIT*26,-inttof32(0)),4),inttof32(1),&companionCubeModel);
-		if(keysDown()&KEY_B)applyForce(selectID, vect(-TILESIZE*4,0,0), vect(0,inttof32(150),0));
-		if(keysDown()&KEY_Y){selectID++;selectID%=NUMOBJECTS;if(!objects[selectID].used)selectID=0;}
-		
-		if(objects[selectID].used && keysHeld()&KEY_A)
-		{
-			camera_struct* c=getPlayerCamera();
-			// applyForce(selectID, vect(0,0,0), vect(0,inttof32(2)*5,0));
-			// applyForce(selectID, vect(0,0,0), vectMultInt(normalize(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),8)),4),objects[selectID].position)),100));
-			setVelocity(selectID, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),4)),4),objects[selectID].position)),4));
-			// updatePlayerPI(NULL);
-			changeAnimation(&getPlayer()->modelInstance,2,false);
-		}else if(keysUp()&KEY_A){changeAnimation(&getPlayer()->modelInstance,0,false);changeAnimation(&getPlayer()->modelInstance,1,true);}
 	// iprintf("controls : %d  \n",cpuEndSlice());
 	
 		updatePlayer(NULL);

@@ -78,7 +78,7 @@ void activateInterfaceButton(interfaceButton_struct* ib)
 	{
 		case 100:
 			//SAVE
-			writeMapEditor(&editorRoom, "fat:/test.map");
+			writeMapEditor(&editorRoom, getEditorMapFilePath());
 			break;
 		case 101:
 			//QUIT

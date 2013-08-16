@@ -25,6 +25,9 @@ extern u8 newLevelMenuPageLength;
 extern menuButton_struct selectLevelMenuPage[];
 extern u8 selectLevelMenuPageLength;
 
+extern menuButton_struct loadLevelMenuPage[];
+extern u8 loadLevelMenuPageLength;
+
 void initMenuButtons(void);
 void setupMenuPage(menuButton_struct* mp, u8 n);
 

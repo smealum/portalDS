@@ -437,17 +437,12 @@ void readEntitiesEditor(FILE* f)
 	}
 }
 
-void loadMapEditor(editorRoom_struct* er, const char* str)
+bool loadMapEditor(editorRoom_struct* er, const char* str)
 {
-	if(!er || !str)return;
+	if(!er || !str)return false;
 
-	FILE* f;
-
-	//TEMP TEMP TEMP
-	f=fopen("fat:/test.map","rb");
-
-	if(!f)f=fopen(str,"rb");
-	if(!f)return;
+	FILE* f=fopen(str,"rb");
+	if(!f)return false;
 
 	mapHeader_struct h;
 	readHeader(&h, f);
@@ -467,4 +462,6 @@ void loadMapEditor(editorRoom_struct* er, const char* str)
 
 	generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 	getEntityBlockFaces(er->blockFaceList);
+
+	return true;
 }

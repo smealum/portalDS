@@ -245,6 +245,20 @@ void initBlockArray(BLOCK_TYPE* ba)
 	}
 }
 
+char editorMapFilePath[2048];
+
+void setEditorMapFilePath(char* str)
+{
+	if(!str)return;
+
+	strcpy(editorMapFilePath,str);
+}
+
+char* getEditorMapFilePath(void)
+{
+	return editorMapFilePath;
+}
+
 void initEditorRoom(editorRoom_struct* er)
 {
 	if(!er)return;
@@ -255,7 +269,8 @@ void initEditorRoom(editorRoom_struct* er)
 	// initBlockArray(er->blockArray);
 	// generateBlockFacesRange(er->blockArray, &er->blockFaceList, vect(0,0,0), vect(ROOMARRAYSIZEX,ROOMARRAYSIZEY,ROOMARRAYSIZEZ), false);
 
-	loadMapEditor(er,"maps/default.map");
+	// loadMapEditor(er,"maps/default.map");
+	if(!loadMapEditor(er,editorMapFilePath))loadMapEditor(er,"maps/default.map");
 }
 
 void freeBlockFace(blockFace_struct* bf)

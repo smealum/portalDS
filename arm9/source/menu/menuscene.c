@@ -161,7 +161,7 @@ void initScreenList(screenList_struct* sl, char* title, char** list, int l)
 {
 	if(!sl || !title || !list)return;
 
-	sl->title=title;
+	strcpy(sl->title,title);
 	sl->list=list;
 	sl->length=l;
 	sl->offset=0;
@@ -210,6 +210,18 @@ void updateScreenList(screenList_struct* sl)
 		else sprintf(menuScreenText[j+1],"  %s",tempString);
 		j++;
 	}
+}
+
+void freeFileList(char** list, int length)
+{
+	if(!list)return;
+
+	int i;
+	for(i=0;i<length;i++)
+	{
+		if(list[i]){free(list[i]);list[i]=NULL;}
+	}
+	free(list);
 }
 
 int listFiles(char* path, char** list)

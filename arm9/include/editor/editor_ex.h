@@ -6,4 +6,7 @@ void editorFrame(void);
 void killEditor(void);
 void editorVBL(void);
 
+void setEditorMapFilePath(char* str);
+char* getEditorMapFilePath(void);
+
 #endif

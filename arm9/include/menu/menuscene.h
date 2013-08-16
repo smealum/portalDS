@@ -29,7 +29,7 @@ void resetSceneScreen(void);
 
 typedef struct 
 {
-	char* title;
+	char title[MENUSCREENCHARS];
 	char** list;
 	int length, offset, cursor;
 }screenList_struct;
@@ -37,6 +37,7 @@ typedef struct
 void initScreenList(screenList_struct* sl, char* title, char** list, int l);
 void screenListMove(screenList_struct* sl, s8 move);
 void updateScreenList(screenList_struct* sl);
+void freeFileList(char** list, int length);
 int listFiles(char* path, char** list);
 
 #endif

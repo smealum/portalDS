@@ -1,5 +1,9 @@
 #include "menu/menu_main.h"
 
+char **testList=NULL;
+int testListCnt, testListCnt1;
+screenList_struct testScreenList;
+
 void initMenuButtons(void)
 {
 	initSimpleGui();
@@ -49,11 +53,6 @@ void playMenuCampaignButtonFunction(sguiButton_struct* b)
 {
 	changeState(&gameState);
 }
-
-// char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
-char **testList;
-int testListCnt, testListCnt1;
-screenList_struct testScreenList;
 
 void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 {
@@ -108,11 +107,35 @@ void createMenuNewLevelButtonFunction(sguiButton_struct* b)
 	setupKeyboard(&menuScreenText[1][2], 10, 16, 16);
 }
 
-menuButton_struct createMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)createMenuBackButtonFunction}, (menuButton_struct){"Load Level", NULL}, (menuButton_struct){"New level", (buttonTargetFunction)createMenuNewLevelButtonFunction}};
+void createMenuLoadLevelButtonFunction(sguiButton_struct* b)
+{
+	testTransition=startCameraTransition(&cameraStates[2],&cameraStates[3],64);
+	setupMenuPage(loadLevelMenuPage, loadLevelMenuPageLength);
+
+	testListCnt=0;
+	testListCnt1=0;
+
+	char str[255]; 
+	sprintf(str,"%s/%s/maps",basePath,ROOT);
+	testListCnt1=testListCnt+=listFiles(str, NULL);
+
+	testList=malloc(sizeof(char*)*testListCnt);
+
+	listFiles(str, testList);
+
+	initScreenList(&testScreenList, "Load level", testList, testListCnt);
+	updateScreenList(&testScreenList);
+}
+
+menuButton_struct createMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)createMenuBackButtonFunction}, (menuButton_struct){"Load Level", createMenuLoadLevelButtonFunction}, (menuButton_struct){"New level", (buttonTargetFunction)createMenuNewLevelButtonFunction}};
 u8 createMenuPageLength=arrayLength(createMenuPage);
 
 void newLevelMenuOKButtonFunction(sguiButton_struct* b)
 {
+	static char str[2048];
+	sprintf(str,"%s/%s/maps/%s.map",basePath,ROOT,&menuScreenText[1][2]);
+
+	setEditorMapFilePath(str);
 	changeState(&editorState);
 }
 
@@ -139,7 +162,7 @@ void selectLevelMenuDownButtonFunction(sguiButton_struct* b)
 
 void selectLevelMenuOKButtonFunction(sguiButton_struct* b)
 {
-	char str[2048];
+	static char str[2048];
 	if(testScreenList.cursor<testListCnt1)sprintf(str,"./maps/%s",testScreenList.list[testScreenList.cursor]);
 	else sprintf(str,"%s/%s/maps/%s",basePath,ROOT,testScreenList.list[testScreenList.cursor]);
 
@@ -151,7 +174,41 @@ void selectLevelMenuBackButtonFunction(sguiButton_struct* b)
 {
 	testTransition=startCameraTransition(&cameraStates[3],&cameraStates[1],64);
 	setupMenuPage(playMenuPage, playMenuPageLength);
+	freeFileList(testList, testListCnt);
+	testList=NULL;
 }
 
 menuButton_struct selectLevelMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)selectLevelMenuBackButtonFunction}, (menuButton_struct){"OK", (buttonTargetFunction)selectLevelMenuOKButtonFunction}, (menuButton_struct){"Down", (buttonTargetFunction)selectLevelMenuDownButtonFunction}, (menuButton_struct){"Up", (buttonTargetFunction)selectLevelMenuUpButtonFunction}};
 u8 selectLevelMenuPageLength=arrayLength(selectLevelMenuPage);
+
+void loadLevelMenuUpButtonFunction(sguiButton_struct* b)
+{
+	screenListMove(&testScreenList, -1);
+	updateScreenList(&testScreenList);
+}
+
+void loadLevelMenuDownButtonFunction(sguiButton_struct* b)
+{
+	screenListMove(&testScreenList, 1);
+	updateScreenList(&testScreenList);
+}
+
+void loadLevelMenuOKButtonFunction(sguiButton_struct* b)
+{
+	static char str[2048];
+	sprintf(str,"%s/%s/maps/%s",basePath,ROOT,testScreenList.list[testScreenList.cursor]);
+
+	setEditorMapFilePath(str);
+	changeState(&editorState);
+}
+
+void loadLevelMenuBackButtonFunction(sguiButton_struct* b)
+{
+	testTransition=startCameraTransition(&cameraStates[3],&cameraStates[2],64);
+	setupMenuPage(createMenuPage, createMenuPageLength);
+	freeFileList(testList, testListCnt);
+	testList=NULL;
+}
+
+menuButton_struct loadLevelMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)loadLevelMenuBackButtonFunction}, (menuButton_struct){"OK", (buttonTargetFunction)loadLevelMenuOKButtonFunction}, (menuButton_struct){"Down", (buttonTargetFunction)loadLevelMenuDownButtonFunction}, (menuButton_struct){"Up", (buttonTargetFunction)loadLevelMenuUpButtonFunction}};
+u8 loadLevelMenuPageLength=arrayLength(loadLevelMenuPage);

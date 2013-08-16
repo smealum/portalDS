@@ -27,4 +27,15 @@ void drawMenuScene(void);
 
 void resetSceneScreen(void);
 
+typedef struct 
+{
+	char* title;
+	char** list;
+	int length, offset, cursor;
+}screenList_struct;
+
+void initScreenList(screenList_struct* sl, char* title, char** list, int l);
+void screenListMove(screenList_struct* sl, s8 move);
+void updateScreenList(screenList_struct* sl);
+
 #endif

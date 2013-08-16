@@ -51,14 +51,15 @@ void playMenuCampaignButtonFunction(sguiButton_struct* b)
 }
 
 char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
+screenList_struct testScreenList;
 
 void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 {
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[3],64);
 	setupMenuPage(selectLevelMenuPage, selectLevelMenuPageLength);
 
-	resetSceneScreen();
-	updateScreenList("Select level", testList, 6, 0, 0);
+	initScreenList(&testScreenList, "Select level", testList, 6);
+	updateScreenList(&testScreenList);
 }
 
 void playMenuBackButtonFunction(sguiButton_struct* b)
@@ -105,6 +106,18 @@ void newLevelMenuBackButtonFunction(sguiButton_struct* b)
 menuButton_struct newLevelMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)newLevelMenuBackButtonFunction}, (menuButton_struct){"OK", (buttonTargetFunction)newLevelMenuOKButtonFunction}};
 u8 newLevelMenuPageLength=arrayLength(newLevelMenuPage);
 
+void selectLevelMenuUpButtonFunction(sguiButton_struct* b)
+{
+	screenListMove(&testScreenList, -1);
+	updateScreenList(&testScreenList);
+}
+
+void selectLevelMenuDownButtonFunction(sguiButton_struct* b)
+{
+	screenListMove(&testScreenList, 1);
+	updateScreenList(&testScreenList);
+}
+
 void selectLevelMenuOKButtonFunction(sguiButton_struct* b)
 {
 	changeState(&gameState);
@@ -116,5 +129,5 @@ void selectLevelMenuBackButtonFunction(sguiButton_struct* b)
 	setupMenuPage(playMenuPage, playMenuPageLength);
 }
 
-menuButton_struct selectLevelMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)selectLevelMenuBackButtonFunction}, (menuButton_struct){"OK", (buttonTargetFunction)selectLevelMenuOKButtonFunction}};
+menuButton_struct selectLevelMenuPage[]={(menuButton_struct){"Back", (buttonTargetFunction)selectLevelMenuBackButtonFunction}, (menuButton_struct){"OK", (buttonTargetFunction)selectLevelMenuOKButtonFunction}, (menuButton_struct){"Down", (buttonTargetFunction)selectLevelMenuDownButtonFunction}, (menuButton_struct){"Up", (buttonTargetFunction)selectLevelMenuUpButtonFunction}};
 u8 selectLevelMenuPageLength=arrayLength(selectLevelMenuPage);

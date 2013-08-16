@@ -156,28 +156,56 @@ void resetSceneScreen(void)
 	int i; for(i=0;i<MENUSCREENLINES;i++)menuScreenText[i][0]='\0';
 }
 
-void updateScreenList(char* title, char** list, int l, int p, int c)
+void initScreenList(screenList_struct* sl, char* title, char** list, int l)
 {
-	if(!title || !list)return;
+	if(!sl || !title || !list)return;
+
+	sl->title=title;
+	sl->list=list;
+	sl->length=l;
+	sl->offset=0;
+	sl->cursor=0;
+}
+
+void screenListMove(screenList_struct* sl, s8 move)
+{
+	if(!sl)return;
+
+	sl->cursor+=move;
+	if(sl->cursor<=0)sl->cursor=0;
+	if(sl->cursor>=sl->length)sl->cursor=sl->length-1;
+
+	if(sl->cursor<sl->offset || sl->cursor>=sl->offset+MENUSCREENLINES-1)
+	{
+		sl->offset+=move;
+		if(sl->offset<=0)sl->offset=0;
+		if(sl->offset>sl->length-(MENUSCREENLINES-1))sl->offset=sl->length-(MENUSCREENLINES-1);
+	}
+}
+
+void updateScreenList(screenList_struct* sl)
+{
+	if(!sl || !sl->title || !sl->list)return;
 
 	resetSceneScreen();
 
-	strcpy(menuScreenText[0],title);
+	strcpy(menuScreenText[0],sl->title);
 
-	int i;
-	for(i=p;i<min(l,p+MENUSCREENLINES-1);i++)
+	int i; int j=0;
+	for(i=sl->offset;i<min(sl->length,sl->offset+MENUSCREENLINES-1);i++)
 	{
 		char tempString[MENUSCREENCHARS-2];
 
-		if(strlen(list[i])>=MENUSCREENCHARS-2)
+		if(strlen(sl->list[i])>=MENUSCREENCHARS-2)
 		{
-			memcpy(tempString,list[i],MENUSCREENCHARS-1-2);
+			memcpy(tempString,sl->list[i],MENUSCREENCHARS-1-2);
 			tempString[MENUSCREENCHARS-2-1]='\0';
 			tempString[MENUSCREENCHARS-2-2]='.';
 			tempString[MENUSCREENCHARS-2-3]='.';
-		}else strcpy(tempString, list[i]);
+		}else strcpy(tempString, sl->list[i]);
 
-		if(i==c)sprintf(menuScreenText[i+1],"* %s",tempString);
-		else sprintf(menuScreenText[i+1],"  %s",tempString);
+		if(i==sl->cursor)sprintf(menuScreenText[j+1],"* %s",tempString);
+		else sprintf(menuScreenText[j+1],"  %s",tempString);
+		j++;
 	}
 }

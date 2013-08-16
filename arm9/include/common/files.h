@@ -3,6 +3,8 @@
 
 #define ROOT "fpsm"
 
+extern char* basePath;
+
 extern bool saveAvailable;
 extern u8 fsMode;
 

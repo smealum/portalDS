@@ -37,5 +37,6 @@ typedef struct
 void initScreenList(screenList_struct* sl, char* title, char** list, int l);
 void screenListMove(screenList_struct* sl, s8 move);
 void updateScreenList(screenList_struct* sl);
+int listFiles(char* path, char** list);
 
 #endif

@@ -50,7 +50,9 @@ void playMenuCampaignButtonFunction(sguiButton_struct* b)
 	changeState(&gameState);
 }
 
-char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
+// char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
+char **testList;
+int testListCnt;
 screenList_struct testScreenList;
 
 void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
@@ -58,7 +60,24 @@ void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[3],64);
 	setupMenuPage(selectLevelMenuPage, selectLevelMenuPageLength);
 
-	initScreenList(&testScreenList, "Select level", testList, 6);
+	testListCnt=0;
+	testListCnt+=listFiles("./maps", NULL);
+	#ifndef FATONLY
+		char str[255]; 
+		sprintf(str,"%s/%s/maps",basePath,ROOT);
+		testListCnt+=listFiles(str, NULL);
+	#endif
+
+	NOGBA("CNT %d",testListCnt);
+
+	testList=malloc(sizeof(char*)*testListCnt);
+
+	testListCnt=listFiles("./maps", testList);
+	#ifndef FATONLY
+		testListCnt+=listFiles(str, &testList[testListCnt]);
+	#endif
+
+	initScreenList(&testScreenList, "Select level", testList, testListCnt);
 	updateScreenList(&testScreenList);
 }
 

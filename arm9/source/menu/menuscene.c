@@ -1,4 +1,5 @@
 #include "menu/menu_main.h"
+#include <dirent.h>
 
 md2Model_struct GLaDOSmodel, domeModel, lairModel, cubeModel;
 modelInstance_struct GLaDOSmodelInstance;
@@ -198,6 +199,7 @@ void updateScreenList(screenList_struct* sl)
 
 		if(strlen(sl->list[i])>=MENUSCREENCHARS-2)
 		{
+			//TODO : scrolling effect would be cool (to read the whole thing)
 			memcpy(tempString,sl->list[i],MENUSCREENCHARS-1-2);
 			tempString[MENUSCREENCHARS-2-1]='\0';
 			tempString[MENUSCREENCHARS-2-2]='.';
@@ -208,4 +210,38 @@ void updateScreenList(screenList_struct* sl)
 		else sprintf(menuScreenText[j+1],"  %s",tempString);
 		j++;
 	}
+}
+
+int listFiles(char* path, char** list)
+{
+	if(!path)return 0;
+
+	char currentPath[255];
+	getcwd(currentPath,255);
+
+	chdir(path);
+
+	struct dirent *ent;
+	struct stat st;
+	DIR* dir=opendir(".");
+
+	int cnt=0;
+	while((ent=readdir(dir)))
+	{
+		stat(ent->d_name,&st);
+		if(!S_ISDIR(st.st_mode) && strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
+		{
+			if(list)
+			{
+				list[cnt]=malloc(strlen(ent->d_name)+1);
+				strcpy(list[cnt],ent->d_name);
+			}
+			cnt++;
+		}
+	}
+	closedir(dir);
+
+	chdir(currentPath);
+
+	return cnt;
 }

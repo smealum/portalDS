@@ -155,3 +155,29 @@ void resetSceneScreen(void)
 {
 	int i; for(i=0;i<MENUSCREENLINES;i++)menuScreenText[i][0]='\0';
 }
+
+void updateScreenList(char* title, char** list, int l, int p, int c)
+{
+	if(!title || !list)return;
+
+	resetSceneScreen();
+
+	strcpy(menuScreenText[0],title);
+
+	int i;
+	for(i=p;i<min(l,p+MENUSCREENLINES-1);i++)
+	{
+		char tempString[MENUSCREENCHARS-2];
+
+		if(strlen(list[i])>=MENUSCREENCHARS-2)
+		{
+			memcpy(tempString,list[i],MENUSCREENCHARS-1-2);
+			tempString[MENUSCREENCHARS-2-1]='\0';
+			tempString[MENUSCREENCHARS-2-2]='.';
+			tempString[MENUSCREENCHARS-2-3]='.';
+		}else strcpy(tempString, list[i]);
+
+		if(i==c)sprintf(menuScreenText[i+1],"* %s",tempString);
+		else sprintf(menuScreenText[i+1],"  %s",tempString);
+	}
+}

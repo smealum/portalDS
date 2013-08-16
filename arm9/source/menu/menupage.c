@@ -50,15 +50,15 @@ void playMenuCampaignButtonFunction(sguiButton_struct* b)
 	changeState(&gameState);
 }
 
+char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
+
 void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 {
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[3],64);
 	setupMenuPage(selectLevelMenuPage, selectLevelMenuPageLength);
 
 	resetSceneScreen();
-	sprintf(menuScreenText[0],"Select level");
-	sprintf(menuScreenText[1],"  - test");
-	sprintf(menuScreenText[2],"  - lala");
+	updateScreenList("Select level", testList, 6, 0, 0);
 }
 
 void playMenuBackButtonFunction(sguiButton_struct* b)

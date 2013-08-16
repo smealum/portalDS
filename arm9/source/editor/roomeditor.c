@@ -276,18 +276,18 @@ void roomEditorControls(void)
 	//TEMP CONTROLS
 	// if(keysHeld() & KEY_R)editorScale+=inttof32(2);
 	// if(keysHeld() & KEY_L)editorScale-=inttof32(2);
-	if(keysHeld() & KEY_R)moveCameraImmediate(&editorCamera, vect(0,0,inttof32(1)/64));
-	if(keysHeld() & KEY_L)moveCameraImmediate(&editorCamera, vect(0,0,-inttof32(1)/64));
+	if(keysHeld() & KEY_R)moveCameraImmediate(&editorCamera, vect(0,0,inttof32(1)/32));
+	if(keysHeld() & KEY_L)moveCameraImmediate(&editorCamera, vect(0,0,-inttof32(1)/32));
 	
-	if(keysHeld() & KEY_UP)moveCameraImmediate(&editorCamera, vect(0,inttof32(1)/64,0));
-	else if(keysHeld() & KEY_DOWN)moveCameraImmediate(&editorCamera, vect(0,-inttof32(1)/64,0));
-	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&editorCamera, vect(inttof32(1)/64,0,0));
-	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&editorCamera, vect(-inttof32(1)/64,0,0));
+	if(keysHeld() & KEY_UP)moveCameraImmediate(&editorCamera, vect(0,inttof32(1)/32,0));
+	else if(keysHeld() & KEY_DOWN)moveCameraImmediate(&editorCamera, vect(0,-inttof32(1)/32,0));
+	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&editorCamera, vect(inttof32(1)/32,0,0));
+	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&editorCamera, vect(-inttof32(1)/32,0,0));
 	
-	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, 64, true);
-	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, -64, true);
-	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, 64, false);
-	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, -64, false);
+	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, 256, true);
+	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, -256, true);
+	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, 256, false);
+	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, -256, false);
 	
 	// if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
 	if(keysDown() & KEY_SELECT){switchScreens();}

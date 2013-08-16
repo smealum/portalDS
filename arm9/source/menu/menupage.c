@@ -52,7 +52,7 @@ void playMenuCampaignButtonFunction(sguiButton_struct* b)
 
 // char *testList[]={"lalala","hmmmm","waaaaaaaaaaaaaaaaaaaaaah","prout","gne","gneeeeeeeeeeeeeeeeeeeeeee"};
 char **testList;
-int testListCnt;
+int testListCnt, testListCnt1;
 screenList_struct testScreenList;
 
 void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
@@ -61,20 +61,20 @@ void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 	setupMenuPage(selectLevelMenuPage, selectLevelMenuPageLength);
 
 	testListCnt=0;
-	testListCnt+=listFiles("./maps", NULL);
+	testListCnt1=0;
+
+	testListCnt1=testListCnt+=listFiles("./maps", NULL);
 	#ifndef FATONLY
 		char str[255]; 
 		sprintf(str,"%s/%s/maps",basePath,ROOT);
 		testListCnt+=listFiles(str, NULL);
 	#endif
 
-	NOGBA("CNT %d",testListCnt);
-
 	testList=malloc(sizeof(char*)*testListCnt);
 
-	testListCnt=listFiles("./maps", testList);
+	listFiles("./maps", testList);
 	#ifndef FATONLY
-		testListCnt+=listFiles(str, &testList[testListCnt]);
+		listFiles(str, &testList[testListCnt1]);
 	#endif
 
 	initScreenList(&testScreenList, "Select level", testList, testListCnt);
@@ -139,6 +139,11 @@ void selectLevelMenuDownButtonFunction(sguiButton_struct* b)
 
 void selectLevelMenuOKButtonFunction(sguiButton_struct* b)
 {
+	char str[2048];
+	if(testScreenList.cursor<testListCnt1)sprintf(str,"./maps/%s",testScreenList.list[testScreenList.cursor]);
+	else sprintf(str,"%s/%s/maps/%s",basePath,ROOT,testScreenList.list[testScreenList.cursor]);
+
+	setMapFilePath(str);
 	changeState(&gameState);
 }
 

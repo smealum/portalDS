@@ -47,7 +47,7 @@ void initWallDoors(void)
 	loadMd2Model("models/door.md2", "door.pcx", &wallDoorModel);
 	generateModelDisplayLists(&wallDoorModel, false, true);
 
-	newReadMap("elevatorroom.map", &elevatorRoom, 1);
+	newReadMap("maps/elevatorroom.map", &elevatorRoom, 1);
 	roomResetOrigin(&elevatorRoom);
 	roomOriginSize(&elevatorRoom, NULL, &elevatorRoomSize);
 	elevatorRoom.displayList=generateRoomDisplayList(&elevatorRoom, vect(0,0,0), vect(0,0,0), false);

@@ -6,4 +6,6 @@ void gameFrame(void);
 void killGame(void);
 void gameVBL(void);
 
+void setMapFilePath(char* path);
+
 #endif

@@ -4,6 +4,8 @@ bool currentBuffer;
 int mainBG;
 u16 mainScreen[256*192];
 
+char mapFilePath[2048];
+
 bool testStepByStep=false;
 
 PrintConsole bottomScreen;
@@ -15,6 +17,13 @@ bigButton_struct* testButton2;
 platform_struct* testPlatform;
 
 u16 vblCNT, frmCNT, FPS;
+
+void setMapFilePath(char* path)
+{
+	if(!path)return;
+
+	strcpy(mapFilePath,path);
+}
 
 void initGame(void)
 {
@@ -105,7 +114,8 @@ void initGame(void)
 
 	// readMap("lalala.map", NULL);
 	// newReadMap("../testedit.map", NULL, 255);
-	newReadMap("test.map", NULL, 255);
+	// newReadMap("test.map", NULL, 255);
+	newReadMap(mapFilePath, NULL, 255);
 	// newReadMap("default.map", NULL, 255);
 	
 	// testButton=createBigButton(NULL, vect(10,0,10)); //TEMP

@@ -451,34 +451,7 @@ void newReadMap(char* filename, room_struct* r, u8 flags)
 {
 	if(!r)r=&gameRoom;
 	char fn[1024];
-	FILE* f=NULL;
-
-	//DEBUG DEBUG DEBUG
-	if(flags&(1<<7))f=fopen("fat:/test.map","rb");
-
-	if(!f)
-	{
-		if(fsMode==1||fsMode==2)
-		{
-			if(fsMode==2)
-			{
-				sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
-				NOGBA("lala : %s",fn);
-				f=fopen(fn,"rb");
-			}
-			if(!f)
-			{
-				sprintf(fn,"nitro:/fpsm/maps/%s",filename);
-				NOGBA("lala : %s",fn);
-				f=fopen(fn,"rb");
-			}
-		}else if(fsMode==3)
-		{
-			sprintf(fn,"%sfpsm/maps/%s",basePath,filename);
-			NOGBA("lala : %s",fn);
-			f=fopen(fn,"rb");
-		}
-	}
+	FILE* f=fopen(filename,"rb");
 	if(!f)return;
 
 	mapHeader_struct h;

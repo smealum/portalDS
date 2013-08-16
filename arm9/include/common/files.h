@@ -14,4 +14,3 @@ bool initFilesystem(int argc, char **argv);
 void* bufferizeFile(char* filename, char* dir, u32* size, bool binary);
 
 #endif
-

@@ -29,6 +29,8 @@ void initD3D()
 	videoSetMode(MODE_3_3D);
 	videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_2D_BMP_256);
     vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_SUB_BG,VRAM_D_SUB_SPRITE);
+	vramSetBankH(VRAM_H_LCD);
+	vramSetBankI(VRAM_I_LCD);
 	
 	REG_BG0CNT = BG_PRIORITY(1);
 	
@@ -83,11 +85,13 @@ void setRegCapture(bool enable, uint8 srcBlend, uint8 destBlend, uint8 bank, uin
 void updateD3D()
 {
 	if (d3dScreen) {
+		videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
 		vramSetBankC(VRAM_C_SUB_BG);
 		vramSetBankD(VRAM_D_LCD);
 		setRegCapture(true, 0, 15, 3, 0, 3, 0, 0);
 		d3dScreen=false;
 	}else{
+		videoSetModeSub(MODE_5_2D | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_2D_BMP_256);
 		vramSetBankC(VRAM_C_LCD);
 		vramSetBankD(VRAM_D_SUB_SPRITE);
 		setRegCapture(true, 0, 15, 2, 0, 3, 0, 0);

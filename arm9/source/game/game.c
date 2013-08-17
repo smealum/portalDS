@@ -47,6 +47,7 @@ void initGame(void)
 	glEnable(GL_OUTLINE);
 	
 	glSetOutlineColor(0,RGB15(0,0,0)); //TEMP?
+	glSetOutlineColor(1,RGB15(0,0,0)); //TEMP?
 	glSetOutlineColor(7,RGB15(31,0,0)); //TEMP?
 	glSetToonTableRange(0, 15, RGB15(8,8,8)); //TEMP?
 	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?

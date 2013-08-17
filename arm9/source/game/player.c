@@ -19,6 +19,8 @@ s16 gravityGunTarget;
 
 int subBG;
 
+u8 touchCnt;
+
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
 	vect3D pr=addVect(convertVect(vect(r->position.x,0,r->position.y)),vect(rec->position.x*TILESIZE*2,rec->position.y*HEIGHTUNIT,rec->position.z*TILESIZE*2));
@@ -117,6 +119,8 @@ void initPlayer(player_struct* p)
 
 	//GRAVITY GUN
 	gravityGunTarget=-1;
+
+	touchCnt=0;
 
 	//TEST TEMP
 	setFog(0);
@@ -280,7 +284,14 @@ void playerControls(player_struct* p)
 	
 	touchRead(&touchCurrent);
 	
-	if(keysDown() & KEY_TOUCH)touchOld=touchCurrent;
+	if(keysDown() & KEY_TOUCH)
+	{
+		touchOld=touchCurrent;
+		if(!touchCnt)touchCnt=16;
+		else {touchCnt=0; p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));}
+	}
+
+	if(touchCnt)touchCnt--;
 	
 	if(keysHeld() & KEY_TOUCH)
 	{		
@@ -318,7 +329,8 @@ void playerControls(player_struct* p)
 		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
 	}
 	
-	if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
+	// if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
+	if(keysDown()&(KEY_START))changeState(&menuState);
 
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 	else if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))

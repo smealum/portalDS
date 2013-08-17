@@ -58,8 +58,13 @@ void initMenu(void)
 	logoMain=createTexture("logo.pcx", "menu");
 	logoRotate=createTexture("rotate_logo.pcx", "menu");
 	logoAlpha=31;
-	
+
+	glSetOutlineColor(0,RGB15(0,0,0)); //TEMP?
+	glSetOutlineColor(1,RGB15(0,0,0)); //TEMP?
+	glSetOutlineColor(7,RGB15(0,0,0)); //TEMP?
+
 	NOGBA("END mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+	fadeIn();
 }
 
 touchPosition currentTouch;

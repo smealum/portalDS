@@ -47,6 +47,16 @@ void initBlocks(void)
 	int i;
 	for(i=0;i<6;i++)
 	{
+		//i know this is terrible
+		//but
+		if(faceOrigin[i].x)faceOrigin[i].x=(faceOrigin[i].x<0)?(-inttof32(1)):(inttof32(1));
+		if(faceOrigin[i].y)faceOrigin[i].y=(faceOrigin[i].y<0)?(-inttof32(1)):(inttof32(1));
+		if(faceOrigin[i].z)faceOrigin[i].z=(faceOrigin[i].z<0)?(-inttof32(1)):(inttof32(1));
+
+		if(faceSize[i].x)faceSize[i].x=inttof32(1);
+		if(faceSize[i].y)faceSize[i].y=inttof32(1);
+		if(faceSize[i].z)faceSize[i].z=inttof32(1);
+
 		faceOrigin[i]=vect(mulf32(faceOrigin[i].x,BLOCKSIZEX)/2,mulf32(faceOrigin[i].y,BLOCKSIZEY)/2,mulf32(faceOrigin[i].z,BLOCKSIZEZ)/2);
 		faceSize[i]=vect(mulf32(faceSize[i].x,BLOCKSIZEX),mulf32(faceSize[i].y,BLOCKSIZEY),mulf32(faceSize[i].z,BLOCKSIZEZ));
 	}
@@ -712,6 +722,8 @@ blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o,
 	
 	int32 closestDist=1<<26;
 	blockFace_struct* bf=NULL;
+
+	vect3D p=getBlockPosition(l->x,l->y,l->z);
 		
 	while(l)
 	{

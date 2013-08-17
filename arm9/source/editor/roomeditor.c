@@ -105,6 +105,8 @@ void updateLineOfTouch(s16 x, s16 y)
 	lineOfTouchVector=vectMultInt(normalize(v),-1);
 	planeOfTouch[0]=evalVectMatrix33(editorCamera.transformationMatrix,vect(inttof32(1),0,0));
 	planeOfTouch[1]=evalVectMatrix33(editorCamera.transformationMatrix,vect(0,inttof32(1),0));
+
+	// NOGBA("LOT %d %d %d",lineOfTouchOrigin.x,lineOfTouchOrigin.y,lineOfTouchOrigin.z);
 }
 
 bool collideLinePlane(vect3D p, vect3D n, vect3D o, vect3D v, vect3D* ip)

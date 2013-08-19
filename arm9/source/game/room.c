@@ -482,6 +482,8 @@ void readMapInfo(char* filename)
 		setNextMapFilePath(str);
 	}
 
+	setLevelInfo(dictionary_get(dic, "info:title", NULL), dictionary_get(dic, "info:author", NULL));
+
 	iniparser_freedict(dic);
 }
 

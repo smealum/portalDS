@@ -9,6 +9,11 @@ bool isNextRoom;
 char mapFilePath[2048];
 char nextMapFilePath[2048];
 
+char levelTitle[32];
+char levelAuthor[32];
+
+s16 levelInfoCounter;
+
 bool testStepByStep=false;
 
 PrintConsole bottomScreen;
@@ -33,6 +38,14 @@ void setNextMapFilePath(char* path)
 	if(!path)return;
 
 	strcpy(nextMapFilePath,path);
+}
+
+void setLevelInfo(char* title, char* author)
+{
+	levelTitle[0]='\0';
+	levelAuthor[0]='\0';
+	if(title)strcpy(levelTitle, title); //enforce length limit
+	if(author)sprintf(levelAuthor, "by %s", author); //enforce length limit
 }
 
 void endGame(void)
@@ -107,6 +120,8 @@ void initGame(void)
 	initSludge();
 	initPause();
 
+	initText();
+
 	NOGBA("lalala");
 
 	getPlayer()->currentRoom=&gameRoom;
@@ -158,9 +173,11 @@ void initGame(void)
 	getVramStatus();
 	
 	startPI();
-	
+
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	NOGBA("vs mem free : %dko (%do)",oldv/1024,oldv);
+
+	levelInfoCounter=70;
 }
 
 bool testbool=false;
@@ -179,6 +196,14 @@ u32 cpuEndSlice()
 	u32 temp=prevTiming;
 	prevTiming=cpuGetTiming();
 	return prevTiming-temp;
+}
+
+void drawCenteredString(char* str, int32 scale, u16 y)
+{
+	if(!str)return;
+	int l=strlen(str);
+
+	drawString(str, RGB15(31,31,31), scale, inttof32(128)-(l*scale)*4, inttof32(y));
 }
 
 static inline void render1(void)
@@ -258,6 +283,27 @@ static inline void render1(void)
 		drawPortal(&portal2);
 			
 	glPopMatrix(1);
+
+	//HUD TEST
+	if(levelInfoCounter>0 && (levelTitle || levelAuthor))
+	{
+		levelInfoCounter--;
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+			glLoadIdentity();
+			glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
+			
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+				glLoadIdentity();
+
+				if(levelTitle)drawCenteredString(levelTitle, inttof32(17)/10, (82));
+				if(levelAuthor)drawCenteredString(levelAuthor, inttof32(1), (100));
+
+			glPopMatrix(1);
+			glMatrixMode(GL_PROJECTION);
+		glPopMatrix(1);
+	}
 	
 	glFlush(0);
 }

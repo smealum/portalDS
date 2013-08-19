@@ -8,6 +8,7 @@ void gameVBL(void);
 
 void setMapFilePath(char* path);
 void setNextMapFilePath(char* path);
+void setLevelInfo(char* title, char* author);
 void endGame(void);
 
 extern bool isNextRoom;

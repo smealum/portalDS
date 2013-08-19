@@ -137,7 +137,7 @@ void drawString(char* s, u16 color, int32 size, int32 x, int32 y)
 	glColor(color);
 	bindTexture(&currentFont->tex);
 	bindPalette4(&currentFont->tex);
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_ID(63));
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_ID(48));
 
 	glPushMatrix();
 		glTranslatef32(x, y, 0);

@@ -322,6 +322,7 @@ void listenPI9(void)
 				
 				if(o->used && (collideBoxEmancipationGrids(o) || collideBoxSludge(o)))
 				{
+					if(o->id==gravityGunTarget)gravityGunTarget=-1;
 					createEmancipator(&o->modelInstance,vectDivInt(o->position,4),o->transformationMatrix);
 					if(o->spawner && ((cubeDispenser_struct*)o->spawner)->active)resetCubeDispenserCube(o->spawner);
 					else killBox(o);

@@ -122,6 +122,7 @@ void updateCubeDispenser(cubeDispenser_struct* cd)
 			if(cd->currentCube)cd->currentCube->spawner=(void*)cd;
 		}else{
 			createEmancipator(&cd->currentCube->modelInstance,vectDivInt(cd->currentCube->position,4),cd->currentCube->transformationMatrix);
+			if(cd->id==gravityGunTarget)gravityGunTarget=-1;
 			resetCubeDispenserCube(cd);
 		}
 		changeAnimation(&cd->modelInstance,1,true);

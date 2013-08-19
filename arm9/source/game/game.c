@@ -106,6 +106,7 @@ void initGame(void)
 	
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
+	loadControlConfiguration("config.ini");
 	
 	initElevators();
 	initWallDoors();
@@ -212,6 +213,7 @@ static inline void render1(void)
 	
 	// cpuEndSlice();
 	playerControls(NULL);
+	updateControls();
 	// iprintf("controls : %d  \n",cpuEndSlice());
 	
 		updatePlayer(NULL);

@@ -15,11 +15,12 @@ SFX_struct *gunSFX1, *gunSFX2;
 SFX_struct *portalEnterSFX[2];
 SFX_struct *portalExitSFX[2];
 
+bool oldCurrentPortalColor;
+bool currentPortalColor; //true=orange
+
 s16 gravityGunTarget;
 
 int subBG;
-
-u8 touchCnt;
 
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
@@ -120,10 +121,38 @@ void initPlayer(player_struct* p)
 	//GRAVITY GUN
 	gravityGunTarget=-1;
 
-	touchCnt=0;
-
 	//TEST TEMP
 	setFog(0);
+
+	currentPortalColor=true;
+	oldCurrentPortalColor=currentPortalColor;
+	drawBottomButton(currentPortalColor);
+}
+
+void drawBottomButton(bool color)
+{
+	u16* d=bgGetGfxPtr(subBG);
+	u8* s=bottomButton->texels;
+	if(!color)s+=32*128;
+	int j; for(j=0;j<32;j++)dmaCopy(&s[j*128],&d[32+(j+4)*128],128);
+
+	if(color)BG_PALETTE_SUB[0]=RGB15(28,17,3);
+	else BG_PALETTE_SUB[0]=RGB15(6,18,22);
+}
+
+bool updateBottomScreen(touchPosition* tp)
+{
+	if(!tp)return false;
+
+	bool r=false;
+
+	if(tp->px>=64 && tp->py>=4 && tp->px<=64+128 && tp->py<=4+32)
+	{
+		r=true;
+		if(keysUp()&KEY_TOUCH){currentPortalColor^=1;}
+	}		
+
+	return r;
 }
 
 void drawPlayer(player_struct* p)
@@ -209,7 +238,7 @@ void renderGun(player_struct* p)
 	glPopMatrix(1);
 }
 
-void shootPlayerGun(player_struct* p, bool R)
+void shootPlayerGun(player_struct* p, bool R, u8 mode)
 {
 	if(!p)p=&player;
 	if(!p->currentRoom)return;
@@ -228,13 +257,13 @@ void shootPlayerGun(player_struct* p, bool R)
 		rectangle_struct* r=collideLineMapClosest(p->currentRoom, NULL, l, u, k-128, &ip, &lk);
 		OBB_struct* o=collideRayBoxes(p->object->position, u, min(k,2048));
 		timedButton_struct* tb=collideRayTimedButtons(p->object->position, u, min(k,1024));
-		if(tb)
+		if(mode&1 && tb)
 		{
 			activateTimedButton(tb);
-		}else if(o)
+		}else if(mode&2 && o)
 		{
 			gravityGunTarget=o->id;
-		}else if(r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))
+		}else if(mode&4 && r&&r->portalable&&!collideLineEmancipationGrids(l,u,lk))
 		{
 			// ip.x+=TILESIZE*2;
 			// ip.z+=TILESIZE*2;
@@ -284,16 +313,14 @@ void playerControls(player_struct* p)
 	
 	touchRead(&touchCurrent);
 	
-	if(keysDown() & KEY_TOUCH)
-	{
-		touchOld=touchCurrent;
-		if(!touchCnt)touchCnt=16;
-		else {touchCnt=0; p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));}
-	}
-
-	if(touchCnt)touchCnt--;
+	// if(keysDown() & KEY_TOUCH)
+	// {
+	// 	touchOld=touchCurrent;
+	// 	if(!touchCnt)touchCnt=16;
+	// 	else {touchCnt=0; p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));}
+	// }
 	
-	if(keysHeld() & KEY_TOUCH)
+	if(!updateBottomScreen(&touchOld) && (keysHeld() & KEY_TOUCH))
 	{		
 		int16 dx = touchCurrent.px - touchOld.px;
 		int16 dy = touchCurrent.py - touchOld.py;
@@ -314,41 +341,41 @@ void playerControls(player_struct* p)
 	
 	// if(keysHeld()&(KEY_A))rotateCamera(NULL, vect(0,0,-(1<<8)));
 	// if(keysHeld()&(KEY_Y))rotateCamera(NULL, vect(0,0,1<<8));
-	if(p->object->contact)
-	{
-		bool idle=true;
-		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/){moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
-		else if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/){moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
-		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/){moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
-		else if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/){moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
-		if(idle)changeAnimation(&p->playerModelInstance,0,false);
-	}else{
-		if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
-		if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERAIRSPEED),0,0));
-		if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
-		if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
-	}
+	// if(p->object->contact)
+	// {
+	// 	bool idle=true;
+	// 	if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/){moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
+	// 	else if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/){moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,4,false);idle=false;}
+	// 	if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/){moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
+	// 	else if((keysHeld()&(KEY_UP))||(keysHeld()&(KEY_X))){moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));p->walkCnt+=2500;changeAnimation(&p->playerModelInstance,3,false);idle=false;}
+	// 	if(idle)changeAnimation(&p->playerModelInstance,0,false);
+	// }else{
+	// 	if((keysHeld()&(KEY_RIGHT))/*||(keysHeld()&(KEY_A))*/)moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
+	// 	if((keysHeld()&(KEY_LEFT))/*||(keysHeld()&(KEY_Y))*/)moveCamera(NULL, vect(-(PLAYERAIRSPEED),0,0));
+	// 	if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
+	// 	if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
+	// }
 	
 	// if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	// if(keysDown()&(KEY_START))changeState(&menuState);
-	if(keysDown()&(KEY_START))doPause(NULL);
+	// if(keysDown()&(KEY_START))doPause(NULL);
 
-	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
-	else if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))
+	// if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
+	if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))
 	{
 		camera_struct* c=getPlayerCamera();
 		setVelocity(gravityGunTarget, vectMultInt(/*normalize*/(vectDifference(vectMultInt(addVect(getPlayer()->object->position,vectDivInt(vect(-c->transformationMatrix[2],-c->transformationMatrix[5],-c->transformationMatrix[8]),4)),4),objects[gravityGunTarget].position)),4));
 		changeAnimation(&getPlayer()->modelInstance,2,false);
-	}else if(gravityGunTarget>=0)
+	}else if((gravityGunTarget>=0) || (getPlayer()->modelInstance.currentAnim==2))
 	{
 		gravityGunTarget=-1;
 		changeAnimation(&getPlayer()->modelInstance,0,false);
 		changeAnimation(&getPlayer()->modelInstance,1,true);
 	}
 
-	// camera_struct* c=getPlayerCamera();
-	// if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
-	if(keysDown()&(KEY_SELECT))p->life=-5;
+	// // camera_struct* c=getPlayerCamera();
+	// // if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
+	// if(keysDown()&(KEY_SELECT))p->life=-5;
 	
 	touchOld=touchCurrent;
 }
@@ -395,6 +422,9 @@ void updatePlayer(player_struct* p)
 	
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?
+
+	if(oldCurrentPortalColor!=currentPortalColor)drawBottomButton(currentPortalColor);
+	oldCurrentPortalColor=currentPortalColor;
 }
 
 void shootPlayer(player_struct* p, vect3D v, u8 damage)

@@ -23,12 +23,15 @@ typedef struct
 	s16 life;
 }player_struct;
 
+s16 gravityGunTarget;
+
 room_struct* getCurrentRoom(void);
 void initPlayer(player_struct* p);
 void playerControls(player_struct* p);
 void updatePlayer(player_struct* p);
 void renderGun(player_struct*);
 player_struct* getPlayer(void);
+void shootPlayerGun(player_struct* p, bool R, u8 mode);
 void freePlayer(void);
 void drawCrosshair(void);
 void damagePlayer(player_struct* p);

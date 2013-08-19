@@ -31,5 +31,6 @@
 #include "game/sludge.h"
 #include "game/sfx.h"
 #include "game/pause.h"
+#include "game/controls.h"
 
 #endif

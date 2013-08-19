@@ -152,6 +152,8 @@ void initGame(void)
 	// readMap("lalala.map", NULL);
 	// newReadMap("../testedit.map", NULL, 255);
 	// newReadMap("test.map", NULL, 255);
+	strcpy(&mapFilePath[strlen(mapFilePath)-3], "map");
+	NOGBA("STUFF STUFF %s",mapFilePath);
 	newReadMap(mapFilePath, NULL, 255);
 	// newReadMap("default.map", NULL, 255);
 	

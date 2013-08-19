@@ -243,12 +243,17 @@ int listFiles(char* path, char** list)
 		stat(ent->d_name,&st);
 		if(!S_ISDIR(st.st_mode) && strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
 		{
-			if(list)
+			//dirty .map filter
+			int l=strlen(ent->d_name);
+			if(l>4 && ent->d_name[l-1]=='p' && ent->d_name[l-2]=='a' && ent->d_name[l-3]=='m' && ent->d_name[l-4]=='.')
 			{
-				list[cnt]=malloc(strlen(ent->d_name)+1);
-				strcpy(list[cnt],ent->d_name);
+				if(list)
+				{
+					list[cnt]=malloc(strlen(ent->d_name)+1);
+					strcpy(list[cnt],ent->d_name);
+				}
+				cnt++;
 			}
-			cnt++;
 		}
 	}
 	closedir(dir);

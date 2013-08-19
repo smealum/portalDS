@@ -30,5 +30,6 @@
 #include "game/walldoor.h"
 #include "game/sludge.h"
 #include "game/sfx.h"
+#include "game/pause.h"
 
 #endif

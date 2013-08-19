@@ -719,12 +719,12 @@ bool collideLineBlockFace(blockFace_struct* bf, vect3D o, vect3D v, int32 d, int
 blockFace_struct* collideLineBlockFaceListClosest(blockFace_struct* l, vect3D o, vect3D v, int32* d)
 {
 	if(!l)return NULL;
-	
+
 	int32 closestDist=1<<26;
 	blockFace_struct* bf=NULL;
 
 	vect3D p=getBlockPosition(l->x,l->y,l->z);
-		
+
 	while(l)
 	{
 		if(collideLineBlockFace(l, o, v, closestDist, &closestDist))

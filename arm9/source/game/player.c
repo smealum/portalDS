@@ -330,7 +330,8 @@ void playerControls(player_struct* p)
 	}
 	
 	// if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
-	if(keysDown()&(KEY_START))changeState(&menuState);
+	// if(keysDown()&(KEY_START))changeState(&menuState);
+	if(keysDown()&(KEY_START))doPause(NULL);
 
 	if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 	else if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))

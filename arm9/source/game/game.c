@@ -86,6 +86,7 @@ void initGame(void)
 	initEmancipation();
 	initDoors();
 	initSludge();
+	initPause();
 
 	NOGBA("lalala");
 
@@ -394,6 +395,7 @@ void killGame(void)
 	freePortals();
 	freeState(NULL);
 	freeSound();
+	freePause();
 
 	resetAllPI();
 

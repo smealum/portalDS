@@ -367,6 +367,8 @@ void updatePlayer(player_struct* p)
 		p->relativePosition=convertCoord(r, p->object->position);
 		p->relativePositionReal=vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y)));
 	}
+
+	NOGBA("P %d",p->object->position.y);
 	
 	// createParticles(p->object->position,vect(0,0,0),120);
 	// particleExplosion(p->object->position,32);

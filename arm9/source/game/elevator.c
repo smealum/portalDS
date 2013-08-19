@@ -30,6 +30,8 @@ void initElevator(elevator_struct* ev, room_struct* r, vect3D position, u8 direc
 	ev->state=ELEVATOR_OPEN;
 	ev->doorSurface=NULL;
 	initModelInstance(&ev->modelInstance, &elevatorModel);
+				NOGBA("EV %d",up);
+				NOGBA("EV %d",ev->direction);
 }
 
 void setElevatorArriving(elevator_struct* ev, int32 distance)
@@ -84,7 +86,7 @@ void updateElevator(elevator_struct* ev)
 			break;
 	}
 
-	bool up=(ev->direction&ELEVATOR_UPDOWNBIT)!=0;
+	bool up=(ev->direction&(1<<ELEVATOR_UPDOWNBIT))!=0;
 	ev->realPosition=ev->position;
 	ev->realPosition.y+=up?(ev->progress):(-ev->progress);
 
@@ -120,7 +122,7 @@ void drawElevator(elevator_struct* ev)
 		
 		renderModelFrameInterp(0,0,0,&elevatorFrameModel,params,false,NULL,RGB15(31,31,31));
 
-		bool up=(ev->direction&ELEVATOR_UPDOWNBIT)!=0;
+		bool up=(ev->direction&(1<<ELEVATOR_UPDOWNBIT))!=0;
 		glTranslate3f32(0,up?(ev->progress):(-ev->progress),0);
 		renderModelFrameInterp(ev->modelInstance.currentFrame,ev->modelInstance.nextFrame,ev->modelInstance.interpCounter,ev->modelInstance.model,params,false,ev->modelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);

@@ -149,24 +149,8 @@ void initGame(void)
 	//PHYSICS
 	initPI9();
 
-	// readMap("lalala.map", NULL);
-	// newReadMap("../testedit.map", NULL, 255);
-	// newReadMap("test.map", NULL, 255);
 	strcpy(&mapFilePath[strlen(mapFilePath)-3], "map");
-	NOGBA("STUFF STUFF %s",mapFilePath);
 	newReadMap(mapFilePath, NULL, 255);
-	// newReadMap("default.map", NULL, 255);
-	
-	// testButton=createBigButton(NULL, vect(10,0,10)); //TEMP
-	// testButton2=createBigButton(NULL, vect(6,0,4)); //TEMP
-	// testDispenser=createCubeDispenser(NULL, vect(4,0,4), true); //TEMP
-	// createEnergyDevice(NULL, vect(0,7,9), pX, true); //TEMP
-	// createEnergyDevice(NULL, vect(20,0,9), pY, false); //TEMP
-	// createPlatform(vect(TILESIZE*2,TILESIZE,TILESIZE*4),vect(TILESIZE*10,TILESIZE,TILESIZE*4), true); //TEMP
-	// testPlatform=createPlatform(vect(-TILESIZE*2,TILESIZE,TILESIZE*4),vect(-TILESIZE*2,TILESIZE*4,TILESIZE*4), true); //TEMP
-	// addActivatorTarget(&testButton2->activator,(void*)testDispenser,DISPENSER_TARGET); //TEMP
-	// addActivatorTarget(&testButton->activator,(void*)testPlatform,PLATFORM_TARGET); //TEMP
-	// createEmancipationGrid(NULL,vect(0,0,7),TILESIZE*8,false);
 	
 	transferRectangles(&gameRoom);
 	makeGrid();
@@ -180,7 +164,7 @@ void initGame(void)
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	NOGBA("vs mem free : %dko (%do)",oldv/1024,oldv);
 
-	levelInfoCounter=70;
+	levelInfoCounter=60;
 }
 
 bool testbool=false;
@@ -279,7 +263,7 @@ static inline void render1(void)
 			drawEmancipators();
 			drawEmancipationGrids();
 			drawDoors();
-			drawWallDoors();
+			drawWallDoors(NULL);
 			drawSludge(&gameRoom);
 		// iprintf("stuff : %d  \n",cpuEndSlice());
 		
@@ -355,7 +339,7 @@ static inline void render2(void)
 		drawEmancipators();
 		drawEmancipationGrids();
 		drawDoors();
-		drawWallDoors();
+		drawWallDoors(currentPortal);
 		drawSludge(&gameRoom);
 
 	glPopMatrix(1);

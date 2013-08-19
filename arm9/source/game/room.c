@@ -455,6 +455,7 @@ void readMapInfo(char* filename)
 
 	//loading info
 	dictionary* dic=iniparser_load(filename);
+	setLevelInfo(dictionary_get(dic, "info:title", NULL), dictionary_get(dic, "info:author", NULL));
 	if(!dic)return;
 	
 	char* r;
@@ -481,8 +482,6 @@ void readMapInfo(char* filename)
 
 		setNextMapFilePath(str);
 	}
-
-	setLevelInfo(dictionary_get(dic, "info:title", NULL), dictionary_get(dic, "info:author", NULL));
 
 	iniparser_freedict(dic);
 }

@@ -136,7 +136,7 @@ void updateWallDoors(void)
 	if(exitWallDoor.elevator.state==ELEVATOR_LEAVING)endGame();
 }
 
-void drawWallDoor(wallDoor_struct* wd)
+void drawWallDoor(wallDoor_struct* wd, portal_struct* p)
 {
 	if(!wd || !wd->used)return;
 
@@ -184,31 +184,34 @@ void drawWallDoor(wallDoor_struct* wd)
 			return;
 		}
 		
-		//TEMP TEST
-		glPushMatrix();
-			switch(wd->orientation)
-			{
-				case 4:
-					glRotateYi(8192*2);
-					break;
-				case 1:
-					glRotateYi(8192);
-					break;
-				case 0:
-					glRotateYi(-8192);
-					break;
-			}
-			glTranslate3f32(-elevatorRoomSize.x*TILESIZE+TILESIZE,0,TILESIZE+WALLDOORINTERVAL); //WALLDOORINTERVAL is arbitrary, just to move it away from the wall
-			drawRoom(&elevatorRoom,((1)<<3)|(1<<2)|(1), getCurrentPortalColor(getPlayer()->object->position));
-		glPopMatrix(1);
+		if(!p || (dotProduct(vectDifference(p->position,wd->position), p->normal)>0))
+		{
+			//TEMP TEST
+			glPushMatrix();
+				switch(wd->orientation)
+				{
+					case 4:
+						glRotateYi(8192*2);
+						break;
+					case 1:
+						glRotateYi(8192);
+						break;
+					case 0:
+						glRotateYi(-8192);
+						break;
+				}
+				glTranslate3f32(-elevatorRoomSize.x*TILESIZE+TILESIZE,0,TILESIZE+WALLDOORINTERVAL); //WALLDOORINTERVAL is arbitrary, just to move it away from the wall
+				drawRoom(&elevatorRoom,((1)<<3)|(1<<2)|(1), getCurrentPortalColor(getPlayer()->object->position));
+			glPopMatrix(1);
+		}
 
 	glPopMatrix(1);
 
 	drawElevator(&wd->elevator);
 }
 
-void drawWallDoors(void)
+void drawWallDoors(portal_struct* p)
 {
-	drawWallDoor(&entryWallDoor);
-	drawWallDoor(&exitWallDoor);
+	drawWallDoor(&entryWallDoor, p);
+	drawWallDoor(&exitWallDoor, p);
 }

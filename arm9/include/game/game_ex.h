@@ -7,5 +7,9 @@ void killGame(void);
 void gameVBL(void);
 
 void setMapFilePath(char* path);
+void setNextMapFilePath(char* path);
+void endGame(void);
+
+extern bool isNextRoom;
 
 #endif

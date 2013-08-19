@@ -132,6 +132,8 @@ void updateWallDoors(void)
 {
 	updateWallDoor(&entryWallDoor);
 	updateWallDoor(&exitWallDoor);
+
+	if(exitWallDoor.elevator.state==ELEVATOR_LEAVING)endGame();
 }
 
 void drawWallDoor(wallDoor_struct* wd)

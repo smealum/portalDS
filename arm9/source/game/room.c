@@ -447,6 +447,43 @@ void readLightingData(room_struct* r, lightingData_struct* ld, FILE* f)
 	}
 }
 
+void readMapInfo(char* filename)
+{
+	//default init
+	isNextRoom=false;
+
+	//loading info
+	dictionary* dic=iniparser_load(filename);
+	if(!dic)return;
+	
+	char* r;
+
+	//next map
+	if(r=dictionary_get(dic, "info:next", NULL))
+	{
+		isNextRoom=true;
+		char str[2048];
+		#ifndef FAT_ONLY
+			switch(filename[0])
+			{
+				case 'f':
+					sprintf(str,"%s/%s/maps/%s",basePath,ROOT,r);
+					break;
+				default:
+					sprintf(str,"maps/%s",r);
+					break;
+			}
+		#else
+			sprintf(str,"%s/%s/maps/%s",basePath,ROOT,r);
+		#endif
+		NOGBA("%s",str);
+
+		setNextMapFilePath(str);
+	}
+
+	iniparser_freedict(dic);
+}
+
 void newReadMap(char* filename, room_struct* r, u8 flags)
 {
 	if(!r)r=&gameRoom;
@@ -481,6 +518,16 @@ void newReadMap(char* filename, room_struct* r, u8 flags)
 	//sludge stuff
 	fseek(f, h.sludgePosition, SEEK_SET);
 		readSludgeRectangles(f);
+
+	//info
+	if(flags&(1<<7))
+	{
+		int l=strlen(filename);
+		filename[l-1]='i';
+		filename[l-2]='n';
+		filename[l-3]='i';
+		readMapInfo(filename);
+	}
 	
 	fclose(f);
 }

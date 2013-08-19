@@ -4,7 +4,10 @@ bool currentBuffer;
 int mainBG;
 u16 mainScreen[256*192];
 
+bool isNextRoom;
+
 char mapFilePath[2048];
+char nextMapFilePath[2048];
 
 bool testStepByStep=false;
 
@@ -23,6 +26,22 @@ void setMapFilePath(char* path)
 	if(!path)return;
 
 	strcpy(mapFilePath,path);
+}
+
+void setNextMapFilePath(char* path)
+{
+	if(!path)return;
+
+	strcpy(nextMapFilePath,path);
+}
+
+void endGame(void)
+{
+	if(!isNextRoom)changeState(&menuState);
+	else {
+		strcpy(mapFilePath,nextMapFilePath);
+		changeState(&gameState);
+	}
 }
 
 void initGame(void)

@@ -15,6 +15,7 @@ typedef struct
 	s16 groundID;
 	int32 mass;
 	s32 startAngle;
+	bool inPortal;
 	bool used;
 	u8 id;
 }OBB_struct;

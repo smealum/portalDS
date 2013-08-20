@@ -322,7 +322,7 @@ void listenPI9(void)
 				o->transformationMatrix[5]=v.y;
 				o->transformationMatrix[8]=v.z;
 				
-				if(o->used && (collideBoxEmancipationGrids(o) || collideBoxSludge(o)))
+				if(o->used && !o->inPortal && (collideBoxEmancipationGrids(o) || collideBoxSludge(o)))
 				{
 					if(o->id==gravityGunTarget)gravityGunTarget=-1;
 					createEmancipator(&o->modelInstance,vectDivInt(o->position,4),o->transformationMatrix);
@@ -499,8 +499,9 @@ void drawOBBs(void)
 		if(objects[i].used)
 		{
 			drawOBB(&objects[i]);
-			if(intersectOBBPortal(&portal1,&objects[i]))drawWarpedOBB(&portal1,&objects[i]);
-			if(intersectOBBPortal(&portal2,&objects[i]))drawWarpedOBB(&portal2,&objects[i]);
+			objects[i].inPortal=false;
+			if(intersectOBBPortal(&portal1,&objects[i])){drawWarpedOBB(&portal1,&objects[i]);objects[i].inPortal=true;}
+			if(intersectOBBPortal(&portal2,&objects[i])){drawWarpedOBB(&portal2,&objects[i]);objects[i].inPortal=true;}
 		}
 	}
 }

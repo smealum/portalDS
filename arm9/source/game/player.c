@@ -409,7 +409,7 @@ void updatePlayer(player_struct* p)
 	editPalette((u16*)p->playerModelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	
 	collidePlayer(p,p->currentRoom);
-	if(collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=-5;
+	if(!p->inPortal && collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=-5;
 	
 	updateCamera(NULL);
 

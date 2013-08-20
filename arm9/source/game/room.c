@@ -501,6 +501,7 @@ void newReadMap(char* filename, room_struct* r, u8 flags)
 
 	fseek(f, h.rectanglesPosition, SEEK_SET);
 		fread(&r->rectangles.num,sizeof(int),1,f);
+		NOGBA("RECTANGLE NUMBER %d",r->rectangles.num);
 		readRectangles(r, f);
 
 	//lighting stuff

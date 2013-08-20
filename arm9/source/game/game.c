@@ -229,6 +229,8 @@ static inline void render1(void)
 	#ifdef DEBUG_GAME
 		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
 		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);NOGBA("ALERT %d      \n",cnt);}
+	#else
+		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);NOGBA("ALERT %d      \n",cnt);}
 	#endif
 	
 	projectCamera(NULL);

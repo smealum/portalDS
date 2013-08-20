@@ -333,11 +333,16 @@ void playerControls(player_struct* p)
 			// if(dx>-2&&dx<2)dx=0;
 			// if(dy>-2&&dy<2)dy=0;
 
-			angle.x -= degreesToAngle(dy);
-			angle.y -= degreesToAngle(dx);
+			angle.x-=degreesToAngle(dy);
+			angle.y-=degreesToAngle(dx);
 		}
 		p->tempAngle=addVect(p->tempAngle,angle);
+
+		int32 tempMatrix[9];
+		int32* m=getPlayerCamera()->transformationMatrix;
+		memcpy(tempMatrix,m,9*sizeof(int32));
 		rotateCamera(NULL, angle);
+		if(m[4]<0 && m[4]<tempMatrix[4])memcpy(m,tempMatrix,9*sizeof(int32));
 	}
 	
 	// if(keysHeld()&(KEY_A))rotateCamera(NULL, vect(0,0,-(1<<8)));

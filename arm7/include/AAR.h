@@ -3,7 +3,8 @@
 
 #define NUMAARSEGMENTS (4)
 
-#define NODESIZE (4096)
+#define ORIGNODESIZE (4096)
+#define NODESIZE (nodeSize)
 
 typedef struct
 {
@@ -25,6 +26,8 @@ typedef struct
 	u16 width, height;
 	vect3D m, M;
 }grid_struct;
+
+extern u32 nodeSize;
 
 void initAARs(void);
 void drawAARs(void);

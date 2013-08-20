@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#define ALLOCATORSIZE (8*1024) //may cause problems !
+#define ALLOCATORSIZE (9*1024) //may cause problems !
 
 u8 allocatorPool[ALLOCATORSIZE];
 u16 allocatorCounter;
@@ -12,6 +12,8 @@ static const u8 AARSegments[NUMAARSEGMENTS][2]={{0,1},{1,2},{3,2},{0,3}};
 static const u8 AARSegmentsPD[NUMAARSEGMENTS][2]={{0,0},{1,1},{3,0},{0,1}};
 
 extern portal_struct portal[2];
+
+u32 nodeSize=ORIGNODESIZE;
 
 void initAllocator(void)
 {
@@ -71,12 +73,23 @@ void generateGrid(grid_struct* g)
 		}
 	}
 	if(!b)return;
+
+	nodeSize=ORIGNODESIZE;
+
 	g->width=(M.x-m.x)/NODESIZE+1;
 	g->height=(M.z-m.z)/NODESIZE+1;
+	
+	while((sizeof(node_struct)*g->width*g->height)>(ALLOCATORSIZE/3))
+	{
+		nodeSize*=2;
+		g->width=(M.x-m.x)/NODESIZE+1;
+		g->height=(M.z-m.z)/NODESIZE+1;
+	}
+
+	g->nodes=allocateData(sizeof(node_struct)*g->width*g->height);
+
 	g->m=m;
 	g->M=M;
-	
-	g->nodes=allocateData(sizeof(node_struct)*g->width*g->height);
 	
 	fifoSendValue32(FIFO_USER_08,allocatorCounter);
 	

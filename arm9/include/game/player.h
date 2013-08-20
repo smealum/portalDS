@@ -24,6 +24,7 @@ typedef struct
 }player_struct;
 
 s16 gravityGunTarget;
+extern bool idle;
 
 room_struct* getCurrentRoom(void);
 void initPlayer(player_struct* p);

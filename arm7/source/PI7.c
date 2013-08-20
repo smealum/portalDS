@@ -274,13 +274,14 @@ void sendDataPI7(void)
 	{
 		if(objects[i].used && !objects[i].sleep)
 		{
-			fifoSendValue32(FIFO_USER_01,(((u16)(objects[i].groundID+1))<<16)|i);
+			fifoSendValue32(FIFO_USER_01,(((u16)(objects[i].groundID+1))<<17)|((objects[i].portaled&1)<<16)|i);
 			fifoSendValue32(FIFO_USER_02,objects[i].position.x);
 			fifoSendValue32(FIFO_USER_03,objects[i].position.y);
 			fifoSendValue32(FIFO_USER_04,objects[i].position.z);
 			fifoSendValue32(FIFO_USER_05,((objects[i].transformationMatrix[3]+4096)<<16)|((u16)objects[i].transformationMatrix[0]+4096));
 			fifoSendValue32(FIFO_USER_06,((objects[i].transformationMatrix[1]+4096)<<16)|((u16)objects[i].transformationMatrix[6]+4096));
 			fifoSendValue32(FIFO_USER_07,((objects[i].transformationMatrix[7]+4096)<<16)|((u16)objects[i].transformationMatrix[4]+4096));
+			objects[i].portaled=false;
 		}
 	}
 	for(i=0;i<NUMPLATFORMS;i++)

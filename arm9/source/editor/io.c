@@ -449,7 +449,7 @@ bool loadMapEditor(editorRoom_struct* er, const char* str)
 
 	fseek(f, h.dataPosition, SEEK_SET);
 		u16* compressed=malloc(sizeof(u16)*h.dataSize);
-		if(!compressed){return;} //TEMP : clean up first !
+		if(!compressed){return false;} //TEMP : clean up first !
 		fread(compressed, sizeof(u16), h.dataSize, f);
 		// decompress(compressed, er->blockArray, RLE); // decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		
 		decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		

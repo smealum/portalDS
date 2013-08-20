@@ -281,7 +281,9 @@ void listenPI9(void)
 		if(k<NUMOBJECTS)
 		{
 			//OBB
-			const s16 groundID=(x>>16)-1;
+			const s16 groundID=(x>>17)-1;
+			bool portaled=(x>>16)&1;
+			if(portaled && gravityGunTarget==k)gravityGunTarget=-1;
 			while(!fifoCheckValue32(FIFO_USER_02));
 			while(!fifoCheckValue32(FIFO_USER_03));
 			while(!fifoCheckValue32(FIFO_USER_04));

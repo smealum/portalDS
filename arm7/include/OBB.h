@@ -60,6 +60,7 @@ typedef struct
 	u32 energy;
 	u16 counter;
 	s16 groundID;
+	bool portaled;
 	bool sleep;
 	bool used;
 }OBB_struct;

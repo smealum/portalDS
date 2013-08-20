@@ -161,6 +161,7 @@ void controlForward(player_struct* p, bool down, bool held)
 		moveCamera(NULL, vect(0,0,-(PLAYERGROUNDSPEED)));
 		p->walkCnt+=2500;
 		changeAnimation(&p->playerModelInstance,3,false);
+		idle=false;
 	}else moveCamera(NULL, vect(0,0,-PLAYERAIRSPEED));
 }
 
@@ -173,6 +174,7 @@ void controlBack(player_struct* p, bool down, bool held)
 		moveCamera(NULL, vect(0,0,PLAYERGROUNDSPEED));
 		p->walkCnt+=2500;
 		changeAnimation(&p->playerModelInstance,3,false);
+		idle=false;
 	}else moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
 }
 
@@ -185,6 +187,7 @@ void controlStrafeLeft(player_struct* p, bool down, bool held)
 		moveCamera(NULL, vect(-(PLAYERGROUNDSPEED),0,0));
 		p->walkCnt+=2500;
 		changeAnimation(&p->playerModelInstance,4,false);
+		idle=false;
 	}else moveCamera(NULL, vect(-PLAYERAIRSPEED,0,0));
 }
 
@@ -197,6 +200,7 @@ void controlStrafeRight(player_struct* p, bool down, bool held)
 		moveCamera(NULL, vect(PLAYERGROUNDSPEED,0,0));
 		p->walkCnt+=2500;
 		changeAnimation(&p->playerModelInstance,4,false);
+		idle=false;
 	}else moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
 }
 

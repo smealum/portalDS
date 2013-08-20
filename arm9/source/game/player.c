@@ -304,6 +304,7 @@ void shootPlayerGun(player_struct* p, bool R, u8 mode)
 }
 
 extern OBB_struct objects[NUMOBJECTS];
+bool idle;
 
 void playerControls(player_struct* p)
 {
@@ -359,6 +360,9 @@ void playerControls(player_struct* p)
 	// if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	// if(keysDown()&(KEY_START))changeState(&menuState);
 	// if(keysDown()&(KEY_START))doPause(NULL);
+
+	if(idle)changeAnimation(&p->playerModelInstance,0,false);
+	idle=true;
 
 	// if(!p->modelInstance.oneshot && ((keysDown()&(KEY_R))||(keysDown()&(KEY_L)))){playSFX(keysDown()&(KEY_R)?gunSFX1:gunSFX2);shootPlayerGun(p,keysDown()&(KEY_R));changeAnimation(&p->modelInstance,1,true);}
 	if(gravityGunTarget>=0 && gravityGunTarget<NUMOBJECTS && objects[gravityGunTarget].used && ((keysHeld() & KEY_R) || (keysHeld() & KEY_L)))

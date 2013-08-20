@@ -220,7 +220,7 @@ void checkPortalPlayerWarp(portal_struct* p)
 	bool r=isPointInPortal(p, pl->object->position, &v, &x, &y, &z);
 	if(r)
 	{
-		if(z<0 && p->oldZ>=0){currentPortal=p;warpPlayer(p,pl);}
+		if(z<0 && p->oldZ>=0){currentPortal=p;warpPlayer(p,pl);gravityGunTarget=-1;}
 		pl->oldInPortal=pl->inPortal;
 		if(abs(z)<PLAYERRADIUS){pl->inPortal=true;}
 		else pl->inPortal=false;

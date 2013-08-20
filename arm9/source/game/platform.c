@@ -45,7 +45,8 @@ void initPlatform(platform_struct* pf, room_struct* r, vect3D orig, vect3D dest,
 	pf->touched=false;
 	pf->backandforth=true;
 	
-	pf->oldactive=pf->active=true;
+	pf->oldactive=false;
+	pf->active=true;
 	
 	addPlatform(id,vectMultInt(pf->origin,4),vectMultInt(pf->destination,4),BAF); //TEMP
 	

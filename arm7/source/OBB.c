@@ -908,6 +908,8 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 				
 				warpMatrix(&portal[id], o->transformationMatrix);
 				warpMatrix(&portal[id], o->invWInertiaMatrix);
+				
+				o->portaled=true;
 			}
 			break;
 		default:

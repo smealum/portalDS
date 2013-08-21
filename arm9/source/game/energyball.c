@@ -314,7 +314,7 @@ void updateEnergyBall(energyBall_struct* eb)
 			if(isPointInPortal(&portal2,ip,&v,&x,&y,&z))portal=&portal2;
 			if(abs(z)>=32)portal=NULL;
 		}
-		if((portal && !portal->used) || (portal->targetPortal && !portal->targetPortal->used))portal=NULL;
+		if((portal && !portal->used) || (portal && portal->targetPortal && !portal->targetPortal->used))portal=NULL;
 		if(!portal)
 		{
 			eb->position=ip;

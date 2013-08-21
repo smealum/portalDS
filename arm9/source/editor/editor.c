@@ -29,6 +29,8 @@ void initEditor(void)
 	
 	initRoomEdition();
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
+
+	fadeIn();
 }
 
 int cnd=0;
@@ -46,6 +48,7 @@ void editorFrame(void)
 
 void killEditor(void)
 {
+	fadeOut();
 	freeRoomEditor();
 	freeState(NULL);
 }

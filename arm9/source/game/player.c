@@ -150,6 +150,7 @@ bool updateBottomScreen(touchPosition* tp)
 	{
 		r=true;
 		if(keysUp()&KEY_TOUCH){currentPortalColor^=1;}
+		touchCnt=0;
 	}		
 
 	return r;
@@ -321,7 +322,7 @@ void playerControls(player_struct* p)
 	// 	else {touchCnt=0; p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));}
 	// }
 	
-	if(!updateBottomScreen(&touchOld) && (keysHeld() & KEY_TOUCH))
+	if(!(((keysDown()&KEY_TOUCH) && updateBottomScreen(&touchCurrent)) || updateBottomScreen(&touchOld)) && (keysHeld() & KEY_TOUCH))
 	{		
 		int16 dx = touchCurrent.px - touchOld.px;
 		int16 dy = touchCurrent.py - touchOld.py;

@@ -51,7 +51,7 @@ u8 mainMenuPageLength=arrayLength(mainMenuPage);
 
 void playMenuCampaignButtonFunction(sguiButton_struct* b)
 {
-	setMapFilePath("maps/test.map");
+	setMapFilePath("maps/test1.map");
 	changeState(&gameState);
 }
 

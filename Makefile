@@ -22,7 +22,7 @@ all: $(TARGET).nds
 
 #---------------------------------------------------------------------------------
 $(TARGET).nds	:	arm7/$(TARGET).elf arm9/$(TARGET).elf
-	ndstool	-c $(TARGET).nds -b logo.bmp "Portal DS;prototype;smea" -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d $(NITRODATA)
+	ndstool	-c $(TARGET).nds -b logo.bmp "Aperture Science;demo;smea and lobo" -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d $(NITRODATA)
 
 #---------------------------------------------------------------------------------
 arm7/$(TARGET).elf:

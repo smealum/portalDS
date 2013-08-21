@@ -185,6 +185,7 @@ void menuFrame(void)
 
 void killMenu(void)
 {
+	fadeOut();
 	freeMenuScene();
 	freeState(NULL);
 }

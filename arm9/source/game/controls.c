@@ -116,7 +116,10 @@ controlAction_type actionByString(char* str)
 
 void loadControlConfiguration(char* filename)
 {
-	dictionary* dic=iniparser_load(filename);
+	char str[255];
+	sprintf(str,"%s/%s",basePath,filename);
+	dictionary* dic=iniparser_load(str);
+	if(!dic)dic=iniparser_load(filename);
 	int i; for(i=0;i<INPUT_NUMBER;i++)
 	{
 		char str[255];
@@ -265,7 +268,7 @@ void controlJump(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
 
-	p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));
+	if(p->object->contact)p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));
 }
 
 void controlLookRight(player_struct* p, bool down, bool held)

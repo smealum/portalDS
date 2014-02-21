@@ -10,16 +10,19 @@ While reading this, please keep in mind that this includes a bunch of legacy cod
 Compiling this requires devkitARM; see http://devkitpro.org for more information on setting everything up.
 This is pretty much the game's final version. It's not quite complete feature-wise but I have no plans on continuing it.
 The code is provided "as-is" (whatever that entails), and can be freely used so long as it's not for commercial purposes and that proper credit is given to the original author.
-I'd love to hear about what people do with this, if anything, so shoot me an email if you feel like using some (or all) of the code ! I'll also try to answer any questions you may have.
+I'd love to hear about what people do with this, if anything, so shoot me an email if you feel like using some (or all) of the code ! I'll also try to answer any questions you may have. Here's a short write-up to accompany the source code : http://smealum.net/?page_id=326
 
 Test chamber video : http://www.youtube.com/watch?v=TlXYyjhOYQU
+
 Level editor video : http://www.youtube.com/watch?v=V2OwozMNJFE
 
 Acknowledgements :
-	- the code for the rigid body dynamics engine is heavily based on chris hecker's articles : http://chrishecker.com/Rigid_Body_Dynamics
-	- the code for loading ini files was written by N. Devillard
-	- the code used for level data compression was taken from GRIT
-	- the code used for loading MD2 models was written by David HENRY
-	- xmem.c was written by SunDEV
+
+- the code for the rigid body dynamics engine is heavily based on chris hecker's articles : http://chrishecker.com/Rigid_Body_Dynamics
+- the code for loading ini files was written by N. Devillard
+- the code used for level data compression was taken from GRIT
+- the code used for loading MD2 models and PCX files was written by David HENRY
+- this project uses libnds and maxmod
+- xmem.c was written by SunDEV
 
 Please let me know if you think I missed anything.

@@ -275,7 +275,7 @@ static inline void render1(void)
 	glPopMatrix(1);
 
 	//HUD TEST
-	if(levelInfoCounter>0 && (levelTitle || levelAuthor))
+	if(levelInfoCounter>0 && (levelTitle[0] || levelAuthor[0]))
 	{
 		levelInfoCounter--;
 		glMatrixMode(GL_PROJECTION);
@@ -287,8 +287,8 @@ static inline void render1(void)
 			glPushMatrix();
 				glLoadIdentity();
 
-				if(levelTitle)drawCenteredString(levelTitle, inttof32(17)/10, (82));
-				if(levelAuthor)drawCenteredString(levelAuthor, inttof32(1), (100));
+				if(levelTitle[0])drawCenteredString(levelTitle, inttof32(17)/10, (82));
+				if(levelAuthor[0])drawCenteredString(levelAuthor, inttof32(1), (100));
 
 			glPopMatrix(1);
 			glMatrixMode(GL_PROJECTION);

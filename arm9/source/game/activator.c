@@ -33,7 +33,7 @@ void useSlot(activatorSlot_struct* as)
 			break;
 		case WALLDOOR_TARGET:
 			{
-				wallDoor_struct* wd=(door_struct*)as->target;
+				wallDoor_struct* wd=(wallDoor_struct*)as->target;
 				wd->override=true;
 			}
 			break;

@@ -1,5 +1,6 @@
 #include "common/general.h"
 
+u8 vramBanks;
 vramBank_struct bank[4];
 vramBank_struct palBank;
 
@@ -31,7 +32,7 @@ void getGlWL(u16 width, u16 height, u8* w, u8* l)
 			*w=TEXTURE_SIZE_512;
 		break;
 	}
-	
+
 	switch(height)
 	{
 		case 8:
@@ -103,7 +104,7 @@ mtlImg_struct* createTexture(char* filename, char* directory)
 {
 	int i;
 	if(!fileExists(filename, directory))return NULL;
-	
+
 	getVramStatus();
 
 	for(i=0;i<MAX_TEX;i++)
@@ -222,7 +223,7 @@ void addToBank(mtlImg_struct *mtl, u8* data, int b)
 	bank[b].s_used+=mtl->size;
 	bank[b].s_free=bank[b].s_total-bank[b].s_used;
 	bank[b].num_t++;
-	
+
 	loadToBank(mtl, data);
 }
 
@@ -317,38 +318,38 @@ void bindTexture(mtlImg_struct *mtl)
 
 void unbindMtl()
 {
-		GFX_TEX_FORMAT = 0; 
+		GFX_TEX_FORMAT = 0;
 }
 
 void loadTextureBuffer(u8* buffer, u16* buffer2, u16 x, u16 y, mtlImg_struct *mtl)
 {
 	int param;
 	uint8 texX=0, texy=0;
-	
+
 	mtl->used=true;
-	
+
 	mtl->width=x;
 	mtl->height=y;
 
 	adjustDimension(&mtl->width);
 	mtl->size=mtl->width*mtl->height;
 	adjustDimension(&mtl->height);
-		
+
 	if(buffer2)addPaletteToBank(mtl, buffer2, 256*2);
 	else addPaletteToBank(mtl, NULL, 256*2);
-	
+
 	getTextureAddress(mtl);
-	
+
 	if(buffer)addToBank(mtl, buffer, mtl->bank);
 	else reserveInBank(mtl, (u8*)buffer, &bank[mtl->bank], 0);
-	
+
 	// adjustDimension(&mtl->height);
-	
+
 	if(buffer2 && buffer2[0]==RGB15(31,0,31))param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | (1<<29);
-	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;	
-	
+	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;
+
 	getGlWL(mtl->width, mtl->height, &texX, &texy);
-	
+
 	setTextureParameter(mtl, texX, texy, mtl->addr, GL_RGB256, param);
 
 }
@@ -357,31 +358,31 @@ void loadTextureBufferA5I3(u8* buffer, u16* buffer2, u16 x, u16 y, mtlImg_struct
 {
 	int param;
 	uint8 texX=0, texy=0;
-	
+
 	mtl->used=true;
-	
+
 	mtl->width=x;
 	mtl->height=y;
 
 	adjustDimension(&mtl->width);
 	mtl->size=mtl->width*mtl->height;
 	adjustDimension(&mtl->height);
-		
+
 	if(buffer2)addPaletteToBank(mtl, buffer2, 8*2);
 	else addPaletteToBank(mtl, NULL, 8*2);
-	
+
 	getTextureAddress(mtl);
-	
+
 	if(buffer)addToBank(mtl, buffer, mtl->bank);
 	else reserveInBank(mtl, (u8*)buffer, &bank[mtl->bank], 0);
-	
+
 	// adjustDimension(&mtl->height);
-	
+
 	if(buffer2 && buffer2[0]==RGB15(31,0,31))param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | (1<<29);
-	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;	
-	
+	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;
+
 	getGlWL(mtl->width, mtl->height, &texX, &texy);
-	
+
 	setTextureParameter(mtl, texX, texy, mtl->addr, GL_RGB8_A5, param);
 }
 
@@ -402,32 +403,32 @@ void loadReservedTextureBufferA5I3(u8* buffer, u16* buffer2, u16 x, u16 y, mtlIm
 {
 	int param;
 	uint8 texX=0, texy=0;
-	
+
 	mtl->used=true;
-	
+
 	mtl->width=x;
 	mtl->height=y;
 
 	adjustDimension(&mtl->width);
 	mtl->size=mtl->width*mtl->height;
 	adjustDimension(&mtl->height);
-		
+
 	if(buffer2)addPaletteToBank(mtl, buffer2, 8*2);
 	else addPaletteToBank(mtl, NULL, 8*2);
-	
+
 	mtl->addr=addr;
 	getTextureAddress(mtl);
-	
+
 	if(buffer)addToBank(mtl, buffer, mtl->bank);
 	else reserveInBank(mtl, (u8*)buffer, &bank[mtl->bank], 0);
-	
+
 	// adjustDimension(&mtl->height);
-	
+
 	if(buffer2 && buffer2[0]==RGB15(31,0,31))param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | (1<<29);
-	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;	
-	
+	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;
+
 	getGlWL(mtl->width, mtl->height, &texX, &texy);
-	
+
 	setTextureParameter(mtl, texX, texy, mtl->addr, GL_RGB8_A5, param);
 }
 
@@ -435,18 +436,18 @@ void loadTextureBuffer16(u16* buffer, u16 x, u16 y, mtlImg_struct *mtl, bool gen
 {
 	int param;
 	uint8 texX=0, texy=0;
-	
+
 	mtl->used=true;
 
 	mtl->width=x;
-	mtl->height=y;	
+	mtl->height=y;
 	mtl->size=mtl->width*mtl->height*2;
-	
-	param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;	
-	
+
+	param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;
+
 	if(genaddr)getTextureAddress(mtl);
 	getGlWL(mtl->width, mtl->height, &texX, &texy);
-	
+
 	setTextureParameter(mtl, texX, texy, mtl->addr, GL_RGBA, param);
 
 	if(cpy)addToBank(mtl, (u8*)buffer, mtl->bank);
@@ -458,22 +459,22 @@ void loadTexturePCX(char* filename, char* directory, mtlImg_struct* mtl)
 	int param;
 	uint8 texX=0, texy=0;
 	u8* texels=NULL;
-	
+
 	mtl->used=true;
 	mtl->name=alloc(strlen(filename)+1,NULL);
 	strcpy(mtl->name,filename);
-	
+
 	struct gl_texture_t *pcxt=(struct gl_texture_t *)ReadPCXFile(filename,directory);
-	
+
 	mtl->rwidth=mtl->width=pcxt->width;
 	mtl->rheight=mtl->height=pcxt->height;
-	
+
 	adjustDimension(&mtl->width);
 	adjustDimension(&mtl->height);
-	
+
 	if(pcxt->palette[0]==RGB15(31,0,31))param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | (1<<29);
-	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;	
-	
+	else param=TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T;
+
 	NOGBA("format : %d",pcxt->format);
 	switch(pcxt->format)
 	{
@@ -518,17 +519,17 @@ void loadTexturePCX(char* filename, char* directory, mtlImg_struct* mtl)
 
 	if(mtl->width!=pcxt->width || mtl->height!=pcxt->height){if(texels){addToBank(mtl, texels, mtl->bank);free(texels);}}
 	else addToBank(mtl, pcxt->texels, mtl->bank);
-	
+
 	freePCX(pcxt);
-	
+
 	NOGBA("%s loaded.\n",filename);
 }
 
 u32* loadPalettePCX(char* filename, char* directory)
-{	
+{
 	struct gl_texture_t *pcxt=(struct gl_texture_t *)ReadPCXFile(filename,directory);
 	mtlImg_struct mtl;
-	
+
 	NOGBA("format : %d",pcxt->format);
 	switch(pcxt->format)
 	{
@@ -538,10 +539,12 @@ u32* loadPalettePCX(char* filename, char* directory)
 		case 8:
 			addPaletteToBank(&mtl, pcxt->palette, 256*2);
 			break;
+		default:
+			return NULL;
 	}
-	
+
 	freePCX(pcxt);
-	
+
 	return mtl.pal;
 }
 

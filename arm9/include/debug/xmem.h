@@ -10,7 +10,7 @@
 #ifndef _XMEM_H
 #define _XMEM_H
 
-size_t latestUsed, latestFree;
+extern size_t latestUsed, latestFree;
 
 u8 *getHeapStart();
 u8 *getHeapEnd();
@@ -18,4 +18,4 @@ u8 *getHeapLimit();
 size_t getMemUsed();
 size_t getMemFree();
 
-#endif 
+#endif

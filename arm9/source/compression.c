@@ -1,6 +1,6 @@
 #include "common/general.h"
 
-// code borrowed from GRIT 
+// code borrowed from GRIT
 // http://www.coranac.com/projects/grit/
 
 //made it into 16bit compression code because screw it 8bit sucks
@@ -12,7 +12,7 @@ enum ECprsTag
 {
 	CPRS_FAKE_TAG	= 0x00,		//<! No compression.
 	CPRS_LZ77_TAG	= 0x10,		//<! GBA LZ77 compression.
-	CPRS_HUFF_TAG	= 0x20, 
+	CPRS_HUFF_TAG	= 0x20,
 //	CPRS_HUFF4_TAG	= 0x24,		//<! GBA Huffman, 4bit.
 	CPRS_HUFF8_TAG	= 0x28,		//<! GBA Huffman, 8bit.
 	CPRS_RLE_TAG	= 0x30,		//<! GBA RLE compression.
@@ -37,7 +37,8 @@ uint compressRLE(u16 **dst, u16 *srcD, uint srcS)
 	if(!srcD || !dst)return 0;
 
 	uint ii, rle, non;
-	u16 curr, prev;
+	u16 curr =0u;
+	u16 prev;
 
 	// Annoyingly enough, rle _can_ end up being larger than
 	// the original. A checker-board will do it for example.
@@ -56,12 +57,12 @@ uint compressRLE(u16 **dst, u16 *srcD, uint srcS)
 	{
 		if(ii!=srcS)curr=srcD[ii];
 
-		if(rle==0x82 || ii==srcS)prev= ~curr;	// stop rle			
+		if(rle==0x82 || ii==srcS)prev= ~curr;	// stop rle
 
 		if(rle<3 && (non+rle > 0x80 || ii==srcS))	// ** mini non
 		{
 			non += rle;
-			dstL[0]= non-2;	
+			dstL[0]= non-2;
 			memcpy(&dstL[1], &srcD[ii-non+1], (non-1)*2);
 			dstL += non;
 			non= rle= 1;
@@ -91,7 +92,7 @@ uint compressRLE(u16 **dst, u16 *srcD, uint srcS)
 		}
 		prev= curr;
 	}
-	
+
 	dstS=ALIGN4(dstL-dstD)+4;
 
 	dstL=(u16*)malloc(dstS*2);

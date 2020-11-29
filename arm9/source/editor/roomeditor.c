@@ -41,6 +41,8 @@ void initRoomEdition(void)
 
 	//controls stuff
 	touchRead(&currentTouch);
+	currentTouch.px = (float)(currentTouch.rawx)*256.0/4080.0;
+	currentTouch.py = (float)(currentTouch.rawy)*192.0/3072.0;
 	oldTouch=currentTouch;
 
 	//cosmetics
@@ -63,10 +65,10 @@ void updateEditorCamera(void)
 	camera_struct* c=&editorCamera;
 
 	c->viewPosition=c->position;
-	
+
 	updateViewMatrix(c);
 	updateFrustum(c);
-	
+
 	fixMatrix(c->transformationMatrix);
 }
 
@@ -113,7 +115,7 @@ bool collideLinePlane(vect3D p, vect3D n, vect3D o, vect3D v, vect3D* ip)
 {
 	int32 p1=dotProduct(v,n);
 	if(!equals(p1,0))
-	{		
+	{
 		int32 p2=dotProduct(vectDifference(p,o),n);
 		int32 k=divf32(p2,p1);
 		if(ip)*ip=addVect(o,vectMult(v,k));
@@ -199,7 +201,7 @@ void roomEditorCursor(selection_struct* sel)
 				}else{
 					undoSelection(sel);
 				}
-			}			
+			}
 		}
 	}else if(keysHeld() & KEY_TOUCH)
 	{
@@ -222,7 +224,7 @@ void roomEditorCursor(selection_struct* sel)
 					bool fill=true;
 					vect3D p=getDragPosition(bf, lineOfTouchOrigin, lineOfTouchVector, lineOfTouchVector);
 					p=vect((p.x+(ROOMARRAYSIZEX*BLOCKSIZEX+BLOCKSIZEX)/2)/BLOCKSIZEX,(p.y+(ROOMARRAYSIZEY*BLOCKSIZEY+BLOCKSIZEY)/2)/BLOCKSIZEY,(p.z+(ROOMARRAYSIZEZ*BLOCKSIZEZ+BLOCKSIZEZ)/2)/BLOCKSIZEZ);
-					
+
 					switch(bf->direction)
 					{
 						case 0:  p.y=bf->y; p.z=bf->z; fill=p.x>sel->currentPosition.x; break;
@@ -280,17 +282,17 @@ void roomEditorControls(void)
 	// if(keysHeld() & KEY_L)editorScale-=inttof32(2);
 	if(keysHeld() & KEY_R)moveCameraImmediate(&editorCamera, vect(0,0,inttof32(1)/32));
 	if(keysHeld() & KEY_L)moveCameraImmediate(&editorCamera, vect(0,0,-inttof32(1)/32));
-	
+
 	if(keysHeld() & KEY_UP)moveCameraImmediate(&editorCamera, vect(0,inttof32(1)/32,0));
 	else if(keysHeld() & KEY_DOWN)moveCameraImmediate(&editorCamera, vect(0,-inttof32(1)/32,0));
 	if(keysHeld() & KEY_RIGHT)moveCameraImmediate(&editorCamera, vect(inttof32(1)/32,0,0));
 	else if(keysHeld() & KEY_LEFT)moveCameraImmediate(&editorCamera, vect(-inttof32(1)/32,0,0));
-	
+
 	if(keysHeld() & KEY_Y)rotateMatrixY(editorCamera.transformationMatrix, 256, true);
 	if(keysHeld() & KEY_A)rotateMatrixY(editorCamera.transformationMatrix, -256, true);
 	if(keysHeld() & KEY_B)rotateMatrixX(editorCamera.transformationMatrix, 256, false);
 	if(keysHeld() & KEY_X)rotateMatrixX(editorCamera.transformationMatrix, -256, false);
-	
+
 	// if(keysHeld() & KEY_START){writeMapEditor(&editorRoom, "fat:/test.map");}
 	if(keysDown() & KEY_SELECT){switchScreens();}
 
@@ -300,7 +302,8 @@ void roomEditorControls(void)
 void updateRoomEditor(void)
 {
 	touchRead(&currentTouch);
-	
+	currentTouch.px = (float)(currentTouch.rawx)*256.0/4080.0;
+	currentTouch.py = (float)(currentTouch.rawy)*192.0/3072.0;
 	if(!currentScreen)
 	{
 		updateLineOfTouch(currentTouch.px-128, currentTouch.py-96);
@@ -323,8 +326,8 @@ void drawRoomEditor(void)
 {
 	projectCamera(&editorCamera);
 	glLoadIdentity();
-	
-	glPushMatrix();		
+
+	glPushMatrix();
 		glScalef32(editorScale,editorScale,editorScale);
 		transformCamera(&editorCamera);
 
@@ -334,7 +337,7 @@ void drawRoomEditor(void)
 	glPopMatrix(1);
 
 	drawContextButtons();
-	
+
 	glFlush(0);
 }
 

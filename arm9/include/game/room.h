@@ -60,4 +60,5 @@ void generateLightmaps(room_struct* r, lightingData_struct* ld);
 
 void generateVertexLighting(room_struct* r, lightingData_struct* ld);
 
+void drawRoomsGame(u8 mode, u16 color);
 #endif

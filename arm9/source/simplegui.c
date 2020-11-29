@@ -56,12 +56,17 @@ void simpleButtonSetImage(sguiButton_struct* b, mtlImg_struct* mtl, vect3D o, ve
 	b->mtlSize=s;
 }
 
+int test_dbg_called = 0xFF;
+int test_x = 0;
+int test_y=0;
 bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 {
+
 	if(!b || !b->used)return false;
 
 	bool ret=false;
-
+	test_x=x;
+	test_y=y;
 	if(!(x==-1 && y==-1) && x>=b->position.x && x<b->position.x+b->size.x && y>=b->position.y && y<b->position.y+b->size.y)
 	{
 		b->active=true;
@@ -107,7 +112,7 @@ void drawSimpleButton(sguiButton_struct* b)
 		if(b->active)GFX_COLOR=RGB15(31,0,0);
 		else GFX_COLOR=RGB15(31,31,31);
 
-		glBegin(GL_QUADS);	
+		glBegin(GL_QUADS);
 			GFX_VERTEX10=NORMAL_PACK(0,(1<<6),0);
 			GFX_VERTEX10=NORMAL_PACK((1<<6),(1<<6),0);
 			GFX_VERTEX10=NORMAL_PACK((1<<6),0,0);
@@ -130,7 +135,7 @@ void drawSimpleGui(void)
 	glLoadIdentity();
 
 	glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 

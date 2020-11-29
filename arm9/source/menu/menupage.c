@@ -65,7 +65,7 @@ void playMenuLoadLevelButtonFunction(sguiButton_struct* b)
 
 	testListCnt1=testListCnt+=listFiles("./maps", NULL);
 	#ifndef FATONLY
-		char str[255]; 
+		char str[255];
 		sprintf(str,"%s/%s/maps",basePath,ROOT);
 		testListCnt+=listFiles(str, NULL);
 	#endif
@@ -104,7 +104,7 @@ void createMenuNewLevelButtonFunction(sguiButton_struct* b)
 	resetSceneScreen();
 	sprintf(menuScreenText[0],"Level name :");
 	sprintf(menuScreenText[1],"  ");
-	
+
 	setupKeyboard(&menuScreenText[1][2], 10, 16, 16);
 }
 
@@ -116,7 +116,7 @@ void createMenuLoadLevelButtonFunction(sguiButton_struct* b)
 	testListCnt=0;
 	testListCnt1=0;
 
-	char str[255]; 
+	char str[255];
 	sprintf(str,"%s/%s/maps",basePath,ROOT);
 	testListCnt1=testListCnt+=listFiles(str, NULL);
 

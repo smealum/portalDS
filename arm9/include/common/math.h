@@ -185,14 +185,9 @@ static const short TABLE_SIN[512] = {
 #define Math_Cos(angle) TABLE_SIN[((angle) + 128)&511]
 #define Math_Sin(angle) TABLE_SIN[((angle))&511]
 
-extern inline u64 Math_FakeDistance(s32 x1, s32 y1, s32 x2, s32 y2) {
-   s64 h = x1 - x2;
-   s64 v = y1 - y2;
-   return(h*h + v*v);
-}
 
 u16 Math_AdjustAngle(u16 angle, s16 anglerot, s32 startx, s32 starty, s32 targetx, s32 targety);
-
+/*
 extern inline u16 getAngle(s32 startx, s32 starty, s32 targetx, s32 targety) {
 	u16 angle = 0;
 	u16 anglerot = 180;
@@ -212,6 +207,6 @@ extern inline u16 getAngle(s32 startx, s32 starty, s32 targetx, s32 targety) {
 	angle = Math_AdjustAngle(angle, anglerot, startx, starty, targetx, targety);
 
 	return angle;
-}
+}*/
 
 #endif

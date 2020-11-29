@@ -39,4 +39,6 @@ u16 getCurrentPortalColor(vect3D o);
 
 bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix);
 
+bool isPointInPortal(portal_struct* p, vect3D o, vect3D *v, int32* x, int32* y, int32* z);
+
 #endif

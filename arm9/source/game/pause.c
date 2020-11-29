@@ -65,6 +65,8 @@ void doPause(u16* buffer)
 		}
 
 		touchRead(&tp);
+		tp.px = (float)(tp.rawx)*256.0/4080.0;
+		tp.py = (float)(tp.rawy)*192.0/3072.0;
 		swiWaitForVBlank();
 	}
 	lcdMainOnTop();

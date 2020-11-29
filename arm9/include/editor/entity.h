@@ -3,7 +3,7 @@
 
 #define NUMENTITYTYPES (15)
 
-enum
+enum directionMask_type
 {
 	pX_mask = 1,
 	mX_mask = 1<<1,
@@ -11,7 +11,7 @@ enum
 	mY_mask = 1<<3,
 	pZ_mask = 1<<4,
 	mZ_mask = 1<<5
-}directionMask_type;
+};
 
 struct entity_struct;
 
@@ -75,4 +75,5 @@ void removeEntity(entity_struct* e);
 
 int32 getGridLength(entity_struct* e);
 
+void setBlock(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, BLOCK_TYPE v);
 #endif

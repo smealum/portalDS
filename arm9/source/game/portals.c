@@ -8,13 +8,13 @@ void preparePortal(void);
 void initPortals(void)
 {
 	initPolygonPool();
-	
+
 	initPortal(&portal1, vect(256*4,1024*2,0), vect(inttof32(1),0,0), true);
 	initPortal(&portal2, vect(2048,1024+512,0), vect(0,inttof32(1),0), false);
-	
+
 	portal1.targetPortal=&portal2;
 	portal2.targetPortal=&portal1;
-	
+
 	currentPortal=&portal1;
 }
 
@@ -39,12 +39,12 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, vect3D plane0, bool
 	p->normal=normal;
 	p->plane[0]=plane0;
 	p->animCNT=0;
-	
+
 	// p->angle=angle;
 	p->oldZ=-1;
-	
+
 	computePortalPlane(p);
-	
+
 	if(actualMove)
 	{
 		updatePortalPI(p==&portal2,p->position,p->normal,p->plane[0]);
@@ -55,19 +55,19 @@ void movePortal(portal_struct* p, vect3D pos, vect3D normal, vect3D plane0, bool
 		// debugVal=getMemFree()/1024; //TEMP
 		p->used=true;
 	}
-	
+
 	const vect3D v1=vectDivInt(p->plane[0],PORTALFRACTIONX);
 	const vect3D v2=vectDivInt(p->plane[1],PORTALFRACTIONY);
-	
+
 	freePolygon(&p->unprojectedPolygon);
-	p->unprojectedPolygon=createEllipse(vect(0,0,0), v1, v2, 32);	
-	
+	p->unprojectedPolygon=createEllipse(vect(0,0,0), v1, v2, 32);
+
 	freePolygon(&p->unprojectedOutline);
 	p->unprojectedOutline=createEllipseOutline(vect(0,0,0), v1, v2, vectMult(v1,inttof32(11)/10), vectMult(v2,inttof32(11)/10), vect(0,0,0), 32);
 	freePolygon(&p->outline);
-	p->outline=createEllipseOutline(vect(0,0,0), v1, v2, vectMult(v1,inttof32(11)/10), vectMult(v2,inttof32(11)/10), vectDivInt(p->normal,256), 32);	
-	
-	NOGBA("PORTAL ! %d %d %d",p->position.x,p->position.y,p->position.z);
+	p->outline=createEllipseOutline(vect(0,0,0), v1, v2, vectMult(v1,inttof32(11)/10), vectMult(v2,inttof32(11)/10), vectDivInt(p->normal,256), 32);
+
+	NOGBA("PORTAL ! %ld %ld %ld",p->position.x,p->position.y,p->position.z);
 }
 
 void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
@@ -78,19 +78,19 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	if(color){p->color=RGB15(31,31,0);}
 	else {p->color=RGB15(0,31,31);}
 	initCamera(&p->camera);
-	
+
 	p->oldZ=-1;
 	p->normal=normal;
 	p->used=false;
 	p->normal=vect(0,0,inttof32(1));
 	p->plane[0]=vect(0,inttof32(1),0);
 	computePortalPlane(p);
-	
+
 	p->displayList=NULL;
 
 	p->polygon=NULL;
 	p->unprojectedPolygon=NULL;
-	
+
 	p->outline=NULL;
 	p->unprojectedOutline=NULL;
 }
@@ -104,10 +104,10 @@ void drawPortal(portal_struct* p)
 	// glPolyFmt(POLY_ALPHA(31) | POLY_DECAL | POLY_CULL_BACK);
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 	// glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-	
+
 	player_struct* pl=getPlayer();
 	int32 dist=distance(pl->object->position,p->position);
-	
+
 	if(dist<inttof32(1)/6)
 	{
 		glPushMatrix();
@@ -115,23 +115,23 @@ void drawPortal(portal_struct* p)
 			glPushMatrix();
 				glLoadIdentity();
 				glOrthof32(0, inttof32(255), inttof32(191), 0, 0, inttof32(1));
-				
+
 				glMatrixMode(GL_MODELVIEW);
 				glLoadIdentity();
-				
+
 				unbindMtl();
 				GFX_COLOR=p->color;
-				
+
 				glScalef32(1<<24, 1<<24, 1<<24);
-				
+
 				drawPolygon(p->polygon);
 				freePolygon(&p->polygon);
-				
+
 				glMatrixMode(GL_PROJECTION);
 			glPopMatrix(1);
 			glMatrixMode(GL_MODELVIEW);
 		glPopMatrix(1);
-		
+
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 		glPushMatrix();
 			const vect3D v=p->position;
@@ -144,7 +144,7 @@ void drawPortal(portal_struct* p)
 		glPushMatrix();
 			const vect3D v=addVect(p->position,vectDivInt(p->normal,64));
 			glTranslate3f32(v.x,v.y,v.z);
-			
+
 			unbindMtl();
 			GFX_COLOR=p->color;
 			drawPolygon(p->unprojectedPolygon);
@@ -196,7 +196,7 @@ void warpPlayer(portal_struct* p, player_struct* pl)
 {
 	camera_struct* c=getPlayerCamera();
 	updatePortalCamera(p,c);
-	
+
 	c->viewPosition=p->camera.viewPosition;
 	pl->object->position=c->position=reverseViewPosition(p->camera.viewPosition);
 
@@ -216,7 +216,7 @@ void checkPortalPlayerWarp(portal_struct* p)
 	if(!p)return;
 	player_struct* pl=getPlayer();
 	vect3D v;
-	int32 x, y, z;
+	int32 x, y, z = 0;
 	bool r=isPointInPortal(p, pl->object->position, &v, &x, &y, &z);
 	if(r)
 	{
@@ -231,38 +231,38 @@ void checkPortalPlayerWarp(portal_struct* p)
 void updatePortal(portal_struct* p)
 {
 	if(!p || !p->used)return;
-	
+
 	if(portal1.used&&portal2.used)
 	{
 		player_struct* pl=getPlayer();
-			
+
 		int32 dist=distance(pl->object->position,p->position);
 		if(dist<inttof32(1)/6)
 		{
 			vect3D v[4];
-			
+
 			v[0]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
 			v[1]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],-PORTALFRACTIONY))));
 			v[2]=(addVect(p->position,addVect(vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
 			v[3]=(addVect(p->position,addVect(vectDivInt(p->plane[0],-PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY))));
-			
+
 			const vect3D u1=normalize(vectDifference(v[1],v[0]));
 			const vect3D u2=normalize(vectDifference(v[3],v[0]));
 			const int32 d1=distance(v[0],v[1]);
 			const int32 d2=distance(v[0],v[3]);
-			
+
 			freePolygon(&p->polygon);
 			p->polygon=createEllipse(p->position, vectDivInt(p->plane[0],PORTALFRACTIONX), vectDivInt(p->plane[1],PORTALFRACTIONY), 32);
 			projectPolygon(NULL, &p->polygon,v[0],u1,u2,d1,d2);
 		}
 	}
-	
+
 	const u16 range=10;
 	s8 x=abs((((p->animCNT)/2)%(range*2))-range)-range/2;
 
 	p->innerOutlineColor=(p->color==RGB15(31,31,0))?(RGB15(27,27,0)):(RGB15(0,27,27));
 	p->outlineColor=(p->color==RGB15(31,31,0))?(RGB15(31,16+x,0)):(RGB15(0,16+x,31));
-	
+
 	p->animCNT++;
 }
 
@@ -281,30 +281,30 @@ void updatePortalCamera(portal_struct* p, camera_struct* c)
 {
 	if(!p||!p->targetPortal)return;
 	if(!c)c=getPlayerCamera();
-	
+
 	portal_struct* p2=p->targetPortal;
-		
+
 	p->camera.position=addVect(p2->position,warpVector(p, vectDifference(c->position, p->position)));
 	p->camera.viewPosition=addVect(p2->position,warpVector(p, vectDifference(c->viewPosition, p->position)));
-	
+
 	memcpy(p->camera.transformationMatrix,c->transformationMatrix,9*sizeof(int32));
-	
+
 	computePortalPlane(p);
-	
+
 	vect3D x=vect(p->camera.transformationMatrix[0],p->camera.transformationMatrix[3],p->camera.transformationMatrix[6]);
 	vect3D y=vect(p->camera.transformationMatrix[1],p->camera.transformationMatrix[4],p->camera.transformationMatrix[7]);
 	vect3D z=vect(p->camera.transformationMatrix[2],p->camera.transformationMatrix[5],p->camera.transformationMatrix[8]);
-	
+
 	x=vect(dotProduct(x,p->plane[0]),dotProduct(x,p->plane[1]),dotProduct(x,p->normal));
 	y=vect(dotProduct(y,p->plane[0]),dotProduct(y,p->plane[1]),dotProduct(y,p->normal));
 	z=vect(dotProduct(z,p->plane[0]),dotProduct(z,p->plane[1]),dotProduct(z,p->normal));
-	
+
 	computePortalPlane(p2);
-	
+
 	vect3D x2=addVect(vectMult(p2->plane[0],-x.x),addVect(vectMult(p2->plane[1],x.y),vectMult(p2->normal,-x.z)));
 	vect3D y2=addVect(vectMult(p2->plane[0],-y.x),addVect(vectMult(p2->plane[1],y.y),vectMult(p2->normal,-y.z)));
 	vect3D z2=addVect(vectMult(p2->plane[0],-z.x),addVect(vectMult(p2->plane[1],z.y),vectMult(p2->normal,-z.z)));
-	
+
 	p->camera.transformationMatrix[0]=x2.x;p->camera.transformationMatrix[3]=x2.y;p->camera.transformationMatrix[6]=x2.z;
 	p->camera.transformationMatrix[1]=y2.x;p->camera.transformationMatrix[4]=y2.y;p->camera.transformationMatrix[7]=y2.z;
 	p->camera.transformationMatrix[2]=z2.x;p->camera.transformationMatrix[5]=z2.y;p->camera.transformationMatrix[8]=z2.z;
@@ -314,7 +314,7 @@ void drawPortalRoom(portal_struct* p)
 {
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r || !p)return;
-	
+
 	glPushMatrix();
 		glTranslate3f32(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y);
 		glTranslate3f32(-TILESIZE,0,-TILESIZE);
@@ -346,7 +346,7 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 	//only need to do this once for all rectangles (so optimize it out)
 	const vect3D v[]={(vectDivInt(p->plane[0],PORTALFRACTIONX)), (vectDivInt(p->plane[1],PORTALFRACTIONY))};
 	const vect3D points[]={addVect(addVect(p->position,v[0]),v[1]),vectDifference(addVect(p->position,v[0]),v[1]),vectDifference(vectDifference(p->position,v[0]),v[1]),addVect(vectDifference(p->position,v[0]),v[1])};
-	
+
 	//projection = more elegant, less efficient ? (rectangles are axis aligned biatch)
 	if(p->normal.x)
 	{
@@ -357,10 +357,10 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 	}else{
 		if(!((pr.z-PORTALMARGIN<=p->position.z&&pr.z+s.z+PORTALMARGIN>=p->position.z)||(pr.z+PORTALMARGIN>=p->position.z&&pr.z+s.z-PORTALMARGIN<=p->position.z)))return false;
 	}
-	
+
 	vect3D p1=pr, p2=addVect(pr,s);
 	vect3D pn=rec->normal;
-	
+
 	int i;
 	for(i=0;i<4;i++)
 	{
@@ -394,7 +394,7 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 	p2=vectDifference(p2,p->position);
 	p2=vect(dotProduct(p2,p->plane[0]),dotProduct(p2,p->plane[1]),0);
 	if(p2.x<PORTALSIZEX||p2.x>PORTALSIZEX||p2.y<PORTALSIZEY||p2.y>PORTALSIZEY)return false;
-	
+
 	return true;
 }
 

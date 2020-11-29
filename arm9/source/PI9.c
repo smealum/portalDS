@@ -39,7 +39,7 @@ OBB_struct* newBox(void)
 		}
 	}
 	return NULL;
-} 
+}
 
 AAR_struct* newAAR(void)
 {
@@ -88,7 +88,7 @@ void resetAllPI(void)
 void killBox(OBB_struct* o)
 {
 	if(!o)return;
-	
+
 	o->used=false;
 	fifoSendValue32(FIFO_USER_08,PI_KILLBOX|((o->id)<<PISIGNALDATA));
 }
@@ -96,7 +96,7 @@ void killBox(OBB_struct* o)
 void sendBoxData(OBB_struct* o)
 {
 	if(!o)return;
-	
+
 	fifoSendValue32(FIFO_USER_08,PI_ADDBOX|((o->id)<<PISIGNALDATA));
 	fifoSendValue32(FIFO_USER_08,(o->size.x&((1<<16)-1))|((o->size.y&((1<<16)-1))<<16));
 	fifoSendValue32(FIFO_USER_08,(o->size.z&((1<<16)-1))|((o->mass&((1<<16)-1))<<16));
@@ -110,12 +110,12 @@ void sendBoxData(OBB_struct* o)
 void resetBox(OBB_struct* o, vect3D pos)
 {
 	if(!o)return;
-	
+
 	o->position=pos;
 	o->transformationMatrix[0]=inttof32(1);o->transformationMatrix[1]=0;o->transformationMatrix[2]=0;
 	o->transformationMatrix[3]=0;o->transformationMatrix[4]=inttof32(1);o->transformationMatrix[5]=0;
 	o->transformationMatrix[6]=0;o->transformationMatrix[7]=0;o->transformationMatrix[8]=inttof32(1);
-	
+
 	sendBoxData(o);
 }
 
@@ -128,16 +128,16 @@ OBB_struct* createBox(vect3D pos, int32 mass, md2Model_struct* model, s32 angle)
 {
 	OBB_struct* o=newBox();
 	if(!o)return NULL;
-	
+
 	initModelInstance(&o->modelInstance,model);
-	
+
 	o->size=vectDivInt(vectDifference(model->frames[0].max,model->frames[0].min),64);
 	o->size=vect(o->size.x,o->size.z,o->size.y); //md2s don't use the same coordinate system
 	o->mass=mass; //reduce precision to improve range
 	o->spawner=NULL;
 	o->startAngle=angle;
 	resetBox(o,pos);
-	
+
 	return o;
 }
 
@@ -147,20 +147,20 @@ s16 createAAR(vect3D size, vect3D pos, vect3D normal) //(id;[sizex][sizey][sizez
 	if(!a)return -1;
 	a->size=size;
 	a->position=pos;
-	
+
 	u16 n=((normal.x<0))|((normal.x>0)<<1)
 		 |((normal.y<0)<<2)|((normal.y>0)<<3)
 		 |((normal.z<0)<<4)|((normal.z>0)<<5);
-		 
+
 	fifoSendValue32(FIFO_USER_08,PI_ADDAAR|((a->id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(a->size.x));	
-	fifoSendValue32(FIFO_USER_08,(a->size.y));	
-	fifoSendValue32(FIFO_USER_08,(a->size.z));	
+	fifoSendValue32(FIFO_USER_08,(a->size.x));
+	fifoSendValue32(FIFO_USER_08,(a->size.y));
+	fifoSendValue32(FIFO_USER_08,(a->size.z));
 	fifoSendValue32(FIFO_USER_08,(n));
 	fifoSendValue32(FIFO_USER_08,(a->position.x));
 	fifoSendValue32(FIFO_USER_08,(a->position.y));
 	fifoSendValue32(FIFO_USER_08,(a->position.z));
-	
+
 	return a->id;
 }
 
@@ -174,7 +174,7 @@ void toggleAAR(s16 id)
 void getBoxAABB(OBB_struct* o, vect3D* s)
 {
 	if(!o || !s)return;
-	
+
 	s->x=abs(mulf32(o->transformationMatrix[0],o->size.x/4))+abs(mulf32(o->transformationMatrix[1],o->size.y/4))+abs(mulf32(o->transformationMatrix[2],o->size.z/4));
 	s->y=abs(mulf32(o->transformationMatrix[3],o->size.x/4))+abs(mulf32(o->transformationMatrix[4],o->size.y/4))+abs(mulf32(o->transformationMatrix[5],o->size.z/4));
 	s->z=abs(mulf32(o->transformationMatrix[6],o->size.x/4))+abs(mulf32(o->transformationMatrix[7],o->size.y/4))+abs(mulf32(o->transformationMatrix[8],o->size.z/4));
@@ -206,10 +206,10 @@ void togglePlatform(u8 id, bool active)
 }
 
 void applyForce(u8 id, vect3D pos, vect3D v) //(id;[posx|posy][posz][vx][vy][vz])
-{	
+{
 	if(id>NUMOBJECTS || !objects[id].used)return;
 	fifoSendValue32(FIFO_USER_08,PI_APPLYFORCE|((id)<<PISIGNALDATA));
-	fifoSendValue32(FIFO_USER_08,(((s16)pos.x))|(((s16)pos.y)<<16));	
+	fifoSendValue32(FIFO_USER_08,(((s16)pos.x))|(((s16)pos.y)<<16));
 	fifoSendValue32(FIFO_USER_08,((s16)pos.z));
 	fifoSendValue32(FIFO_USER_08,(v.x));
 	fifoSendValue32(FIFO_USER_08,(v.y));
@@ -217,7 +217,7 @@ void applyForce(u8 id, vect3D pos, vect3D v) //(id;[posx|posy][posz][vx][vy][vz]
 }
 
 void setVelocity(u8 id, vect3D v) //(id;[vx][vy][vz])
-{	
+{
 	if(id>NUMOBJECTS || !objects[id].used)return;
 	fifoSendValue32(FIFO_USER_08,PI_SETVELOCITY|((id)<<PISIGNALDATA));
 	fifoSendValue32(FIFO_USER_08,(v.x));
@@ -226,7 +226,7 @@ void setVelocity(u8 id, vect3D v) //(id;[vx][vy][vz])
 }
 
 void updatePlayerPI(player_struct* p) //([vx][vy][vz])
-{	
+{
 	if(!p)p=getPlayer();
 	fifoSendValue32(FIFO_USER_08,PI_UPDATEPLAYER);
 	fifoSendValue32(FIFO_USER_08,(p->object->position.x));
@@ -235,11 +235,11 @@ void updatePlayerPI(player_struct* p) //([vx][vy][vz])
 }
 
 void updatePortalPI(u8 id, vect3D pos, vect3D normal, vect3D plane0) //(id;[px][py][pz][n][p0x][p0y][p0z])
-{	
+{
 	u16 n=((normal.x<0))|((normal.x>0)<<1)
 		 |((normal.y<0)<<2)|((normal.y>0)<<3)
 		 |((normal.z<0)<<4)|((normal.z>0)<<5);
-	
+
 	fifoSendValue32(FIFO_USER_08,PI_UPDATEPORTAL|((id)<<PISIGNALDATA));
 	fifoSendValue32(FIFO_USER_08,(pos.x*4));
 	fifoSendValue32(FIFO_USER_08,(pos.y*4));
@@ -298,30 +298,30 @@ void listenPI9(void)
 				o->position.x=fifoGetValue32(FIFO_USER_02);
 				o->position.y=fifoGetValue32(FIFO_USER_03);
 				o->position.z=fifoGetValue32(FIFO_USER_04);
-				
+
 				int32 x=fifoGetValue32(FIFO_USER_05);
 				o->transformationMatrix[0]=(s16)x-4096;
 				o->transformationMatrix[3]=(s16)(x>>16)-4096;
 				x=fifoGetValue32(FIFO_USER_06);
-				o->transformationMatrix[6]=(s16)(x)-4096;				
+				o->transformationMatrix[6]=(s16)(x)-4096;
 				o->transformationMatrix[1]=(s16)(x>>16)-4096;
 				x=fifoGetValue32(FIFO_USER_07);
 				o->transformationMatrix[4]=(s16)x-4096;
 				o->transformationMatrix[7]=(s16)(x>>16)-4096;
-				
+
 				const vect3D v1=vect(o->transformationMatrix[0],o->transformationMatrix[3],o->transformationMatrix[6]);
 				const vect3D v2=vect(o->transformationMatrix[1],o->transformationMatrix[4],o->transformationMatrix[7]);
 				const vect3D v=normalize(vectProduct(v1,v2));
-				
+
 				// NOGBA("0 : %d %d %d",v1.x,v1.y,v1.z);
 				// NOGBA("1 : %d %d %d",v2.x,v2.y,v2.z);
 				// NOGBA("2 : %d %d %d",v.x,v.y,v.z);
 				// NOGBA("4 : %d %d %d",warpVector(&portal1,v1));
-				
+
 				o->transformationMatrix[2]=v.x;
 				o->transformationMatrix[5]=v.y;
 				o->transformationMatrix[8]=v.z;
-				
+
 				if(o->used && !o->inPortal && (collideBoxEmancipationGrids(o) || collideBoxSludge(o)))
 				{
 					if(o->id==gravityGunTarget)gravityGunTarget=-1;
@@ -335,7 +335,7 @@ void listenPI9(void)
 			while(!fifoCheckValue32(FIFO_USER_02));
 			while(!fifoCheckValue32(FIFO_USER_03));
 			while(!fifoCheckValue32(FIFO_USER_04));
-			
+
 			platform_struct* p=&platform[k-NUMOBJECTS];
 			vect3D oldpos=p->position;
 			p->position.x=fifoGetValue32(FIFO_USER_02);
@@ -345,7 +345,7 @@ void listenPI9(void)
 			p->velocity=addVect(p->velocity,vectDifference(p->position,oldpos));
 		}
 	}
-	
+
 	// if(fifoCheckValue32(FIFO_USER_08))
 	// {
 		// NOGBA("fifo 8 : %d",fifoGetValue32(FIFO_USER_08));
@@ -368,7 +368,7 @@ void getOBBVertices(OBB_struct* o, vect3D* v)
 	// m2[0]=mulf32(m[0],o->size.x);m2[3]=mulf32(m[3],o->size.x);m2[6]=mulf32(m[6],o->size.x);
 	// m2[1]=mulf32(m[1],o->size.y);m2[4]=mulf32(m[4],o->size.y);m2[7]=mulf32(m[7],o->size.y);
 	// m2[2]=mulf32(m[2],o->size.z);m2[5]=mulf32(m[5],o->size.z);m2[8]=mulf32(m[8],o->size.z);
-	int32* m=o->transformationMatrix;
+	//int32* m=o->transformationMatrix;
 	m2[0]=o->size.x;m2[3]=0;m2[6]=0;
 	m2[1]=0;m2[4]=o->size.y;m2[7]=0;
 	m2[2]=0;m2[5]=0;m2[8]=o->size.z;
@@ -377,7 +377,7 @@ void getOBBVertices(OBB_struct* o, vect3D* v)
 	v[1]=vect(m2[0]-m2[1]-m2[2],m2[3]-m2[4]-m2[5],m2[6]-m2[7]-m2[8]);
 	v[2]=vect(m2[0]-m2[1]+m2[2],m2[3]-m2[4]+m2[5],m2[6]-m2[7]+m2[8]);
 	v[3]=vect(-m2[0]-m2[1]+m2[2],-m2[3]-m2[4]+m2[5],-m2[6]-m2[7]+m2[8]);
-	
+
 	v[4]=vect(-v[1].x,-v[1].y,-v[1].z);
 	v[5]=vect(-v[2].x,-v[2].y,-v[2].z);
 	v[6]=vect(-v[3].x,-v[3].y,-v[3].z);
@@ -393,15 +393,15 @@ void getOBBVertices(OBB_struct* o, vect3D* v)
 void multTMatrix(int32* m)
 {
 	if(!m)return;
-	
+
 	MATRIX_MULT3x3=m[0];
 	MATRIX_MULT3x3=m[3];
 	MATRIX_MULT3x3=m[6];
-	
+
 	MATRIX_MULT3x3=m[1];
 	MATRIX_MULT3x3=m[4];
 	MATRIX_MULT3x3=m[7];
-	
+
 	MATRIX_MULT3x3=m[2];
 	MATRIX_MULT3x3=m[5];
 	MATRIX_MULT3x3=m[8];
@@ -413,31 +413,31 @@ void drawOBB(OBB_struct* o)
 	if(!o->used)return;
 	vect3D v[8];
 	getOBBVertices(o,v);
-	
+
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 
 	glPushMatrix();
-	
+
 	u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(40+o->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 	setupObjectLighting(NULL, vectDivInt(o->position,4), &params);
-	
+
 	glTranslatef32(o->position.x/4,o->position.y/4,o->position.z/4);
 	multTMatrix(o->transformationMatrix);
 
 	if(selectID==o->id)GFX_COLOR=RGB15(31,0,0);
 	else GFX_COLOR=RGB15(31,31,31);
-	
+
 	GFX_COLOR=RGB15(31,31,31);
-	
+
 	renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, o->modelInstance.interpCounter, o->modelInstance.model, params, true, o->modelInstance.palette, RGB15(31,31,31));
 	// renderModelFrameInterp(o->modelInstance.currentFrame, o->modelInstance.nextFrame, 0, o->modelInstance.model, params, true, o->modelInstance.palette);
 
 	glPopMatrix(1);
 }
 
-void copyOBB(OBB_struct* o, OBB_struct* o2)
+bool copyOBB(OBB_struct* o, OBB_struct* o2)
 {
-	if(!o || !o2)return;
+	if(!o || !o2)return false;
 	o2->position=o->position;
 	o2->size=o->size;
 	o2->mass=o->mass;
@@ -445,12 +445,13 @@ void copyOBB(OBB_struct* o, OBB_struct* o2)
 	o2->modelInstance=o->modelInstance;
 	o2->id=o->id;
 	memcpy(o2->transformationMatrix,o->transformationMatrix,sizeof(int32)*9);
+	return true;
 }
 
 bool intersectAABBAAR(vect3D o1, vect3D s, vect3D o2, vect3D sp)
 {
 	const vect3D v=vectDifference(o2,o1);
-	
+
 	if(!sp.x)return !((v.x>s.x || v.x<-s.x) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
 	else if(!sp.y)return !((v.y>s.y || v.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x) || (v.z-sp.z>s.z || v.z+sp.z<-s.z));
 	else return !((v.z>s.z || v.z<-s.z) || (v.y-sp.y>s.y || v.y+sp.y<-s.y) || (v.x-sp.x>s.x || v.x+sp.x<-s.x));
@@ -459,18 +460,18 @@ bool intersectAABBAAR(vect3D o1, vect3D s, vect3D o2, vect3D sp)
 bool intersectOBBPortal(portal_struct* p, OBB_struct* o)
 {
 	if(!p || !o)return false;
-	
+
 	vect3D s;
 	getBoxAABB(o, &s);
 	vect3D sp=vect(abs(p->plane[0].x/PORTALFRACTIONX)+abs(p->plane[1].x/PORTALFRACTIONY),abs(p->plane[0].y/PORTALFRACTIONX)+abs(p->plane[1].y/PORTALFRACTIONY),abs(p->plane[0].z/PORTALFRACTIONX)+abs(p->plane[1].z/PORTALFRACTIONY));
-		
+
 	return intersectAABBAAR(vectDivInt(o->position,4),s,p->position,sp);
 }
 
 void ejectPortalOBBs(portal_struct* p)
 {
 	if(!p)return;
-	
+
 	int i;
 	for(i=0;i<NUMOBJECTS;i++)
 	{
@@ -485,7 +486,11 @@ void ejectPortalOBBs(portal_struct* p)
 void drawWarpedOBB(portal_struct* p, OBB_struct* o)
 {
 	OBB_struct o2;
-	copyOBB(o,&o2);
+	if(!copyOBB(o,&o2))
+	{
+		//copy failed, abort
+		return;
+	}
 	warpMatrix(p, o2.transformationMatrix);
 	o2.position=addVect(vectMultInt(p->targetPortal->position,4),warpVector(p,vectDifference(o2.position,vectMultInt(p->position,4))));
 	drawOBB(&o2);
@@ -526,13 +531,13 @@ void drawAAR(AAR_struct* a)
 {
 	if(!a)return;
 	if(!a->used)return;
-	
+
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-	
+
 	glPushMatrix();
 
 	GFX_COLOR=RGB15(0,0,31);
-	
+
 	if(!a->size.x)
 	{
 		glBegin(GL_QUADS);

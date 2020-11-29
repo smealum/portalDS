@@ -57,4 +57,11 @@ OBB_struct* collideRayBoxes(vect3D o, vect3D u, int32 l);
 void drawOBBs(void);
 void drawAARs(void);
 
+void makeGrid(void);
+void setVelocity(u8 id, vect3D v);
+void togglePlatform(u8 id, bool active);
+void updatePortalPI(u8 id, vect3D pos, vect3D normal, vect3D plane0);
+void multTMatrix(int32* m);
+
+void drawOBB(OBB_struct* o);
 #endif

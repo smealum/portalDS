@@ -23,7 +23,7 @@ typedef struct
 	s16 life;
 }player_struct;
 
-s16 gravityGunTarget;
+extern s16 gravityGunTarget;
 extern bool idle;
 
 room_struct* getCurrentRoom(void);

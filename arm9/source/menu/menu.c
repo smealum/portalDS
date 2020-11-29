@@ -15,22 +15,22 @@ void initMenu(void)
 	lcdMainOnTop();
 	videoSetMode(MODE_5_3D);
 	videoSetModeSub(MODE_5_2D);
-	
-	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_SUB_BG,VRAM_D_TEXTURE);	
-	
+
+	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_SUB_BG,VRAM_D_TEXTURE);
+
 	initD3D();
 
 	glInit();
-	
+
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
 	glEnable(GL_OUTLINE);
-	
+
 	glClearPolyID(63);
 	glClearDepth(0x7FFF);
 	glViewport(0,0,255,191);
-	
+
 	initVramBanks(2);
 	initTextures();
 
@@ -67,7 +67,7 @@ void initMenu(void)
 	fadeIn();
 }
 
-touchPosition currentTouch;
+touchPosition currentTouchA;
 
 void drawLogo(void)
 {
@@ -75,7 +75,7 @@ void drawLogo(void)
 	glLoadIdentity();
 
 	glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -113,8 +113,10 @@ void drawLogo(void)
 	glPopMatrix(1);
 }
 
+int cpt_debug_test = 0;
 void menuFrame(void)
 {
+	cpt_debug_test++;
 	if(!d3dScreen)initProjectionMatrix(&menuCamera, 70*90, inttof32(4)/3, inttof32(2), inttof32(1000));
 	else initProjectionMatrixBottom(&menuCamera, 70*90, inttof32(4)/3, inttof32(2), inttof32(1000));
 
@@ -126,7 +128,7 @@ void menuFrame(void)
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 
 	scanKeys();
-	touchRead(&currentTouch);
+	touchRead(&currentTouchA);
 
 	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&menuState);
 
@@ -142,7 +144,7 @@ void menuFrame(void)
 
 	// if(keysHeld() & KEY_A)lightAngle+=128;
 	// else if(keysHeld() & KEY_B)lightAngle-=128;
-		
+
 	if(keysHeld() & KEY_A)tempState.angle.x+=64;
 	if(keysHeld() & KEY_B)tempState.angle.x-=64;
 	if(keysHeld() & KEY_X)tempState.angle.y+=64;
@@ -159,7 +161,9 @@ void menuFrame(void)
 	// }
 
 	if(!(keysHeld() & KEY_TOUCH)) updateSimpleGui(-1, -1);
-	else updateSimpleGui(currentTouch.px, currentTouch.py);
+	else  updateSimpleGui((float)(currentTouchA.rawx)*256.0/(4080.0), (float)(currentTouchA.rawy)*192.0/3072.0);
+
+	//updateSimpleGui(currentTouch.px, currentTouch.py);
 
 	// applyCameraState(&menuCamera,&tempState);
 	updateCameraTransition(&menuCamera,&testTransition);
@@ -176,7 +180,7 @@ void menuFrame(void)
 			if(logoAlpha)drawLogo();
 			break;
 	}
-	
+
 	glFlush(0);
 	swiWaitForVBlank();
 

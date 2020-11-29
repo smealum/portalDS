@@ -52,6 +52,7 @@ void updateFrustum(camera_struct* c);
 vect3D getViewPosition(vect3D p);
 vect3D reverseViewPosition(vect3D p);
 
+void initProjectionMatrix(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far);
 void initProjectionMatrixBottom(camera_struct* c, int fovy, int32 aspect, int32 near, int32 far);
 void initProjectionMatrixOrtho(camera_struct* c, int left, int right, int bottom, int top, int zNear, int zFar);
 void getUnprojectedZLine(camera_struct* c, s16 x, s16 y, vect3D* o, vect3D* v);
@@ -62,5 +63,11 @@ void multMatrix33(int32* m1, int32* m2, int32* m);
 void multMatrix44(int32* m1, int32* m2, int32* m);
 void translateMatrix(int32* tm, int32 x, int32 y, int32 z);
 vect3D clipPointFrustum(frustum_struct* f, vect3D* v, u8 vid, const u8 vn);
+
+void initTransformationMatrix(camera_struct* c);
+void rotateMatrixX(int32* tm, int32 x, bool r);
+void rotateMatrixY(int32* tm, int32 x, bool r);
+void rotateMatrixZ(int32* tm, int32 x, bool r);
+void multMatrixGfx33(int32* n);
 
 #endif

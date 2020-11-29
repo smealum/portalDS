@@ -19,7 +19,7 @@ void initEmancipation(void)
 	{
 		emancipationGrids[i].used=false;
 	}
-	
+
 	loadMd2Model("models/grid.md2","balllauncher.pcx",&gridModel);
 	generateModelDisplayLists(&gridModel, false, 1);
 	getVramStatus();
@@ -35,7 +35,7 @@ void initEmancipation(void)
 
 	u16 paletteTest[16];
 	getPaletteFromBank(gridMtl, paletteTest, 16*2);
-	
+
 	for(i=0;i<5;i++)
 	{
 		int j;
@@ -56,7 +56,7 @@ void freeEmancipation(void)
 void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos, int32* m)
 {
 	if(!e)return;
-	
+
 	e->position=pos;
 	e->modelInstance=*mi;
 	if(m)memcpy(e->transformationMatrix,m,sizeof(int32)*9);
@@ -74,7 +74,7 @@ void initEmancipator(emancipator_struct* e, modelInstance_struct* mi, vect3D pos
 	e->axis=normalize(e->axis);
 
 	playSFX(emancipationSFX);
-	
+
 	e->used=true;
 }
 
@@ -95,7 +95,7 @@ void createEmancipator(modelInstance_struct* mi, vect3D pos, int32* m)
 void updateEmancipator(emancipator_struct* e)
 {
 	if(!e || !e->used)return;
-	
+
 	e->counter++;
 	e->angle+=128;
 	e->position=addVect(e->position,e->velocity);
@@ -117,10 +117,10 @@ void updateEmancipators(void)
 void drawEmancipator(emancipator_struct* e)
 {
 	if(!e || !e->used)return;
-	
+
 	u8 shade=max(31-(e->counter*31)/BLACKENINGTIME,0);
 	u8 alpha=(e->counter<BLACKENINGTIME)?(31):(max(31-((e->counter-BLACKENINGTIME)*31)/FADINGTIME,1));
-	
+
 	glPushMatrix();
 		glTranslatef32(e->position.x,e->position.y,e->position.z);
 		multTMatrix(e->transformationMatrix);
@@ -145,12 +145,12 @@ void drawEmancipators(void)
 void initEmancipationGrid(room_struct* r, emancipationGrid_struct* eg, vect3D pos, int32 l, bool dir)
 {
 	if(!eg || !r)return;
-	
+
 	pos=vect(pos.x+r->position.x, pos.y, pos.z+r->position.y);
 	eg->position=convertVect(pos);
 	eg->length=l;
 	eg->direction=dir;
-	
+
 	eg->used=true;
 }
 
@@ -171,7 +171,7 @@ void createEmancipationGrid(room_struct* r, vect3D pos, int32 l, bool dir)
 void updateEmancipationGrid(emancipationGrid_struct* eg)
 {
 	if(!eg)return;
-	
+
 	player_struct* pl=getPlayer();
 	vect3D pos, sp;
 	getEmancipationGridAAR(eg,&pos,&sp);
@@ -198,9 +198,9 @@ u16 counter=0;
 void drawEmancipationGrid(emancipationGrid_struct* eg)
 {
 	if(!eg)return;
-	
+
 	int32 l=abs(eg->length);
-	
+
 	glPushMatrix();
 		glTranslatef32(eg->position.x,eg->position.y,eg->position.z);
 		if(eg->direction)glRotateYi(-8192);
@@ -211,7 +211,7 @@ void drawEmancipationGrid(emancipationGrid_struct* eg)
 			glRotateYi(8192*2);
 			renderModelFrameInterp(0, 0, 0, &gridModel, POLY_ALPHA(31) | POLY_ID(20) | POLY_CULL_FRONT | POLY_TOON_HIGHLIGHT | POLY_FORMAT_LIGHT0 | POLY_FOG, false, NULL, RGB15(31,31,31));
 		glPopMatrix(1);
-		
+
 		applyMTL(gridMtl);
 		bindPaletteAddr(gridPalettes[(((counter++)/4)%6)]);
 		GFX_COLOR=RGB15(31,31,31);
@@ -244,7 +244,7 @@ void drawEmancipationGrids(void)
 void getEmancipationGridAAR(emancipationGrid_struct* eg, vect3D* pos, vect3D* sp)
 {
 	if(!eg || !pos || !sp)return;
-	
+
 	*sp=vect(eg->direction?(0):(eg->length/2),0,eg->direction?(eg->length/2):(0));
 	*pos=addVect(eg->position,*sp);
 	sp->y=EMANCIPATIONGRIDHEIGHT/2;
@@ -254,11 +254,11 @@ void getEmancipationGridAAR(emancipationGrid_struct* eg, vect3D* pos, vect3D* sp
 bool emancipationGridBoxCollision(emancipationGrid_struct* eg, OBB_struct* o)
 {
 	if(!eg || !o)return false;
-	
+
 	vect3D s, pos, sp;
 	getBoxAABB(o,&s);
 	getEmancipationGridAAR(eg,&pos,&sp);
-	
+
 	return intersectAABBAAR(vectDivInt(o->position,4), s, pos, sp);
 }
 
@@ -279,7 +279,7 @@ bool collideBoxEmancipationGrids(OBB_struct* o)
 bool emancipationGridLineCollision(emancipationGrid_struct* eg, vect3D l, vect3D v, int32 d)
 {
 	if(!eg)return false;
-	
+
 	vect3D pos, sp;
 	getEmancipationGridAAR(eg,&pos,&sp);
 	pos=vectDifference(pos,convertVect(vect(gameRoom.position.x,0,gameRoom.position.y)));
@@ -292,8 +292,8 @@ bool emancipationGridLineCollision(emancipationGrid_struct* eg, vect3D l, vect3D
 	else if(!sp.y)n=vect(0,inttof32(1),0);
 	else n=vect(0,0,inttof32(1));
 
-	NOGBA("%d %d %d vs %d %d %d",pos.x,pos.y,pos.z,l.x,l.y,l.z);
-	
+	NOGBA("%ld %ld %ld vs %ld %ld %ld",pos.x,pos.y,pos.z,l.x,l.y,l.z);
+
 	return collideLineConvertedRectangle(n, pos, sp, l, v, d, NULL, NULL);
 }
 

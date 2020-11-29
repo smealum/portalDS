@@ -4,7 +4,7 @@
 #define MAX_TEX 128
 #define BANKS vramBanks
 
-u8 vramBanks;
+extern u8 vramBanks;
 
 typedef struct
 {

@@ -39,7 +39,7 @@ typedef struct
 	contactPoint_type type;
 }contactPoint_struct;
 
-contactPoint_struct contactPoints[MAXCONTACTPOINTS];
+extern contactPoint_struct contactPoints[MAXCONTACTPOINTS];
 
 typedef struct
 {
@@ -64,7 +64,7 @@ typedef struct
 	bool sleep;
 	bool used;
 }OBB_struct;
-// 4 + 9*4*3 + 4 + 
+// 4 + 9*4*3 + 4 +
 
 extern OBB_struct objects[NUMOBJECTS];
 

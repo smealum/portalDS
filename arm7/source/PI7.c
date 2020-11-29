@@ -9,13 +9,13 @@ void initPI7(void)
 	initOBBs();
 	initAARs();
 	initPlatforms();
-	
+
 	player.position=vect(0,0,0);
-	
+
 	portal[0].targetPortal=&portal[1];
 	portal[1].targetPortal=&portal[0];
 	portal[0].used=false;portal[1].used=false;
-	
+
 	PI7running=false;
 }
 
@@ -53,22 +53,22 @@ void listenPI7(void)
 					u32 mass;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						u32 x=fifoGetValue32(FIFO_USER_08);
-						size.x=x&((1<<16)-1);
-						size.y=(x>>16)&((1<<16)-1);
+					u32 x=fifoGetValue32(FIFO_USER_08);
+					size.x=x&((1<<16)-1);
+					size.y=(x>>16)&((1<<16)-1);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						x=fifoGetValue32(FIFO_USER_08);
-						size.z=x&((1<<16)-1);
-						mass=(x>>16)&((1<<16)-1);
+					x=fifoGetValue32(FIFO_USER_08);
+					size.z=x&((1<<16)-1);
+					mass=(x>>16)&((1<<16)-1);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.x=fifoGetValue32(FIFO_USER_08);
+					pos.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.y=fifoGetValue32(FIFO_USER_08);
+					pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.z=fifoGetValue32(FIFO_USER_08);
+					pos.z=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						s32 cosine=fifoGetValue32(FIFO_USER_08);
-						s32 sine=fifoGetValue32(FIFO_USER_08);
+					s32 cosine=fifoGetValue32(FIFO_USER_08);
+					s32 sine=fifoGetValue32(FIFO_USER_08);
 					createOBB(id,size,pos,mass,cosine,sine);
 				}
 				break;
@@ -77,18 +77,18 @@ void listenPI7(void)
 					vect3D pos, v;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						u32 x=fifoGetValue32(FIFO_USER_08);
-						pos.x=(s16)x;
-						pos.y=(s16)(x>>16);
+					u32 x=fifoGetValue32(FIFO_USER_08);
+					pos.x=(s16)x;
+					pos.y=(s16)(x>>16);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						x=fifoGetValue32(FIFO_USER_08);
-						pos.z=(s16)x;
+					x=fifoGetValue32(FIFO_USER_08);
+					pos.z=(s16)x;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.x=fifoGetValue32(FIFO_USER_08);
+					v.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.y=fifoGetValue32(FIFO_USER_08);
+					v.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.z=fifoGetValue32(FIFO_USER_08);
+					v.z=fifoGetValue32(FIFO_USER_08);
 					if(id<NUMOBJECTS && objects[id].used)
 					{
 						applyOBBForce(&objects[id],addVect(objects[id].position,pos),v);
@@ -103,25 +103,25 @@ void listenPI7(void)
 					vect3D normal=vect(0,0,0);
 					u16 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						size.x=fifoGetValue32(FIFO_USER_08);
+					size.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						size.y=fifoGetValue32(FIFO_USER_08);
+					size.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						size.z=fifoGetValue32(FIFO_USER_08);
+					size.z=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						int32 x=fifoGetValue32(FIFO_USER_08);
-						if(x&1)normal.x=-inttof32(1);
-						else if(x&2)normal.x=inttof32(1);
-						if(x&4)normal.y=-inttof32(1);
-						else if(x&8)normal.y=inttof32(1);
-						if(x&16)normal.z=-inttof32(1);
-						else if(x&32)normal.z=inttof32(1);
+					int32 x=fifoGetValue32(FIFO_USER_08);
+					if(x&1)normal.x=-inttof32(1);
+					else if(x&2)normal.x=inttof32(1);
+					if(x&4)normal.y=-inttof32(1);
+					else if(x&8)normal.y=inttof32(1);
+					if(x&16)normal.z=-inttof32(1);
+					else if(x&32)normal.z=inttof32(1);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.x=fifoGetValue32(FIFO_USER_08);
+					pos.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.y=fifoGetValue32(FIFO_USER_08);
+					pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.z=fifoGetValue32(FIFO_USER_08);
+					pos.z=fifoGetValue32(FIFO_USER_08);
 					createAAR(id,pos,size,normal);
 				}
 				break;
@@ -133,11 +133,11 @@ void listenPI7(void)
 					vect3D v;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.x=fifoGetValue32(FIFO_USER_08);
+					v.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.y=fifoGetValue32(FIFO_USER_08);
+					v.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.z=fifoGetValue32(FIFO_USER_08);
+					v.z=fifoGetValue32(FIFO_USER_08);
 					if(id<NUMOBJECTS && objects[id].used)
 					{
 						objects[id].velocity=v;
@@ -150,11 +150,11 @@ void listenPI7(void)
 				{
 					vect3D v;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.x=fifoGetValue32(FIFO_USER_08);
+					v.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.y=fifoGetValue32(FIFO_USER_08);
+					v.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						v.z=fifoGetValue32(FIFO_USER_08);
+					v.z=fifoGetValue32(FIFO_USER_08);
 					player.position=v;
 				}
 				break;
@@ -165,25 +165,25 @@ void listenPI7(void)
 					vect3D plane0=vect(0,0,0);
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.x=fifoGetValue32(FIFO_USER_08);
+					pos.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.y=fifoGetValue32(FIFO_USER_08);
+					pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.z=fifoGetValue32(FIFO_USER_08);
+					pos.z=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						u32 x=fifoGetValue32(FIFO_USER_08);
-						if(x&1)normal.x=-inttof32(1);
-						else if(x&2)normal.x=inttof32(1);
-						if(x&4)normal.y=-inttof32(1);
-						else if(x&8)normal.y=inttof32(1);
-						if(x&16)normal.z=-inttof32(1);
-						else if(x&32)normal.z=inttof32(1);
+					u32 x=fifoGetValue32(FIFO_USER_08);
+					if(x&1)normal.x=-inttof32(1);
+					else if(x&2)normal.x=inttof32(1);
+					if(x&4)normal.y=-inttof32(1);
+					else if(x&8)normal.y=inttof32(1);
+					if(x&16)normal.z=-inttof32(1);
+					else if(x&32)normal.z=inttof32(1);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						plane0.x=fifoGetValue32(FIFO_USER_08);
+					plane0.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						plane0.y=fifoGetValue32(FIFO_USER_08);
+					plane0.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						plane0.z=fifoGetValue32(FIFO_USER_08);
+					plane0.z=fifoGetValue32(FIFO_USER_08);
 					if(id<2)
 					{
 						portal[id].used=true;
@@ -203,17 +203,17 @@ void listenPI7(void)
 					vect3D orig, dest;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						orig.x=fifoGetValue32(FIFO_USER_08);
+					orig.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						orig.y=fifoGetValue32(FIFO_USER_08);
+					orig.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						orig.z=fifoGetValue32(FIFO_USER_08);
+					orig.z=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						dest.x=fifoGetValue32(FIFO_USER_08);
+					dest.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						dest.y=fifoGetValue32(FIFO_USER_08);
+					dest.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						dest.z=fifoGetValue32(FIFO_USER_08);
+					dest.z=fifoGetValue32(FIFO_USER_08);
 					createPlatform(id%NUMPLATFORMS,orig,dest,id>=NUMPLATFORMS);
 				}
 				break;
@@ -222,11 +222,11 @@ void listenPI7(void)
 					vect3D pos;
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.x=fifoGetValue32(FIFO_USER_08);
+					pos.x=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.y=fifoGetValue32(FIFO_USER_08);
+					pos.y=fifoGetValue32(FIFO_USER_08);
 					while(!fifoCheckValue32(FIFO_USER_08));
-						pos.z=fifoGetValue32(FIFO_USER_08);
+					pos.z=fifoGetValue32(FIFO_USER_08);
 					movePlatform(id,pos);
 				}
 				break;
@@ -234,13 +234,12 @@ void listenPI7(void)
 				{
 					u8 id=signal>>PISIGNALDATA;
 					while(!fifoCheckValue32(FIFO_USER_08));
-						bool active=fifoGetValue32(FIFO_USER_08);
+					bool active=fifoGetValue32(FIFO_USER_08);
 					togglePlatform(id,active);
 				}
 				break;
 			case PI_KILLBOX:
 				{
-					u32 mass;
 					u8 id=signal>>PISIGNALDATA;
 					if(id<NUMOBJECTS)
 					{

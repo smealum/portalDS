@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-bool PI7running;
+static bool PI7running;
 player_struct player;
 portal_struct portal[2];
 

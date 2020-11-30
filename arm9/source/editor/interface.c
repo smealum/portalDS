@@ -2,7 +2,7 @@
 
 #define NUMINTERFACEBUTTONS (15)
 
-interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
+static interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"storagecube2_ui.pcx",NULL,6,false},
 											(interfaceButton_struct){72,38,"pressurebttn2_ui.pcx",NULL,3,false},
 											(interfaceButton_struct){107,38,"platform2_ui.pcx",NULL,9,false},
 											(interfaceButton_struct){142,38,"grid2_ui.pcx",NULL,8,false},
@@ -18,8 +18,8 @@ interfaceButton_struct interfaceButtons[]={ (interfaceButton_struct){37,38,"stor
 											(interfaceButton_struct){23,150,"save_button.pcx",NULL,100,false},
 											(interfaceButton_struct){178,150,"quit_button.pcx",NULL,101,false}};
 
-struct gl_texture_t *interfaceBackground;
-int bgSub;
+static struct gl_texture_t *interfaceBackground;
+static int bgSub;
 
 void initInterfaceButton(interfaceButton_struct* ib)
 {

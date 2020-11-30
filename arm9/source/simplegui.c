@@ -1,6 +1,6 @@
 #include "common/general.h"
 
-sguiButton_struct simpleButtons[NUMSIMPLEBUTTONS];
+static sguiButton_struct simpleButtons[NUMSIMPLEBUTTONS];
 
 void initSimpleButtons(void)
 {
@@ -56,17 +56,13 @@ void simpleButtonSetImage(sguiButton_struct* b, mtlImg_struct* mtl, vect3D o, ve
 	b->mtlSize=s;
 }
 
-int test_dbg_called = 0xFF;
-int test_x = 0;
-int test_y=0;
+
 bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 {
 
 	if(!b || !b->used)return false;
 
 	bool ret=false;
-	test_x=x;
-	test_y=y;
 	if(!(x==-1 && y==-1) && x>=b->position.x && x<b->position.x+b->size.x && y>=b->position.y && y<b->position.y+b->size.y)
 	{
 		b->active=true;

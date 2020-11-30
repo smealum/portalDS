@@ -1,14 +1,17 @@
 #include "menu/menu_main.h"
 
-u32 lightAngle=54912;
-cameraState_struct tempState={(vect3D){0,0,0}, (vect3D){0,0,0}};
-cameraTransition_struct testTransition;
-bool tempbool=false;
 
-mtlImg_struct* logoMain;
-mtlImg_struct* logoRotate;
-u32 logoAngle=0;
+
+#define MENU_LIGHTANGLE 54912
+
+cameraTransition_struct testTransition;
 u8 logoAlpha;
+
+
+static cameraState_struct tempState={(vect3D){0,0,0}, (vect3D){0,0,0}};
+
+static mtlImg_struct* logoMain;
+static mtlImg_struct* logoRotate;
 
 void initMenu(void)
 {
@@ -67,10 +70,9 @@ void initMenu(void)
 	fadeIn();
 }
 
-touchPosition currentTouchA;
-
 void drawLogo(void)
 {
+	static u32 logoAngle=0;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
@@ -113,22 +115,21 @@ void drawLogo(void)
 	glPopMatrix(1);
 }
 
-int cpt_debug_test = 0;
 void menuFrame(void)
 {
-	cpt_debug_test++;
+	touchPosition currentTouch;
 	if(!d3dScreen)initProjectionMatrix(&menuCamera, 70*90, inttof32(4)/3, inttof32(2), inttof32(1000));
 	else initProjectionMatrixBottom(&menuCamera, 70*90, inttof32(4)/3, inttof32(2), inttof32(1000));
 
 	projectCamera(&menuCamera);
 	glLoadIdentity();
 
-	glLight(0, RGB15(31,31,31), cosLerp(lightAngle)>>3, 0, sinLerp(lightAngle)>>3);
+	glLight(0, RGB15(31,31,31), cosLerp(MENU_LIGHTANGLE)>>3, 0, sinLerp(MENU_LIGHTANGLE)>>3);
 
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 
 	scanKeys();
-	touchRead(&currentTouchA);
+	touchRead(&currentTouch);
 
 	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&menuState);
 
@@ -161,7 +162,7 @@ void menuFrame(void)
 	// }
 
 	if(!(keysHeld() & KEY_TOUCH)) updateSimpleGui(-1, -1);
-	else  updateSimpleGui((float)(currentTouchA.rawx)*256.0/(4080.0), (float)(currentTouchA.rawy)*192.0/3072.0);
+	else  updateSimpleGui((float)(currentTouch.rawx)*256.0/(4080.0), (float)(currentTouch.rawy)*192.0/3072.0);
 
 	//updateSimpleGui(currentTouch.px, currentTouch.py);
 

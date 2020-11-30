@@ -1,8 +1,9 @@
 #include "menu/menu_main.h"
 
-char **testList=NULL;
-int testListCnt, testListCnt1;
-screenList_struct testScreenList;
+static char **testList=NULL;
+static int testListCnt, testListCnt1;
+static screenList_struct testScreenList;
+//extern u8 logoAlpha;
 
 void initMenuButtons(void)
 {
@@ -22,7 +23,7 @@ void setupMenuPage(menuButton_struct* mp, u8 n)
 	}
 }
 
-extern u8 logoAlpha;
+
 
 void startMenuPlayButtonFunction(sguiButton_struct* b)
 {

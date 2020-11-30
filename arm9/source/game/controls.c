@@ -1,5 +1,11 @@
 #include "game/game_main.h"
 
+
+u8 touchCnt;
+
+//extern bool currentPortalColor;
+// extern SFX_struct *gunSFX1, *gunSFX2;
+
 typedef enum
 {
 	CONTROL_FORWARD,
@@ -20,21 +26,21 @@ typedef enum
 	CONTROL_NUMBER
 }controlAction_type;
 
-char* controlStrings[]={"CONTROL_FORWARD",
-					"CONTROL_BACK",
-					"CONTROL_STRAFEL",
-					"CONTROL_STRAFER",
-					"CONTROL_LOOKL",
-					"CONTROL_LOOKR",
-					"CONTROL_LOOKUP",
-					"CONTROL_LOOKDOWN",
-					"CONTROL_JUMP",
-					"CONTROL_SHOOTALL",
-					"CONTROL_SHOOTY",
-					"CONTROL_SHOOTB",
-					"CONTROL_USE",
-					"CONTROL_PAUSE",
-					"CONTROL_SCREENSHOT"};
+static char* controlStrings[]={"CONTROL_FORWARD",
+								"CONTROL_BACK",
+								"CONTROL_STRAFEL",
+								"CONTROL_STRAFER",
+								"CONTROL_LOOKL",
+								"CONTROL_LOOKR",
+								"CONTROL_LOOKUP",
+								"CONTROL_LOOKDOWN",
+								"CONTROL_JUMP",
+								"CONTROL_SHOOTALL",
+								"CONTROL_SHOOTY",
+								"CONTROL_SHOOTB",
+								"CONTROL_USE",
+								"CONTROL_PAUSE",
+								"CONTROL_SCREENSHOT"};
 
 typedef enum
 {
@@ -54,35 +60,35 @@ typedef enum
 	INPUT_NUMBER
 }controlInput_type;
 
-char* inputStrings[]={"INPUT_A",
-					"INPUT_B",
-					"INPUT_X",
-					"INPUT_Y",
-					"INPUT_UP",
-					"INPUT_DOWN",
-					"INPUT_LEFT",
-					"INPUT_RIGHT",
-					"INPUT_R",
-					"INPUT_L",
-					"INPUT_SELECT",
-					"INPUT_START",
-					"INPUT_DOUBLETAP"};
+static char* inputStrings[]={"INPUT_A",
+							"INPUT_B",
+							"INPUT_X",
+							"INPUT_Y",
+							"INPUT_UP",
+							"INPUT_DOWN",
+							"INPUT_LEFT",
+							"INPUT_RIGHT",
+							"INPUT_R",
+							"INPUT_L",
+							"INPUT_SELECT",
+							"INPUT_START",
+							"INPUT_DOUBLETAP"};
 
-KEYPAD_BITS inputMasks[]={KEY_A,
-					KEY_B,
-					KEY_X,
-					KEY_Y,
-					KEY_UP,
-					KEY_DOWN,
-					KEY_LEFT,
-					KEY_RIGHT,
-					KEY_R,
-					KEY_L,
-					KEY_SELECT,
-					KEY_START,
-					0};
+static KEYPAD_BITS inputMasks[]={KEY_A,
+								KEY_B,
+								KEY_X,
+								KEY_Y,
+								KEY_UP,
+								KEY_DOWN,
+								KEY_LEFT,
+								KEY_RIGHT,
+								KEY_R,
+								KEY_L,
+								KEY_SELECT,
+								KEY_START,
+								0};
 
-char* inputDefaults[]={"CONTROL_STRAFER",
+static char* inputDefaults[]={"CONTROL_STRAFER",
 					"CONTROL_BACK",
 					"CONTROL_FORWARD",
 					"CONTROL_STRAFEL",
@@ -96,12 +102,43 @@ char* inputDefaults[]={"CONTROL_STRAFER",
 					"CONTROL_PAUSE",
 					"CONTROL_JUMP"};
 
-controlAction_type currentConfiguration[INPUT_NUMBER];
+static controlAction_type currentConfiguration[INPUT_NUMBER];
 
 typedef void(*controlActionFunction)(player_struct*,bool,bool);
-controlActionFunction controlFunctions[];
 
-extern SFX_struct *gunSFX1, *gunSFX2;
+
+void controlForward(player_struct* p, bool down, bool held);
+void controlBack(player_struct* p, bool down, bool held);
+void controlStrafeLeft(player_struct* p, bool down, bool held);
+void controlStrafeRight(player_struct* p, bool down, bool held);
+void controlPause(player_struct* p, bool down, bool held);
+void controlShootAll(player_struct* p, bool down, bool held);
+void controlShootYellow(player_struct* p, bool down, bool held);
+void controlShootBlue(player_struct* p, bool down, bool held);
+void controlUse(player_struct* p, bool down, bool held);
+void controlJump(player_struct* p, bool down, bool held);
+void controlLookRight(player_struct* p, bool down, bool held);
+void controlLookLeft(player_struct* p, bool down, bool held);
+void controlLookUp(player_struct* p, bool down, bool held);
+void controlLookDown(player_struct* p, bool down, bool held);
+
+
+static controlActionFunction controlFunctions[]={(controlActionFunction)controlForward,
+												(controlActionFunction)controlBack,
+												(controlActionFunction)controlStrafeLeft,
+												(controlActionFunction)controlStrafeRight,
+												(controlActionFunction)controlLookLeft,
+												(controlActionFunction)controlLookRight,
+												(controlActionFunction)controlLookUp,
+												(controlActionFunction)controlLookDown,
+												(controlActionFunction)controlJump,
+												(controlActionFunction)controlShootAll,
+												(controlActionFunction)controlShootYellow,
+												(controlActionFunction)controlShootBlue,
+												(controlActionFunction)controlUse,
+												(controlActionFunction)controlPause,
+												NULL};
+
 
 controlAction_type actionByString(char* str)
 {
@@ -129,8 +166,6 @@ void loadControlConfiguration(char* filename)
 	}
 	iniparser_freedict(dic);
 }
-
-u8 touchCnt;
 
 void updateControl(controlInput_type ci)
 {
@@ -213,8 +248,6 @@ void controlPause(player_struct* p, bool down, bool held)
 
 	doPause(NULL);
 }
-
-extern bool currentPortalColor;
 
 void controlShootAll(player_struct* p, bool down, bool held)
 {
@@ -299,18 +332,4 @@ void controlLookDown(player_struct* p, bool down, bool held)
 	rotateCamera(NULL, vect(-16,0,0));
 }
 
-controlActionFunction controlFunctions[]={(controlActionFunction)controlForward,
-										(controlActionFunction)controlBack,
-										(controlActionFunction)controlStrafeLeft,
-										(controlActionFunction)controlStrafeRight,
-										(controlActionFunction)controlLookLeft,
-										(controlActionFunction)controlLookRight,
-										(controlActionFunction)controlLookUp,
-										(controlActionFunction)controlLookDown,
-										(controlActionFunction)controlJump,
-										(controlActionFunction)controlShootAll,
-										(controlActionFunction)controlShootYellow,
-										(controlActionFunction)controlShootBlue,
-										(controlActionFunction)controlUse,
-										(controlActionFunction)controlPause,
-										NULL};
+

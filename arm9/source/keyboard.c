@@ -1,19 +1,18 @@
 #include "common/general.h"
 
-#define KEYBOARDBUTTONS 39
+#define KEYBOARD_N_BUTTONS 39
 
-sguiButton_struct* keyboardButton[KEYBOARDBUTTONS];
+sguiButton_struct* keyboardButton[KEYBOARD_N_BUTTONS];
 
 static const char keyboardButtons[] = { '1','\0','2','\0','3','\0','4','\0','5','\0','6','\0','7','\0','8','\0','9','\0','0','\0',
 										'q','\0','w','\0','e','\0','r','\0','t','\0','y','\0','u','\0','i','\0','o','\0','p','\0',
 										'a','\0','s','\0','d','\0','f','\0','g','\0','h','\0','j','\0','k','\0','l','\0',
 										'z','\0','x','\0','c','\0','v','\0','b','\0','n','\0','m','\0',' ','\0'};
-						
+
 static const u8 keyboardRows[] = {10,10,9,7};
 
-char* keyboardString;
-int keyboardCursor, keyboardStrlen;
-bool keyboardLock;
+static char* keyboardString;
+static int keyboardCursor, keyboardStrlen;
 
 void keyboardButtonPressed(sguiButton_struct* b)
 {

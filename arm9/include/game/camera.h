@@ -33,6 +33,8 @@ static inline int32 evaluatePlanePoint(plane_struct* p, vect3D v)
 	return mulf32(p->A,v.x)+mulf32(p->B,v.y)+mulf32(p->C,v.z)+p->D;
 }
 
+extern camera_struct playerCamera;
+
 void initCamera(camera_struct* c);
 void projectCamera(camera_struct* c);
 void transformCamera(camera_struct* c);

@@ -1,14 +1,16 @@
 #include "game/game_main.h"
 
 #define ENERGYBALLSIZE (128)
+#define NUMENERGYDEVICES (8)
+#define NUMENERGYBALLS (8)
 
-u32* activeDevicePalette;
-energyDevice_struct energyDevice[NUMENERGYDEVICES];
-energyBall_struct energyBall[NUMENERGYBALLS];
+static u32* activeDevicePalette;
+static energyDevice_struct energyDevice[NUMENERGYDEVICES];
+static energyBall_struct energyBall[NUMENERGYBALLS];
 
-md2Model_struct energyCatcherModel, energyLauncherModel, energyBallModel;
+static md2Model_struct energyCatcherModel, energyLauncherModel, energyBallModel;
 
-const vect3D energyDeviceDirection[6]={(vect3D){inttof32(1),0,0},(vect3D){-inttof32(1),0,0},(vect3D){0,inttof32(1),0},(vect3D){0,-inttof32(1),0},(vect3D){0,0,inttof32(1)},(vect3D){0,0,-inttof32(1)}};
+static const vect3D energyDeviceDirection[6]={(vect3D){inttof32(1),0,0},(vect3D){-inttof32(1),0,0},(vect3D){0,inttof32(1),0},(vect3D){0,-inttof32(1),0},(vect3D){0,0,inttof32(1)},(vect3D){0,0,-inttof32(1)}};
 
 void initEnergyBalls(void)
 {
@@ -23,7 +25,7 @@ void initEnergyBalls(void)
 		energyBall[i].used=false;
 		energyBall[i].id=i;
 	}
-	
+
 	loadMd2Model("models/ballcatcher.md2","balllauncher.pcx",&energyCatcherModel);
 	loadMd2Model("models/balllauncher.md2","balllauncher.pcx",&energyLauncherModel);
 	loadMd2Model("models/energyball.md2","energyball.pcx",&energyBallModel);
@@ -43,18 +45,18 @@ void freeEnergyBalls(void)
 void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, deviceOrientation_type or, bool type)
 {
 	if(!ed)return;
-	
+
 	initActivator(&ed->activator);
 	initModelInstance(&ed->modelInstance, type?(&energyLauncherModel):(&energyCatcherModel));
 	ed->orientation=or;
-	
+
 	ed->surface=NULL;
-	
+
 	{//for collisions
 		rectangle_struct rec;
 		rectangle_struct* recp;
 		rec.material=NULL;
-		
+
 			if(or!=mY)
 			{
 				rec.position=addVect(pos,vect(-1,4,-1));rec.size=vect(2,0,2);rec.normal=vect(0,inttof32(1),0);recp=addRoomRectangle(r, rec, NULL, false);
@@ -94,7 +96,7 @@ void initEnergyDevice(room_struct* r, energyDevice_struct* ed, vect3D pos, devic
 	}
 	pos=vect(pos.x+r->position.x, pos.y, pos.z+r->position.y);
 	ed->position=convertVect(pos);
-	
+
 	ed->active=type;
 	ed->type=type;
 	ed->used=true;
@@ -119,13 +121,13 @@ energyDevice_struct* createEnergyDevice(room_struct* r, vect3D pos, deviceOrient
 void drawEnergyDevice(energyDevice_struct* ed)
 {
 	if(!ed)return;
-	
+
 	glPushMatrix();
 		u32 params=POLY_ALPHA(31)|POLY_CULL_NONE|POLY_ID(30+ed->id)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, ed->position, &params);
 
 		glTranslate3f32(ed->position.x,ed->position.y,ed->position.z);
-		
+
 		switch(ed->orientation)
 		{
 			case mY:
@@ -146,7 +148,7 @@ void drawEnergyDevice(energyDevice_struct* ed)
 			default:
 				break;
 		}
-		
+
 		renderModelFrameInterp(ed->modelInstance.currentFrame,ed->modelInstance.nextFrame,ed->modelInstance.interpCounter,ed->modelInstance.model,params,false,ed->modelInstance.palette,RGB15(31,31,31));
 	glPopMatrix(1);
 }
@@ -163,7 +165,7 @@ void drawEnergyDevices(void)
 void updateEnergyDevice(energyDevice_struct* ed)
 {
 	if(!ed)return;
-	
+
 	if(ed->type)
 	{
 		//launcher
@@ -181,7 +183,7 @@ void updateEnergyDevice(energyDevice_struct* ed)
 			useActivator(&ed->activator);
 		}else ed->modelInstance.palette=NULL;
 	}
-	
+
 	updateAnimation(&ed->modelInstance);
 }
 
@@ -197,16 +199,16 @@ void updateEnergyDevices(void)
 void initEnergyBall(energyBall_struct* eb, energyDevice_struct* ed, vect3D pos, vect3D dir, u16 life)
 {
 	if(!eb)return;
-	
+
 	initModelInstance(&eb->modelInstance, &energyBallModel);
-	
+
 	eb->maxLife=life;
 	eb->life=life;
 	eb->launcher=ed;
 	eb->position=pos;
 	eb->direction=dir;
 	eb->speed=128;
-	
+
 	eb->used=true;
 }
 
@@ -227,9 +229,9 @@ energyBall_struct* createEnergyBall(energyDevice_struct* launcher, vect3D pos, v
 void drawEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
-	
+
 	u8 alpha=8+(22*eb->life)/eb->maxLife;
-	
+
 	glPushMatrix();
 		u32 angle=(eb->modelInstance.currentFrame*4+eb->modelInstance.interpCounter);
 		glTranslate3f32(eb->position.x,eb->position.y,eb->position.z);
@@ -261,7 +263,7 @@ void warpEnergyBall(portal_struct* p, energyBall_struct* eb)
 void killEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
-	
+
 	if(eb->launcher)eb->launcher->active=true;
 	eb->used=false;
 }
@@ -269,7 +271,7 @@ void killEnergyBall(energyBall_struct* eb)
 energyDevice_struct* isEnergyCatcherSurface(rectangle_struct* rec)
 {
 	if(!rec)return NULL;
-	
+
 	int i;
 	for(i=0;i<NUMENERGYDEVICES;i++)
 	{
@@ -281,11 +283,11 @@ energyDevice_struct* isEnergyCatcherSurface(rectangle_struct* rec)
 void updateEnergyBall(energyBall_struct* eb)
 {
 	if(!eb)return;
-	
+
 	player_struct* p=getPlayer();
-	
+
 	vect3D l=vectDifference(eb->position,convertSize(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)));
-	
+
 	vect3D ip=l, normal;
 	rectangle_struct* col=collideGridCell(getCurrentCell(p->currentRoom,eb->position), eb->launcher?eb->launcher->surface:NULL, l, eb->direction, eb->speed, &ip, &normal);
 	if(!col)col=collideGridCell(getCurrentCell(p->currentRoom,addVect(eb->position,vectMult(eb->direction,eb->speed))), eb->launcher?eb->launcher->surface:NULL, l, eb->direction, eb->speed, &ip, &normal);
@@ -328,9 +330,9 @@ void updateEnergyBall(energyBall_struct* eb)
 	}else{
 		eb->position=addVect(eb->position,vectMult(eb->direction,eb->speed));
 	}
-	
+
 	updateAnimation(&eb->modelInstance);
-	
+
 	if(!eb->life)killEnergyBall(eb);
 	else eb->life--;
 }

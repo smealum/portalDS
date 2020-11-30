@@ -193,10 +193,11 @@ void updateEmancipationGrids(void)
 	}
 }
 
-u16 counter=0;
+
 
 void drawEmancipationGrid(emancipationGrid_struct* eg)
 {
+	static u16 counter=0;
 	if(!eg)return;
 
 	int32 l=abs(eg->length);

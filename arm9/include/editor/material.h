@@ -23,6 +23,10 @@ typedef struct
 	bool used;
 }material_struct;
 
+
+extern material_struct materials[NUMMATERIALS];
+
+
 static inline u16 getMaterialID(material_struct* m){if(m)return m->id;return 0;}
 
 void initMaterials(void);

@@ -1,15 +1,14 @@
 #include "game/game_main.h"
 
-s16 gravityGunTarget;
 
 player_struct player;
-md2Model_struct gun, playerModel;
-mtlImg_struct* crossHair;
+static md2Model_struct gun, playerModel;
+//static mtlImg_struct* crossHair; // Not used currently
 //static struct gl_texture_t *bottomScreen;
 struct gl_texture_t *bottomButton;
 
-u8* bottomScreenIMG;
-u16* bottomScreenPAL;
+static u8* bottomScreenIMG;
+static u16* bottomScreenPAL;
 
 touchPosition touchCurrent, touchOld;
 
@@ -17,12 +16,12 @@ SFX_struct *gunSFX1, *gunSFX2;
 SFX_struct *portalEnterSFX[2];
 SFX_struct *portalExitSFX[2];
 
-bool oldCurrentPortalColor;
+static bool oldCurrentPortalColor;
 bool currentPortalColor; //true=orange
 
 s16 gravityGunTarget;
 
-int subBG;
+static int subBG;
 
 void drawBottomButton(bool color);
 

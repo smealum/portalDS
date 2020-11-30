@@ -1,10 +1,10 @@
 #include "editor/editor_main.h"
 
-blockFace_struct* blockFacePool=NULL;
-blockFace_struct* blockFacePoolHead=NULL;
+
+
 
 vect3D faceNormals[]={vect(inttof32(1),0,0),vect(-inttof32(1),0,0),vect(0,inttof32(1),0),vect(0,-inttof32(1),0),vect(0,0,inttof32(1)),vect(0,0,-inttof32(1))};
-u16 faceColors[]={RGB15(31,31,31),RGB15(25,25,25),RGB15(20,20,20),RGB15(15,15,15),RGB15(10,10,10),RGB15(5,5,5)}; //TEMP
+
 u32 packedVertex[6][4]={{NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),-(1<<5),(1<<5))},
 						{NORMAL_PACK(-(1<<5),-(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),-(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),-(1<<5))},
 						{NORMAL_PACK(-(1<<5),(1<<5),-(1<<5)), NORMAL_PACK(-(1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),(1<<5)), NORMAL_PACK((1<<5),(1<<5),-(1<<5))},
@@ -14,12 +14,17 @@ u32 packedVertex[6][4]={{NORMAL_PACK((1<<5),-(1<<5),-(1<<5)), NORMAL_PACK((1<<5)
 vect3D faceOrigin[]={vect(inttof32(1),-inttof32(1),-inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1)),
 					vect(-inttof32(1),inttof32(1),-inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1)),
 					vect(-inttof32(1),-inttof32(1),inttof32(1)), vect(-inttof32(1),-inttof32(1),-inttof32(1))};
-vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(1)),
-					vect(inttof32(1),0,inttof32(1)), vect(inttof32(1),0,inttof32(1)),
-					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
+
 u8 oppositeDirection[]={1,0,3,2,5,4};
 
-mtlImg_struct *wallTexture, *floorTexture, *unportalableTexture;
+static blockFace_struct* blockFacePool=NULL;
+static blockFace_struct* blockFacePoolHead=NULL;
+static mtlImg_struct *wallTexture, *floorTexture, *unportalableTexture;
+static u16 faceColors[]={RGB15(31,31,31),RGB15(25,25,25),RGB15(20,20,20),RGB15(15,15,15),RGB15(10,10,10),RGB15(5,5,5)}; //TEMP
+static vect3D faceSize[]={vect(0,inttof32(1),inttof32(1)), vect(0,inttof32(1),inttof32(1)),
+					vect(inttof32(1),0,inttof32(1)), vect(inttof32(1),0,inttof32(1)),
+					vect(inttof32(1),inttof32(1),0), vect(inttof32(1),inttof32(1),0)};
+
 
 void initBlockFacePool(void)
 {

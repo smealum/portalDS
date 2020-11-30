@@ -7,6 +7,7 @@ contactPoint_struct contactPoints[MAXCONTACTPOINTS];
 OBB_struct objects[NUMOBJECTS];
 
 u32 coll, integ, impul;
+u8 sleeping;
 
 /*s16 divLUT[4097];
 
@@ -730,8 +731,7 @@ void integrate(OBB_struct* o, float dt)
 	o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
 }
 
-extern plane_struct testPlane;
-extern OBB_struct *testOBB, *testOBB2;
+//extern plane_struct testPlane;
 
 void checkOBBCollisions(OBB_struct* o, bool sleep)
 {
@@ -771,7 +771,7 @@ void calculateOBBEnergy(OBB_struct* o)
 	o->energy=tmp;
 }
 
-u8 sleeping;
+
 
 void simulate(OBB_struct* o, float dt2)
 {
@@ -897,10 +897,13 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 	o->oldPortal[id]=o->portal[id];
 	o->portal[id]=((dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0)&1)|(((pointInFrontOfPortal(&portal[id],o->position,&z))&1)<<1);
 
-	switch(init)
+	if(init)
 	{
-		case false:
-			if(((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2)) || (o->portal[id]&2 && z<=0 && z>-16))
+		o->oldPortal[id]=o->portal[id];
+	}
+	else
+	{
+		if(((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2)) || (o->portal[id]&2 && z<=0 && z>-16))
 			{
 				o->position=addVect(portal[id].targetPortal->position,warpVector(&portal[id],vectDifference(o->position,portal[id].position)));
 				o->velocity=warpVector(&portal[id],o->velocity);
@@ -913,11 +916,8 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 
 				o->portaled=true;
 			}
-			break;
-		default:
-			o->oldPortal[id]=o->portal[id];
-			break;
 	}
+
 }
 
 void updateOBB(OBB_struct* o)

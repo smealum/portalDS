@@ -1,13 +1,15 @@
 #include "menu/menu_main.h"
 #include <dirent.h>
 
-md2Model_struct GLaDOSmodel, domeModel, lairModel, cubeModel;
-modelInstance_struct GLaDOSmodelInstance;
 
 camera_struct menuCamera;
-
-menuBox_struct menuBoxes[NUMMENUBOXES];
 char menuScreenText[MENUSCREENLINES][MENUSCREENCHARS];
+
+
+static md2Model_struct GLaDOSmodel, domeModel, lairModel, cubeModel;
+static modelInstance_struct GLaDOSmodelInstance;
+static menuBox_struct menuBoxes[NUMMENUBOXES];
+
 
 void initMenuBoxes(void)
 {

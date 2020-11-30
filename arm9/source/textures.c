@@ -1,10 +1,11 @@
 #include "common/general.h"
 
 u8 vramBanks;
-vramBank_struct bank[4];
-vramBank_struct palBank;
 
-mtlImg_struct texture[MAX_TEX];
+static vramBank_struct bank[4];
+static vramBank_struct palBank;
+
+static mtlImg_struct texture[MAX_TEX];
 
 void getGlWL(u16 width, u16 height, u8* w, u8* l)
 {

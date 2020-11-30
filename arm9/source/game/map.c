@@ -4,10 +4,9 @@
 
 room_struct gameRoom;
 
-u32* testDL=NULL;
 
 //DEBUG
-bool debugWireframe=false;
+static bool debugWireframe=false;
 
 void initRectangleList(rectangleList_struct* p)
 {

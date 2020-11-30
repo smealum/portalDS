@@ -3,15 +3,21 @@
 #define TOUCHSPEEDX (-32)
 #define TOUCHSPEEDY (32)
 
-camera_struct editorCamera;
+
+
 editorRoom_struct editorRoom;
 
-vect3D editorTranslation;
-int32 editorScale;
 
-vect3D lineOfTouchOrigin, lineOfTouchVector;
-vect3D planeOfTouch[2];
-touchPosition currentTouch, oldTouch;
+static camera_struct editorCamera;
+
+static vect3D editorTranslation;
+static int32 editorScale;
+
+static vect3D lineOfTouchOrigin;
+static vect3D lineOfTouchVector;
+static vect3D planeOfTouch[2];
+static touchPosition currentTouch;
+static  touchPosition oldTouch;
 
 bool currentScreen;
 

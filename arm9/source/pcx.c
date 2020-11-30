@@ -29,7 +29,7 @@
 
 #include "game/game_main.h"
 
-int fileptr, filesize;
+static int fileptr, filesize;
 /*
 static void
 ReadPCX1bit (FILE *fp, const struct pcx_header_t *hdr, struct gl_texture_t *texinfo)
@@ -294,7 +294,7 @@ void convertPCX16Bit(struct gl_texture_t* pcx)
 	pcx->palette = NULL;
 }
 
-extern int lastSize;
+//extern int lastSize;
 
 struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 {

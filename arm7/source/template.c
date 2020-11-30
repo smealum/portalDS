@@ -56,9 +56,9 @@ void powerButtonCB() {
 
 
 OBB_struct *testOBB, *testOBB2;
-plane_struct testPlane;
-extern u32 coll, integ, impul;
-extern u8 sleeping;
+//plane_struct testPlane;
+//extern u32 coll, integ, impul;
+//extern u8 sleeping;
 
 int32 sqrtv(int32 x)
 {
@@ -90,13 +90,13 @@ int main() {
 	irqSet(IRQ_VBLANK, VblankHandler);
 
 	irqEnable(IRQ_VBLANK | IRQ_VCOUNT);
-	
+
 	setPowerButtonCB(powerButtonCB);
-	
+
 	initPI7();
-	
+
 	// initPlane(&testPlane, 0, inttof32(1), 0, inttof32(3)/2);
-	
+
 	// createAAR(0, vect(-inttof32(0),-inttof32(1)/2,-inttof32(3)), vect(inttof32(6),0,inttof32(6)), vect(0,inttof32(1),0));
 	// createAAR(1, vect(-inttof32(0),-inttof32(1)/2-inttof32(6),-inttof32(3)), vect(0,inttof32(6),inttof32(6)), vect(-inttof32(1),0,0));
 
@@ -105,7 +105,7 @@ int main() {
 		if(getPI7Status())
 		{
 			// cpuStartTiming(0);
-	
+
 			coll=impul=integ=0;
 				updatePlatforms();
 				updateOBBs();
@@ -133,14 +133,14 @@ int main() {
 			// fifoSendValue32(FIFO_USER_08,sleeping);
 			// fifoSendValue32(FIFO_USER_08,objects[0].energy);
 			// fifoSendValue32(FIFO_USER_08,objects[1].energy);
-			
+
 			sendDataPI7();
 			// u32 key=REG_KEYINPUT;
 			// if(0==(key&(KEY_B)))applyOBBForce(&objects[0],addVect(testOBB->position,vect(-inttof32(1),0,0)),vect(0,inttof32(100),0));
 		}
-		
+
 		listenPI7();
-		
+
 		swiWaitForVBlank();
 		cnt++;
 	}

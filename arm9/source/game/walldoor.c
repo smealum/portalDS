@@ -3,29 +3,31 @@
 #define DOORFRAMELENGTH (8)
 #define WALLDOORINTERVAL (32)
 
-room_struct elevatorRoom;
 
 wallDoor_struct entryWallDoor;
 wallDoor_struct exitWallDoor;
-md2Model_struct wallDoorModel;
 
-vect3D doorFrameData[]={{-TILESIZE*2,HEIGHTUNIT*8,0},{-TILESIZE*2,HEIGHTUNIT*5,0},{-TILESIZE,HEIGHTUNIT*8,0},{-TILESIZE,HEIGHTUNIT*7,0},{TILESIZE,HEIGHTUNIT*8,0},{TILESIZE,HEIGHTUNIT*7,0},{TILESIZE*2,HEIGHTUNIT*8,0},{TILESIZE*2,HEIGHTUNIT*5,0}};
+static md2Model_struct wallDoorModel;
+static room_struct elevatorRoom;
 
-vect3D wallDoorV1[]={{0,0,1},
+
+static vect3D doorFrameData[]={{-TILESIZE*2,HEIGHTUNIT*8,0},{-TILESIZE*2,HEIGHTUNIT*5,0},{-TILESIZE,HEIGHTUNIT*8,0},{-TILESIZE,HEIGHTUNIT*7,0},{TILESIZE,HEIGHTUNIT*8,0},{TILESIZE,HEIGHTUNIT*7,0},{TILESIZE*2,HEIGHTUNIT*8,0},{TILESIZE*2,HEIGHTUNIT*5,0}};
+
+static vect3D wallDoorV1[]={{0,0,1},
 					{0,0,-1},
 					{0,0,0},
 					{0,0,0},
 					{1,0,0},
 					{-1,0,0}};
 
-vect3D wallDoorV2[]={{-1,0,0},
+static vect3D wallDoorV2[]={{-1,0,0},
 					{1,0,0},
 					{0,0,0},
 					{0,0,0},
 					{0,0,-1},
 					{0,0,1}};
 
-vect3D elevatorRoomSize;
+static vect3D elevatorRoomSize;
 
 void initWallDoor(wallDoor_struct* wd)
 {

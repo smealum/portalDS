@@ -19,8 +19,8 @@ static const u8 OBBSegmentsPD[NUMOBBSEGMENTS][2]={{0,0},{1,2},{3,0},{0,2},
 										 {5,2},{5,0},{6,2},{4,0},
 										 {3,1},{0,1},{1,1},{2,1}};
 
-static const u8 OBBFaces[NUMOBBFACES][4]={{0,1,2,3},{4,5,6,7},{0,5,4,3},{0,1,6,5},{1,2,7,6},{2,3,4,7}};
-static const s8 OBBFacesPDDN[NUMOBBFACES][4]={{0,0,2,-2},{5,0,2,2},{0,1,2,-1},{0,0,1,-3},{1,1,2,1},{3,0,1,3}};
+
+//static const s8 OBBFacesPDDN[NUMOBBFACES][4]={{0,0,2,-2},{5,0,2,2},{0,1,2,-1},{0,0,1,-3},{1,1,2,1},{3,0,1,3}};
 
 typedef enum
 {
@@ -67,6 +67,8 @@ typedef struct
 // 4 + 9*4*3 + 4 +
 
 extern OBB_struct objects[NUMOBJECTS];
+extern u32 coll, integ, impul;
+extern u8 sleeping;
 
 void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32 sine);
 void initTransformationMatrix(int32* m, s32 cosine, s32 sine);

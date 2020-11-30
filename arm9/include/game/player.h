@@ -1,6 +1,8 @@
 #ifndef __PLAYER9__
 #define __PLAYER9__
 
+#include "game/sfx.h"
+
 #define PLAYERRADIUS (256)
 #define ERRORMARGIN (2)
 #define SQPLAYERRADIUS ((PLAYERRADIUS*PLAYERRADIUS)>>12)
@@ -25,6 +27,8 @@ typedef struct
 
 extern s16 gravityGunTarget;
 extern bool idle;
+extern SFX_struct *gunSFX1, *gunSFX2;
+extern bool currentPortalColor; //true=orange
 
 room_struct* getCurrentRoom(void);
 void initPlayer(player_struct* p);

@@ -1,7 +1,8 @@
 #include "editor/editor_main.h"
 
-mapHeader_struct blankHeader=(mapHeader_struct){0,0,0,0,0};
+static mapHeader_struct blankHeader=(mapHeader_struct){0,0,0,0,0};
 
+//extern entity_struct entity[NUMENTITIES];
 //WRITING STUFF
 
 void writeTranslatedVect(vect3D v, FILE* f)
@@ -179,7 +180,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 	}
 }
 
-extern entity_struct entity[NUMENTITIES];
+
 
 void writeEntities(FILE* f)
 {

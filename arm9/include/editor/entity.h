@@ -1,7 +1,10 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "editor/blocks.h"
+#include "editor/contextbuttons.h"
 #define NUMENTITYTYPES (15)
+#define NUMENTITIES (64)
 
 enum directionMask_type
 {
@@ -46,6 +49,8 @@ typedef struct entity_struct
 	u8 writeID;
 	bool used, placed;
 }entity_struct;
+
+extern entity_struct entity[NUMENTITIES];
 
 extern contextButton_struct ballLauncherButtonArray[];
 extern contextButton_struct ballCatcherButtonArray[];

@@ -3,11 +3,11 @@
 
 #define NUMOBBFACES 6
 
-const u8 OBBFaces[NUMOBBFACES][4]={{0,1,2,3},{4,5,6,7},{0,5,4,3},{0,1,6,5},{1,2,7,6},{2,3,4,7}};
-
 OBB_struct objects[NUMOBJECTS];
 AAR_struct aaRectangles[NUMAARS];
-u8 selectID; //debug
+
+static u8 selectID; //debug
+//static const u8 OBBFaces[NUMOBBFACES][4]={{0,1,2,3},{4,5,6,7},{0,5,4,3},{0,1,6,5},{1,2,7,6},{2,3,4,7}};
 
 void initPI9(void)
 {

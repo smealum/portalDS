@@ -2,16 +2,16 @@
 
 #define RESERVED_SIZE_DISPLAY_LISTS   (64*1024) //TEMP?
 
-u32 dl_displayLists[RESERVED_SIZE_DISPLAY_LISTS];
-u32 dl_displayLists_filled = 0;
+static u32 dl_displayLists[RESERVED_SIZE_DISPLAY_LISTS];
+static u32 dl_displayLists_filled = 0;
 
-u32 dl_curdisplayList_filled_start;
+static u32 dl_curdisplayList_filled_start;
 
-u8 dl_commands_buffer[4];
-u32 dl_commands_buffer_filled = 0;
+static u8 dl_commands_buffer[4];
+static u32 dl_commands_buffer_filled = 0;
 
-u32 dl_attributes_buffer[8];
-u32 dl_attributes_buffer_filled = 0;
+static u32 dl_attributes_buffer[8];
+static u32 dl_attributes_buffer_filled = 0;
 
 void packCommandsForDisplayList()
 {

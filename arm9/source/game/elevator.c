@@ -2,8 +2,8 @@
 
 #define ELEVATOR_SPEED (64)
 
-md2Model_struct elevatorModel;
-md2Model_struct elevatorFrameModel;
+static md2Model_struct elevatorModel;
+static md2Model_struct elevatorFrameModel;
 
 void initElevators(void)
 {
@@ -104,7 +104,7 @@ void drawElevator(elevator_struct* ev)
 		setupObjectLighting(NULL, ev->position, &params);
 
 		glTranslate3f32(ev->position.x,ev->position.y,ev->position.z);
-		
+
 		switch(ev->direction&(~(1<<ELEVATOR_UPDOWNBIT)))
 		{
 			case 0:
@@ -119,7 +119,7 @@ void drawElevator(elevator_struct* ev)
 			default:
 				break;
 		}
-		
+
 		renderModelFrameInterp(0,0,0,&elevatorFrameModel,params,false,NULL,RGB15(31,31,31));
 
 		bool up=(ev->direction&(1<<ELEVATOR_UPDOWNBIT))!=0;

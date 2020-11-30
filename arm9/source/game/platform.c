@@ -5,8 +5,8 @@
 #define PLATFORMHEIGHT (32)
 
 platform_struct platform[NUMPLATFORMS];
-mtlImg_struct* platformTexture;
-md2Model_struct platformModel;
+static mtlImg_struct* platformTexture;
+static md2Model_struct platformModel;
 
 void initPlatforms(void)
 {

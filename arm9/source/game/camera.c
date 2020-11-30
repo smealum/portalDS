@@ -2,6 +2,7 @@
 
 #define mcoord(i,j) ((i)+(j)*4)
 
+
 camera_struct playerCamera;
 
 //repurposed from libnds

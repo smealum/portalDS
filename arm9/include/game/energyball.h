@@ -1,8 +1,7 @@
 #ifndef ENERGYBALL_H
 #define ENERGYBALL_H
 
-#define NUMENERGYDEVICES (8)
-#define NUMENERGYBALLS (8)
+
 
 typedef enum
 {

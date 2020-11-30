@@ -1,5 +1,6 @@
 #include "game/game_main.h"
 #include "editor/io.h"
+#include "editor/entity.h"
 
 void drawRoomsGame(u8 mode, u16 color)
 {

@@ -12,8 +12,11 @@ static u16* bottomScreenPAL;
 
 touchPosition touchCurrent, touchOld;
 
+/** Sound effects for portals shots. */
 SFX_struct *gunSFX1, *gunSFX2;
+/** Sound effect when entering portal */
 SFX_struct *portalEnterSFX[2];
+/** Sound effect when leaving portal */
 SFX_struct *portalExitSFX[2];
 
 static bool oldCurrentPortalColor;
@@ -439,7 +442,11 @@ void updatePlayer(player_struct* p)
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?
 
-	if(oldCurrentPortalColor!=currentPortalColor)drawBottomButton(currentPortalColor);
+	if(oldCurrentPortalColor!=currentPortalColor)
+	{
+		drawBottomButton(currentPortalColor);
+		p->currentPortal= currentPortalColor;// TODO : find better way to do it asap
+	}
 	oldCurrentPortalColor=currentPortalColor;
 }
 

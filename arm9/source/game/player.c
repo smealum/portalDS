@@ -288,13 +288,14 @@ void shootPlayerGun(player_struct* p, bool R, u8 mode)
 			plane0=normalize(vectDifference(plane0,vectMult(r->normal,dotProduct(r->normal,plane0))));
 
 			portal_struct* por=R?(&portal1):(&portal2);
+			portal_struct* other_por=R?(&portal2):(&portal1);
 
 			vect3D oldp=por->position;vect3D oldn=por->normal;vect3D oldp0=por->plane[0];
 			movePortal(por, pos, vectMultInt(r->normal,-1), plane0, false);
 
 			isPortalOnWall(p->currentRoom,por,true);
 
-			if(isPortalOnWall(p->currentRoom,por,false))
+			if(isPortalOnWall(p->currentRoom,por,false)&&portalToPortalIntersection(por,other_por))
 			{
 				pos=por->position;
 				movePortal(por, oldp, oldn, oldp0, false); //terribly inelegant, please forgive me

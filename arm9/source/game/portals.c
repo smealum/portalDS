@@ -3,7 +3,6 @@
 portal_struct portal1, portal2;
 portal_struct* currentPortal;
 
-void preparePortal(void);
 
 void initPortals(void)
 {
@@ -95,7 +94,6 @@ void initPortal(portal_struct* p, vect3D pos, vect3D normal, bool color)
 	p->unprojectedOutline=NULL;
 }
 
-portal_struct portal1, portal2;
 
 void drawPortal(portal_struct* p)
 {
@@ -323,8 +321,8 @@ void drawPortalRoom(portal_struct* p)
 	glPopMatrix(1);
 }
 
-const u8 segmentList[4][2]={{0,1},{1,2},{2,3},{3,0}};
-const u8 segmentNormal[4]={0,1,0,1};
+static const u8 segmentList[4][2]={{0,1},{1,2},{2,3},{3,0}};
+static const u8 segmentNormal[4]={0,1,0,1};
 
 bool doSegmentsIntersect(vect3D s1, vect3D s2, vect3D sn, vect3D p1, vect3D p2, vect3D pn, bool *vv1, bool *vv2)
 {
@@ -397,6 +395,37 @@ bool portalRectangleIntersection(room_struct* r, portal_struct* p, rectangle_str
 
 	return true;
 }
+
+bool portalToPortalIntersection(const portal_struct* p, const portal_struct* p2)
+{
+	if(!p || !p2)return false;
+
+
+	vect3D vect_portals = vectProduct(p->normal,p2->normal);
+	if (equals(vect_portals.x,0) && equals(vect_portals.y,0) && equals(vect_portals.z,0))
+	{
+		//works as we are on a grid, no inclination
+		// y is "up"
+		if (p->normal.x==p2->normal.x)
+		{
+			return abs(p->position.y-p2->position.y)> 782*2-100
+
+			||  abs(p->position.z-p2->position.z)>374*2;
+		}
+		if (p->normal.z==p2->normal.z)
+		{
+			return abs(p->position.y-p2->position.y)> 782*2-100 ||  abs(p->position.x-p2->position.x)>374*2;
+		}
+		if (p->position.y==p2->position.y)
+		{
+			// TODO : complete this case
+			return true;
+		}
+	}
+
+	return true;
+}
+
 
 bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix)
 {

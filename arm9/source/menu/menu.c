@@ -8,7 +8,6 @@ cameraTransition_struct testTransition;
 u8 logoAlpha;
 
 
-static cameraState_struct tempState={(vect3D){0,0,0}, (vect3D){0,0,0}};
 
 static mtlImg_struct* logoMain;
 static mtlImg_struct* logoRotate;
@@ -53,10 +52,10 @@ void initMenu(void)
 	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?
 
 	applyCameraState(&menuCamera,&cameraStates[4]);
-	tempState=cameraStates[4];
+
 	testTransition=startCameraTransition(&cameraStates[1],&cameraStates[4],64);
 
-	setupMenuPage(startMenuPage, startMenuPageLength);
+	setupHomeMenuPage();
 
 	logoMain=createTexture("logo.pcx", "menu");
 	logoRotate=createTexture("rotate_logo.pcx", "menu");
@@ -131,56 +130,37 @@ void menuFrame(void)
 	scanKeys();
 	touchRead(&currentTouch);
 
-	if((keysHeld() & KEY_R) && (keysHeld() & KEY_L))changeState(&menuState);
-
-	if(keysHeld() & KEY_R)tempState.position=addVect(tempState.position,vect(0,0,inttof32(1)/64));
-	if(keysHeld() & KEY_L)tempState.position=addVect(tempState.position,vect(0,0,-inttof32(1)/64));
-	if(keysHeld() & KEY_UP)tempState.position=addVect(tempState.position,vect(0,inttof32(1)/64,0));
-	if(keysHeld() & KEY_DOWN)tempState.position=addVect(tempState.position,vect(0,-inttof32(1)/64,0));
-	if(keysHeld() & KEY_RIGHT)tempState.position=addVect(tempState.position,vect(inttof32(1)/64,0,0));
-	if(keysHeld() & KEY_LEFT)tempState.position=addVect(tempState.position,vect(-inttof32(1)/64,0,0));
-
 	//TEMP (updateCamera stuff)
-		menuCamera.viewPosition=menuCamera.position;
+	menuCamera.viewPosition=menuCamera.position;
 
-	// if(keysHeld() & KEY_A)lightAngle+=128;
-	// else if(keysHeld() & KEY_B)lightAngle-=128;
 
-	if(keysHeld() & KEY_A)tempState.angle.x+=64;
-	if(keysHeld() & KEY_B)tempState.angle.x-=64;
-	if(keysHeld() & KEY_X)tempState.angle.y+=64;
-	if(keysHeld() & KEY_Y)tempState.angle.y-=64;
-	if(keysHeld() & KEY_START)tempState.angle.z+=64;
-	if(keysHeld() & KEY_SELECT)tempState.angle.z-=64;
-
-	// if(keysUp() & KEY_TOUCH)
-	// {
-	// 	if(tempbool)testTransition=startCameraTransition(&cameraStates[1],&cameraStates[0],64);
-	// 	else testTransition=startCameraTransition(&cameraStates[0],&cameraStates[1],64);
-
-	// 	tempbool^=1;
-	// }
 
 	if(!(keysHeld() & KEY_TOUCH)) updateSimpleGui(-1, -1);
 	else  updateSimpleGui((float)(currentTouch.rawx)*256.0/(4080.0), (float)(currentTouch.rawy)*192.0/3072.0);
 
-	//updateSimpleGui(currentTouch.px, currentTouch.py);
-
-	// applyCameraState(&menuCamera,&tempState);
+	/**
+	 * Moves camera
+	 */
 	updateCameraTransition(&menuCamera,&testTransition);
 
 	drawMenuScene();
 
-	switch(d3dScreen)
+	if(d3dScreen)
 	{
-		case true:
 			drawSimpleGui();
 			updateMenuScene();
-			break;
-		default:
-			if(logoAlpha)drawLogo();
-			break;
+
+
 	}
+	else
+	{
+		if(logoAlpha)
+		{
+			drawLogo();
+		}
+
+	}
+
 
 	glFlush(0);
 	swiWaitForVBlank();

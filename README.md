@@ -22,7 +22,7 @@ Acknowledgements :
 - the code for loading ini files was written by N. Devillard
 - the code used for level data compression was taken from GRIT
 - the code used for loading MD2 models and PCX files was written by David HENRY
-- this project uses libnds and maxmod
+- this project uses libnds
 - xmem.c was written by SunDEV
 
 Please let me know if you think I missed anything.

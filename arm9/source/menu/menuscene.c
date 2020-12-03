@@ -1,5 +1,4 @@
 #include "menu/menu_main.h"
-#include <dirent.h>
 
 
 camera_struct menuCamera;
@@ -10,15 +9,42 @@ static md2Model_struct GLaDOSmodel, domeModel, lairModel, cubeModel;
 static modelInstance_struct GLaDOSmodelInstance;
 static menuBox_struct menuBoxes[NUMMENUBOXES];
 
+/**
+ * Moves and rotates a 3D box.
+ * \param[inout] mb box to draw
+ */
+static void updateMenuBox(menuBox_struct* mb);
+/**
+ * Moves and rotates all 3D boxes.
+ * \param[inout] mb box to draw
+ */
+static void updateMenuBoxes(void);
 
-void initMenuBoxes(void)
-{
-	int i;
-	for(i=0;i<NUMMENUBOXES;i++)
-	{
-		menuBoxes[i].used=false;
-	}
-}
+/**
+ * Creates a new box in the array menuBoxes,
+ * in the first unused location.
+ */
+static void createMenuBox(void);
+
+/**
+ * Initialises a box.
+ *
+ * \param[in] mb box to initialise
+ */
+static void initMenuBox(menuBox_struct* mb);
+
+/**
+ * Draws a background 3D box
+ * \param[in] mb box to draw
+ */
+static void drawMenuBox(const menuBox_struct* mb);
+/**
+ * Draws all background 3D boxes
+ */
+static void drawMenuBoxes(void);
+
+
+static void drawScreenText(void);
 
 void initMenuScene(void)
 {
@@ -43,10 +69,8 @@ void freeMenuScene(void)
 	freeMd2Model(&cubeModel);
 }
 
-vect3D boxOrigin={-9984,11392,-14016};
-vect3D boxDestination={-9984,-576,-14016};
 
-void updateMenuBox(menuBox_struct* mb)
+static void updateMenuBox(menuBox_struct* mb)
 {
 	if(!mb)return;
 
@@ -56,10 +80,14 @@ void updateMenuBox(menuBox_struct* mb)
 
 	mb->progress++;
 
-	if(mb->progress>MENUBOXSPEED)mb->used=false;
+	if(mb->progress>MENUBOXSPEED)
+	{
+		// if mb->progress >= MENUBOXSPEED, the box reached its destination
+		mb->used=false;
+	}
 }
 
-void updateMenuBoxes(void)
+static void updateMenuBoxes(void)
 {
 	int i;
 	for(i=0;i<NUMMENUBOXES;i++)
@@ -68,7 +96,7 @@ void updateMenuBoxes(void)
 	}
 }
 
-void initMenuBox(menuBox_struct* mb)
+static void initMenuBox(menuBox_struct* mb)
 {
 	if(!mb)return;
 
@@ -80,7 +108,7 @@ void initMenuBox(menuBox_struct* mb)
 	mb->used=true;
 }
 
-void createMenuBox(void)
+static void createMenuBox(void)
 {
 	int i;
 	for(i=0;i<NUMMENUBOXES;i++)
@@ -97,9 +125,12 @@ void updateMenuScene(void)
 	if(!(rand()%MENUBOXFREQUENCY))createMenuBox();
 }
 
-void drawMenuBox(menuBox_struct* mb)
+
+static void drawMenuBox(const menuBox_struct* mb)
 {
 	if(!mb)return;
+	vect3D boxOrigin={-9984,11392,-14016};
+	vect3D boxDestination={-9984,-576,-14016};
 
 	vect3D pos=vect(boxOrigin.x+((boxDestination.x-boxOrigin.x)*mb->progress)/MENUBOXSPEED,
 					boxOrigin.y+((boxDestination.y-boxOrigin.y)*mb->progress)/MENUBOXSPEED,
@@ -115,7 +146,7 @@ void drawMenuBox(menuBox_struct* mb)
 	glPopMatrix(1);
 }
 
-void drawMenuBoxes(void)
+static void drawMenuBoxes(void)
 {
 	int i;
 	for(i=0;i<NUMMENUBOXES;i++)
@@ -124,11 +155,11 @@ void drawMenuBoxes(void)
 	}
 }
 
-vect3D textPosition={-8256,6784,-14848};
-vect3D textAngle={0,-1664,0};
 
-void drawScreenText(void)
+static void drawScreenText(void)
 {
+	vect3D textPosition={-8256,6784,-14848};
+	vect3D textAngle={0,-1664,0};
 	glPushMatrix();
 		glTranslate3f32(textPosition.x,textPosition.y,textPosition.z);
 		glRotateXi(8192*2);
@@ -158,6 +189,7 @@ void resetSceneScreen(void)
 {
 	int i; for(i=0;i<MENUSCREENLINES;i++)menuScreenText[i][0]='\0';
 }
+
 
 void initScreenList(screenList_struct* sl, char* title, char** list, int l)
 {
@@ -214,53 +246,3 @@ void updateScreenList(screenList_struct* sl)
 	}
 }
 
-void freeFileList(char** list, int length)
-{
-	if(!list)return;
-
-	int i;
-	for(i=0;i<length;i++)
-	{
-		if(list[i]){free(list[i]);list[i]=NULL;}
-	}
-	free(list);
-}
-
-int listFiles(char* path, char** list)
-{
-	if(!path)return 0;
-
-	char currentPath[255];
-	getcwd(currentPath,255);
-
-	chdir(path);
-
-	struct dirent *ent;
-	struct stat st;
-	DIR* dir=opendir(".");
-
-	int cnt=0;
-	while((ent=readdir(dir)))
-	{
-		stat(ent->d_name,&st);
-		if(!S_ISDIR(st.st_mode) && strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
-		{
-			//dirty .map filter
-			int l=strlen(ent->d_name);
-			if(l>4 && ent->d_name[l-1]=='p' && ent->d_name[l-2]=='a' && ent->d_name[l-3]=='m' && ent->d_name[l-4]=='.')
-			{
-				if(list)
-				{
-					list[cnt]=malloc(strlen(ent->d_name)+1);
-					strcpy(list[cnt],ent->d_name);
-				}
-				cnt++;
-			}
-		}
-	}
-	closedir(dir);
-
-	chdir(currentPath);
-
-	return cnt;
-}

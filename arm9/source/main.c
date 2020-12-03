@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	initHardware();
 	initFilesystem(argc, argv);
 
-	initAudio();
+	//initAudio();
 
 	createState(&gameState, initGame, gameFrame, killGame, gameVBL);
 	createState(&menuState, initMenu, menuFrame, killMenu, menuVBL);

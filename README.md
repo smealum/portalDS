@@ -22,6 +22,7 @@ Acknowledgements :
 - the code for loading ini files was written by N. Devillard
 - the code used for level data compression was taken from GRIT
 - the code used for loading MD2 models and PCX files was written by David HENRY
+- Output function for No$gba debug messages written by Peter Schraut (www.console-dev.de)
 - this project uses libnds
 - xmem.c was written by SunDEV
 

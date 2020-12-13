@@ -1,5 +1,6 @@
 #include "game/game_main.h"
-
+// Currently  not used
+/*
 static particle_struct particles[NUMPARTICLES];
 static u16 particleCnt;
 
@@ -105,4 +106,4 @@ void particleExplosionDir(vect3D p, vect3D dir, int number, u16 color)
 	{
 		createParticles(p, addVect(dir,vect((rand()%speed)-speed/2,(rand()%speed)-speed/2,(rand()%speed)-speed/2)), 90, color);
 	}
-}
+}*/

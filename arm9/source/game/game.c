@@ -100,7 +100,8 @@ void initGame(void)
 	initPlayer(NULL);
 
 	initLights();
-	initParticles();
+	// Not used
+	//initParticles();
 
 	initMaterials();
 
@@ -249,9 +250,9 @@ static inline void render1(void)
 			drawRoomsGame(0, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
 		// iprintf("room : %d  \n",cpuEndSlice());
-
-		updateParticles();
-		drawParticles();
+		// Not used
+		//updateParticles();
+		//drawParticles();
 		// iprintf("particles : %d  \n",cpuEndSlice());
 
 			drawOBBs();

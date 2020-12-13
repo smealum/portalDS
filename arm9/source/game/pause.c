@@ -1,4 +1,6 @@
 #include "game/game_main.h"
+#include "engine/touch.h"
+
 
 static struct gl_texture_t* pauseImage;
 static struct gl_texture_t* pauseButtonsImage;
@@ -64,9 +66,7 @@ void doPause(u16* buffer)
 			}
 		}
 
-		touchRead(&tp);
-		tp.px = (float)(tp.rawx)*256.0/4080.0;
-		tp.py = (float)(tp.rawy)*192.0/3072.0;
+		touchReadFix(&tp);
 		swiWaitForVBlank();
 	}
 	lcdMainOnTop();

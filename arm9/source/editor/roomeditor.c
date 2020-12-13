@@ -1,4 +1,6 @@
 #include "editor/editor_main.h"
+#include "engine/touch.h"
+
 
 #define TOUCHSPEEDX (-32)
 #define TOUCHSPEEDY (32)
@@ -46,9 +48,7 @@ void initRoomEdition(void)
 	editorScale=inttof32(8*20);
 
 	//controls stuff
-	touchRead(&currentTouch);
-	currentTouch.px = (float)(currentTouch.rawx)*256.0/4080.0;
-	currentTouch.py = (float)(currentTouch.rawy)*192.0/3072.0;
+	touchReadFix(&currentTouch);
 	oldTouch=currentTouch;
 
 	//cosmetics
@@ -307,9 +307,7 @@ void roomEditorControls(void)
 
 void updateRoomEditor(void)
 {
-	touchRead(&currentTouch);
-	currentTouch.px = (float)(currentTouch.rawx)*256.0/4080.0;
-	currentTouch.py = (float)(currentTouch.rawy)*192.0/3072.0;
+	touchReadFix(&currentTouch);
 	if(!currentScreen)
 	{
 		updateLineOfTouch(currentTouch.px-128, currentTouch.py-96);

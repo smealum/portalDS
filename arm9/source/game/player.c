@@ -1,4 +1,5 @@
 #include "game/game_main.h"
+#include "engine/touch.h"
 
 
 player_struct player;
@@ -87,9 +88,7 @@ void initPlayer(player_struct* p)
 	p->object->radius=PLAYERRADIUS;
 	p->object->sqRadius=SQPLAYERRADIUS;
 	p->currentRoom=NULL;
-	touchRead(&touchCurrent);
-	touchCurrent.px = (float)(touchCurrent.rawx)*256.0/4080.0;
-	touchCurrent.py = (float)(touchCurrent.rawy)*192.0/3072.0;
+	touchReadFix(&touchCurrent);
 	touchOld=touchCurrent;
 	p->walkCnt=0;
 	p->life=127;
@@ -321,9 +320,8 @@ void playerControls(player_struct* p)
 
 	if(p->life<=0)changeState(&gameState);
 
-	touchRead(&touchCurrent);
-	touchCurrent.px = (float)(touchCurrent.rawx)*256.0/4080.0;
-	touchCurrent.py = (float)(touchCurrent.rawy)*192.0/3072.0;
+	touchReadFix(&touchCurrent);
+
 	// if(keysDown() & KEY_TOUCH)
 	// {
 	// 	touchOld=touchCurrent;

@@ -1,4 +1,5 @@
 #include "menu/menu_main.h"
+#include "engine/touch.h"
 
 
 
@@ -128,7 +129,7 @@ void menuFrame(void)
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
 
 	scanKeys();
-	touchRead(&currentTouch);
+	touchReadFix(&currentTouch);
 
 	//TEMP (updateCamera stuff)
 	menuCamera.viewPosition=menuCamera.position;
@@ -136,7 +137,9 @@ void menuFrame(void)
 
 
 	if(!(keysHeld() & KEY_TOUCH)) updateSimpleGui(-1, -1);
-	else  updateSimpleGui((float)(currentTouch.rawx)*256.0/(4080.0), (float)(currentTouch.rawy)*192.0/3072.0);
+	//else  updateSimpleGui((float)(currentTouch.rawx)*256.0/(4080.0), (float)(currentTouch.rawy)*192.0/3072.0);
+	//TODO make this work, code above ugly (not taking into account calibration data of touch)
+	else  updateSimpleGui((float)(currentTouch.px), (float)(currentTouch.py));
 
 	/**
 	 * Moves camera

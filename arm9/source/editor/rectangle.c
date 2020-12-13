@@ -140,9 +140,9 @@ bool collideLineConvertedRectangle(vect3D n, vect3D p, vect3D s, vect3D o, vect3
 		vect3D i=addVect(o,vectMult(v,k));
 		if(ip)*ip=i;
 		i=vectDifference(i,p);
-		NOGBA("I %d %d %d",i.x,i.y,i.z);
-		NOGBA("S %d %d %d",s.x,s.y,s.z);
-		
+		NOGBA("I %ld %ld %ld",i.x,i.y,i.z);
+		NOGBA("S %ld %ld %ld",s.x,s.y,s.z);
+
 		bool r=true;
 		if(s.x)
 		{
@@ -173,7 +173,7 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 	{
 		vect3D p=convertVect(rec->position); //CHECK lightmap generation ?
 		vect3D s=vect(rec->size.x*TILESIZE*2,rec->size.y*HEIGHTUNIT,rec->size.z*TILESIZE*2);
-		
+
 		int32 p2=dotProduct(vectDifference(p,o),n);
 
 		int32 k=divf32(p2,p1);
@@ -186,7 +186,7 @@ bool collideLineRectangle(rectangle_struct* rec, vect3D o, vect3D v, int32 d, in
 		vect3D i=addVect(o,vectMult(v,k));
 		if(ip)*ip=i;
 		i=vectDifference(i,p);
-		
+
 		bool r=true;
 		if(s.x)
 		{
@@ -212,29 +212,29 @@ vect3D getClosestPointRectangle(vect3D p, vect3D s, vect3D o)
 {
 	vect3D u1, u2;
 	int32 x,y,sx,sy;
-	
+
 	// NOGBA("p: %d %d %d",p.x,p.y,p.z);
 	// NOGBA("o: %d %d %d",o.x,o.y,o.z);
-	
+
 	if(s.x){sx=abs(s.x);u1=vect((s.x>0)?inttof32(1):(-inttof32(1)),0,0);}
 	else{sx=abs(s.y);u1=vect(0,(s.y>0)?inttof32(1):(-inttof32(1)),0);}
-	
+
 	if(s.z){sy=abs(s.z);u2=vect(0,0,(s.z>0)?inttof32(1):(-inttof32(1)));}
 	else{sy=abs(s.y);u2=vect(0,(s.y>0)?inttof32(1):(-inttof32(1)),0);}
-	
+
 	o=vectDifference(o,p);
-	
+
 	x=dotProduct(o,u1);y=dotProduct(o,u2);
-	
+
 	// NOGBA("x, y: %d %d",x,y);
 	// NOGBA("sx, sy: %d %d",sx,sy);
-	
+
 	bool r=true;
 	r=r&&x<sx&&x>=0;
 	r=r&&y<sy&&y>=0;
-	
+
 	if(r)return addVect(p,vect(mulf32(x,u1.x)+mulf32(y,u2.x), mulf32(x,u1.y)+mulf32(y,u2.y), mulf32(x,u1.z)+mulf32(y,u2.z)));
-	
+
 	if(x<0)
 	{
 		x=0;
@@ -256,7 +256,7 @@ vect3D getClosestPointRectangle(vect3D p, vect3D s, vect3D o)
 		if(x<0)x=0;
 		else if(x>sx)x=sx;
 	}
-	
+
 	return addVect(p,vect(mulf32(x,u1.x)+mulf32(y,u2.x), mulf32(x,u1.y)+mulf32(y,u2.y), mulf32(x,u1.z)+mulf32(y,u2.z)));
 }
 
@@ -444,7 +444,7 @@ bool insertRectangles(tree_struct* t, rectangle2DList_struct* l)
 			lc->data.real->lmPos.x=lc->data.position.x;
 			lc->data.real->lmPos.y=lc->data.position.y;
 			lc->data.real->rot=lc->data.rot;
-			NOGBA("pos %p %d %d %d %d (%d)",lc->data.real,lc->data.real->lmPos.x,lc->data.real->lmPos.y,lc->data.size.x,lc->data.size.y,lc->data.rot);
+			NOGBA("pos %p %ld %ld %ld %ld (%d)",lc->data.real,lc->data.real->lmPos.x,lc->data.real->lmPos.y,lc->data.size.x,lc->data.size.y,lc->data.rot);
 		}else rr=false;
 		lc=lc->next;
 	}

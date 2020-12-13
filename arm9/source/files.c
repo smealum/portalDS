@@ -1,10 +1,10 @@
 #include "common/general.h"
 #include <errno.h>
 
-bool saveAvailable;
+
 char* basePath;
 int lastSize;
-u8 fsMode;
+
 
 u32 getFileSize(FILE *file) {
     fseek(file, 0, SEEK_END);
@@ -13,6 +13,8 @@ u32 getFileSize(FILE *file) {
 
 bool initFilesystem(int argc, char **argv)
 {
+	bool saveAvailable;
+	u8 fsMode;
 	#ifndef FATONLY
 		if(nitroFSInit(&basePath))
 		{
@@ -61,14 +63,14 @@ void* bufferizeFile(char* filename, char* dir, u32* size, bool binary)
 	//if(strlen(dir)<=0)r=-1;
 	FILE* file;
 	NOGBA("opening %s...",filename);
-	
+
 	if(!binary)file = fopen(filename, "r+");
 	else file = fopen(filename, "rb+");
-	
+
 	NOGBA("done.");
-	
+
 	if(!file){chdir(path);return NULL;}
-	
+
 	u8* buffer;
 	long lsize;
 	fseek (file, 0 , SEEK_END);
@@ -77,9 +79,9 @@ void* bufferizeFile(char* filename, char* dir, u32* size, bool binary)
 	buffer=(u8*)malloc(lsize);
 	lastSize=lsize;
 	if(size)*size=lsize;
-	
+
 	if(!buffer){fclose(file);chdir(path);return NULL;}
-		
+
 	fread(buffer, 1, lsize, file);
 	fclose(file);
 	chdir(path);
@@ -91,7 +93,7 @@ bool fileExists(char* filename, char* dir)
 	char path[255];getcwd(path,255);
 	NOGBA(path);
 	chdir(dir);
-	FILE* file;	
+	FILE* file;
 	file=fopen(filename, "r+");
 	if(!file){chdir(path);return false;}
 	chdir(path);

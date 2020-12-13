@@ -1,6 +1,6 @@
 #include "common/general.h"
 
-sguiButton_struct simpleButtons[NUMSIMPLEBUTTONS];
+static sguiButton_struct simpleButtons[NUMSIMPLEBUTTONS];
 
 void initSimpleButtons(void)
 {
@@ -56,12 +56,13 @@ void simpleButtonSetImage(sguiButton_struct* b, mtlImg_struct* mtl, vect3D o, ve
 	b->mtlSize=s;
 }
 
+
 bool updateSimpleButton(sguiButton_struct* b, s16 x, s16 y)
 {
+
 	if(!b || !b->used)return false;
 
 	bool ret=false;
-
 	if(!(x==-1 && y==-1) && x>=b->position.x && x<b->position.x+b->size.x && y>=b->position.y && y<b->position.y+b->size.y)
 	{
 		b->active=true;
@@ -107,7 +108,7 @@ void drawSimpleButton(sguiButton_struct* b)
 		if(b->active)GFX_COLOR=RGB15(31,0,0);
 		else GFX_COLOR=RGB15(31,31,31);
 
-		glBegin(GL_QUADS);	
+		glBegin(GL_QUADS);
 			GFX_VERTEX10=NORMAL_PACK(0,(1<<6),0);
 			GFX_VERTEX10=NORMAL_PACK((1<<6),(1<<6),0);
 			GFX_VERTEX10=NORMAL_PACK((1<<6),0,0);
@@ -130,7 +131,7 @@ void drawSimpleGui(void)
 	glLoadIdentity();
 
 	glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 

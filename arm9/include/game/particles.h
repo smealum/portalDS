@@ -1,6 +1,8 @@
 #ifndef __PARTICLES9__
 #define __PARTICLES9__
 
+/* Not used currently */
+/*
 #define NUMPARTICLES 256
 
 typedef struct
@@ -17,5 +19,5 @@ void updateParticles(void);
 void particleExplosion(vect3D p, int number, u16 color);
 void particleExplosionDir(vect3D p, vect3D dir, int number, u16 color);
 void createParticles(vect3D position, vect3D speed, u16 life, u16 color);
-
+*/
 #endif

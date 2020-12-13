@@ -1,7 +1,8 @@
 #include "common/general.h"
 
-u8 state_id;
-state_struct *currentState, *nextState;
+static u8 state_id;
+state_struct *currentState;
+static state_struct *nextState;
 
 state_struct* getCurrentState(void)
 {
@@ -26,7 +27,7 @@ void createState(state_struct* s, function i, function f, function k, function v
 	s->frame=(function)f;
 	s->kill=(function)k;
 	s->vbl=(function)vbl;
-	
+
 	s->id=state_id;
 	s->mc_id=0;
 	state_id++;

@@ -1,6 +1,6 @@
 #include  "game/game_main.h"
 
-SFX_struct SFX[NUMSFX];
+static SFX_struct SFX[NUMSFX];
 
 void initSound()
 {

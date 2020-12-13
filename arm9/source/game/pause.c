@@ -1,11 +1,13 @@
 #include "game/game_main.h"
+#include "engine/touch.h"
 
-struct gl_texture_t* pauseImage;
-struct gl_texture_t* pauseButtonsImage;
-extern int mainBG;
 
-vect3D pauseButtonSize=(vect3D){128,29,0};
-vect3D pauseButtonPositions[]={(vect3D){59,47,0}, (vect3D){59,85,0}, (vect3D){59,123,0}};
+static struct gl_texture_t* pauseImage;
+static struct gl_texture_t* pauseButtonsImage;
+
+//extern int mainBG;
+static vect3D pauseButtonSize=(vect3D){128,29,0};
+static vect3D pauseButtonPositions[]={(vect3D){59,47,0}, (vect3D){59,85,0}, (vect3D){59,123,0}};
 
 void initPause(void)
 {
@@ -64,7 +66,7 @@ void doPause(u16* buffer)
 			}
 		}
 
-		touchRead(&tp);
+		touchReadFix(&tp);
 		swiWaitForVBlank();
 	}
 	lcdMainOnTop();

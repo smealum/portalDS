@@ -1,9 +1,9 @@
 #include "editor/editor_main.h"
 
 material_struct materials[NUMMATERIALS];
-material_struct* defaultMaterial;
-materialSlice_struct materialSlices[NUMMATERIALSLICES];
-materialSlice_struct* defaultMaterialSlice;
+static material_struct* defaultMaterial;
+static materialSlice_struct materialSlices[NUMMATERIALSLICES];
+static materialSlice_struct* defaultMaterialSlice;
 
 void initMaterials(void)
 {
@@ -83,7 +83,7 @@ void loadMaterialSlices(char* filename)
 		materialSlice_struct* ms=createMaterialSlice();
 		loadMaterialSlice(ms,r);
 		NOGBA("loaded %d : %s",i,r);
-		
+
 			int k=0;
 			sprintf(key,"slice%d:align",i);
 			sscanf(dictionary_get(dic, key, "0"),"%d",&k);
@@ -92,7 +92,7 @@ void loadMaterialSlices(char* filename)
 			sscanf(dictionary_get(dic, key, "1"),"%d",&k);
 			ms->factorX=k;
 			ms->factorY=k;
-			
+
 			{
 				char def[16];
 				sprintf(def,"%d",ms->factorX);
@@ -103,10 +103,10 @@ void loadMaterialSlices(char* filename)
 				sscanf(dictionary_get(dic, key, def),"%d",&k);
 				ms->factorY=k;
 			}
-		
+
 		// if(!ms->img){break;}
 		i++;
-		sprintf(key,"slice%d:texture",i);		
+		sprintf(key,"slice%d:texture",i);
 	}
 	iniparser_freedict(dic);
 }
@@ -146,7 +146,7 @@ void loadMaterials(char* filename)
 		i++;
 		sprintf(key1,"material%d:top",i);
 		sprintf(key2,"material%d:side",i);
-		sprintf(key3,"material%d:bottom",i);	
+		sprintf(key3,"material%d:bottom",i);
 		r1=dictionary_get(dic, key1, NULL);r2=dictionary_get(dic, key2, NULL);r3=dictionary_get(dic, key3, NULL);
 	}
 	iniparser_freedict(dic);
@@ -255,7 +255,7 @@ materialSlice_struct* bindMaterial(material_struct* m, rectangle_struct* rec, in
 {
 	if(!m)m=defaultMaterial;
 	if(!m->used)return NULL;
-	
+
 	materialSlice_struct* ms=m->side;
 
 	if(!rec)bindMaterialSlice(ms, DL);

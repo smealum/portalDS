@@ -11,7 +11,7 @@ struct sguiButton_struct;
 
 typedef void(*buttonTargetFunction)(struct sguiButton_struct*);
 
-typedef struct
+struct sguiButton_struct
 {
 	vect3D position, size;
 	char* string;
@@ -19,7 +19,9 @@ typedef struct
 	vect3D mtlOffset, mtlSize;
 	buttonTargetFunction targetFunction;
 	bool used, active;
-}sguiButton_struct;
+};
+
+typedef struct sguiButton_struct sguiButton_struct;
 
 
 void initSimpleGui(void);

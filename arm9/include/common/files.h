@@ -5,8 +5,9 @@
 
 extern char* basePath;
 
-extern bool saveAvailable;
-extern u8 fsMode;
+//extern bool saveAvailable;
+//extern u8 fsMode;
+extern int lastSize;
 
 int chdir (const char *path);
 bool fileExists(char* filename, char* dir);

@@ -12,5 +12,5 @@ void setLevelInfo(char* title, char* author);
 void endGame(void);
 
 extern bool isNextRoom;
-
+extern int mainBG;
 #endif

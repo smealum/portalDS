@@ -3,29 +3,31 @@
 #define DOORFRAMELENGTH (8)
 #define WALLDOORINTERVAL (32)
 
-room_struct elevatorRoom;
 
 wallDoor_struct entryWallDoor;
 wallDoor_struct exitWallDoor;
-md2Model_struct wallDoorModel;
 
-vect3D doorFrameData[]={{-TILESIZE*2,HEIGHTUNIT*8,0},{-TILESIZE*2,HEIGHTUNIT*5,0},{-TILESIZE,HEIGHTUNIT*8,0},{-TILESIZE,HEIGHTUNIT*7,0},{TILESIZE,HEIGHTUNIT*8,0},{TILESIZE,HEIGHTUNIT*7,0},{TILESIZE*2,HEIGHTUNIT*8,0},{TILESIZE*2,HEIGHTUNIT*5,0}};
+static md2Model_struct wallDoorModel;
+static room_struct elevatorRoom;
 
-vect3D wallDoorV1[]={{0,0,1},
+
+static vect3D doorFrameData[]={{-TILESIZE*2,HEIGHTUNIT*8,0},{-TILESIZE*2,HEIGHTUNIT*5,0},{-TILESIZE,HEIGHTUNIT*8,0},{-TILESIZE,HEIGHTUNIT*7,0},{TILESIZE,HEIGHTUNIT*8,0},{TILESIZE,HEIGHTUNIT*7,0},{TILESIZE*2,HEIGHTUNIT*8,0},{TILESIZE*2,HEIGHTUNIT*5,0}};
+
+static vect3D wallDoorV1[]={{0,0,1},
 					{0,0,-1},
 					{0,0,0},
 					{0,0,0},
 					{1,0,0},
 					{-1,0,0}};
 
-vect3D wallDoorV2[]={{-1,0,0},
+static vect3D wallDoorV2[]={{-1,0,0},
 					{1,0,0},
 					{0,0,0},
 					{0,0,0},
 					{0,0,-1},
 					{0,0,1}};
 
-vect3D elevatorRoomSize;
+static vect3D elevatorRoomSize;
 
 void initWallDoor(wallDoor_struct* wd)
 {
@@ -34,7 +36,7 @@ void initWallDoor(wallDoor_struct* wd)
 	wd->used=false;
 	wd->rectangle=NULL;
 	wd->override=false;
-	
+
 	initModelInstance(&wd->modelInstance, &wallDoorModel);
 }
 
@@ -73,7 +75,7 @@ void setupWallDoor(room_struct* r, wallDoor_struct* wd, vect3D position, u8 orie
 	NOGBA("ORIENTATION %d",orientation);
 
 	rectangle_struct rec;
-	rectangle_struct* recp;
+
 	//door wall
 	rec.material=NULL;
 	rec.position=addVect(position,vectDifference(vect(0,-4,0),wallDoorV1[orientation]));rec.size=addVect(vect(0,8,0),vectMultInt(wallDoorV1[orientation],2));rec.normal=vectMultInt(wallDoorV2[orientation],inttof32(1));
@@ -145,12 +147,12 @@ void drawWallDoor(wallDoor_struct* wd, portal_struct* p)
 		setupObjectLighting(NULL, wd->position, &params);
 
 		glTranslate3f32(wd->position.x,wd->position.y,wd->position.z);
-		
+
 		glPushMatrix();
 			if(wd->orientation<=1)glRotateYi(8192);
-			
+
 			renderModelFrameInterp(wd->modelInstance.currentFrame,wd->modelInstance.nextFrame,wd->modelInstance.interpCounter,wd->modelInstance.model,params,false,wd->modelInstance.palette,RGB15(31,31,31));
-		
+
 			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_BACK|POLY_ID(31)|POLY_FOG);
 			GFX_COLOR=RGB15(31,31,31);
 			vect3D v[4];
@@ -163,9 +165,9 @@ void drawWallDoor(wallDoor_struct* wd, portal_struct* p)
 					int32 tx=v[0].x+((doorFrameData[i].x-doorFrameData[0].x)*(v[2].x-v[0].x))/(TILESIZE*4);
 					int32 ty=v[0].y+((doorFrameData[i].y-doorFrameData[0].y)*(v[2].y-v[0].y))/(HEIGHTUNIT*8);
 					GFX_TEX_COORD=TEXTURE_PACK((tx), (ty));
-					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z);			
+					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z);
 				}
-		
+
 			glPolyFmt(POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(31)|POLY_FOG);
 			GFX_BEGIN=GL_QUAD_STRIP;
 
@@ -174,7 +176,7 @@ void drawWallDoor(wallDoor_struct* wd, portal_struct* p)
 					int32 tx=v[0].x+((doorFrameData[i].x-doorFrameData[0].x)*(v[2].x-v[0].x))/(TILESIZE*4);
 					int32 ty=v[0].y+((doorFrameData[i].y-doorFrameData[0].y)*(v[2].y-v[0].y))/(HEIGHTUNIT*8);
 					GFX_TEX_COORD=TEXTURE_PACK((tx), (ty));
-					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z-WALLDOORINTERVAL);			
+					glVertex3v16(doorFrameData[i].x,doorFrameData[i].y,doorFrameData[i].z-WALLDOORINTERVAL);
 				}
 		glPopMatrix(1);
 
@@ -183,7 +185,7 @@ void drawWallDoor(wallDoor_struct* wd, portal_struct* p)
 			glPopMatrix(1);
 			return;
 		}
-		
+
 		if(!p || (dotProduct(vectDifference(p->position,wd->position), p->normal)>0))
 		{
 			//TEMP TEST

@@ -4,10 +4,9 @@
 
 room_struct gameRoom;
 
-u32* testDL=NULL;
 
 //DEBUG
-bool debugWireframe=false;
+static bool debugWireframe=false;
 
 void initRectangleList(rectangleList_struct* p)
 {
@@ -68,7 +67,7 @@ rectangle_struct createRectangle(vect3D pos, vect3D size, bool portalable)
 vect3D getUnitVect(rectangle_struct* rec)
 {
 	vect3D u=vect(0,0,0);
-	vect3D size=rec->size;	
+	vect3D size=rec->size;
 	if(size.x>0)u.x=(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	else if(size.x)u.x=-(TILESIZE*2)/LIGHTMAPRESOLUTION;
 	if(size.y>0)u.y=(TILESIZE*2)/LIGHTMAPRESOLUTION;
@@ -219,7 +218,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 	u16 tw=1, th=1;
 	if(c)
 	{
-		GFX_COLOR=RGB15(31,31,31);		
+		GFX_COLOR=RGB15(31,31,31);
 		materialSlice_struct* ms=bindMaterial(rec.material,&rec,t,vt,false);
 		int i;for(i=0;i<4;i++){vt[i].x/=TEXTURE_SCALE;vt[i].y/=TEXTURE_SCALE;t[i]=TEXTURE_PACK(vt[i].x, vt[i].y);}
 		if(ms && ms->img){tw=ms->img->width;th=ms->img->height;}
@@ -284,7 +283,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 					vect3D vtest1=vect(tp.x+vt2.x,tp.y+vt2.y,0);
 					vect3D vtest2=vect(tp.x,tp.y,0);
 					int32 v=max(max(abs(vtest1.x),abs(vtest1.y)),max(abs(vtest2.x),abs(vtest2.y)));
-					if(v>=32768){iprintf("lala %d %d %d %d \n",tp.x,tp.y,inttot16(tw),inttot16(th));continue;}
+					if(v>=32768){iprintf("lala %ld %ld %d %d \n",tp.x,tp.y,inttot16(tw),inttot16(th));continue;}
 
 					// vc=&rec.lightData.vertex->values[(k++)+rec.lightData.vertex->height];
 					// u8 vb=computeVertexLightings(convertVect(vectDivInt(vect(p.x+v1.x,p.y+v1.y,p.z+v1.z),32)), rec.normal);
@@ -312,7 +311,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 				GFX_TEX_COORD = t[0];
 				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[0].x,v[0].y,v[0].z);
-		
+
 				GFX_TEX_COORD = t[1];
 				vc=&rec.lightData.vertex->values[1];
 				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
@@ -322,7 +321,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 				vc=&rec.lightData.vertex->values[3];
 				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
 				glVertex3v16(v[2].x,v[2].y,v[2].z);
-		
+
 				GFX_TEX_COORD = t[3];
 				vc=&rec.lightData.vertex->values[2];
 				if(!debugWireframe)GFX_COLOR=RGB15(*vc,*vc,*vc);
@@ -332,13 +331,13 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 		glBegin(GL_QUAD);
 			GFX_TEX_COORD = t[0];
 			glVertex3v16(v[0].x,v[0].y,v[0].z);
-	
+
 			GFX_TEX_COORD = t[1];
 			glVertex3v16(v[1].x,v[1].y,v[1].z);
-	
+
 			GFX_TEX_COORD = t[2];
 			glVertex3v16(v[2].x,v[2].y,v[2].z);
-	
+
 			GFX_TEX_COORD = t[3];
 			glVertex3v16(v[3].x,v[3].y,v[3].z);
 	}
@@ -347,7 +346,7 @@ void drawRect(rectangle_struct rec, vect3D pos, vect3D size, bool c) //TEMP ? (c
 void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cpos, vect3D cnormal, bool cull) //TEMP ?
 {
 	if(rec.hide)return;
-	
+
 	vect3D v[4];
 	vect3D rpos=pos, rsize=size;
 	pos=convertVect(pos);
@@ -369,7 +368,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		v[2]=vect(pos.x+size.x, pos.y, pos.z+size.z);
 		v[3]=vect(pos.x+size.x, pos.y, pos.z);
 	}
-	
+
 	if(cull)
 	{
 		int i;bool pass=false;
@@ -380,7 +379,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 		}
 		if(!pass)return;
 	}
-	
+
 	vect3D vt[4];
 	int32 t[4];
 	if(c)
@@ -481,7 +480,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 				glTexCoordPACKED(t[0]);
 				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
 				glVertex3v16DL(v[0].x,v[0].y,v[0].z);
-		
+
 				glTexCoordPACKED(t[1]);
 				vc=&rec.lightData.vertex->values[1];
 				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
@@ -491,7 +490,7 @@ void drawRectDL(rectangle_struct rec, vect3D pos, vect3D size, bool c, vect3D cp
 				vc=&rec.lightData.vertex->values[3];
 				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
 				glVertex3v16DL(v[2].x,v[2].y,v[2].z);
-		
+
 				glTexCoordPACKED(t[3]);
 				vc=&rec.lightData.vertex->values[2];
 				if(!debugWireframe)glColorDL(RGB15(*vc,*vc,*vc));
@@ -569,7 +568,7 @@ void drawRectangleList(rectangleList_struct* rl)
 
 	glMatrixMode(GL_TEXTURE);
 	glPopMatrix(1);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(1);
 }
@@ -580,7 +579,7 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 	if(keysDown() & KEY_X)debugWireframe^=1;
 	if(debugWireframe)glPolyFmt(POLY_ALPHA(0) | POLY_CULL_BACK); //DEBUG
 	else glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	
+
 	drawRectangleList(&r->rectangles);
 	if(mode&6 && r->lightingData.type==LIGHTMAP_DATA)
 	{
@@ -620,12 +619,12 @@ void drawRectangles(room_struct* r, u8 mode, u16 color)
 void initRoomGrid(room_struct* r)
 {
 	if(!r || !r->width || !r->height)return;
-	
+
 	r->rectangleGridSize.x=r->width/CELLSIZE+1;
 	r->rectangleGridSize.y=r->height/CELLSIZE+1;
-	
+
 	r->rectangleGrid=malloc(sizeof(gridCell_struct)*r->rectangleGridSize.x*r->rectangleGridSize.y);
-	
+
 	int i;
 	for(i=0;i<r->rectangleGridSize.x*r->rectangleGridSize.y;i++)
 	{
@@ -636,13 +635,13 @@ void initRoomGrid(room_struct* r)
 void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 {
 	if(!r)return;
-	
+
 	r->width=w;
 	r->height=h;
 	r->position=p;
-	
+
 	initRectangleList(&r->rectangles);
-	
+
 	if(r->height && r->width)
 	{
 		r->materials=malloc(r->height*r->width*sizeof(material_struct*));
@@ -652,17 +651,17 @@ void initRoom(room_struct* r, u16 w, u16 h, vect3D p)
 	initLightData(&r->lightingData);
 	r->rectangleGrid=NULL;
 	r->displayList=NULL;
-		
+
 	initRoomGrid(r);
 }
 
 gridCell_struct* getCurrentCell(room_struct* r, vect3D o)
 {
 	if(!r)return NULL;
-	
+
 	o=vectDifference(o,convertSize(vect(r->position.x,0,r->position.y)));
 	o=vectDivInt(o,CELLSIZE*TILESIZE*2);
-	
+
 	if(o.x>=0 && o.x<r->rectangleGridSize.x && o.z>=0 && o.z<r->rectangleGridSize.y)return &r->rectangleGrid[o.x+o.z*r->rectangleGridSize.x];
 	return NULL;
 }
@@ -670,7 +669,7 @@ gridCell_struct* getCurrentCell(room_struct* r, vect3D o)
 void drawCell(gridCell_struct* gc) //debug
 {
 	if(!gc)return;
-	
+
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r)return;
 	glPushMatrix();
@@ -687,14 +686,14 @@ void drawCell(gridCell_struct* gc) //debug
 void generateGridCell(room_struct* r, gridCell_struct* gc, u16 x, u16 y)
 {
 	if(!r || !gc)return;
-	
+
 	if(gc->rectangles)free(gc->rectangles);
 	gc->numRectangles=0;
 	gc->lights[0]=NULL;gc->lights[1]=NULL;gc->lights[2]=NULL;
-	
+
 	x*=CELLSIZE*2;y*=CELLSIZE*2; //so getting the center isn't a problem
 	x+=CELLSIZE;y+=CELLSIZE; //center
-	
+
 	listCell_struct *lc=r->rectangles.first;
 	while(lc)
 	{
@@ -715,14 +714,14 @@ void generateGridCell(room_struct* r, gridCell_struct* gc, u16 x, u16 y)
 		}
 		lc=lc->next;
 	}
-	
+
 	getClosestLights(vect(x/2,0,y/2), &gc->lights[0], &gc->lights[1], &gc->lights[2], &gc->lightDistances[0], &gc->lightDistances[1], &gc->lightDistances[2]);
 }
 
 void generateRoomGrid(room_struct* r)
 {
 	if(!r)return;
-	
+
 	int i, j;
 	for(i=0;i<r->rectangleGridSize.x;i++)
 	{
@@ -754,11 +753,11 @@ void drawRoom(room_struct* r, u8 mode, u16 color) //obviously temp
 extern u32 debugVal; //TEMP
 
 u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cull)
-{	
+{
 	if(!r)r=getPlayer()->currentRoom;
 	if(!r)return NULL;
 	u32* ptr=glBeginListDL();
-	
+
 	glPolyFmtDL(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FOG);
 	listCell_struct *lc=r->rectangles.first;
 	while(lc)
@@ -766,7 +765,7 @@ u32* generateRoomDisplayList(room_struct* r, vect3D pos, vect3D normal, bool cul
 		drawRectDL(lc->data,(lc->data.position),(lc->data.size),true,vectDifference(pos,vect(TILESIZE*2*r->position.x, 0, TILESIZE*2*r->position.y)),normal,cull);
 		lc=lc->next;
 	}
-	
+
 	if(r->lightingData.type==LIGHTMAP_DATA)
 	{
 		lc=r->rectangles.first;
@@ -811,12 +810,12 @@ void setupObjectLighting(room_struct* r, vect3D pos, u32* params)
 	l2=gc->lights[1];
 	l3=gc->lights[2];
 	// *params=POLY_ALPHA(31) | POLY_CULL_FRONT;
-	
+
 	glMaterialf(GL_AMBIENT, RGB15(5,5,5));
 	glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
 	glMaterialf(GL_SPECULAR, RGB15(0,0,0));
 	glMaterialf(GL_EMISSION, RGB15(0,0,0));
-	
+
 	if(l1)
 	{
 		*params|=POLY_FORMAT_LIGHT0;

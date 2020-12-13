@@ -1,6 +1,6 @@
 #include "editor/editor_main.h"
 
-mtlImg_struct* pointTexture;
+static mtlImg_struct* pointTexture;
 
 void cubeSpecialInit(entity_struct* e);
 void wallDoorSpecialDraw(entity_struct* e);
@@ -276,8 +276,6 @@ void moveEntitiesRange(vect3D o, vect3D s, vect3D u)
 	}
 }
 
-extern camera_struct editorCamera;
-
 void drawEntity(entity_struct* e)
 {
 	if(!e || !e->placed)return;
@@ -362,8 +360,6 @@ contextButton_struct lightButtonArray[]={(contextButton_struct){"delete", (butto
 
 //SPECIAL INITS/UPDATES
 
-
-extern editorRoom_struct editorRoom;
 
 void cubeSpecialInit(entity_struct* e)
 {

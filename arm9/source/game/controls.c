@@ -1,5 +1,11 @@
 #include "game/game_main.h"
 
+
+u8 touchCnt;
+
+//extern bool currentPortalColor;
+// extern SFX_struct *gunSFX1, *gunSFX2;
+
 typedef enum
 {
 	CONTROL_FORWARD,
@@ -20,21 +26,21 @@ typedef enum
 	CONTROL_NUMBER
 }controlAction_type;
 
-char* controlStrings[]={"CONTROL_FORWARD",
-					"CONTROL_BACK",
-					"CONTROL_STRAFEL",
-					"CONTROL_STRAFER",
-					"CONTROL_LOOKL",
-					"CONTROL_LOOKR",
-					"CONTROL_LOOKUP",
-					"CONTROL_LOOKDOWN",
-					"CONTROL_JUMP",
-					"CONTROL_SHOOTALL",
-					"CONTROL_SHOOTY",
-					"CONTROL_SHOOTB",
-					"CONTROL_USE",
-					"CONTROL_PAUSE",
-					"CONTROL_SCREENSHOT"};
+static char* controlStrings[]={"CONTROL_FORWARD",
+								"CONTROL_BACK",
+								"CONTROL_STRAFEL",
+								"CONTROL_STRAFER",
+								"CONTROL_LOOKL",
+								"CONTROL_LOOKR",
+								"CONTROL_LOOKUP",
+								"CONTROL_LOOKDOWN",
+								"CONTROL_JUMP",
+								"CONTROL_SHOOTALL",
+								"CONTROL_SHOOTY",
+								"CONTROL_SHOOTB",
+								"CONTROL_USE",
+								"CONTROL_PAUSE",
+								"CONTROL_SCREENSHOT"};
 
 typedef enum
 {
@@ -54,35 +60,35 @@ typedef enum
 	INPUT_NUMBER
 }controlInput_type;
 
-char* inputStrings[]={"INPUT_A",
-					"INPUT_B",
-					"INPUT_X",
-					"INPUT_Y",
-					"INPUT_UP",
-					"INPUT_DOWN",
-					"INPUT_LEFT",
-					"INPUT_RIGHT",
-					"INPUT_R",
-					"INPUT_L",
-					"INPUT_SELECT",
-					"INPUT_START",
-					"INPUT_DOUBLETAP"};
+static char* inputStrings[]={"INPUT_A",
+							"INPUT_B",
+							"INPUT_X",
+							"INPUT_Y",
+							"INPUT_UP",
+							"INPUT_DOWN",
+							"INPUT_LEFT",
+							"INPUT_RIGHT",
+							"INPUT_R",
+							"INPUT_L",
+							"INPUT_SELECT",
+							"INPUT_START",
+							"INPUT_DOUBLETAP"};
 
-KEYPAD_BITS inputMasks[]={KEY_A,
-					KEY_B,
-					KEY_X,
-					KEY_Y,
-					KEY_UP,
-					KEY_DOWN,
-					KEY_LEFT,
-					KEY_RIGHT,
-					KEY_R,
-					KEY_L,
-					KEY_SELECT,
-					KEY_START,
-					0};
+static KEYPAD_BITS inputMasks[]={KEY_A,
+								KEY_B,
+								KEY_X,
+								KEY_Y,
+								KEY_UP,
+								KEY_DOWN,
+								KEY_LEFT,
+								KEY_RIGHT,
+								KEY_R,
+								KEY_L,
+								KEY_SELECT,
+								KEY_START,
+								0};
 
-char* inputDefaults[]={"CONTROL_STRAFER",
+static char* inputDefaults[]={"CONTROL_STRAFER",
 					"CONTROL_BACK",
 					"CONTROL_FORWARD",
 					"CONTROL_STRAFEL",
@@ -96,14 +102,53 @@ char* inputDefaults[]={"CONTROL_STRAFER",
 					"CONTROL_PAUSE",
 					"CONTROL_JUMP"};
 
-controlAction_type currentConfiguration[INPUT_NUMBER];
+
+#define CONTROLS_NB_CONTROL_FN  14
+
+/** Guard to prevent the same control function to
+ * be called twice in case of allocation to two
+ * different button that may be pressed at the same time. */
+static bool controlWasCalled[CONTROLS_NB_CONTROL_FN];
+
+static controlAction_type currentConfiguration[INPUT_NUMBER];
 
 typedef void(*controlActionFunction)(player_struct*,bool,bool);
-controlActionFunction controlFunctions[];
 
-extern SFX_struct *gunSFX1, *gunSFX2;
 
-controlAction_type actionByString(char* str)
+static void controlForward(player_struct* p, bool down, bool held);
+static void controlBack(player_struct* p, bool down, bool held);
+static void controlStrafeLeft(player_struct* p, bool down, bool held);
+static void controlStrafeRight(player_struct* p, bool down, bool held);
+static void controlPause(player_struct* p, bool down, bool held);
+static void controlShootAll(player_struct* p, bool down, bool held);
+static void controlShootYellow(player_struct* p, bool down, bool held);
+static void controlShootBlue(player_struct* p, bool down, bool held);
+static void controlUse(player_struct* p, bool down, bool held);
+static void controlJump(player_struct* p, bool down, bool held);
+static void controlLookRight(player_struct* p, bool down, bool held);
+static void controlLookLeft(player_struct* p, bool down, bool held);
+static void controlLookUp(player_struct* p, bool down, bool held);
+static void controlLookDown(player_struct* p, bool down, bool held);
+
+
+static controlActionFunction controlFunctions[]={(controlActionFunction)controlForward,
+												(controlActionFunction)controlBack,
+												(controlActionFunction)controlStrafeLeft,
+												(controlActionFunction)controlStrafeRight,
+												(controlActionFunction)controlLookLeft,
+												(controlActionFunction)controlLookRight,
+												(controlActionFunction)controlLookUp,
+												(controlActionFunction)controlLookDown,
+												(controlActionFunction)controlJump,
+												(controlActionFunction)controlShootAll,
+												(controlActionFunction)controlShootYellow,
+												(controlActionFunction)controlShootBlue,
+												(controlActionFunction)controlUse,
+												(controlActionFunction)controlPause,
+												NULL};
+
+
+static controlAction_type actionByString(char* str)
 {
 	if(!str)return CONTROL_NUMBER;
 
@@ -130,8 +175,6 @@ void loadControlConfiguration(char* filename)
 	iniparser_freedict(dic);
 }
 
-u8 touchCnt;
-
 void updateControl(controlInput_type ci)
 {
 	switch(ci)
@@ -150,14 +193,24 @@ void updateControl(controlInput_type ci)
 	}
 }
 
+
 void updateControls(void)
 {
-	int i; for(i=0;i<INPUT_NUMBER;i++)updateControl(i);
+
+	int i;
+	for(i=0;i<CONTROLS_NB_CONTROL_FN;i++)controlWasCalled[i]=false;
+	for(i=0;i<INPUT_NUMBER;i++)updateControl(i);
 }
 
-void controlForward(player_struct* p, bool down, bool held)
+static void controlForward(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[0])
+		return;
+
+	controlWasCalled[0]=true;
+
 
 	if(p->object->contact)
 	{
@@ -168,9 +221,14 @@ void controlForward(player_struct* p, bool down, bool held)
 	}else moveCamera(NULL, vect(0,0,-PLAYERAIRSPEED));
 }
 
-void controlBack(player_struct* p, bool down, bool held)
+static void controlBack(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[1])
+		return;
+
+	controlWasCalled[1]=true;
 
 	if(p->object->contact)
 	{
@@ -181,9 +239,14 @@ void controlBack(player_struct* p, bool down, bool held)
 	}else moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
 }
 
-void controlStrafeLeft(player_struct* p, bool down, bool held)
+static void controlStrafeLeft(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[2])
+		return;
+
+	controlWasCalled[2]=true;
 
 	if(p->object->contact)
 	{
@@ -194,9 +257,14 @@ void controlStrafeLeft(player_struct* p, bool down, bool held)
 	}else moveCamera(NULL, vect(-PLAYERAIRSPEED,0,0));
 }
 
-void controlStrafeRight(player_struct* p, bool down, bool held)
+static void controlStrafeRight(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[3])
+		return;
+
+	controlWasCalled[3]=true;
 
 	if(p->object->contact)
 	{
@@ -207,18 +275,26 @@ void controlStrafeRight(player_struct* p, bool down, bool held)
 	}else moveCamera(NULL, vect(PLAYERAIRSPEED,0,0));
 }
 
-void controlPause(player_struct* p, bool down, bool held)
+static void controlPause(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[4])
+		return;
+
+	controlWasCalled[4]=true;
 
 	doPause(NULL);
 }
 
-extern bool currentPortalColor;
-
-void controlShootAll(player_struct* p, bool down, bool held)
+static void controlShootAll(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[5])
+		return;
+
+	controlWasCalled[5]=true;
 
 	if(!p->modelInstance.oneshot)
 	{
@@ -228,9 +304,14 @@ void controlShootAll(player_struct* p, bool down, bool held)
 	}
 }
 
-void controlShootYellow(player_struct* p, bool down, bool held)
+static void controlShootYellow(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[6])
+		return;
+
+	controlWasCalled[6]=true;
 
 	if(!p->modelInstance.oneshot)
 	{
@@ -240,9 +321,14 @@ void controlShootYellow(player_struct* p, bool down, bool held)
 	}
 }
 
-void controlShootBlue(player_struct* p, bool down, bool held)
+static void controlShootBlue(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[7])
+		return;
+
+	controlWasCalled[7]=true;
 
 	if(!p->modelInstance.oneshot)
 	{
@@ -252,9 +338,14 @@ void controlShootBlue(player_struct* p, bool down, bool held)
 	}
 }
 
-void controlUse(player_struct* p, bool down, bool held)
+static void controlUse(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[8])
+		return;
+
+	controlWasCalled[8]=true;
 
 	if(!p->modelInstance.oneshot)
 	{
@@ -264,53 +355,63 @@ void controlUse(player_struct* p, bool down, bool held)
 	}
 }
 
-void controlJump(player_struct* p, bool down, bool held)
+static void controlJump(player_struct* p, bool down, bool held)
 {
 	if(!p || !down)return;
+
+	if(controlWasCalled[9])
+		return;
+
+	controlWasCalled[9]=true;
 
 	if(p->object->contact)p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));
 }
 
-void controlLookRight(player_struct* p, bool down, bool held)
+static void controlLookRight(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[10])
+		return;
+
+	controlWasCalled[10]=true;
 
 	rotateCamera(NULL, vect(0,16,0));
 }
 
-void controlLookLeft(player_struct* p, bool down, bool held)
+static void controlLookLeft(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[11])
+		return;
+
+	controlWasCalled[11]=true;
 
 	rotateCamera(NULL, vect(0,-16,0));
 }
 
-void controlLookUp(player_struct* p, bool down, bool held)
+static void controlLookUp(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+
+	if(controlWasCalled[12])
+		return;
+
+	controlWasCalled[12]=true;
 
 	rotateCamera(NULL, vect(16,0,0));
 }
 
-void controlLookDown(player_struct* p, bool down, bool held)
+static void controlLookDown(player_struct* p, bool down, bool held)
 {
 	if(!p)return;
+	if(controlWasCalled[13])
+		return;
+
+	controlWasCalled[13]=true;
 
 	rotateCamera(NULL, vect(-16,0,0));
 }
 
-controlActionFunction controlFunctions[]={(controlActionFunction)controlForward,
-										(controlActionFunction)controlBack,
-										(controlActionFunction)controlStrafeLeft,
-										(controlActionFunction)controlStrafeRight,
-										(controlActionFunction)controlLookLeft,
-										(controlActionFunction)controlLookRight,
-										(controlActionFunction)controlLookUp,
-										(controlActionFunction)controlLookDown,
-										(controlActionFunction)controlJump,
-										(controlActionFunction)controlShootAll,
-										(controlActionFunction)controlShootYellow,
-										(controlActionFunction)controlShootBlue,
-										(controlActionFunction)controlUse,
-										(controlActionFunction)controlPause,
-										NULL};
+

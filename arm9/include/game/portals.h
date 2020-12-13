@@ -39,4 +39,18 @@ u16 getCurrentPortalColor(vect3D o);
 
 bool isPortalOnWall(room_struct* r, portal_struct* p, bool fix);
 
+/**
+ * Determines if the two portals do not collide.
+ *
+ * \param[in] p one portal
+ *
+ * \param[in] p the other portal
+ *
+ * \return true if the two portal do not collides, false otherwise
+ *
+ * \warning Does not work if two portals are on the ceiling.
+*/
+bool portalToPortalIntersection(const  portal_struct* p, const portal_struct* p2);
+bool isPointInPortal(portal_struct* p, vect3D o, vect3D *v, int32* x, int32* y, int32* z);
+
 #endif

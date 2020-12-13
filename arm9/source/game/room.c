@@ -1,9 +1,9 @@
 #include "game/game_main.h"
 #include "editor/io.h"
+#include "editor/entity.h"
 
 void drawRoomsGame(u8 mode, u16 color)
 {
-	int i;
 	unbindMtl();
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
 
@@ -24,7 +24,7 @@ void roomOriginSize(room_struct* r, vect3D* o, vect3D* s)
 		m=minVect(addVect(lc->data.position,lc->data.size),m);
 		M=maxVect(lc->data.position,M);
 		M=maxVect(addVect(lc->data.position,lc->data.size),M);
-		NOGBA("%d",lc->data.position.y);
+		NOGBA("%ld",lc->data.position.y);
 		lc=lc->next;
 	}
 
@@ -127,7 +127,7 @@ void insertRoom(room_struct* r1, room_struct* r2, vect3D v, u8 orientation)
 		if(!(orientation%2) || orientation==1)invertRectangle(&rec);
 
 		rec.position=addVect(rec.position,v);
-		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);	
+		rectangle_struct* recp=addRoomRectangle(r1, rec, rec.material, rec.portalable);
 		if(recp)
 		{
 			recp->hide=true; //TEMP ?
@@ -150,13 +150,13 @@ activatorTarget_type entityTargetTypeArray[NUMENTITIES];
 void readRectangle(rectangle_struct* rec, FILE* f)
 {
 	if(!rec || !f)return;
-	
+
 	readVect(&rec->position,f);
 	readVect(&rec->size,f);
 	readVect(&rec->normal,f);
 
 	fread(&rec->portalable,sizeof(bool),1,f);
-	
+
 	u16 mid=0; fread(&mid,sizeof(u16),1,f);
 
 	rec->lightData.lightMap=NULL;
@@ -457,11 +457,13 @@ void readMapInfo(char* filename)
 	dictionary* dic=iniparser_load(filename);
 	setLevelInfo(dictionary_get(dic, "info:title", NULL), dictionary_get(dic, "info:author", NULL));
 	if(!dic)return;
-	
+
 	char* r;
 
+	r=dictionary_get(dic, "info:next", NULL);
+
 	//next map
-	if(r=dictionary_get(dic, "info:next", NULL))
+	if(r)
 	{
 		isNextRoom=true;
 		char str[2048];
@@ -478,7 +480,7 @@ void readMapInfo(char* filename)
 		#else
 			sprintf(str,"%s/%s/maps/%s",basePath,ROOT,r);
 		#endif
-		NOGBA("%s",str);
+		//NOGBA("%s",str);
 
 		setNextMapFilePath(str);
 	}
@@ -489,7 +491,6 @@ void readMapInfo(char* filename)
 void newReadMap(char* filename, room_struct* r, u8 flags)
 {
 	if(!r)r=&gameRoom;
-	char fn[1024];
 	FILE* f=fopen(filename,"rb");
 	if(!f)return;
 
@@ -531,6 +532,6 @@ void newReadMap(char* filename, room_struct* r, u8 flags)
 		filename[l-3]='i';
 		readMapInfo(filename);
 	}
-	
+
 	fclose(f);
 }

@@ -1,7 +1,8 @@
 #include "game/game_main.h"
-
-particle_struct particles[NUMPARTICLES];
-u16 particleCnt;
+// Currently  not used
+/*
+static particle_struct particles[NUMPARTICLES];
+static u16 particleCnt;
 
 void initParticles(void)
 {
@@ -49,7 +50,7 @@ void drawParticle(particle_struct* p)
 			GFX_VERTEX10=NORMAL_PACK(size, size, 0);
 			GFX_VERTEX10=NORMAL_PACK(size, -size, 0);
 			GFX_VERTEX10=NORMAL_PACK(-size, -size, 0);
-			
+
 			GFX_VERTEX10=NORMAL_PACK(0, size, -size);
 			GFX_VERTEX10=NORMAL_PACK(0, size, size);
 			GFX_VERTEX10=NORMAL_PACK(0, -size, size);
@@ -105,4 +106,4 @@ void particleExplosionDir(vect3D p, vect3D dir, int number, u16 color)
 	{
 		createParticles(p, addVect(dir,vect((rand()%speed)-speed/2,(rand()%speed)-speed/2,(rand()%speed)-speed/2)), 90, color);
 	}
-}
+}*/

@@ -1,7 +1,7 @@
 #include "game/game_main.h"
 
-rectangleList_struct sludgeRectangleList;
-mtlImg_struct* sludgeMtl;
+static rectangleList_struct sludgeRectangleList;
+static mtlImg_struct* sludgeMtl;
 
 void initSludge(void)
 {

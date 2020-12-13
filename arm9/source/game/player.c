@@ -1,26 +1,33 @@
 #include "game/game_main.h"
+#include "engine/touch.h"
+
 
 player_struct player;
-md2Model_struct gun, playerModel;
-mtlImg_struct* crossHair;
-struct gl_texture_t *bottomScreen;
+static md2Model_struct gun, playerModel;
+//static mtlImg_struct* crossHair; // Not used currently
+//static struct gl_texture_t *bottomScreen;
 struct gl_texture_t *bottomButton;
 
-u8* bottomScreenIMG;
-u16* bottomScreenPAL;
+static u8* bottomScreenIMG;
+static u16* bottomScreenPAL;
 
 touchPosition touchCurrent, touchOld;
 
+/** Sound effects for portals shots. */
 SFX_struct *gunSFX1, *gunSFX2;
+/** Sound effect when entering portal */
 SFX_struct *portalEnterSFX[2];
+/** Sound effect when leaving portal */
 SFX_struct *portalExitSFX[2];
 
-bool oldCurrentPortalColor;
+static bool oldCurrentPortalColor;
 bool currentPortalColor; //true=orange
 
 s16 gravityGunTarget;
 
-int subBG;
+static int subBG;
+
+void drawBottomButton(bool color);
 
 bool isPortalInRectangle(room_struct* r, rectangle_struct* rec, portal_struct* p, vect3D* o)
 {
@@ -81,7 +88,7 @@ void initPlayer(player_struct* p)
 	p->object->radius=PLAYERRADIUS;
 	p->object->sqRadius=SQPLAYERRADIUS;
 	p->currentRoom=NULL;
-	touchRead(&touchCurrent);
+	touchReadFix(&touchCurrent);
 	touchOld=touchCurrent;
 	p->walkCnt=0;
 	p->life=127;
@@ -151,7 +158,7 @@ bool updateBottomScreen(touchPosition* tp)
 		r=true;
 		if(keysUp()&KEY_TOUCH){currentPortalColor^=1;}
 		touchCnt=0;
-	}		
+	}
 
 	return r;
 }
@@ -159,11 +166,11 @@ bool updateBottomScreen(touchPosition* tp)
 void drawPlayer(player_struct* p)
 {
 	if(!p)p=&player;
-	
+
 	glPushMatrix();
 		u32 params=POLY_ALPHA(31)|POLY_CULL_FRONT|POLY_ID(2)|POLY_TOON_HIGHLIGHT|POLY_FOG;
 		setupObjectLighting(NULL, p->object->position, &params);
-		
+
 		camera_struct* c=getPlayerCamera();
 		glTranslatef32(c->position.x,c->position.y-600,c->position.z);
 		int32 m[9];transposeMatrix33(c->transformationMatrix,m);
@@ -182,22 +189,22 @@ void drawCrosshair(void)
 	return;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 255, 191, 0, -1, 1);	
+	glOrtho(0, 255, 191, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+
 	// applyMTL(crossHair);
-	
+
 	GFX_COLOR=RGB15(31,31,31);
-	
+
 	glPushMatrix();
-	
+
 	glTranslate3f32(inttof32(128),inttof32(96),0);
 	glScalef32(inttof32(16),inttof32(16),inttof32(16));
-	
+
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 	glBegin(GL_QUADS);
-	
+
 		GFX_TEX_COORD = TEXTURE_PACK(32*16, 0);
 		GFX_VERTEX10 = NORMAL_PACK(-32,-32,0);
 		GFX_TEX_COORD = TEXTURE_PACK(32*16, 32*16);
@@ -209,7 +216,7 @@ void drawCrosshair(void)
 
 	glEnd();
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
-	
+
 	glPopMatrix(1);
 }
 
@@ -223,7 +230,7 @@ void renderGun(player_struct* p)
 	glPushMatrix();
 		u32 params=POLY_ALPHA(31) | POLY_CULL_FRONT | POLY_ID(1) | POLY_TOON_HIGHLIGHT | POLY_FOG;
 		setupObjectLighting(NULL, p->object->position, &params);
-		
+
 		glTranslate3f32((sinLerp(p->walkCnt>>1)>>11),(sinLerp(p->walkCnt)>>11),0);
 		glTranslate3f32(0,height,depth);
 		glRotateYi(-(1<<13));
@@ -232,7 +239,6 @@ void renderGun(player_struct* p)
 		glMaterialf(GL_AMBIENT, RGB15(31,31,31));
 		glTranslate3f32(0,0,X);
 		glScalef32(inttof32(1)>>4,inttof32(1)>>4,inttof32(1)>>4);
-		room_struct* r=getPlayer()->currentRoom;
 		// vect3D v=reverseConvertVect(vectDifference(p->object->position,convertVect(vect(r->position.x,0,r->position.y))));
 		// NOGBA("%d %d %d",v.x,v.y,v.z);
 		renderModelFrameInterp(p->modelInstance.currentFrame, p->modelInstance.nextFrame, p->modelInstance.interpCounter, &gun, params, false, p->modelInstance.palette, RGB15(31,31,31));
@@ -244,9 +250,9 @@ void shootPlayerGun(player_struct* p, bool R, u8 mode)
 	if(!p)p=&player;
 	if(!p->currentRoom)return;
 	camera_struct* c=getPlayerCamera();
-	
+
 	p->currentPortal=R;
-	
+
 	int32 k=inttof32(300);
 	vect3D u=getUnitVector(NULL);
 	vect3D l=vectDifference(p->object->position,convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)));
@@ -270,32 +276,33 @@ void shootPlayerGun(player_struct* p, bool R, u8 mode)
 			// ip.z+=TILESIZE*2;
 			ip.x+=TILESIZE;
 			ip.z+=TILESIZE;
-			
+
 			vect3D pos=addVect(convertVect(vect(p->currentRoom->position.x,0,p->currentRoom->position.y)),ip);
-			NOGBA("SHOT WALL ! GOOD GOING %d %d %d",r->normal.z,r->normal.x, r->AARid);
-			
+			NOGBA("SHOT WALL ! GOOD GOING %ld %ld %d",r->normal.z,r->normal.x, r->AARid);
+
 			// particleExplosion(pos,64,R?(RGB15(31,31,0)):(RGB15(0,31,31)));
-			
+
 			// r->hide^=1;
 
-			vect3D v=vectDifference(pos,p->object->position);
+			//vect3D v=vectDifference(pos,p->object->position);
 
 			vect3D plane0=vect(c->transformationMatrix[0],c->transformationMatrix[3],c->transformationMatrix[6]);
 			plane0=normalize(vectDifference(plane0,vectMult(r->normal,dotProduct(r->normal,plane0))));
-			
+
 			portal_struct* por=R?(&portal1):(&portal2);
-			
+			portal_struct* other_por=R?(&portal2):(&portal1);
+
 			vect3D oldp=por->position;vect3D oldn=por->normal;vect3D oldp0=por->plane[0];
 			movePortal(por, pos, vectMultInt(r->normal,-1), plane0, false);
-			
+
 			isPortalOnWall(p->currentRoom,por,true);
-			
-			if(isPortalOnWall(p->currentRoom,por,false))
+
+			if(isPortalOnWall(p->currentRoom,por,false)&&portalToPortalIntersection(por,other_por))
 			{
 				pos=por->position;
-				movePortal(por, oldp, oldn, oldp0, false); //terribly inelegant, please forgive me	
+				movePortal(por, oldp, oldn, oldp0, false); //terribly inelegant, please forgive me
 				ejectPortalOBBs(por);
-				
+
 				movePortal(por, pos, vectMultInt(r->normal,-1), plane0, true);
 			}else{
 				movePortal(por, oldp, oldn, oldp0, false);
@@ -310,25 +317,25 @@ bool idle;
 void playerControls(player_struct* p)
 {
 	if(!p)p=&player;
-	
+
 	if(p->life<=0)changeState(&gameState);
-	
-	touchRead(&touchCurrent);
-	
+
+	touchReadFix(&touchCurrent);
+
 	// if(keysDown() & KEY_TOUCH)
 	// {
 	// 	touchOld=touchCurrent;
 	// 	if(!touchCnt)touchCnt=16;
 	// 	else {touchCnt=0; p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>5)));}
 	// }
-	
+
 	if(!(((keysDown()&KEY_TOUCH) && updateBottomScreen(&touchCurrent)) || updateBottomScreen(&touchOld)) && (keysHeld() & KEY_TOUCH))
-	{		
+	{
 		int16 dx = touchCurrent.px - touchOld.px;
 		int16 dy = touchCurrent.py - touchOld.py;
-		
+
 		vect3D angle=vect(0,0,0);
-		
+
 		if (dx<20 && dx>-20 && dy<20 && dy>-20)
 		{
 			// if(dx>-2&&dx<2)dx=0;
@@ -345,7 +352,7 @@ void playerControls(player_struct* p)
 		rotateCamera(NULL, angle);
 		if(m[4]<0 && m[4]<tempMatrix[4])memcpy(m,tempMatrix,9*sizeof(int32));
 	}
-	
+
 	// if(keysHeld()&(KEY_A))rotateCamera(NULL, vect(0,0,-(1<<8)));
 	// if(keysHeld()&(KEY_Y))rotateCamera(NULL, vect(0,0,1<<8));
 	// if(p->object->contact)
@@ -362,7 +369,7 @@ void playerControls(player_struct* p)
 	// 	if((keysHeld()&(KEY_DOWN))/*||(keysHeld()&(KEY_B))*/)moveCamera(NULL, vect(0,0,PLAYERAIRSPEED));
 	// 	if((keysHeld()&(KEY_UP))/*||(keysHeld()&(KEY_X))*/)moveCamera(NULL, vect(0,0,-(PLAYERAIRSPEED)));
 	// }
-	
+
 	// if(keysDown()&(KEY_START))p->object->speed=addVect(p->object->speed,vectMult(normGravityVector,-(inttof32(1)>>4)));
 	// if(keysDown()&(KEY_START))changeState(&menuState);
 	// if(keysDown()&(KEY_START))doPause(NULL);
@@ -386,7 +393,7 @@ void playerControls(player_struct* p)
 	// // camera_struct* c=getPlayerCamera();
 	// // if(keysDown()&(KEY_SELECT))changeGravity(vect(-normGravityVector.z,normGravityVector.x,normGravityVector.y),16);
 	// if(keysDown()&(KEY_SELECT))p->life=-5;
-	
+
 	touchOld=touchCurrent;
 }
 
@@ -410,13 +417,13 @@ void updatePlayer(player_struct* p)
 
 	if(p->inPortal && !p->oldInPortal)playSFX(portalEnterSFX[rand()%2]);
 	else if(!p->inPortal && p->oldInPortal)playSFX(portalExitSFX[rand()%2]);
-	
+
 	editPalette((u16*)p->modelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
 	editPalette((u16*)p->playerModelInstance.model->texture->pal,0,p->currentPortal?(RGB15(31,16,0)):(RGB15(0,12,31))); //TEMP?
-	
+
 	collidePlayer(p,p->currentRoom);
 	if(!p->inPortal && collideAABBSludge(p->object->position, vect(PLAYERRADIUS,PLAYERRADIUS,PLAYERRADIUS)))p->life=-5;
-	
+
 	updateCamera(NULL);
 
 	//regeneration
@@ -424,16 +431,20 @@ void updatePlayer(player_struct* p)
 	if(p->life>127)p->life=127;
 
 	setFog((127-p->life)/2);
-	
+
 	p->tempAngle.x/=2;
 	p->tempAngle.y/=2;
-	
+
 	updateAnimation(&p->playerModelInstance);
-	
+
 	updateAnimation(&p->modelInstance);
 	updateAnimation(&p->modelInstance); //TEMP?
 
-	if(oldCurrentPortalColor!=currentPortalColor)drawBottomButton(currentPortalColor);
+	if(oldCurrentPortalColor!=currentPortalColor)
+	{
+		drawBottomButton(currentPortalColor);
+		p->currentPortal= currentPortalColor;// TODO : find better way to do it asap
+	}
 	oldCurrentPortalColor=currentPortalColor;
 }
 
@@ -450,6 +461,7 @@ void freePlayer(void)
 	freeMd2Model(&gun);
 	freeMd2Model(&playerModel);
 	free(bottomScreenIMG); free(bottomScreenPAL);
-	bottomScreenIMG=bottomScreenPAL=NULL;
+	bottomScreenIMG=NULL;
+	bottomScreenPAL=NULL;
 	if(bottomButton){freePCX(bottomButton);bottomButton=NULL;}
 }

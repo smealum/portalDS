@@ -1,12 +1,12 @@
 #include "common/general.h"
 #include <errno.h>
 
-void *mallocList[MAX_MALLOC];
+static void *mallocList[MAX_MALLOC];
 
 void initMalloc()
 {
 	int i;
-	
+
 	for(i=0;i<MAX_MALLOC;i++)
 	{
 		mallocList[i]=NULL;

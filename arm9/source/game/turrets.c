@@ -2,15 +2,15 @@
 
 #define TURRET_SIGHTANGLE (5144)
 
-turret_struct turrets[NUMTURRETS];
-md2Model_struct turretModel;
-mtlImg_struct* turretShotTexture;
+static turret_struct turrets[NUMTURRETS];
+static md2Model_struct turretModel;
+static mtlImg_struct* turretShotTexture;
 
-SFX_struct* turretFireSFX;
-SFX_struct* turretDeploySFX;
-SFX_struct* turretRetractSFX;
+static SFX_struct* turretFireSFX;
+static SFX_struct* turretDeploySFX;
+static SFX_struct* turretRetractSFX;
 
-const vect3D laserOrigin=(vect3D){16,76,140};
+static const vect3D laserOrigin=(vect3D){16,76,140};
 
 void initTurrets(void)
 {
@@ -20,7 +20,7 @@ void initTurrets(void)
 		turrets[i].used=false;
 		turrets[i].OBB=NULL;
 	}
-	
+
 	loadMd2Model("models/turret.md2","turret.pcx",&turretModel);
 	NOGBA("turret1 mem free : %dko (%do)",getMemFree()/1024,getMemFree());
 	// generateModelDisplayLists(&turretModel, true, 1);
@@ -88,7 +88,7 @@ void drawLaser(vect3D orig, vect3D target)
 void drawTurretStuff(turret_struct* t)
 {
 	if(!t || !t->used || t->dead)return;
-	
+
 	drawLaser(t->laserOrigin,t->laserDestination);
 	if(t->laserThroughPortal)drawLaser(t->laserOrigin2,t->laserDestination2);
 
@@ -187,13 +187,13 @@ bool pointInTurretSight(turret_struct* t, vect3D p, int32* angle, int32* d2)
 void updateTurret(turret_struct* t)
 {
 	if(!t || !t->used)return;
-	
+
 	if(!t->OBB || !t->OBB->used){t->OBB=NULL;t->used=false;return;}
-	
+
 	t->counter+=2;t->counter%=63; //TEMP
 	if(t->dead)t->counter=31;
 	editPalette((u16*)t->OBB->modelInstance.palette,0,RGB15(abs(31-t->counter),0,0)); //TEMP
-	
+
 	int32* m=t->OBB->transformationMatrix;
 	room_struct* r=getPlayer()->currentRoom;
 	if(!r)return;
@@ -275,7 +275,7 @@ void updateTurret(turret_struct* t)
 		t->laserThroughPortal=false;
 
 		laserProgression(r, &t->laserOrigin, &t->laserDestination, dir);
-		
+
 		int32 x, y, z;
 		vect3D v;
 		portal_struct* portal=NULL;
@@ -295,16 +295,16 @@ void updateTurret(turret_struct* t)
 			dir=warpVector(portal,dir);
 			t->laserOrigin2=addVect(portal->targetPortal->position, warpVector(portal, vectDifference(t->laserDestination, portal->position)));
 			t->laserDestination2=addVect(t->laserOrigin2,dir);
-			
+
 			laserProgression(r, &t->laserOrigin2, &t->laserDestination2, dir);
-			
+
 
 			t->laserOrigin2=addVect(t->laserOrigin2,vectMult(dir,-TILESIZE));
 		}
 
 		if(m[4]<sinLerp(8192/2))t->dead=true;
 	}
-	
+
 	updateAnimation(&t->OBB->modelInstance);
 }
 

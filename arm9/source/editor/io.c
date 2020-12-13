@@ -1,7 +1,8 @@
 #include "editor/editor_main.h"
 
-mapHeader_struct blankHeader=(mapHeader_struct){0,0,0,0,0};
+static mapHeader_struct blankHeader=(mapHeader_struct){0,0,0,0,0};
 
+//extern entity_struct entity[NUMENTITIES];
 //WRITING STUFF
 
 void writeTranslatedVect(vect3D v, FILE* f)
@@ -16,11 +17,11 @@ void writeRectangle(rectangle_struct* rec, FILE* f)
 	writeVect(rec->position,f);
 	writeVect(rec->size,f);
 	writeVect(rec->normal,f);
-	
+
 	fwrite(&rec->portalable,sizeof(bool),1,f);
 
 	u16 mid=getMaterialID(rec->material);
-	
+
 	fwrite(&mid,sizeof(u16),1,f);
 }
 
@@ -179,7 +180,7 @@ bool writeEntity(entity_struct* e, FILE* f)
 	}
 }
 
-extern entity_struct entity[NUMENTITIES];
+
 
 void writeEntities(FILE* f)
 {
@@ -206,7 +207,7 @@ u16* compressBlockArray(BLOCK_TYPE* ba, u32* size)
 	//TEMP TEMP TEMP TEST
 	// int i; for(i=0;i<64*64*64;i++&&ba++)testARRAY[i]=(u8)((*(ba++))>>8);
 	// *size=compressRLE(&dst, (u8*)testARRAY, sizeof(u8)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
-	
+
 	// *size=compressRLE(&dst, (u8*)ba, sizeof(BLOCK_TYPE)*ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	*size=compressRLE(&dst, ba, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 	return dst;
@@ -270,9 +271,9 @@ void writeMapEditor(editorRoom_struct* er, const char* str)
 	generateVertexLighting(&r, ld);
 
 	h.dataPosition=ftell(f);
-		u8* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);
+		u16* compressed=compressBlockArray(er->blockArray, &h.dataSize);	// decompress(compressed, er->blockArray, RLE);
 		if(!compressed){return;} //TEMP : clean up first !
-		NOGBA("DATASIZE %d",h.dataSize);
+		NOGBA("DATASIZE %lu",h.dataSize);
 		fwrite(compressed,sizeof(u8),h.dataSize*2,f);
 		free(compressed);
 
@@ -451,8 +452,8 @@ bool loadMapEditor(editorRoom_struct* er, const char* str)
 		u16* compressed=malloc(sizeof(u16)*h.dataSize);
 		if(!compressed){return false;} //TEMP : clean up first !
 		fread(compressed, sizeof(u16), h.dataSize, f);
-		// decompress(compressed, er->blockArray, RLE); // decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		
-		decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);		
+		// decompress(compressed, er->blockArray, RLE); // decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
+		decompressRLE(er->blockArray, compressed, ROOMARRAYSIZEX*ROOMARRAYSIZEY*ROOMARRAYSIZEZ);
 		free(compressed);
 
 	fseek(f, h.entityPosition, SEEK_SET);

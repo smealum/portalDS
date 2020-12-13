@@ -84,5 +84,5 @@ void changeAttributeBlockArrayRange(BLOCK_TYPE* ba, blockAttributeFunction f, bl
 void changeAttributeBlockArrayRangeDirection(BLOCK_TYPE* ba, blockAttributeFunction f, blockFace_struct* l, vect3D o, vect3D s, u8 dir, bool portalable);
 
 rectangleList_struct generateOptimizedRectangles(BLOCK_TYPE* ba, rectangleList_struct* sludgeList);
-
+BLOCK_TYPE getBlock(BLOCK_TYPE* ba, s8 x, s8 y, s8 z);
 #endif

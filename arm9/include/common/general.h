@@ -7,7 +7,6 @@
 #include <nds.h>
 #include <fat.h>
 #include <filesystem.h>
-#include <maxmod9.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,14 +18,10 @@
 
 // #define FATONLY
 
-#include "soundbank.h"
-#include "soundbank_bin.h"
-
 #include "common/compress.h"
 #include "common/iniparser.h"
 #include "common/math.h"
 #include "common/files.h"
-#include "common/audio.h"
 #include "dual3D.h"
 #include "common/pcx.h"
 #include "common/textures.h"

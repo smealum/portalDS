@@ -1,6 +1,7 @@
 #ifndef __STATE9__
 #define __STATE9__
 
+
 typedef void(*function)();
 
 typedef struct{
@@ -9,6 +10,8 @@ typedef struct{
 	u8 id;
 	bool used;
 }state_struct;
+
+extern state_struct* currentState;
 
 void applyState(void);
 void initHardware(void);

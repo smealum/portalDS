@@ -1,9 +1,12 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "editor/blocks.h"
+#include "editor/contextbuttons.h"
 #define NUMENTITYTYPES (15)
+#define NUMENTITIES (64)
 
-enum
+enum directionMask_type
 {
 	pX_mask = 1,
 	mX_mask = 1<<1,
@@ -11,7 +14,7 @@ enum
 	mY_mask = 1<<3,
 	pZ_mask = 1<<4,
 	mZ_mask = 1<<5
-}directionMask_type;
+};
 
 struct entity_struct;
 
@@ -47,6 +50,8 @@ typedef struct entity_struct
 	bool used, placed;
 }entity_struct;
 
+extern entity_struct entity[NUMENTITIES];
+
 extern contextButton_struct ballLauncherButtonArray[];
 extern contextButton_struct ballCatcherButtonArray[];
 extern contextButton_struct button1ButtonArray[];
@@ -75,4 +80,5 @@ void removeEntity(entity_struct* e);
 
 int32 getGridLength(entity_struct* e);
 
+void setBlock(BLOCK_TYPE* ba, u8 x, u8 y, u8 z, BLOCK_TYPE v);
 #endif

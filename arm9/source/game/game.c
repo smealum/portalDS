@@ -65,49 +65,50 @@ void initGame(void)
 	NOGBA("initializing...");
 	videoSetMode(MODE_5_3D | DISPLAY_BG3_ACTIVE);
 	videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE);
-	
+
 	glInit();
-	
+
 	vramSetPrimaryBanks(VRAM_A_TEXTURE,VRAM_B_TEXTURE,VRAM_C_LCD,VRAM_D_MAIN_BG_0x06000000);
 	vramSetBankH(VRAM_H_SUB_BG);
 	vramSetBankI(VRAM_I_SUB_BG_0x06208000);
-	
+
 	glEnable(GL_TEXTURE_2D);
 	// glEnable(GL_ANTIALIAS);
 	glDisable(GL_ANTIALIAS);
 	glEnable(GL_BLEND);
 	glEnable(GL_OUTLINE);
-	
+
 	glSetOutlineColor(0,RGB15(0,0,0)); //TEMP?
 	glSetOutlineColor(1,RGB15(0,0,0)); //TEMP?
 	glSetOutlineColor(7,RGB15(31,0,0)); //TEMP?
 	glSetToonTableRange(0, 15, RGB15(8,8,8)); //TEMP?
 	glSetToonTableRange(16, 31, RGB15(24,24,24)); //TEMP?
-	
+
 	glClearColor(31,31,0,31);
 	glClearPolyID(63);
 	glClearDepth(0x7FFF);
 
 	glViewport(0,0,255,191);
-	
+
 	// initVramBanks(1);
 	initVramBanks(2);
 	initTextures();
 	initSound();
-	
+
 	initCamera(NULL);
-	
+
 	initPlayer(NULL);
-	
+
 	initLights();
-	initParticles();
-	
+	// Not used
+	//initParticles();
+
 	initMaterials();
-	
+
 	loadMaterialSlices("slices.ini");
 	loadMaterials("materials.ini");
 	loadControlConfiguration("config.ini");
-	
+
 	initElevators();
 	initWallDoors();
 	initTurrets();
@@ -126,39 +127,39 @@ void initGame(void)
 	NOGBA("lalala");
 
 	getPlayer()->currentRoom=&gameRoom;
-	
+
 	currentBuffer=false;
-	
+
 	getVramStatus();
 	fadeIn();
-	
+
 	mainBG=bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 0, 0);
 	bgSetPriority(mainBG, 0);
 	REG_BG0CNT=BG_PRIORITY(3);
-	
+
 	#ifdef DEBUG_GAME
 		consoleInit(&bottomScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 16, 0, false, true);
 		consoleSelect(&bottomScreen);
 	#endif
-	
+
 	// glSetToonTableRange(0, 14, RGB15(16,16,16));
 	// glSetToonTableRange(15, 31, RGB15(26,26,26));
-	
+
 	initPortals();
-	
+
 	//PHYSICS
 	initPI9();
 
 	strcpy(&mapFilePath[strlen(mapFilePath)-3], "map");
 	newReadMap(mapFilePath, NULL, 255);
-	
+
 	transferRectangles(&gameRoom);
 	makeGrid();
 	generateRoomGrid(&gameRoom);
 	gameRoom.displayList=generateRoomDisplayList(&gameRoom, vect(0,0,0), vect(0,0,0), false);
-	
+
 	getVramStatus();
-	
+
 	startPI();
 
 	NOGBA("START mem free : %dko (%do)",getMemFree()/1024,getMemFree());
@@ -169,7 +170,8 @@ void initGame(void)
 
 bool testbool=false;
 bool switchPortal=false;
-portal_struct *currentPortal, *previousPortal;
+//portal_struct *currentPortal,
+portal_struct *previousPortal;
 
 void postProcess(u16* scrP, u32* stackP);
 bool orangeSeen, blueSeen;
@@ -196,15 +198,15 @@ void drawCenteredString(char* str, int32 scale, u16 y)
 static inline void render1(void)
 {
 	scanKeys();
-	
+
 	// cpuEndSlice();
 	playerControls(NULL);
 	updateControls();
 	// iprintf("controls : %d  \n",cpuEndSlice());
-	
+
 		updatePlayer(NULL);
 	// iprintf("player : %d  \n",cpuEndSlice());
-	
+
 		updatePortals();
 		updateTurrets();
 		updateBigButtons();
@@ -218,41 +220,41 @@ static inline void render1(void)
 		updateDoors();
 		updateWallDoors();
 	// iprintf("updates : %d  \n",cpuEndSlice());
-	
+
 	// if(currentPortal)GFX_CLEAR_COLOR=currentPortal->color|(31<<16);
 	// else GFX_CLEAR_COLOR=0;
 	u16 color=getCurrentPortalColor(getPlayer()->object->position);
 	// NOGBA("col %d",color);
 	// GFX_CLEAR_COLOR=color|(31<<16);
 	GFX_CLEAR_COLOR=RGB15(0,0,0)|(31<<16);
-	
+
 	#ifdef DEBUG_GAME
 		if(fifoCheckValue32(FIFO_USER_08))iprintf("\x1b[0J");
-		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %d      \n",cnt);NOGBA("ALERT %d      \n",cnt);}
+		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);iprintf("ALERT %ld      \n",cnt);NOGBA("ALERT %d      \n",cnt);}
 	#else
-		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);NOGBA("ALERT %d      \n",cnt);}
+		while(fifoCheckValue32(FIFO_USER_08)){int32 cnt=fifoGetValue32(FIFO_USER_08);NOGBA("ALERT %ld      \n",cnt);}
 	#endif
-	
+
 	projectCamera(NULL);
 
 	glPushMatrix();
-		
+
 		glScalef32(SCALEFACT,SCALEFACT,SCALEFACT);
-		
+
 		renderGun(NULL);
-		
+
 		transformCamera(NULL);
-		
+
 		cpuEndSlice();
 			// drawRoomsGame(128, color);
 			drawRoomsGame(0, color);
 			// drawCell(getCurrentCell(getPlayer()->currentRoom,getPlayerCamera()->position));
 		// iprintf("room : %d  \n",cpuEndSlice());
-		
-		updateParticles();
-		drawParticles();
+		// Not used
+		//updateParticles();
+		//drawParticles();
 		// iprintf("particles : %d  \n",cpuEndSlice());
-		
+
 			drawOBBs();
 		// iprintf("OBBs : %d  \n",cpuEndSlice());
 			drawBigButtons();
@@ -268,10 +270,10 @@ static inline void render1(void)
 			drawWallDoors(NULL);
 			drawSludge(&gameRoom);
 		// iprintf("stuff : %d  \n",cpuEndSlice());
-		
+
 		drawPortal(&portal1);
 		drawPortal(&portal2);
-			
+
 	glPopMatrix(1);
 
 	//HUD TEST
@@ -282,7 +284,7 @@ static inline void render1(void)
 		glPushMatrix();
 			glLoadIdentity();
 			glOrthof32(inttof32(0), inttof32(255), inttof32(191), inttof32(0), -inttof32(1), inttof32(1));
-			
+
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 				glLoadIdentity();
@@ -294,7 +296,7 @@ static inline void render1(void)
 			glMatrixMode(GL_PROJECTION);
 		glPopMatrix(1);
 	}
-	
+
 	glFlush(0);
 }
 
@@ -307,29 +309,29 @@ static inline void render2(void)
 		else currentPortal=&portal2;
 	}else if(orangeSeen)currentPortal=&portal1;
 	else if(blueSeen)currentPortal=&portal2;
-	
+
 	previousPortal=currentPortal;
-	
+
 	switchPortal^=1;
-	
+
 	glClearColor(0,0,0,31);
-	
+
 	updatePortalCamera(currentPortal, NULL);
 	projectCamera(&currentPortal->camera);
 
 	glPushMatrix();
-		
+
 		glScalef32(SCALEFACT,SCALEFACT,SCALEFACT);
-		
+
 		renderGun(NULL);
-		
+
 		transformCamera(&currentPortal->camera);
-		
+
 		// drawRoomsGame(0);
 		drawPortalRoom(currentPortal);
-		
+
 		drawPlayer(NULL);
-		
+
 		drawOBBs();
 		drawBigButtons();
 		drawTimedButtons();
@@ -345,7 +347,7 @@ static inline void render2(void)
 		drawSludge(&gameRoom);
 
 	glPopMatrix(1);
-	
+
 	glFlush(0);
 }
 
@@ -377,7 +379,6 @@ u32 debugVal; //TEMP
 
 void gameFrame(void)
 {
-	int lala;
 	switch(currentBuffer)
 	{
 		case false:
@@ -401,7 +402,7 @@ void gameFrame(void)
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;
-			if(previousPortal)dmaCopy(VRAM_C, previousPortal->viewPoint, 256*192*2);			
+			if(previousPortal)dmaCopy(VRAM_C, previousPortal->viewPoint, 256*192*2);
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
 			frmCNT++;
 			break;
@@ -419,14 +420,14 @@ void gameFrame(void)
 			swiWaitForVBlank();
 			cpuStartTiming(0);
 			prevTiming=0;
-			dmaCopy(VRAM_C, mainScreen, 256*192*2);			
+			dmaCopy(VRAM_C, mainScreen, 256*192*2);
 			setRegCapture(true, 0, 15, 2, 0, 3, 1, 0);
 			break;
 	}
-	
+
 	// if(testStepByStep){int i=0;while(!(keysUp()&KEY_TOUCH)){scanKeys();listenPI9();swiWaitForVBlank();}NOGBA("WAITED");scanKeys();scanKeys();if(keysHeld()&KEY_SELECT)testStepByStep=false;}
 	// else if(keysDown()&KEY_SELECT)testStepByStep=true;
-	
+
 	currentBuffer^=1;
 }
 

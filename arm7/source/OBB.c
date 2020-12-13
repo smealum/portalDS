@@ -2,9 +2,12 @@
 
 #define TIMEPREC (6)
 
+contactPoint_struct contactPoints[MAXCONTACTPOINTS];
+
 OBB_struct objects[NUMOBJECTS];
 
 u32 coll, integ, impul;
+u8 sleeping;
 
 /*s16 divLUT[4097];
 
@@ -29,7 +32,7 @@ static inline int32 divv(int32 a, int32 b) // b in 1-4096
 void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32 sine)
 {
 	if(!o)return;
-	
+
 	o->used=true;
 	o->position=pos;
 	o->angularMomentum=vect(0,0,0);
@@ -37,10 +40,10 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32
 	o->size=size;
 	o->mass=mass;
 	o->maxPenetration=0;
-	
+
 	o->energy=0;
 	o->sleep=false;
-	
+
 	o->velocity=vect(0,0,0);
 	o->angularVelocity=vect(0,0,0);
 	o->moment=vect(0,0,0);
@@ -51,7 +54,7 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32
 	int32 x2=mulf32(o->size.x,o->size.x);
 	int32 y2=mulf32(o->size.y,o->size.y);
 	int32 z2=mulf32(o->size.z,o->size.z);
-	
+
 	int i;for(i=0;i<9;i++){o->invInertiaMatrix[i]=0;}
     //o->invInertiaMatrix[0]=divf32(inttof32(3),(mulf32(o->mass,(y2+z2))));
     //o->invInertiaMatrix[4]=divf32(inttof32(3),(mulf32(o->mass,(x2+z2))));
@@ -59,13 +62,13 @@ void initOBB(OBB_struct* o, vect3D size, vect3D pos, int32 mass, s32 cosine, s32
     o->invInertiaMatrix[0]=divv16(inttof32(3),(mulf32(o->mass,(y2+z2))));
     o->invInertiaMatrix[4]=divv16(inttof32(3),(mulf32(o->mass,(x2+z2))));
     o->invInertiaMatrix[8]=divv16(inttof32(3),(mulf32(o->mass,(x2+y2))));
-	
+
 	//temporary
 	o->contactPoints=contactPoints;
-	
+
 	//rotateMatrixX(o->transformationMatrix,4096,false);
 	//rotateMatrixZ(o->transformationMatrix,4096,false);
-	
+
 	if(portal[0].used&&portal[1].used)
 	{
 		updateOBBPortals(o,0,true);
@@ -85,29 +88,29 @@ void initOBBs(void)
 void copyOBB(OBB_struct* o1, OBB_struct* o2)
 {
 	if(!o1 || !o2)return;
-	
+
 	o2->angularMomentum=o1->angularMomentum;
 	o2->numContactPoints=o1->numContactPoints;
 	o2->mass=o1->mass;
 	o2->position=o1->position;
 	o2->size=o1->size;
 	o2->maxPenetration=o1->maxPenetration;
-	
+
 	o2->velocity=o1->velocity;
 	o2->angularVelocity=o1->angularVelocity;
 	o2->forces=o1->forces;
 	o2->moment=o1->moment;
-	
+
 	o2->energy=o1->energy;
 	o2->sleep=o1->sleep;
-	
+
 	//temporary
 	o2->contactPoints=contactPoints;
-	
+
 	memcpy(o2->transformationMatrix,o1->transformationMatrix,sizeof(int32)*9);
 	memcpy(o2->invInertiaMatrix,o1->invInertiaMatrix,sizeof(int32)*9);
 	memcpy(o2->invWInertiaMatrix,o1->invWInertiaMatrix,sizeof(int32)*9);
-	
+
 	memcpy(o2->contactPoints,o1->contactPoints,sizeof(contactPoint_struct)*o2->numContactPoints);
 }
 
@@ -125,7 +128,7 @@ vect3D projectPointAABB(vect3D size, vect3D p, vect3D* n)
 
 	/*if(p.x<-size.x){v.x=-size.x;n->x=-1;}
 	else if(p.x>size.x){v.x=size.x;n->x=1;}
-	
+
 	if(p.y<-size.y){v.y=-size.y;n->y=-1;}
 	else if(p.y>size.y){v.y=size.y;n->y=1;}
 
@@ -140,7 +143,7 @@ vect3D projectPointAABB(vect3D size, vect3D p, vect3D* n)
 	else if(p.z>size.z){v.z=size.z;n->z=1;}
 
 	if(!n->x && !n->y && !n->z)
-	{	
+	{
 		int32 d1=abs(p.x+size.x);int32 d2=abs(p.x-size.x);
 		int32 d3=abs(p.y+size.y);int32 d4=abs(p.y-size.y);
 		int32 d5=abs(p.z+size.z);int32 d6=abs(p.z-size.z);
@@ -171,7 +174,7 @@ bool collideLineRectangle(vect3D ro, vect3D ru1, vect3D ru2, vect3D rn, int32 rs
 		if(ip)*ip=i; //real position at this point
 		i=vectDifference(i,ro);
 		i=vect(dotProduct(i,ru1),dotProduct(i,ru2),0);
-		
+
 		return i.x>=0 && i.x<=rs1 && i.y>=0 && i.y<=rs2;
 	}
 	return false;
@@ -203,7 +206,7 @@ bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, ve
 			*b2=true;
 		}
 	}
-				
+
 	if(uu1->x<ss[0])
 	{
 		if(uu2->x>ss[0])
@@ -227,7 +230,7 @@ bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, ve
 		}else return false;
 	}
 
-				
+
 	if(uu1->y<-ss[1])
 	{
 		if(uu2->y>-ss[1])
@@ -250,7 +253,7 @@ bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, ve
 			*b2=true;
 		}
 	}
-				
+
 	if(uu1->y<ss[1])
 	{
 		if(uu2->y>ss[1])
@@ -274,7 +277,7 @@ bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, ve
 		}else return false;
 	}
 
-				
+
 	if(uu1->z<-ss[2])
 	{
 		if(uu2->z>-ss[2])
@@ -297,7 +300,7 @@ bool clipSegmentOBB(int32* ss, vect3D *uu, vect3D* p1, vect3D* p2, vect3D vv, ve
 			*b2=true;
 		}
 	}
-				
+
 	if(uu1->z<ss[2])
 	{
 		if(uu2->z>ss[2])
@@ -335,7 +338,7 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 
 	vect3D v[8],v2[8];
 	getOBBVertices(o1,v);
-	
+
 	vect3D z1=vect(o1->transformationMatrix[0],o1->transformationMatrix[3],o1->transformationMatrix[6]);
 	vect3D z2=vect(o1->transformationMatrix[1],o1->transformationMatrix[4],o1->transformationMatrix[7]);
 	vect3D z3=vect(o1->transformationMatrix[2],o1->transformationMatrix[5],o1->transformationMatrix[8]);
@@ -346,7 +349,7 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 
 	vect3D pp=vectDifference(o1->position,o2->position);
 
-	getVertices(o1->size, vect(dotProduct(pp,u1),dotProduct(pp,u2),dotProduct(pp,u3)), vect(dotProduct(z1,u1),dotProduct(z1,u2),dotProduct(z1,u3)), 
+	getVertices(o1->size, vect(dotProduct(pp,u1),dotProduct(pp,u2),dotProduct(pp,u3)), vect(dotProduct(z1,u1),dotProduct(z1,u2),dotProduct(z1,u3)),
 		vect(dotProduct(z2,u1),dotProduct(z2,u2),dotProduct(z2,u3)), vect(dotProduct(z3,u1),dotProduct(z3,u2),dotProduct(z3,u3)), v2);
 
 	int i;
@@ -416,7 +419,7 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 				bool b1=false;
 				bool b2=false;
 				if(!clipSegmentOBB(ss,uu,&p1,&p2,vv,&uu1,&uu2,vv1,&n1,&n2,&b1,&b2,&k1,&k2))break;
-				
+
 				if(b1&&b2)
 				{
 					//p1=addVect(p1,vectMult(vv,k1));
@@ -430,7 +433,7 @@ void collideOBBs(OBB_struct* o1, OBB_struct* o2)
 					o1->contactPoints[o1->numContactPoints].penetration=distance(p,oo);
 					//o1->contactPoints[o1->numContactPoints].penetration=0;
 					o1->contactPoints[o1->numContactPoints].target=o2;
-					o1->numContactPoints++;	
+					o1->numContactPoints++;
 				}else{
 					if(b1)
 					{
@@ -484,12 +487,12 @@ void getVertices(vect3D s, vect3D p, vect3D u1, vect3D u2, vect3D u3, vect3D* v)
 	v[1]=vect(m2[0]-m2[1]-m2[2],m2[3]-m2[4]-m2[5],m2[6]-m2[7]-m2[8]);
 	v[2]=vect(m2[0]-m2[1]+m2[2],m2[3]-m2[4]+m2[5],m2[6]-m2[7]+m2[8]);
 	v[3]=vect(-m2[0]-m2[1]+m2[2],-m2[3]-m2[4]+m2[5],-m2[6]-m2[7]+m2[8]);
-	
+
 	v[4]=vect(-v[1].x,-v[1].y,-v[1].z);
 	v[5]=vect(-v[2].x,-v[2].y,-v[2].z);
 	v[6]=vect(-v[3].x,-v[3].y,-v[3].z);
 	v[7]=vect(-v[0].x,-v[0].y,-v[0].z);
-	
+
 	v[0]=addVect(v[0],p);v[1]=addVect(v[1],p);v[2]=addVect(v[2],p);v[3]=addVect(v[3],p);
 	v[4]=addVect(v[4],p);v[5]=addVect(v[5],p);v[6]=addVect(v[6],p);v[7]=addVect(v[7],p);
 }
@@ -527,12 +530,12 @@ void applyOBBForce(OBB_struct* o, vect3D p, vect3D f)
 void applyOBBImpulsePlane(OBB_struct* o, u8 pID)
 {
 	if(!o || pID>=o->numContactPoints)return;
-	contactPoint_struct* cp=&o->contactPoints[pID];    
+	contactPoint_struct* cp=&o->contactPoints[pID];
 	vect3D r=vectDifference(cp->point,o->position);
 	vect3D v=addVect(o->velocity,vectProduct(o->angularVelocity,r));
 
 	const int32 CoefficientOfRestitution=floattof32(0.2f);
-    
+
 	int32 iN=-mulf32((floattof32(1)+CoefficientOfRestitution),dotProduct(v,cp->normal));
 	//int32 invMass=divf32(inttof32(1),o->mass);
 	int32 invMass=divv16(inttof32(1),o->mass);
@@ -544,21 +547,21 @@ void applyOBBImpulsePlane(OBB_struct* o, u8 pID)
 	vect3D imp=vectMult(cp->normal,iN+cp->penetration/2); //added bias adds jitter, but prevents sinking.
 
 	//printf("imp : %d",iN);
-    
+
     // apply impulse to primary quantities
 	o->velocity=addVect(o->velocity,vectMult(imp,invMass));
 	o->angularMomentum=addVect(o->angularMomentum,vectProduct(r,imp));
-    
+
     // compute affected auxiliary quantities
 	o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
-	
+
 	{
 		vect3D tangent=vect(0,0,0);
 		tangent=vectDifference(v,(vectMult(cp->normal,dotProduct(v, cp->normal))));
 		if(magnitude(tangent)<1)return;
 		tangent=normalize(tangent);
 
-		int32 kTangent=invMass+dotProduct(tangent,vectProduct(evalVectMatrix33(o->invWInertiaMatrix,(vectProduct(r, tangent))), r));			
+		int32 kTangent=invMass+dotProduct(tangent,vectProduct(evalVectMatrix33(o->invWInertiaMatrix,(vectProduct(r, tangent))), r));
 
 		int32 vt = dotProduct(v, tangent);
 		//int32 dPt = divf32((-vt),kTangent);
@@ -575,7 +578,7 @@ void applyOBBImpulsePlane(OBB_struct* o, u8 pID)
 
 		o->velocity=addVect(o->velocity,vectMult(P,invMass));
 		o->angularMomentum=addVect(o->angularMomentum,vectProduct(r,P));
-    
+
 		// compute affected auxiliary quantities
 		o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
 	}
@@ -594,7 +597,7 @@ void applyOBBImpulseOBB(OBB_struct* o, u8 pID)
 	vect3D dv=vectDifference(v1,v2);
 
 	const int32 CoefficientOfRestitution=floattof32(0.5f);
-    
+
 	int32 iN=-mulf32((floattof32(1)+CoefficientOfRestitution),dotProduct(dv,cp->normal));
 	//int32 invMass1=divf32(inttof32(1),o->mass);
 	//int32 invMass2=divf32(inttof32(1),o2->mass);
@@ -608,19 +611,19 @@ void applyOBBImpulseOBB(OBB_struct* o, u8 pID)
 	vect3D imp=vectMult(cp->normal,iN+cp->penetration); //added bias adds jitter, but prevents sinking.
 
 	//printf("norm : %d %d %d\n",cp->normal.x,cp->normal.y,cp->normal.z);
-    
+
     // apply impulse to primary quantities
 	o->velocity=addVect(o->velocity,vectMult(imp,invMass1));
 	o->angularMomentum=addVect(o->angularMomentum,vectProduct(r1,imp));
 
 	o2->velocity=vectDifference(o2->velocity,vectMult(imp,invMass2));
 	o2->angularMomentum=vectDifference(o2->angularMomentum,vectProduct(r2,imp));
-    
+
     // compute affected auxiliary quantities
 	o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
 
 	o2->angularVelocity=evalVectMatrix33(o2->invWInertiaMatrix,o2->angularMomentum);
-	
+
 	{
 		vect3D tangent=vect(0,0,0);
 		tangent=vectDifference(dv,(vectMult(cp->normal,dotProduct(dv, cp->normal))));
@@ -642,13 +645,13 @@ void applyOBBImpulseOBB(OBB_struct* o, u8 pID)
 
 		// Apply contact impulse
 		vect3D P = vectMult(tangent,dPt);
-		
+
 		o->velocity=addVect(o->velocity,vectMult(P,invMass1));
 		o->angularMomentum=addVect(o->angularMomentum,vectProduct(r1,P));
 
 		o2->velocity=vectDifference(o2->velocity,vectMult(P,invMass2));
 		o2->angularMomentum=vectDifference(o2->angularMomentum,vectProduct(r2,P));
-    
+
 		// compute affected auxiliary quantities
 		o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
 		o2->angularVelocity=evalVectMatrix33(o2->invWInertiaMatrix,o2->angularMomentum);
@@ -690,7 +693,7 @@ void integrate(OBB_struct* o, float dt)
 	//									(mulf32((o->velocity.y+o->oldVelocity.y)/2,dt)>>TIMEPREC),
 	//									(mulf32((o->velocity.z+o->oldVelocity.z)/2,dt)>>TIMEPREC)));
 	o->position=addVect(o->position,vect(o->velocity.x*dt,o->velocity.y*dt,o->velocity.z*dt));
-	
+
 	int32 m[9], m2[9];
 	//m[0]=0;m[1]=-(mulf32(dt,o->angularVelocity.z));m[2]=(mulf32(dt,o->angularVelocity.y));
     //m[3]=-m[1];m[4]=0;m[5]=-(mulf32(dt,o->angularVelocity.x));
@@ -703,33 +706,32 @@ void integrate(OBB_struct* o, float dt)
     m[6]=-m[2];m[7]=-m[5];m[8]=0;
 	multMatrix33(m,o->transformationMatrix,m2);
 	addMatrix33(o->transformationMatrix,m2,o->transformationMatrix);
-	
+
 	//o->velocity=addVect(o->velocity,divideVect(vectMult(o->forces,dt),o->mass));
 	//o->velocity=addVect(o->velocity,divideVect(vect(mulf32(o->forces.x,dt)>>TIMEPREC,mulf32(o->forces.y,dt)>>TIMEPREC,mulf32(o->forces.z,dt)>>TIMEPREC),o->mass));
 	//o->velocity=addVect(o->velocity,divideVect(vect((mulf32((o->forces.x+o->oldForces.x)/2,dt)>>TIMEPREC),
 	//											(mulf32((o->forces.y+o->oldForces.y)/2,dt)>>TIMEPREC),
 	//											(mulf32((o->forces.z+o->oldForces.z)/2,dt)>>TIMEPREC)),o->mass));
 	o->velocity=addVect(o->velocity,divideVect(vect(o->forces.x*dt,o->forces.y*dt,o->forces.z*dt),o->mass));
-	
+
 	//o->angularMomentum=addVect(o->angularMomentum,vectMult(o->moment,dt));
 	//o->angularMomentum=addVect(o->angularMomentum,vect(mulf32(o->moment.x,dt)>>TIMEPREC,mulf32(o->moment.y,dt)>>TIMEPREC,mulf32(o->moment.z,dt)>>TIMEPREC));
 	//o->angularMomentum=addVect(o->angularMomentum,vect((mulf32((o->moment.x+o->oldMoment.x)/2,dt)>>TIMEPREC),
 	//												(mulf32((o->moment.y+o->oldMoment.y)/2,dt)>>TIMEPREC),
 	//												(mulf32((o->moment.z+o->oldMoment.z)/2,dt)>>TIMEPREC)));
 	o->angularMomentum=addVect(o->angularMomentum,vect(o->moment.x*dt,o->moment.y*dt,o->moment.z*dt));
-	
+
 	fixMatrix(o->transformationMatrix);
 
     // compute auxiliary quantities
 	transposeMatrix33(o->transformationMatrix,m2);
 	multMatrix33(m2,o->invInertiaMatrix,m);
 	multMatrix33(m,o->transformationMatrix,o->invWInertiaMatrix);
-	
+
 	o->angularVelocity=evalVectMatrix33(o->invWInertiaMatrix,o->angularMomentum);
 }
 
-extern plane_struct testPlane;
-extern OBB_struct *testOBB, *testOBB2;
+//extern plane_struct testPlane;
 
 void checkOBBCollisions(OBB_struct* o, bool sleep)
 {
@@ -763,13 +765,13 @@ void wakeOBBs(void)
 void calculateOBBEnergy(OBB_struct* o)
 {
 	if(!o)return;
-	
+
 	u32 tmp=dotProduct(o->velocity,o->velocity)+dotProduct(o->angularVelocity,o->angularVelocity);
 	// o->energy=(o->energy*9+tmp)/10;
 	o->energy=tmp;
 }
 
-u8 sleeping;
+
 
 void simulate(OBB_struct* o, float dt2)
 {
@@ -778,11 +780,11 @@ void simulate(OBB_struct* o, float dt2)
 	float dt=f32tofloat(dt2);
     float currentTime=0;
     float targetTime=dt;
-	
+
 	applyOBBForce(o,o->position,vect(0,-inttof32(2),0)); //gravity
 	o->forces=addVect(o->forces,vectDivInt(o->velocity,-25));
 	o->moment=addVect(o->moment,vectDivInt(o->angularVelocity,-20));
-	
+
 	if(!o->sleep)
 	{
 		while(currentTime<dt)
@@ -797,7 +799,7 @@ void simulate(OBB_struct* o, float dt2)
 			// cpuStartTiming(0);
 			checkOBBCollisions(o, false);
 			// coll+=cpuEndTiming();
-			
+
 			// cpuStartTiming(0);
 			if(o->numContactPoints && o->maxPenetration>PENETRATIONTHRESHOLD)
 			{
@@ -873,7 +875,7 @@ void simulate(OBB_struct* o, float dt2)
 			if(!canSleep)o->sleep=false;
 		}
 	}
-		
+
 	o->forces=vect(0,0,0);
 	o->moment=vect(0,0,0);
 }
@@ -894,36 +896,36 @@ void updateOBBPortals(OBB_struct* o, u8 id, bool init)
 	int32 z;
 	o->oldPortal[id]=o->portal[id];
 	o->portal[id]=((dotProduct(vectDifference(o->position,portal[id].position),portal[id].normal)>0)&1)|(((pointInFrontOfPortal(&portal[id],o->position,&z))&1)<<1);
-	
-	switch(init)
+
+	if(init)
 	{
-		case false:
-			if(((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2)) || (o->portal[id]&2 && z<=0 && z>-16))
+		o->oldPortal[id]=o->portal[id];
+	}
+	else
+	{
+		if(((o->oldPortal[id]&1) && !(o->portal[id]&1) && (o->oldPortal[id]&2 || o->portal[id]&2)) || (o->portal[id]&2 && z<=0 && z>-16))
 			{
 				o->position=addVect(portal[id].targetPortal->position,warpVector(&portal[id],vectDifference(o->position,portal[id].position)));
 				o->velocity=warpVector(&portal[id],o->velocity);
 				o->forces=warpVector(&portal[id],o->forces);
 				o->angularVelocity=warpVector(&portal[id],o->angularVelocity);
 				o->moment=warpVector(&portal[id],o->moment);
-				
+
 				warpMatrix(&portal[id], o->transformationMatrix);
 				warpMatrix(&portal[id], o->invWInertiaMatrix);
-				
+
 				o->portaled=true;
 			}
-			break;
-		default:
-			o->oldPortal[id]=o->portal[id];
-			break;
 	}
+
 }
 
 void updateOBB(OBB_struct* o)
 {
 	if(!o)return;
-	
+
 	simulate(o,20);
-	
+
 	if(portal[0].used&&portal[1].used)
 	{
 		updateOBBPortals(o,0,false);

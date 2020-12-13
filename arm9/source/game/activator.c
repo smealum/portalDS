@@ -3,14 +3,14 @@
 void initActivator(activator_struct* a)
 {
 	if(!a)return;
-	
+
 	a->numSlots=0;
 }
 
 void useSlot(activatorSlot_struct* as)
 {
 	if(!as)return;
-	
+
 	switch(as->type)
 	{
 		case DISPENSER_TARGET:
@@ -37,13 +37,17 @@ void useSlot(activatorSlot_struct* as)
 				wd->override=true;
 			}
 			break;
+		default :
+			{
+				// do nothing
+			}
 	}
 }
 
 void unuseSlot(activatorSlot_struct* as)
 {
 	if(!as)return;
-	
+
 	switch(as->type)
 	{
 		case DISPENSER_TARGET:
@@ -70,6 +74,10 @@ void unuseSlot(activatorSlot_struct* as)
 				wd->override=false;
 			}
 			break;
+		default :
+			{
+				// do nothing
+			}
 	}
 }
 
@@ -97,12 +105,12 @@ void addActivatorTarget(activator_struct* a, void* target, activatorTarget_type 
 {
 	if(!a)return;
 	if(a->numSlots>=NUMACTIVATORSLOTS)return;
-	
+
 	activatorSlot_struct* as=&a->slot[a->numSlots];
-	
+
 	as->target=target;
 	as->type=type;
-	
+
 	a->numSlots++;
 	unuseActivator(a);
 }

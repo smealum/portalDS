@@ -12,7 +12,7 @@
 
 #define ELEVATOR_ANGLE (3084)
 
-extern platform_struct platform[NUMPLATFORMS];
+//extern platform_struct platform[NUMPLATFORMS];
 
 vect3D gravityVector=(vect3D){0,-16,0};
 vect3D normGravityVector=(vect3D){0,-4096,0};
@@ -186,12 +186,12 @@ u8 checkObjectElevatorCollision(physicsObject_struct* o, room_struct* r, elevato
 }
 
 bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
-{	
+{
 	// vect3D o1=vectDifference(o->position,convertVect(vect(r->position.x,0,r->position.y)));
 	// o1.y-=128; //make ourselves taller
-	
+
 	bool ret=false;
-	
+
 	gridCell_struct* gc=getCurrentCell(r,o->position);
 	if(!gc)return false;
 	ret=ret||checkObjectCollisionCell(gc,o,r);
@@ -211,7 +211,7 @@ bool checkObjectCollision(physicsObject_struct* o, room_struct* r)
 	u8 val=0;
 	if((entryWallDoor.used && checkObjectElevatorCollision(o,r,&entryWallDoor.elevator)) || (exitWallDoor.used && (val=checkObjectElevatorCollision(o,r,&exitWallDoor.elevator))))ret=true;
 	if(val==2)closeElevator(&exitWallDoor.elevator);
-	
+
 	//timed buttons
 	if(checkObjectTimedButtonsCollision(o,r))ret=true;
 
@@ -234,11 +234,11 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 
 	if(o->speed.y>800)o->speed.y=800;
 	else if(o->speed.y<-800)o->speed.y=-800;
-	
+
 	int32 length=magnitude(o->speed);
-	
+
 	bool ret=false;
-	
+
 	if(length<200)
 	{
 		o->position=addVect(o->position,o->speed);
@@ -246,21 +246,21 @@ void collideObjectRoom(physicsObject_struct* o, room_struct* r)
 	}else{
 		vect3D v=divideVect(o->speed,length);
 		v=vectDivInt(v,32);
-		
+
 		while(length>128)
 		{
 			o->position=addVect(o->position,v);
 			ret=ret||checkObjectCollision(o,r);
 			length-=128;
 		}
-		
+
 		v=vectMult(v,length*32);
 		o->position=addVect(o->position,v);
 		checkObjectCollision(o,r);
 	}
-	
+
 	o->contact=ret;
-	
+
 	vect3D os=o->speed;
 	o->speed=vect(o->position.x-pos.x,o->position.y-pos.y,o->position.z-pos.z);
 	o->speed=vect((os.x*o->speed.x>0)?(o->speed.x):(0),(os.y*o->speed.y>0)?(o->speed.y):(0),(os.z*o->speed.z>0)?(o->speed.z):(0));

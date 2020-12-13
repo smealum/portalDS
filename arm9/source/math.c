@@ -3,7 +3,7 @@
 #define MAX_ANGLE   512
 #define ABS(x)   ((x) < 0 ? -(x) : (x))
 
-const u32 arctan2_tab[129] =
+static const u32 arctan2_tab[129] =
 {
 	0x00000000, 0x0000000c, 0x00000019, 0x00000025, 0x00000032, 0x0000003e, 0x0000004b, 0x00000058,
 	0x00000064, 0x00000071, 0x0000007e, 0x0000008b, 0x00000097, 0x000000a4, 0x000000b1, 0x000000be,
@@ -25,7 +25,7 @@ const u32 arctan2_tab[129] =
 };
 
 
-// ArcTan, renvoie l'angle de 0 à 128 (dx et dy doivent être positifs !)
+// ArcTan, renvoie l'angle de 0 ï¿½ 128 (dx et dy doivent ï¿½tre positifs !)
 int ArcTan(int dx, int dy)
 {
     // Secure...
@@ -51,24 +51,26 @@ int ArcTan(int dx, int dy)
     return mid;
 }
 
-// Récupère l'angle de 0 à 90 et corrige pour obtenir
+// Rï¿½cupï¿½re l'angle de 0 ï¿½ 90 et corrige pour obtenir
 int ArcTan2(int dx, int dy)
 {
     int angle = ArcTan(ABS(dx), ABS(dy));
 
 	//iprintf("\nTEST2 : %d, %d, ",dx,dy);
-	
+
     if (dx < 0) angle = 256 - angle;
     if (dy < 0) angle = 512 - angle;
-	
+
 	//iprintf("%d  \n",angle);
-	
+
     return angle;
 }
 
-u64 Math_FakeDistance(s32 x1, s32 y1, s32 x2, s32 y2)
+inline u64 Math_FakeDistance(s32 x1, s32 y1, s32 x2, s32 y2)
 {
-	return (x2-x1)*(x2-x1)+(y2-y1)*(y2-y1);
+   s64 h = x1 - x2;
+   s64 v = y1 - y2;
+   return(h*h + v*v);
 }
 
 u16 Math_AdjustAngle(u16 angle, s16 anglerot, s32 startx, s32 starty, s32 targetx, s32 targety) {
@@ -90,14 +92,14 @@ u64 distances[3];
       tempangle += anglerot;
 	  tempangle &= 511;
       distances[2] = Math_FakeDistance(startx + Math_Cos(tempangle), starty - Math_Sin(tempangle), targetx, targety);
-                                 
-                                 
+
+
 
       // On regarde si l'angle est optimal. Si ce n'est pas le cas,
       // on fait tourner toujours dans le meme sens...
       if (distances[0] < distances[1])  angle -= anglerot;
       else if (distances[2] < distances[1])  angle += anglerot;
-           
-      return (angle&511);    
+
+      return (angle&511);
 }
 

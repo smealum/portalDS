@@ -29,8 +29,8 @@
 
 #include "game/game_main.h"
 
-int fileptr, filesize;
-
+static int fileptr, filesize;
+/*
 static void
 ReadPCX1bit (FILE *fp, const struct pcx_header_t *hdr, struct gl_texture_t *texinfo)
 {
@@ -43,9 +43,9 @@ ReadPCX1bit (FILE *fp, const struct pcx_header_t *hdr, struct gl_texture_t *texi
 	{
 		ptr = &texinfo->texels[(texinfo->height - (y + 1)) * texinfo->width * 3];
 		bytes = hdr->bytesPerScanLine;
-
+*/
 /* Decode line number y */
-		while (bytes--)
+/*		while (bytes--)
 		{
 			if (rle_count == 0)
 			{
@@ -72,7 +72,7 @@ ReadPCX1bit (FILE *fp, const struct pcx_header_t *hdr, struct gl_texture_t *texi
 			}
 		}
 	}
-}
+}*/
 
 static void
 ReadPCX4bits (u8 *buffer, const struct pcx_header_t *hdr, struct gl_texture_t *texinfo)
@@ -290,10 +290,11 @@ void convertPCX16Bit(struct gl_texture_t* pcx)
 
 	free(pcx->texels);
 	free(pcx->palette);
-	pcx->texels=pcx->palette=NULL;
+	pcx->texels = NULL;
+	pcx->palette = NULL;
 }
 
-extern int lastSize;
+//extern int lastSize;
 
 struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 {
@@ -311,9 +312,9 @@ struct gl_texture_t * ReadPCXFile (const char *filename, char* directory)
 	fileptr=0;
 	if (!buffer)
 	{
-		char path[255];
-		getcwd(path, 255);
-		NOGBA("error: couldn't open \"%s\"! (%s)\n", filename, path);
+		//char path[255];
+		//getcwd(path, 255);
+		//NOGBA("error: couldn't open \"%s\"! (%s)\n", filename, path);
 		return NULL;
 	}
 
@@ -388,6 +389,8 @@ void freePCX(struct gl_texture_t * pcx)
 	if(pcx->texels)free(pcx->texels);
 	if(pcx->texels16)free(pcx->texels16);
 	if(pcx->palette)free(pcx->palette);
-	pcx->texels=pcx->texels16=pcx->palette=NULL;
+	pcx->texels=NULL;
+	pcx->texels16=NULL;
+	pcx->palette=NULL;
 	free(pcx);
 }

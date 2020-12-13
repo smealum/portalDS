@@ -71,4 +71,6 @@ void unloadLightMap(room_struct* r);
 void unloadAllLightMaps(room_struct* r);
 void unloadLightMaps(room_struct* r, room_struct* r2);
 
+void transferRectangles(room_struct* r);
+void popRectangle(rectangleList_struct* p);
 #endif
